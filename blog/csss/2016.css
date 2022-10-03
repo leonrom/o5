@@ -1,0 +1,13 @@
+
+div.publish-info,
+a.ribbon.date {
+  display:none;
+}
+
+.smile{
+    background: lightyellow;
+    padding: 3px 2px 2px 2px;
+    font-size: 19px;
+    border: 1px solid gold;
+    border-radius: 12px;
+}

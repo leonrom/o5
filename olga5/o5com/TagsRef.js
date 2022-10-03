@@ -1,0 +1,232 @@
+/* global document, window, console, Map*/
+/* exported olga5_menuPopDn_Click*/
+/*jshint asi:true  */
+/*jshint esversion: 6*/
+/**
+ *  исправление 'src', 'data-src' и 'href' в тегах html-заголовка
+ **/
+//
+(function () {              // ---------------------------------------------- o5com/TagRefs ---
+	'use strict'
+	const olga5_modul = 'o5com',
+		modulname = 'TagsRef'
+	if (!window.olga5) window.olga5 = []
+	if (!window.olga5.C) window.olga5.C = {}
+	if (!window.olga5[olga5_modul]) window.olga5[olga5_modul] = {}
+	let trn = 0
+	const wshp = window.olga5[olga5_modul],
+		C = window.olga5.C,
+		// regExp = /[^\/\s+]+$/
+		// olga5_script = document.currentScript,
+		ReplaceTag = (tagName, change, adrName, url, errs) => {
+			const addnew = document.createElement(tagName),
+				regExp = new RegExp(/[\\+<>'"`=#\\/\\\\]/)
+			let err = false
+			for (const attr of change.attributes) {
+				if (attr.name.match(regExp)) {
+					errs.push({ tag: tagName, ref: attr.name, txt: `cодержит кавычки или '+><=#/'` })
+					err = true
+				}
+				else
+					try {
+						addnew.setAttribute(attr.name, attr.value) // здесь копирую "как есть" 
+					} catch (err) {
+						errs.push({ tag: tagName, ref: url, txt: (attr.name + '=' + attr.value) })
+					}
+			}
+			addnew.setAttribute(adrName, url)
+			// change.dataset.o5_old = 1 // это нужно, если не удалять оригинал
+			if (err || C.consts.o5debug > 1)
+				console.log(`добавляю тег <${tagName}> с атрибутом ${adrName}=${url} ${err ? ' с ошибками' : ''}`)
+
+			// if (trn>=7)
+			// 	console.log()
+			// if (addnew.tagName== "SCRIPT")	
+			// console.log(trn++, addnew.src, change.src)
+			// if (addnew.tagName== "LINK")	
+			// console.log(trn++, addnew.href, change.href)
+			change.parentNode.insertBefore(addnew, change)
+			change.parentNode.removeChild(change) //  ??  а вот удалять  -м.б. и не надо: для контроля
+
+			return addnew
+		},
+		ConvertScripts = () => {
+			const errs = [],
+				scrs = [],
+				preloads = [],
+				load_snm = {},
+				Orig = (obj) => {
+					const origs = obj.outerHTML.match(/\s(data-)?src\s*=\s*["*'][^"']*["*']/g)
+					if (origs && origs.length > 0) {
+						origs.forEach((orig) => {
+							orig = orig.replaceAll(/["'s*]/g, '')
+						})
+						return origs.join(', ')
+					} else
+						return '-нету-'
+				}
+
+			for (const w of window.olga5)
+				preloads.push({ w: w, orig: Orig(C.o5script), script: C.o5script, isset: false, })
+
+			/*				сначала из тегов <script>, пропуская те, которые в скомпилированном			*/
+
+			const s = C.consts.o5incls.trim(),
+				incls = s ? s.split(/\s*[,;]\s*/) : [],
+				match_o5 = /\bo5\w+/,  // начинаются с o5
+				igns = [],
+				needs = {}
+
+			incls.forEach(incl => needs[incl] = 1)
+			for (const script of document.scripts) {
+				// if (C.consts.o5debug > 1) console.log(`тег <script>: id= '${script.id}', src= "${script.src}"`)
+
+				if (script === C.o5script) // это ядро, т.е. конец скриптов (не зависимо от наличия 'o5_scripts')
+					break
+
+				if (script.dataset.o5add) continue 		// это добавленный мною скрипт		
+				if (script.innerText.trim()) continue	// это встроенный скрипт
+
+				const td = C.TagDes(script, 'src', errs)
+
+				if (!td || !(td.modul.match(match_o5) || (td.trans && !C.consts.o5only)))
+					continue
+
+				if (incls.length > 0)
+					if (needs[td.modul]) needs[td.modul] = 0
+					else {
+						igns.push(td.modul)
+						continue
+					}
+
+				// if (needs[td.modul])needs[td.modul]=0
+				// else (if )
+				// if (Igns(td.modul)) {
+				// 	if (C.consts.is_debug > 1) console.log(`   -"-    игнорируется: orig=${td.orig}`)
+				// 	continue
+				// }
+
+				if (load_snm[td.modul])
+					errs.push({ tag: td.modul, ref: td.orig, txt: 'повторная загрузка модуля' })
+				load_snm[td.modul] = td.orig // перезаписываю!
+
+				const w = window.olga5.find(w => w.modul == td.modul),
+					scrpt = { modul: td.modul, orig: td.orig, act: { W: w }, script: script, }
+				let dochg = ''
+				if (!w || td.code == '_' || (td.trans && td.code != 'data-')) {
+					dochg = !w ? 'новый  ' : 'замена '
+					if (C.consts.o5debug > 1) console.log(`тег <script>: id= '${script.id}' -> в обработку (${dochg}): orig=${td.orig}`)
+
+					scrpt.act.W = null
+					let url = td.orig
+					if (td.trans) {
+						const wref = C.DeCodeUrl(C.urlrfs, td.orig)
+						if (wref.err)
+							errs.push({ tag: td.modul, ref: td.from, txt: wref.err })
+						url = wref.url
+						// scrpt.script = ReplaceTag('script', script, 'src', wref.url, errs)
+					}
+					scrpt.script = ReplaceTag('script', script, 'src', url, errs)
+				}
+
+				C.scrpts.push(scrpt)	//	{ modul: td.modul, orig: td.orig, act: { W: null }, script: replace, })
+				scrs.push({
+					modul: scrpt.modul,
+					orig: scrpt.orig,
+					src: scrpt.script.src,
+					txt: dochg + td.from
+				})
+			}
+			/*				дописываю те, которые в скомпилированном и отсутствуют в SCRIPT's			*/
+			for (const w of window.olga5) {
+				const modul = w.modul
+				if (!C.scrpts.find(scrpt => scrpt.modul == modul))
+					// if (!igns(modul)) {
+					if (!igns.includes(modul)) {
+						C.scrpts.push({ modul: modul, orig: '', act: { W: w }, script: C.o5script })
+						scrs.push({ modul: modul, orig: '', src: C.o5script.src, txt: `из скомпилированного` })
+					}
+			}
+
+			const errneeds = []
+			for (const need in needs) {
+				if (needs[need]) errneeds.push(need)
+			}
+			if (errneeds.length > 0)
+				C.ConsoleError(`Из заданных в 'o5incls' отсутствуют модули:`, errneeds.join(', '))
+			// сюда проверь!?
+			if (C.consts.o5debug > 0) {
+				if (scrs.length > 0) C.ConsoleInfo("Найденные olga5 SCRIPT'ы : ", scrs.length, scrs)
+				else C.ConsoleInfo("Не найдены olga5 SCRIPT'ы ?")
+
+				if (igns.length > 0)
+					C.ConsoleInfo(`Проигнорированы скрипты, отсутствующие в 'o5incls': `, igns.join(', '))
+
+				if (C.consts.o5debug > 1) { // тестирование атрибутов
+					const errs = []
+					for (const scrpt of C.scrpts)
+						for (const attr of scrpt.script.attributes)
+							if (!attr.name || attr.name.match(/['"`\+\.,;]/))
+								errs.push({ 'атрибут': attr.name, 'скрипт': scrpt.script.src, })
+					if (errs.length > 0)
+						C.ConsoleError(`${errs.length} странных атрибутов (м.б. перепутаны кавычки?) у скрипта`, scrpt.modul + '.js', errs)
+				}
+			}
+			if (errs.length > 0)
+				C.ConsoleError(`Ошибки в преобразовании SCRIPT `, errs.length, errs)
+
+			for (const scrpt of C.scrpts) {
+				Object.assign(scrpt.act, { done: 0, strt: 0, timeout: 0 })
+				Object.freeze(scrpt)
+			}
+			Object.freeze(C.scrpts)
+
+			scrs.splice(0, scrs.length)
+			errs.splice(0, errs.length)
+		},
+		ConvertLinks = () => {
+			const links = [],
+				errs = []
+			for (const child of document.head.children)
+				if (child.tagName.toLowerCase() == 'link') {
+					const td = C.TagDes(child, 'href', errs)
+					if (!td.orig) {
+						C.ConsoleError(`обнаружен <link> без 'href', '_href' или 'data-href': `, child.outerHTML, null)
+						continue
+					}
+					if (td.trans) { 									// для link'ов не надо проверять 'o5'
+						const wref = C.DeCodeUrl(C.urlrfs, td.orig)
+						if (wref.err)
+							errs.push({ tag: td.modul, ref: td.from, txt: wref.err })
+
+						ReplaceTag('link', child, 'href', wref.url, errs)
+						links.push({ orig: td.orig, src: wref.url, txt: td.from })
+					}
+
+					wshp.o5iniready ||= child.href.match(/\/o5ini\.css$/)
+				}
+
+			if (C.consts.o5debug > 0)
+				if (links.length > 0) C.ConsoleInfo("Скорректированные LINK'и : ", links.length, links)
+				else C.ConsoleInfo("Скорректированных LINK'ов нет ")
+
+			if (errs.length > 0)
+				C.ConsoleError(`Ошибки в преобразовании LINK `, errs.length, errs)
+
+			links.splice(0, links.length)
+			errs.splice(0, errs.length)
+
+		}
+
+	wshp[modulname] = () => {
+		// тут еще не определен 'C.consts'                if (C.consts.o5debug > 0) 
+		// console.log(`}===  инициализация ${olga5_modul}/${modulname}.js`)
+
+		ConvertScripts()
+		ConvertLinks()
+
+	}
+
+	if (window.location.search.match(/(\&|\?|\s)is(-|_)debug\s*(\s|$|\?|#|&|=\s*\d*)/))
+		console.log(`}---> подключен ${olga5_modul}/${modulname}.js`)
+})();

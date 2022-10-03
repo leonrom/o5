@@ -1,0 +1,56 @@
+<html>
+
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<title>b</title>
+	<link rel="shortcut icon" href="./blog/favicon.svg" type="image/x-icon">
+	<base href='http://localhost/o5/' />
+
+	<link href='./tests/bases/b.css' media='screen' rel='stylesheet' />
+
+	<!-- <script src='./tests/bases/basef.js'></script> -->
+	<!-- <script src='./tests/bases/basei.js'></script> -->
+	<script src='./tests/bases/imgs.js'></script>
+	<script src='./tests/bases/b.js'></script>
+</head>
+
+<body>
+
+	Просто два примера
+	<div class='example'>
+		<p>1 <img id="1" img_play='./blog/media/image/play.png'
+				src='./blog/media/image/solfedjio.png'  />
+			задано 'src'
+		</p>
+		<p>2 <img id="2" img_play='https://rombase.neocities.org/o5/blog/media/image/play.png'
+				src='https://rombase.neocities.org/o5/blog/media/image/solfedjio.png'  />
+			задано 'src'
+		</p>
+		<p>3 <img id="3" _src='./blog/media/image/ext2.2.png' 
+				img_play='./blog/media/image/logscreen.png'
+				/>
+			задано '_src'
+		</p>
+		<p>4 <img id="4" _src='https://rombase.neocities.org/o5/blog/media/image/solfedjio.png'
+				img_play='https://rombase.neocities.org/o5/blog/media/image/play.png' />
+			задано '_src'
+		</p>
+		<p>5 <img id="5" _src='https://rombase.neocities.org/o5/blog/media/image/ext2.2.png' 
+				img_play='https://rombase.neocities.org/o5/blog/media/image/logscreen.png'
+			/>
+		задано '_src'
+		</p>
+		<p>6 <img id="6" data-src='./blog/media/image/solfedjio.png' 
+				img_play='./blog/media/image/play.png'
+				src='https://rombase.neocities.org/o5/blog/media/image/play.png' />
+			задано 'data-src'
+		</p>
+	</div>
+	<script>
+		document.addEventListener("DOMContentLoaded", function (event) {
+			DoStart()
+		});
+	</script>
+</body>
+
+</html>

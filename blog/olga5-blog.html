@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<title>olga5-blog</title>
+	<link rel="shortcut icon" href="+../blog/favicon.svg" type="image/x-icon">
+
+	<link data-href='+o5ini.css' media='screen' rel='stylesheet' />
+	<script data-src='+o5mnu.js' scrollY='-32'></script>
+	<script data-src='+add/o5blog.js'></script>
+	<script data-src='+o5shp.js'></script>
+	<script data-src='+o5pop.js'></script>
+	<script data-src='+o5ref.js' o5tag_attrs="
+					img=image_play;
+					a,img,audio=href,data-href,src,_src,data-src,data_src;
+				" o5urlrfs="  
+					images=_url_root + /o5/blog/media/image;
+					sounds=https://archive.org/download/clouds_20200310;
+
+					iTunes-icon='images + /myMusikIT.png' # --- только для o5snd ---;
+					Ceza1-25=sounds+/Ceza1-25.mp3;
+
+					мой-блог=https://ariturlearn.blogspot.com/2017/02; # --- только для o5shp ---;
+					_блог_Olga=https://turkish4dummies.blogspot.com;
+				"></script>
+	<script data-src='+o5snd.js' btn_play='images + /play.png' btn_stop='images + /play_Freepik.png'></script>
+	<script data-src='+add/pusto.js' moe-attr='мой атрибут'></script>
+
+	<link data-href='+../blog/csss/olga5.tableCode.css' media='screen' rel='stylesheet' />
+	<link data-href='+../blog/csss/olga5.textNshow.css' media='screen' rel='stylesheet' />
+	<link data-href='+../blog/csss/olga5.addStyles.css' media='screen' rel='stylesheet' />
+	<link data-href='+../blog/csss/olga5.tableKuplet.css' media='screen' rel='stylesheet' />
+	<link data-href='+../blog/csss/tests.css' media='screen' rel='stylesheet' />
+
+	<!-- <script o5debug='2' _src='https://rombase.neocities.org/olga5/o5common.js' -->
+	<script src='../olga5/o5com.js' src='https://rombase.h1n.ru/o5/olga5/o5common.js'
+		_блог_o5='https://olga-5.blogspot.com/2020/02' _тесты='_url_olga5 + ../olga5-tests'
+		_url_html='# адрес текущей страницы (этот и 2 следующих - закомментированы)'
+		_url_root='# адрес сайта (с текущей страницей)' _url_olga5='# адрес загрузки файла o5common.js'></script>
+
+<body>
+	<div class="olga5_Start" dir="ltr" trbidi="on">
+		<!-- <div class="olga5_diagonal"> статья &nbsp; ещё&nbsp; редактируется</div> -->
+		<p class="olga5_page_header">
+			Особенности подключения <i>библиотеки</i>
+			&nbsp;<a id="a_1" href="_блог_o5 + /olga5-all.html" target="olga5_add"><code>Olga5</code></a>&nbsp;
+			к Blogger'у
+		</p>
+
+		<h4>Подключение модулей</h4>
+		<p style="line-height: 1.3; margin-bottom: 0cm;">
+			Подключение модулей <i>библиотеки</i> к блогу выполняется аналогично как и для обычных веб-страниц:
+			вставкой необходимых тегов &lt;<b>script</b>&gt; и &lt;<b>link</b>&gt;
+			в его &lt;<b>html</b>&gt; заголовок.
+		</p>
+		<p><code class="olga5_popup" onmouseup="window.olga5.PopShow('', 555, 555, '+/add/blogger.html')">Здесь</code>
+			можно посмотреть (полный) набор тегов подключения <i>библиотеки</i> к <u>данному</u> блогу.
+			Для их вставки в <i><b>Blogger</b></i> следует открыть закладку "Тема" (иначе 'Template') и
+			в открывшемся окне выбрать кнопку "Настроить":
+		</p>
+		<style>
+			img {
+				/* max-width: 333px;
+				max-height: 333px; */
+				display: flex;
+				padding: 0;
+				text-align: left;
+				height: 222px;
+			}
+			img:hover {
+				height: fit-contentx;
+			}
+		</style>
+		<!-- <img
+			src="https://1.bp.blogspot.com/-lsAxN0jO9bI/YE-gYHFY27I/AAAAAAAAESE/3awWY0iyHG0B2yoxM7PqjojogluihpK3gCLcBGAsYHQ/s783/toblog1.png" /> -->
+
+		<a target="olga5_add" class="moediv" title="кликните рисунок для открытия в новой закладке"
+			style="max-width: 333px; max-height: 333px; display: flex; padding: 0; text-align:  left;height: 222px; "
+			href="https://1.bp.blogspot.com/-lsAxN0jO9bI/YE-gYHFY27I/AAAAAAAAESE/3awWY0iyHG0B2yoxM7PqjojogluihpK3gCLcBGAsYHQ/s783/toblog1.png">
+			<img
+				src="https://1.bp.blogspot.com/-lsAxN0jO9bI/YE-gYHFY27I/AAAAAAAAESE/3awWY0iyHG0B2yoxM7PqjojogluihpK3gCLcBGAsYHQ/s783/toblog1.png" />
+		</a>
+
+		<p>
+			После клика по кнопке "Настроить" в выпавшем меню - выбрать "Изменить HTML":
+		</p>
+
+		<a target="olga5_add" class="moediv" title="кликните рисунок для открытия в новой закладке"
+			style="max-width: 333px; max-height: 199px; display: flex; padding: 0; text-align:  left; "
+			href="https://1.bp.blogspot.com/-Q1EiTh423qE/YE-hrNQKN2I/AAAAAAAAESM/w4jLKpMYlygqVyTJWW8aTDEeTd8o_QiAQCLcBGAsYHQ/s783/toblog2.png">
+			<img
+				src="https://1.bp.blogspot.com/-Q1EiTh423qE/YE-hrNQKN2I/AAAAAAAAESM/w4jLKpMYlygqVyTJWW8aTDEeTd8o_QiAQCLcBGAsYHQ/s783/toblog2.png" />
+		</a>
+		<p>
+			после чего вставить (желательно: подготовленные в отдельном файле) теги подключения <i>библиотеки</i>,
+			обведенные контуром на рисунке:
+		</p>
+		<a target="olga5_add" class="moediv"
+			style="max-width: 666px; max-height: 333px; display: flex; padding: 0; text-align:  left; "
+			href="https://1.bp.blogspot.com/-udswHv-Rlbk/YE-lFb9UFNI/AAAAAAAAESc/FBv_oFX683wdguMc208yAn7s_aEyGF-5wCLcBGAsYHQ/s1366/toblog3.png">
+			<img
+				src="https://1.bp.blogspot.com/-udswHv-Rlbk/YE-lFb9UFNI/AAAAAAAAESc/FBv_oFX683wdguMc208yAn7s_aEyGF-5wCLcBGAsYHQ/s1366/toblog3.png" />
+		</a>
+		<p>
+			Вставку можно делать как после тега &lt;<b>title</b>&gt;,
+			так и перед закрывающим тегом &lt;<b>/html</b>&gt;, памятуя об очередности обработки вставляемых тегов.
+			Следует быть готовым <u>повторять</u> вставку, так как при смене темы оформления блога <b>Blogger</b>
+			полностью изменяет <b>html</b>-файл.
+		</p>
+		<!-- <p>
+			Из-за того, что <b>Blogger</b> переформатирует HTML-текст блога при его сохранении,
+			при вставке в него скриптов действуют дополнительные (к описанным в соответствующих инструкциях
+			<span o5popup='+ ./help/o5help.html; width: 430, height: 390'> библиотеки</span>&nbsp;)
+			ограничения на задание их атрибутов:
+		</p>
+		<ul>
+			<li>в значениях атребутов, для адресных строк, можно использовать лишь двойные кавычки (а можно и без
+				кавычек),-
+				т.к. <b>Blogger</b> заменяет одиночные кавычки строками '&apos;';</li>
+			<li>строки необходимо оканчивать символом '<b>;</b>',-ё
+				т.к. <b>Blogger</b> объединяет строки и символ конца строки им игнорируется.</li>
+		</ul> -->
+		<p>
+			Возможны проблемы с работой плагинов, подключенных к браузеру.
+			Например: из-за ошибки "net::ERR_BLOCKED_BY_CLIENT",
+			вызванной работой плагина <i>AdBlock</i>, пришлось заменить фирменное название иконки "iTunes-icon" на
+			нейтральное "myMusikIT".
+		</p>
+		Также при вставке скриптов в <b>html</b>-заголовок блога рекомендуется:
+		<ul>
+			<li>задавать конкретное значение для
+				<span o5popup='+ ../blog/olga5-shp.html?o5nomnu#head_42; width: 430, height: 390'>olga5_owners</span>,
+				например <b>olga5_owners</b>="n";
+			</li>
+			<li>все вставляемые теги должны быть аккуратно закрыты;</li>
+			<li>числовые значения атрибутов должны указываться литералами (заключаться в кавычки);</li>
+			<li>для оформления блога аналогично данному - подключить скрипт <code>o5blog.js</code>,
+				который (для генерации псевдоблоговского меню) должен находиться после <code>mnus.js</code>.</li>
+		</ul>
+
+		<p>
+			После клика иконки записи (<i>дискетка</i> в правом верхнем углу рисунка) <i>библиотека</i> будет подключена
+			к блогу.
+		</p>
+
+		<h4>Подключение ссылок</h4>
+		<p>
+			Подключение ссылок в тексты страниц блога выполняется редактированием HTML-кодов страниц сообщений,
+			как выделено цветом на рисунке:
+		</p>
+		<a target="olga5_add" class="moediv"
+			style="max-width: 666px; max-height: 444px; display: flex; padding: 0; text-align:  left; "
+			href="https://1.bp.blogspot.com/-QWdPLij20rY/YFIQzegFbqI/AAAAAAAAETI/ZGPo14oRgwsoN6Log9POQYDTzzBPp2i0gCLcBGAsYHQ/s1364/toblog4.png">
+			<img
+				src="https://1.bp.blogspot.com/-QWdPLij20rY/YFIQzegFbqI/AAAAAAAAETI/ZGPo14oRgwsoN6Log9POQYDTzzBPp2i0gCLcBGAsYHQ/s1364/toblog4.png" />
+		</a>
+		<p>
+			Для обработки ссылок следует включить режим редактирования HTML-кода (вместо "Режим верстки")
+			кликом по показанной на рисунке (крайней слева) кнопкой.
+		</p>
+
+		<h4 id='o5init_events'>Инициализация страниц блога</h4>
+		<p>
+			Поскольку показ страниц в <b>Blogger</b>'е' выполняется по алгоритму, определяемому блоговским шаблоном,
+			то 'стандартное' т.с. событие <b>DOMContentLoaded</b> не обязательно свидетельствует об отображении
+			страницы на экране и, следовательно, не даёт оснований для запуска скриптов <i>библиотеки</i>.
+			Например, в блоговском шаблоне <b>DynamicView</b>
+			после события '<i>DOMContentLoaded</i>' страница всё еще не доступна для обработки и нужно ожидать
+			наступления какого-то из '<i>message</i>'
+		</p>
+		<p>
+			При наступлении любого из <i>событий</i>
+			определяется <i>адрес</i> загружаемой страницы и, если:
+		</p>
+		<ul>
+			<li><i>адрес</i> отличается от раннее сохранённого адреса страницы;</li>
+			<li>и страница содержит хотя бы один тег с классом, начинающимся '<b>olga5_</b>'</li>
+		</ul>
+		то <i>адрес</i> сохраняется и
+		выполняется <span title="обработка скриптами библиотеки">инициализация</span> страницы
+		а остальные события для этой страницы игнорируются.
+
+		<p>
+			Поэтому в атрибуте <b>o5init_events</b> (скрипта <code>o5common.js</code>) следует указывать
+			конкретное событие, инициализирующее страницы блога.
+		</p>
+		<p>
+			Если для выбранного шаблона инициализация не происходит, это значит,
+			что либо такое событие не наступало, ли наступило тогда, когда страница еще не ыла отображена.
+			В этом случае следует выбрать другое событие. 
+		</p>	<p>
+			Если атрибут <b>o5init_events</b> не задаётся, то (скрипта <code>o5common.js</code>) следует указывать
+			конкретное событие, инициализирующее страницы блога.
+		</p>
+
+		<h4>Скрипт <code>o5blog.js</code> </h4>
+		<p>
+			При подключении <i>библиотеки</i> к блогу рекомендуется включать дополнительный скрипт <code>o5blog.js</code>, 
+			выполняющий обработку следующих необязательных скриптовых атрибутов:
+		</p>
+		<ul>
+			<li><b>o5blog&nbsp;</b> &mdash; </li>
+			<li><b>o5bmnu&nbsp;</b> &mdash; </li>
+			<li><b>o5noact&nbsp;</b> &mdash; не исполнять 
+				<span title=" в тело документа,- т.е. в  теге 'body'">встроенные</span> скрипты;</li>
+			<li><b>o5nocss&nbsp;</b> &mdash; не подключать <b>CSS</b>'ы встроенные в скрипт.</li>
+		</ul>
+		<p>
+			Использование скрипта позволяет легко адаптировать <b>html</b>-документ как к автономному использованию, так 
+			и ко встраиванию в виде страницы или сообщения в <b>Blogger</b>.
+		</p>
+
+		<h5>Исполнение встроенных скриптов</h5>
+	<p>
+		Хотя <b>Blogger</b> имеет механизм  подключения <b>js</b>-скриптов к публикуемым документам, но 
+		представляется удобным (например для отладки на автономном сервере) встраивать скрипты прямо в текст документа.
+	</p>
+	<p>
+		Ненулевое значение атрибута <b>o5acts</b> задает однократное исполнение всех встроенных тегов 
+		&lt;<b>script</b>&gt; при каждой перерисовке документа.
+	</p>
+
+		<br />
+	</div>
+	<div class='blog-pager'>&nbsp;&nbsp;&nbsp;&nbsp;------</div>
+</body>
+
+</html>

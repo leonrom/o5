@@ -1,0 +1,105 @@
+/* global document, window, console, Map*/
+/*jshint asi:true  */
+/*jshint esversion: 6*/
+(function () {              // ---------------------------------------------- o5com/params
+	'use strict'
+	const olga5_modul = 'o5com',
+		modulname = 'CInclude'
+	if (!window.olga5) window.olga5 = []
+	if (!window.olga5.C) window.olga5.C = {}
+	if (!window.olga5[olga5_modul]) window.olga5[olga5_modul] = {}
+
+	const wshp = window.olga5[olga5_modul],
+		C = window.olga5.C,
+		o5include = 'o5include',
+		dests = {},
+		act = {
+			div: null,
+			cnt: 0,
+			Deccnt: function () {
+				if (--this.cnt <= 0)
+					console.log(`Всё обработано`)
+			}
+		},
+		SelInclDests = () => {
+			const incls = document.querySelectorAll("div[o5include]")
+			for (const incl of incls) { // группировка по url'ам, чтобы не грузить лишнее
+				const ref = incl.getAttribute(o5include),
+					ss = ref.split('?'),
+					url = ss[0].trim()
+				if (!dests[url]) dests[url] = []
+				dests[url].push({ incl: incl, id: (ss[1] ? ss[1] : '') })
+				// incl.attributes.removeNamedItem(o5include)// 'это на потом: чтобы могло искать и обрабатывать вложенные
+			}
+			return dests
+		},
+		OnLoad = function () {
+			const xhr = this
+			if (xhr.status == 200) {
+				const dest = xhr.aO5.dest,
+					s = xhr.responseText,
+					m1 = s.match(/<body\.*>/),
+					i1 = (m1 && m1.length>0)?(m1.index + m1[0].length):0,
+					i2 = i1 > 0 ? s.lastIndexOf('</body') : s.length,
+					res = (i1 > 0 ? s.substring(i1, i2) : s).trim()
+if (i1>0)
+console.log()
+					for (const d of dest) {
+						if (d.id){
+							if (!act.div) { // первый и единственный раз
+								act.div = document.createElement('div')
+								// Object.assign(act.div.style, { visible: false, height: 0, width: 0 })
+								// document.body.appendChild(act.div)
+							}
+							act.div.innerHTML = res
+
+							const tag = act.div.querySelector(d.id)
+							if (tag) d.incl.innerHTML = tag.innerHTML
+							else
+								console.error(`не найден селектор '${d.id}'`)
+						}else
+						d.incl.innerHTML = res
+					}
+				act.Deccnt()
+				console.log(res)
+			}
+			else {
+				act.Deccnt()
+				console.error('ошибка OnLoad ' + xhr.status + ': ' + xhr.statusText)
+			}
+		},
+		OnError = function () {
+			const xhr = this,
+				incl = xhr.o5include
+			console.error('ошибка OnError ' + xhr.responseText)
+			act.Deccnt()
+		},
+		Includes = () => {
+			SelInclDests()
+			for (const url in dests) {
+				const xhr = new XMLHttpRequest()
+				Object.assign(xhr, {
+					aO5: { dest: dests[url] },
+					onload: OnLoad,
+					onerror: OnError,
+					timeout: 10000,
+					responseType: 'text',
+					withCredentials: true,
+				})
+
+				act.cnt++
+				xhr.open("get", url, true)
+				xhr.send()
+			}
+		}
+
+	wshp[modulname] = () => {
+		// if (C.params.o5_debug > 0) console.log(`}===  инициализация ${olga5_modul}/${modulname}.js`)
+		Object.assign(C, {
+			Includes: Includes,
+		})
+		return true
+	}
+
+	console.log(`}---> подключен ${olga5_modul}/${modulname}.js`)
+})();

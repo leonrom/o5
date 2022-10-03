@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<title>ref1-иконки</title>
+
+	<script defer src='../olga5/o5ref.js'
+	  check_url = '7'
+	  tag_attrs="
+	  		a,img, audio=href,data-href,src;
+	  		img, xxx, b=img_on-play,audio_for-play
+	  "
+	  o5urlrfs="
+	  		Олин-блог=https://turkish4dummies.blogspot.com;
+  			мой-блог=https://rombase.h1n.ru/o5/blog;
+
+			url_ma='мой-блог + /media'
+			url_tt='url_ma + /tt'
+
+			images=_url_olga5 + ../blog/media/image;
+			audios = 'мой-блог + /media/audio'
+			iTunes-icon='images + /iTunes-icon.png'
+	  		no_llorare='audios + /no_llorare.oga'
+	  ">
+  	</script>
+
+	<script async src='../olga5/o5snd.js'
+		btn_play='_url_olga5 + ../blog/media/image/play.png'
+		btn_stop='мой-блог + /media/image/play_Freepik.png'
+	></script>
+
+
+	<link href='../csss/olga5.menuPopDn.css' media='screen' rel='stylesheet' />
+	<link href='../csss/olga5.tableCode.css' media='screen' rel='stylesheet' />
+	<link href='../csss/olga5.textNshow.css' media='screen' rel='stylesheet' />
+	<link href='../csss/olga5.addStyles.css' media='screen' rel='stylesheet' />
+
+		<script async src=' ../olga5/o5common.js' o5debug=2 ></script>
+</head>
+
+<body>
+	<div style="text-align: left;line-height: 1.3; margin-bottom: 0cm;">
+		<p>
+			Описание скрипта <code>o5snd</code> <i>библиотеки</i>
+			<a href="мой-блог + /olga5-all.html" target="olga5_add"><code>olga5</code></a>,
+			расширяющего возможности использования стандартного аудиоплейера.
+		</p>
+		<h3 id='snd_1'>1. Общие сведения</h3>
+
+		<div style="background-color: lightblue; border: solid 1px red; display: block; padding: 4px;overflow: auto;">
+			<table class="tableIllu" cellspacing="0" cellpadding="0" border="1">
+				<caption>Иллюстрация работы скрипта.</caption>
+				<tbody>
+					<tr>
+						<td>1</td>
+						<td>
+							<img class="olga5_snd" title="img01" id="01" audio_for-play="+no_llorare" src="+iTunes-icon" img_on-play=src />
+						</td>
+						<td>&lt;<b>img</b> class="olga5_snd" <b>audio_for-play</b>= "+no_llorare" <b>src</b>= "+iTunes-icon" <b>img_on-play</b>= src/&gt;
+							<br />&nbsp;&nbsp;&nbsp;
+							простейший пример со всеми атрибутами
+						</td>
+					</tr>
+					<tr>
+						<td>2</td>
+						<td>
+							<img class="olga5_snd:live" title="img02" id='02' audio_for-play="+no_llorare" />
+						</td>
+						<td>&lt;<b>img</b> class="olga5_snd:live" <b>audio_for-play</b>= "+no_llorare"/&gt;
+							<br />&nbsp;&nbsp;&nbsp;
+							звучание не прерывается при уходе; <b>img_on-play</b> и <b>src</b> - не указаны
+						</td>
+					</tr>
+					<tr>
+						<td>3</td>
+						<td><img class="olga5_snd:loop:live" title="img03" id='03' audio_for-play="+url_tt + /gitme.mp3" src="+iTunes-icon"
+							img_on-play="https://icons.iconarchive.com/icons/froyoshark/enkel/48/Spotify-icon.png" />
+						</td>
+						<td>&lt;<b>img</b> class="olga5_snd:loop:live" <b>audio_for-play</b>= "url_tt+gitme.mp3"
+							<b>src</b>= "+iTunes-icon" <b>img_on-play</b>="https://icons.../Spotify-icon.png"/&gt;
+							<br />&nbsp;&nbsp;&nbsp;
+							зацикленное звучание до следующего клика
+						</td>
+					</tr>
+					<tr>
+						<td>4</td>
+						<td><img class="olga5_snd:over" title="img04" id='04' audio_for-play="+url_tt + /yapma.mp3" src="url_ma + /image/solfedjio.png" img_on-play="src" />
+						</td>
+						<td>&lt;<b>img</b> class="olga5_snd:over" <b>audio_for-play</b>="+url_tt + /yapma.mp3"
+							<b>src</b>="url_ma+/image/solfedjio.png" <b>img_on-play</b>= "src"/&gt;
+							<br />&nbsp;&nbsp;&nbsp;
+							однократное звучание по наведению курсора
+						</td>
+					</tr>
+					<tr>
+						<td>5</td>
+						<td><img class="olga5_snd:over:loop" title="img05" id='05' audio_for-play="+url_tt + /yapma.mp3" src="url_ma + /image/solfedjio.png" />
+						</td>
+						<td>&lt;<b>img</b> class="olga5_snd:over" <b>audio_for-play</b>= "+url_tt + /yapma.mp3"
+							<b>src</b>="url_ma + /image/solfedjio.png"/&gt; (<b>img_on-play</b> НЕ задан)
+							<br />&nbsp;&nbsp;&nbsp;
+							зацикленное звучание по наведению курсора и сменой изображение
+						</td>
+					</tr>
+					<tr>
+						<td>6</td>
+						<td>
+							`<a class='olga5_snd:over' target="olga5_add" title="" id='6a' href="+url_ma+/audio/Clouds.mp3" audio_for-play=href><b>&lt;a&gt;</b></a>`
+							<br />
+							`<b class='olga5_snd:live' audio_for-play="+url_ma+/audio/LazyDay.mp3" title="кликни чтобы прослушать" id='6b'>&lt;b&gt;</b>`
+						</td>
+						<td>
+							&lt;<b>a</b> class='olga5_snd:over' target="olga5_add" id='7a'
+							href="+url_ma+/audio/Clouds.mp3" <b>audio_for-play</b>=href&gt;
+							<a class='olga5_snd:over' target="olga5_add" title="a7" id='7a' href="+url_ma+/audio/Clouds.mp3" audio_for-play=href>Clouds.mp3</a>
+							&lt;/a&gt;
+							<br />
+							&lt;<b>b</b> class='olga5_snd:live' <b>audio_for-play</b>="+url_ma + /audio/LazyDay.mp3" id='7b'&gt;
+							<b class='olga5_snd:live' audio_for-play="+url_ma+/audio/LazyDay.mp3" title="кликни чтобы прослушать" id='7b'>LazyDay</b>
+							&lt;/b&gt;
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<table border="1" cellpadding="0" cellspacing="0" style="border-color: transparent; line-height: 1.1; width: 100%; font-size: smaller;">
+				<caption style="text-align: left;margin: 4px">
+					Дополнительно показано подключение и стандартных плейеров:
+				</caption>
+				<tbody>
+					<tr>
+						<td>
+							<div><audio controls="controls" id="playSoundNewX" src="+url_ma+/audio/dillon_-_thirteen_thirtyfive_.mp3">
+								</audio></div>
+						</td>
+						<td>
+							<div><audio controls="controls" src="+url_ma+/audio/20190202-mimag_neto.oga">
+								</audio></div>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</body>
+
+</html>

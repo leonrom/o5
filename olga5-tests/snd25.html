@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<title>snd25</title>
+	<link rel="shortcut icon" href="./favicon.svg" type="image/x-icon">
+
+	<link href="../blog/csss/olga5.tableCode.css" media="screen" rel="stylesheet" />
+	
+	<!-- <script data-src='+ o5inc.js'></script> -->
+	<script src='../olga5/o5snd.js'
+		o5urlrfs="
+		btn_stop='images + /icons8-youtube-music-48.png';
+		btn_play='images + /icons8-youtube-music-50.png';
+		imagestop='_url_olga5 + ../blog/media/image/myMusikIT.png';
+		imageplay='images + /play.png';
+		аудио_файл=sounds + /Ceza1-25.mp3;
+		"
+	></script>
+	<script async src='../olga5/o5com.js' 
+		o5consts="o5debug=0"
+		o5urlrfs="
+			images=_url_olga5 + ../blog/media/image; 
+			sounds=https://archive.org/download/clouds_20200310;
+		"
+	></script>
+</head>
+
+<body style="margin: 0 0.1em 0 0.3em;">
+	<div class='example'>
+		Примеры <span title="Для звучания - кликнуть по иконке (и чуток подождать)">задания</span> атрибутов тега <b>&lt;img&gt;</b>:	
+		<style>
+			.olga5_codeTextSeparate {
+				width: max-content;
+				padding: 0.5em;
+				padding-left: 1.0em;
+				padding-right: 1.0em;
+				margin-left: 3em;
+				vertical-align: baseline;
+				text-align: left;
+				text-align: -moz-left;
+				text-align: -webkit-left;
+				font-size: x-small;
+				background-color: aliceblue;
+				border: solid lightpink 1px;
+				border-radius: 2px;
+				font-family: monospace;
+				padding-right: 12px;
+			}
+
+			span {
+				background-color: beige;
+				border: 1px solid gold;
+			}
+
+			span[title] {
+				cursor: help;
+				padding-left: 2px;
+				padding-right: 2px;
+				color: black;
+				font-style: italic;
+				background-color: LavenderBlush;
+				border-radius: 6px;
+				padding-bottom: 2px;
+				font-family: sans-serif;
+				font-size: 88%;
+				border: 1px dotted aqua;
+			}
+
+			audio {
+				height: 16px;
+				width: 244px;
+			}
+
+			p,
+			span {
+				font-size: small;
+				white-space: nowrap;
+			}
+
+			p {
+				margin: 0;
+			}
+			p > img{
+				height: 32px;
+			}
+		</style>
+
+<p>5 <img id="5" class="olga5_snd:аудио_файл" />
+    Не заданы ни <u><i>без звука</i></u>, ни <u><i>звучание</i></u>,- берутся, соответственно, из <b>btn_stop</b> и <b>btn_play</b>.
+</p>
+<p class="olga5_codeTextSeparate">
+    &lt;img id="5" class="olga5_snd:аудио_файл"&nbsp;/&gt;
+</p>
+		<br />
+		<!-- <p>
+			Использовались следующие 'кнопки' (эти ниже - некликабельные):
+			<br /><img id='i1' src=imagestop class="olga5_snd:n" title="файл 'myMusikIT.png'"/> &mdash; теговый атрибут src=<b>imagestop</b>; 
+			<br /><img id='i2' src=imageplay class="olga5_snd:n" title="файл 'play.png'"/> &mdash; теговый атрибут image_play=<b>imageplay</b>; 
+			<br /><img id='i3' src=btn-stop class="olga5_snd:n" title="файл 'icons8-youtube-music-48.png'"/> &mdash; скриптовый параметр <b>btn-stop</b>;
+			<br /><img id='i4' src=btn-play class="olga5_snd:n" title="файл 'icons8-youtube-music-50.png'"/> &mdash; скриптовый параметр <b>btn-play</b>.
+		</p> -->
+		<br />
+
+	</div>
+</body>
+
+</html>

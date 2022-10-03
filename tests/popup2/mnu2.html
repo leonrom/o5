@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<title>mnu</title>
+</head>
+
+<body>
+	<p>
+		этот и следующий два примера даны в режиме просмотра, тег &lt;<b>input </b>...&gt;: &nbsp;
+		<input id='i1' type="button" value="показать">.
+		Параметры окна не указываются.
+		Выводится по-умолчанию (в правый верхний угол).
+	</p>
+
+	<style>
+		.o5menu {
+			position: absolute;
+			width: max-content;
+			padding: 1px;
+			margin: 0;
+			border: 1px solid gray;
+			background: lightcyan;
+			z-index: 100;
+			border-radius: 2px;
+			cursor: pointer;
+			/* opacity: 0; */
+			display: none;
+			pointer-events: none;
+		}
+		.o5menu.show {
+			/* opacity: 1; */
+			display: block;
+			pointer-events: auto;
+		}
+		.o5menu li {
+			display: block;
+			position: relative;
+			margin: 0;
+			padding: 0;
+			white-space: nowrap;
+			font-family: monospace;
+			border-bottom: 0.01em solid lightseagreen;
+			background: gray;
+			color: white;
+			height: 1.5em;
+			padding: 1px 5px 1px 2px;
+			font-size: medium;
+			width: auto;
+		}
+		.o5menu li:last-child {
+			border-bottom: none
+		}
+		.o5menu span {
+			margin-left: 6px;
+			font-family: sans-serif;
+			font-size: small;
+		}
+		.o5menu li:hover {
+			color: black;
+			background-color: lavender;
+		}
+		.o5menu li.disabled {
+			color: lightgray;
+			font-style: italic;
+		}
+		.o5menu li.divided {
+			border-top: 1px solid gray;
+		}
+	</style>
+
+	<ul class="o5menu">
+		<li id='m_close'>
+			&nbsp;&#10005; <span>Закрыть окно</span>
+		</li>
+		<li id='m_whide' class="divided">
+			&nbsp;&#8743; <span>Развернуть на экран</span>
+		</li>
+		<li id='m_small' class="disabled">
+			&nbsp;&#9671; <span>В исходный размер</span>
+		</li>
+	</ul>
+	<script>
+		function AttachToMenu(div, CallBack) {
+			const menu = document.querySelector('.o5menu'),
+				ShowMenu = function(x, y) {
+					menu.style.left = (x - 12) + 'px';
+					menu.style.top = (y - 12) + 'px';
+					menu.classList.add('show');
+				},
+				HideMenu = function() {
+					menu.classList.remove('show');
+					document.removeEventListener('mousedown', HideMenu);
+				}
+
+			menu.addEventListener('mousedown', (e) => {
+				const s = e.srcElement,
+					li = s.tagName == "SPAN" ? s.parentElement : s
+				CallBack(li.id + ' ого-го!')
+			}, false);
+
+			i1.addEventListener('contextmenu', (e) => {
+				e.preventDefault();
+				ShowMenu(e.pageX, e.pageY);
+				document.addEventListener('mousedown', HideMenu, false);
+			}, false);
+		}
+		// document.addEventListener('contextmenu', onContextMenu, false);
+		const i1 = document.getElementById('i1')
+		AttachToMenu(i1, DoContext)
+
+		function DoContext( act, div) {
+			console.log(act);
+		}
+	</script>
+</body>
+
+</html>

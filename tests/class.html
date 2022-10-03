@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>inspic</title>
+</head>
+
+<body>
+    пример
+    <script>
+        console.log('0')
+
+        class AO5p {
+            txt1 = 'txt1-ориг'
+            static sext = 'sext-ориг'
+            #pext = '#pext-ориг'
+            constructor(txt) {
+                this.txt1 = 'txt1-изменён'
+                this.txt2 = 'txt2-изменён'
+                if (txt) this.sext = txt
+            }
+            get pext() {return this.#pext}
+            #Print=(txt)=>{
+                console.log(txt)
+            }
+            static Ps = () => { console.log(`Ps  ` + AO5p.sext, this.txt1, this.txt2) }
+            P1 = () => { console.log(`P1  ` + AO5p.sext, this.txt1, this.txt2) }
+            P2 = () => { console.log(`P2  ` + AO5p.sext, this.txt1, this.txt2) }
+            P2 = () => { 
+                this.#Print(`P2P  ` + this.pext,  this.#pext)
+            }
+        }
+
+        class AO5 extends AO5p {
+            constructor(txt) { super(txt) }
+            Ps = AO5p.Ps // чтобы доступиться к "static Ps=()"
+            P1 = this.P1
+        }
+        AO5p.prototype.PP = function(x){console.log(x)}
+
+        const a1 = new AO5(),
+            a2 = new AO5('мой-текст')
+        a1.Ps()
+        a1.P1()
+        a1.P2()
+        a1.PP('прото')
+        console.log(`#pext=${a1.pext}`)
+        // console.log('Одинаковость: Ps=' + (a1.Ps === a2.Ps), 'P1=' + (a1.P1 === a2.P1), 'P2=' + (a1.P2 === a2.P2))
+        console.log(`Одинаковость: Ps=${a1.Ps === a2.Ps}, P1=${a1.P1 === a2.P1}, P2=${a1.P2 === a2.P2}, PP=${a1.PP === a2.PP} `)
+
+        console.log('------------')
+    </script>
+</body>
+</body>

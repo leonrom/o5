@@ -1,0 +1,9 @@
+/**
+ * тестовое задани цвета фона
+ **/
+
+body {
+        background-color: yellow;
+    border-style: solid;
+font-size: small;
+}                                                   

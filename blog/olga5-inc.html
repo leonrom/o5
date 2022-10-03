@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<title>olga5-inc</title>
+	<link rel="shortcut icon" href="+../blog/favicon.svg" type="image/x-icon">
+
+	<link data-href='+o5ini.css' media='screen' rel='stylesheet' />
+	<script data-src='+o5mnu.js' scrollY='-32'></script>
+	<script data-src='+o5shp.js'></script>
+	<script data-src='+o5pop.js'></script>
+	<script data-src='+o5ref.js' o5tag_attrs="img=image_play;a,img=href,data-href,src,_src;" "></script>
+
+	<link data-href='+../blog/csss/olga5.tableCode.css' media='screen' rel='stylesheet' />
+	<link data-href='+../blog/csss/olga5.textNshow.css' media='screen' rel='stylesheet' />
+	<link data-href='+../blog/csss/olga5.addStyles.css' media='screen' rel='stylesheet' />
+	<link data-href='+../blog/csss/olga5.tableKuplet.css' media='screen' rel='stylesheet' />
+	<link data-href='+../blog/csss/tests.css' media='screen' rel='stylesheet' />
+
+	<script src='../olga5/o5com.js'
+	o5urlrfs=" _блог_o5='https://olga-5.blogspot.com/2020/02' ; _тесты='_url_olga5 + ../olga5-tests' ;
+		_url_html='# адрес текущей страницы (этот и 2 следующих - закомментированы)' ;
+		_url_root='# адрес сайта (с текущей страницей)' ; _url_olga5='# адрес загрузки файла o5common.js' ; "></script>
+
+<body>
+	<div class=" olga5_Start" dir="ltr" trbidi="on">
+		<!-- <div class="olga5_diagonal"> статья &nbsp; ещё&nbsp; редактируется</div> -->
+
+	<div class="olga5_diagonal"> статья &nbsp; ещё&nbsp; редактируется</div>
+	<p class="olga5_page_header">
+		Вставка html-файлов или их фрагментов в текст загруженного документа
+	</p>
+	<p>
+		Скрипт частично расширяет возможности тега &lt;<b>iframe</b>&gt; при
+		вставке html-файлов или их фрагментов, находящихся в одном домене с основным документом.
+	</p>
+	<p style="line-height: 1.3; margin-bottom: 0cm;">
+		Вставка выполняется добавлением содержимого считанного файла к содержимому тега,
+		где считывание реализовано с использованием 'веб API интерфейса' <b>XMLHttpRequest</b>.
+		В документ могут
+		<span title="последующие вставки в уже вставленный файл не предусмотрены">одноуровнево</span>
+		вставляться несколько файлов.
+		При наличии в считываемом файле тегов &lt;<b>body</b>&gt; загружается содержимое первого из них
+		(иначе - весь файл).
+		Вставляться может не только весь загруженный текст, но и лишь содержимое отдельного селектора.
+	</p>
+	<p><code class="olga5_popup" onclick="window.olga5.PopShow('', 555, 555, '+/incl/tst.html')">Здесь</code>
+		(кликните) можно посмотреть пример организации нескольких вставок из двух файлов.
+	</p>
+
+	<p>
+		Чтобы в тег <span title="т.е. добавить к существующему содержимому">вставить</span> содержимое (или его часть)
+		некоторого файла этот
+		тег должен содержать атрибут <b>o5include</b>, значением которого является строка с именем файла
+		после которого может быть символ '<b>?</b>' с последующим селектором тега в этом файле. Например:
+	</p>
+
+	<p class="olga5_codeTextSeparate">
+	<pre>
+		&lt;div o5include='./inc1.html'     &gt;&lt;/div&gt;
+		&lt;div o5include='./inc1.html?#i3' &gt;&lt;/div&gt;
+		&lt;div o5include='./inc1.html?.s1' &gt;&lt;/div&gt;
+		&lt;div o5include='./inc1.html?span'&gt;&lt;/div&gt;
+	</pre>
+	</p>
+
+	<p>
+		Здесь показаны четыре вставки. В первой вставляется всё содержамое тега &lt;<b>body</b>&gt; из файла
+		<b>inc1.html</b>,
+		а в остальных - только первых соответствющих тегов: с <b>id</b>=i3, <b>class</b>=s1 и наименованием тега
+		<b>span</b>.
+		Конечно, при этом сам файл <b>inc1.html</b> считывается только один раз.
+	</p>
+	<p>
+		В примере показана вставка в теги <b>div</b>, однако можно вставлять в любые теги (заменяя при этом их
+		содержимое).
+	</p>
+	<p>
+		На загрузку файлов с иных адресов действуют ограничния '<i>CORS policy</i>'.
+	</p>
+	<p>
+		При модключении скрипта совместно с иными <i>библиотечными</i> скриптами он должен располагаться прежде них.
+		Также модуль может выполняться автономно,- без подключения ядра <i>библиотеки</i> <code>o5common.js</code>,-
+		как это сделано в упомянутом
+		<code class="olga5_popup" onmouseup="window.olga5.PopShow('', 555, 555, '+/incl/tst.html')">примере</code>.
+		Результаты загрузки файлов приводятся в сообщении "<i>Обработка 'CInclude'</i>" в <i>console.log</i>.
+	</p>
+
+	<div class='blog-pager'>&nbsp;&nbsp;&nbsp;&nbsp;------</div>
+	</body>
+
+</html>

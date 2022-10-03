@@ -1,0 +1,52 @@
+<html>
+
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<title>tst</title>
+	<link rel="shortcut icon" href="./favicon.svg" type="image/x-icon">
+
+	<script id='s_o5tstinc' src = "./o5tstinc.js">       </script>
+	<script id='s_o5inc'    src = '../../olga5/o5inc.js'></script>
+
+	<script async src='../../olga5/o5com.js' o5params="o5debug=2"></script>
+	<style>
+		div {
+			height: 166px;
+			width: 22%;
+			border: 1px solid gray;
+			margin-top: 6px;
+			background-color: aliceblue;
+			overflow-y: auto;
+			overflow-x: hidden;
+			display: inline-block;
+		}
+
+		div div {
+			width: 98%;
+			background-color: cornsilk;
+			border: 1px solid aqua;
+			display: block;
+			height: 77px;
+		}
+
+		h6 {
+			margin: 0;
+			background-color: antiquewhite;
+		}
+	</style>
+</head>
+
+<body>
+	Примеры подключения
+	<br />
+	<div id="txt-00">
+		<div id="txt-01">
+			<span class='s1'>Привет 0<b>1</b> тег &lt;div&gt;!</span>
+		</div>
+	</div>
+	<div  id="txt-01" o5include='./inc.html?#inc-01'></div>
+
+	<!-- <script> window.olga5.o5inc.W.Init()</script> -->
+</body>
+
+</html>
