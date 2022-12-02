@@ -15,9 +15,8 @@
         debugids = ['shp1'] // , 'shp_text' shp1 shp_1÷4 shp_5÷8 'shp_text' // 'shp_1÷4' // 'shp-demo' // 'shp_text'
 
     const wshp = window.olga5[olga5_modul],
-        W = window.olga5.find(w => w.modul == olga5_modul), // так делать во всех подмодулях 
         datestart = Date.now(),
-        CalcParentLocate = (pO5) => {
+        CalcParentLocate = pO5 => {
             if (pO5.isBody) {
                 const doc = document.documentElement
                 Object.assign(pO5.pos,
@@ -27,8 +26,8 @@
                 const current = pO5.current,
                     isO5 = current.aO5shp,
                     p = isO5 ? current.aO5shp.posC : current.getBoundingClientRect(),
-                    right1 = isO5 ? p.left + p.width : p.right,
-                    bottom1 = isO5 ? p.top + p.height : p.bottom,
+                    // right1 = isO5 ? p.left + p.width : p.right,
+                    // bottom1 = isO5 ? p.top + p.height : p.bottom,
                     right = isO5 ? p.left + p.width : p.left + current.clientWidth + pO5.add.left,
                     bottom = isO5 ? p.top + p.height : p.top + current.clientHeight + pO5.add.top
                 Object.assign(pO5.pos,
@@ -49,26 +48,28 @@
                     for (const bord of bords) {
                         const pO5 = bord.pO5,
                             pos = pO5.pos
-                        Object.assign(a, {
-                            to: ((a.to && a.to.pos.top > pos.top) ? a.to : pO5),
-                            le: ((a.le && a.le.pos.left > pos.left) ? a.le : pO5),
-                            ri: ((a.ri && a.ri.pos.right < pos.right) ? a.ri : pO5),
-                            bo: ((a.bo && a.bo.pos.bottom < pos.bottom) ? a.bo : pO5),
-                        })
-                    }
-                },
-                Located1 = (bords, a) => {
-                    for (const bord of bords) {
-                        const pO5 = bord.pO5,
-                            pos = pO5.pos
-                        Object.assign(a, {
-                            to: ((a.to && a.to.pos.top < pos.top) ? a.to : pO5),
-                            le: ((a.le && a.le.pos.left < pos.left) ? a.le : pO5),
-                            ri: ((a.ri && a.ri.pos.right > pos.right) ? a.ri : pO5),
-                            bo: ((a.bo && a.bo.pos.bottom > pos.bottom) ? a.bo : pO5),
-                        })
+                        if (pos.top != pos.bottom) {
+                            if (!a.to || a.to.pos.top < pos.top) a.to = pO5
+                            if (!a.bo || a.bo.pos.bottom > pos.bottom) a.bo = pO5
+                        }
+                        if (pos.left != pos.right) {
+                            if (!a.le || a.le.pos.left < pos.left) a.le = pO5
+                            if (!a.ri || a.ri.pos.right > pos.right) a.ri = pO5
+                        }
                     }
                 }
+            // Located = (bords, a) => {
+            //     for (const bord of bords) {
+            //         const pO5 = bord.pO5,
+            //             pos = pO5.pos
+            //         Object.assign(a, {
+            //             to: ((a.to && a.to.pos.top > pos.top) ? a.to : pO5),
+            //             le: ((a.le && a.le.pos.left > pos.left) ? a.le : pO5),
+            //             ri: ((a.ri && a.ri.pos.right < pos.right) ? a.ri : pO5),
+            //             bo: ((a.bo && a.bo.pos.bottom < pos.bottom) ? a.bo : pO5),
+            //         })
+            //     }
+            // }
             for (const ask of aO5.hovered.asks)
                 Located([ask.bords[0]], a)
             Object.assign(aO5.hovered, a)
@@ -205,7 +206,7 @@
                     }
                 }
                 if (posC.left + posC.width > bR) {
-                    if (posC.left >= bR) hide = true
+                    if (posC.left >= bR) aO5.Hide()
                     else
                         posC.width -= (posC.left + posC.width - bR)
                 }
@@ -320,10 +321,12 @@
             }
         },
         Scroll = (aO5s) => {
-            if (W.consts.o5debug > 2)
+            if (wshp.W.consts.o5debug > 2)
                 console.log("Scroll для '" + (() => {
                     let s = ''
                     aO5s.forEach(aO5 => { s += (s ? ', ' : '') + aO5.name })
+                    // if (!s)
+                    //     s = s
                     return s
                 })() + "'")
             let k2 = -1,
@@ -333,23 +336,22 @@
                     CalcParentsLocates(aO5)
                     PrepareBords(aO5)
 
-                    const W = aO5.shdw.getBoundingClientRect()
-                    Object.assign(aO5.posW, { top: W.top, left: W.left, height: W.height, width: W.width })
-                    Object.assign(aO5.posC, { top: W.top, left: W.left, height: W.height, width: W.width })
-                    Object.assign(aO5.posS, { top: 0, left: 0, height: W.height, width: W.width })
+                    const b = aO5.shdw.getBoundingClientRect()
+                    Object.assign(aO5.posW, { top: b.top, left: b.left, height: b.height, width: b.width })
+                    Object.assign(aO5.posC, { top: b.top, left: b.left, height: b.height, width: b.width })
+                    Object.assign(aO5.posS, { top: 0, left: 0, height: b.height, width: b.width })
                     onscr = aO5.posW.top < aO5.located.bo.pos.bottom //aO5.act.first.pO5.pos.bottom) {
                 }
-                // k2=k
                 if (onscr) {
                     k2 = k
                     aO5.Show()
-                } else {//тут не давать 'break' - пусть попрячет остальные !
+                } else {        //тут не давать 'break' - пусть попрячет остальные !
                     aO5.Hide()
                     aO5.act.wasKilled = false
                 }
-                // console.log('opacity for id= ' + aO5.id)
-                aO5.shdw.style.opacity = 0
-                aO5.shp.style.opacity = 1
+                // // console.log('opacity for id= ' + aO5.id)
+                // aO5.shdw.style.opacity = 0
+                // aO5.shp.style.opacity = 1
             }
 
             let killevel = -1
@@ -405,37 +407,23 @@
             for (const aO5 of aO5s)  // д.б. отдельно от CutBounds, т.к. м.б. пересчитаны размеры
                 SavePos(aO5)
 
-            if (W.consts.o5debug > 2)
+            if (wshp.W.consts.o5debug > 2)
                 DebugShowBounds(aO5s)
 
-            for (const aO5 of aO5s)
-                Scroll(aO5.aO5s)
-        }
-        // DoScrollEnd = () => {
-        //     if (!o5first_scroll) {
-        //         o5first_scroll = new window.Event('o5first_scroll')
-        //         document.dispatchEvent(o5first_scroll)
-        //     }
-        //     if (!o5shp_scroll)
-        //         o5shp_scroll = new window.Event('o5shp_scroll')
-        //     document.dispatchEvent(o5shp_scroll)
-        // }
+            for (const aO5 of aO5s)   //  не скроллировать внутренности!
+                if (aO5.aO5s.length > 0)
+                    Scroll(aO5.aO5s)
+        },
+        o5shp_scroll = new window.Event('o5shp_scroll')
 
-    // let // isfirst = true,
-    //     o5shp_scroll = null,
-    //     o5first_scroll = null
-    const o5shp_scroll = new window.Event('o5shp_scroll')
-
-    wshp.DoScroll = function (aO5s, etimeStamp) {
+    wshp.DoScroll = (aO5s, etimeStamp) => {
         C = window.olga5.C
-        if (etimeStamp) timeStamp = etimeStamp
+        timeStamp = etimeStamp ? etimeStamp : (Date.now() + Math.random())
 
         if (aO5s.length > 0) {
-            if (timeStamp && W.consts.o5debug > 2) {
-                console.groupCollapsed("  старт Scroll для '" + (() => {
+            if (timeStamp && wshp.W.consts.o5debug > 2) {
+                console.groupCollapsed(`  старт Scroll для '` + (() => {
                     let s = ''
-                    // if (!aO5s.forEach)
-                    //     console.log()
                     aO5s.forEach(aO5 => { s += (s ? ', ' : '') + aO5.name })
                     return s
                 })() + "'" + ' (t=' + (Date.now() - datestart) + ')')
@@ -449,5 +437,6 @@
         document.dispatchEvent(o5shp_scroll)
     }
 
-    console.log(`}---< ${document.currentScript.src.indexOf(`/${olga5_modul}.`) > 0 ? 'дозагружен' : 'подключён '}:  ${olga5_modul}/DoScroll.js`)
+    if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
+        console.log(`}---< ${document.currentScript.src.indexOf(`/${olga5_modul}.`) > 0 ? 'дозагружен' : 'подключён '}:  ${olga5_modul}/DoScroll.js`)
 })();

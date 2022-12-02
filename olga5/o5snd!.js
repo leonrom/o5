@@ -56,7 +56,7 @@
                 AddError: (aO5, mrk, txt) => {
                     if (!aO5.sound.errIs[mrk]) {
                         errTypes.SetT(aO5, mrk, true)
-                        C.ConsoleError(`"${errTypes[mrk]}" (${mrk})` + (txt ? (` (${txt})`) : '') + ` для '${aO5.name}'`)
+                        C.ConsoleError(`"${errTypes[mrk]}" (${mrk})` + (txt ? ` ${txt}` : '') + ` для '${aO5.name}'`)
 
                         aO5.sound.errIs.errs = true
                         if (!aO5.snd.classList.contains(_clsError))
@@ -147,7 +147,7 @@
                             type: 'error', Act: (snd, e) => {
                                 const aO5 = snd.aO5snd
                                 errTypes.AddError(aO5, 'неЗагружен',
-                                    `\n"${e.target.src}" \n(т.е. это при audio_play= '${aO5.parms.audio_play}', attrs.aplay= '${aO5.modis.aplay}') `)
+                                    `\n(это при audio_play= '${aO5.parms.audio_play}', attrs.aplay= '${aO5.modis.aplay}') `)
                             }
                         },
                         {
@@ -350,95 +350,272 @@
 /*jshint strict:true  */
 /*jshint esversion: 6 */
 
-(function () {              // ---------------------------------------------- o5snd/CSS ---
+(function () {              // ---------------------------------------------- o5snd/Imgs ---
     "use strict"
     const olga5_modul = 'o5snd'
 
     if (!window.olga5) window.olga5 = []
     if (!window.olga5[olga5_modul]) window.olga5[olga5_modul] = {}
 
+    let C = null,
+        o5debug = 0
+
     const wshp = window.olga5[olga5_modul],
-        css = { _clsError: `_error`, _clsLoad: `_load`, _clsPause: `_pause`, _clsPlay: `_play`, _clsNone: `_none`, _clsFreeImg: `_freeimg`, }
+        StopSoundOnPage = () => {
+            if (wshp.actaudio)
+                wshp.StopSound(wshp.actaudio.aO5snd)
+        },
+        TryEncode = (ori, tag) => {
+            const wref = C.DeCodeUrl(wshp.W.urlrfs, ori.url, tag ? tag.aO5snd.o5attrs : '')
+            if (wref.err.length > 0)
+                errs.Add(C.MakeObjName(tag), ori.url, "декодир. ссылки", ori.atr, wref.err)
+            return wref.url
+        },
+        urlattrs = [],
+        errs = []
 
-    function CSS(olga5_class) {
-        return `
-.${olga5_class}:not(.${css._clsNone}) {
-    cursor: pointer;
-}
-.${olga5_class}.${css._clsPlay} {
-    cursor: progress;
-    animation: olga5_viewTextWash 5s infinite linear;
-}
-.${olga5_class}.${css._clsPause} {
-    cursor: wait;
-    animation: none;
-}
-.${olga5_class}.${css._clsError} {
-    opacity: 0.5;
-    outline: 2px dotted black;
-    cursor: help;
-}
-.${olga5_class}.${css._clsLoad} {
-    opacity: 0.5;
-    outline: 1px dotted black;
-    cursor: wait;
-}
-img.${olga5_class}:not(.${css._clsFreeImg}) {
-    background-color: transparent;
-    position: inherit;
-    padding: 0 !important;
-    vertical-align: bottom;
-    border-radius: 50%;
-    box-shadow: none !important;
-    animation: none;
-    max-height: 28px;
-    max-width:  28px;
-}
-img.${olga5_class}.${css._clsPlay} {
-    animation: olga5_sndImgSwing 2s infinite linear;
-}
-@keyframes olga5_viewTextWash {
-    100%,0% {background-color: white;color: aqua;}
-    75%,25% {background-color: gold;}
-    50% {background-color: coral;color: blue;    }
-}
-@keyframes olga5_sndImgSwing {
-    100%,50%,0% {transform: rotateZ(0deg);}
-    25% {transform: rotateZ(33deg);}
-    75% {transform: rotateZ(-33deg);}
-}
-`
+
+    errs.Add = function (name, url, txt, atr, err) {
+        this.push({ snd: name, 'источник': url, 'пояснение': txt, val: atr, 'ошибка': err })
     }
 
-    wshp.CSS = CSS
-    Object.assign(wshp.CSS, css)
-    wshp.CSS.NewClassList = function (snd) { // искусственное создание classList'а
-        const cls = [],
-            ss = snd.className.split(' ')
-        for (const si of ss) {
-            const s = si.trim()
-            if (s.length > 0) cls.push(s)
-        }
-        cls.snd = snd
-        cls.contains = function (nam) {
-            return this.includes(nam)
-        }
-        cls.remove = function (nam) {
-            const k = this.indexOf(nam)
-            if (k >= 0) {
-                this.splice(k, 1)
-                this.snd.className = this.join('')
+    Object.assign(wshp, {
+        setClass: {
+            stop: 'stop', play: 'play', pause: 'pause',
+            SetC: (aO5, state) => {
+                if (o5debug > 1) console.log(`--> setClass.SetC (${aO5.name}, '${state}')`)
+                const classList = (aO5.image.play ? aO5.image.play : aO5.snd).classList
+                if (state == wshp.setClass.play) {
+                    const image = aO5.image
+                    if (image.play) {
+                        image.stop.style.display = 'none'
+                        image.play.style.display = aO5.modis.dspl
+                    }
+                    classList.add(wshp.CSS._clsPlay)
+                    classList.remove(wshp.CSS._clsPause)
+                }
+                else if (state == wshp.setClass.pause) {
+                    classList.remove(wshp.CSS._clsPlay)
+                    classList.add(wshp.CSS._clsPause)
+                }
+                else if (state == wshp.setClass.stop) {
+                    classList.remove(wshp.CSS._clsPlay)
+                    classList.remove(wshp.CSS._clsPause)
+                }
+                else alert(`setClass.SetC: state='${state}'`)
+                aO5.sound.state = state
             }
-        }
-        cls.add = function (nam) {
-            if (!this.includes(nam) ) {
-                this.push(nam)
-                this.snd.className = this.join('')
+        },
+        OriForTag : (tag, ref, atnam) => {
+            const ori = { url: '', atr: '' },
+                attr = atnam ? C.GetAttribute(tag.aO5snd.o5attrs, atnam) : ''
+            if (attr)
+                Object.assign(ori, { url: attr.value, atr: atnam })
+            else
+                if (ref) {
+                    const td = C.TagDes(tag, ref)
+                    if (td)
+                        Object.assign(ori, { url: td.orig, atr: td.from })
+                }
+            return ori
+        },
+        StopSound: aO5 => {
+            if (o5debug > 1) console.log(`--> StopSound (${aO5.name})`)
+            wshp.actaudio = null
+
+            const image = aO5.image,
+                audio = aO5.audio ? aO5.audio : aO5.sound.audio
+
+            audio.pause()
+            audio.currentTime = 0
+            aO5.sound.state = wshp.setClass.stop
+
+            if (image && image.play) {
+                image.play.style.display = 'none'
+                image.stop.style.display = aO5.modis.dspl
             }
-        }
-        return cls
-    }
-    console.log(`}---< ${document.currentScript.src.indexOf(`/${olga5_modul}.`) > 0 ? 'дозагружен' : 'подключён '}:  ${olga5_modul}/CSS.js`)
+
+            if (audio !== aO5.audio)
+                wshp.setClass.SetC(aO5, wshp.setClass.stop)
+        },
+        Prepare: mtags => {
+            C = window.olga5.C
+            o5debug = wshp.W.consts.o5debug
+            /*
+                        PrepareSnds
+            */
+            const btns = { stop: '', play: '' },
+                DecodeAttrs = (mtag) => {
+                    const snd = mtag.tag,
+                        scls = snd.className,
+                        aO5 = snd.aO5snd,
+                        modis = aO5.modis,
+                        ers = []
+                    for (const qual of mtag.quals) {
+                        const c = qual.substring(0, 1).toUpperCase()
+
+                        if ('AOLFN'.indexOf(c) >= 0)
+                            switch (c) {
+                                case 'A': modis.alive = true
+                                    break
+                                case 'O': modis.over = true
+                                    break
+                                case 'L': modis.loop = true
+                                    break
+                                case 'F': if (!snd.classList.contains(wshp.CSS.o5freeimg))
+                                    snd.classList.add(wshp.CSS.o5freeimg)
+                                    break
+                                case 'N': modis.none = true
+                                    break
+                                default: ers.push(qual)
+                            }
+                        else
+                            modis.aplay = qual.replace(/^[`'"]?\s*|\s*[`'"]?$/g, '')
+                    }
+
+                    if (ers.length > 0)
+                        errs.Add(aO5.name, scls, 'квалиф. класса', ers.join(', '), "ошибочные квалиф.")
+
+                    if (!modis.aplay && !modis.none)
+                        errs.Add(aO5.name, scls, `игнор остальных квалиф.`, 'audio_play', "нету аудио-квалиф.")
+
+                    if (aO5.modis.none) snd.classList.add(wshp.CSS._clsNone)
+
+                    if (!snd.alt || (snd.alt.trim() == '')) snd.alt = snd.title.trim()
+                },
+                PrepOther = aO5 => {
+                    const snd = aO5.snd,
+                        srcAtr = aO5.srcAtr,
+                        ori = wshp.OriForTag(snd, srcAtr, '')
+
+                    if (ori.url) {
+                        const url = TryEncode(ori, snd)
+                        if (url != snd[srcAtr]) {
+                            snd.setAttribute(srcAtr, url)
+                            urlattrs.push({ snd: aO5.name, atr: srcAtr, url: url, 'ориг.': ori.url })
+                        }
+                    }
+                    else
+                        errs.Add(aO5.name, 'PrepUrlsAudio()', `тег <${aO5.tagName}>`, '', `Нет ${'data-' + srcAtr}, ${'_' + srcAtr} или ${srcAtr}`)
+
+                    if (ori.atr == 'data-' + srcAtr || ori.atr == '_' + srcAtr)
+                        snd.removeAttribute(ori.atr)	// чтоб другие модули не повторяли
+
+                },
+                GetBtnUrl = (atr) => {
+                    const ori = { url: wshp.W.urlrfs[atr], atr: atr }
+
+                    if (ori.url) {
+                        const url = TryEncode(ori, null)
+                        if (url != ori.url)
+                            urlattrs.push({ snd: atr, atr: ori.atr, url: url, 'ориг.': ori.url })
+                        return url
+                    }
+                }
+
+            for (const mtag of mtags) {
+                const snd = mtag.tag,
+                    tagName = snd.tagName.toLowerCase()
+
+                if (tagName.match(/audio/i)) continue
+
+                const aO5 = wshp.AO5snd(snd, C)
+
+                if (mtag.quals && mtag.quals.length > 0) {
+                    DecodeAttrs(mtag)
+
+                    const ori = { url: aO5.modis.aplay, atr: 'audio_play' }
+                    if (ori.url) {
+                        const url = TryEncode(ori, snd)
+                        aO5.parms.audio_play = url
+                        urlattrs.push({ snd: aO5.name, atr: ori.atr, url: url, 'ориг.': ori.url })
+                    }
+                }
+                else // if (!aO5.modis.none)
+                    errs.Add(aO5.name, 'PrepUrlsSnd()', `для тега <${aO5.tagName}> '${aO5.name}' `, '', `нет 'audio_play' или иных атрибутов url'а`)
+
+                if (aO5.image.stop) {
+                    if (!wshp.imgs) {
+                        wshp.imgs = wshp.Imgs(C)
+                        btns.stop = GetBtnUrl('btn_stop') || ''
+                        btns.play = GetBtnUrl('btn_play') || ''
+                    }
+                    const urlatr = wshp.imgs.prepImage(aO5, btns, TryEncode)
+                    if (urlatr.snd)
+                        urlattrs.push(urlatr)
+
+                    if (snd.src) wshp.imgs.regiBySrc(snd)
+                }
+                else
+                    if (aO5.srcAtr) // если есть адрес - пробую перекодировать
+                        PrepOther(aO5)
+
+                aO5.waitActivate(snd)
+
+                Object.freeze(aO5.modis)
+                Object.freeze(aO5.parms)
+            }
+
+            window.addEventListener('olga5_done', StopSoundOnPage)
+            for (const eve of ['blur', 'pagehide', 'dblclick'])
+                document.addEventListener(eve, StopSoundOnPage)
+
+            /*
+                        PrepareAudios
+            */
+            const audios = C.GetTagsByTagNames('audio', wshp.W.modul),
+                efirsts = ['mouseenter', 'focusin'],
+                OnPlay = (audio) => {
+                    const a = wshp.actaudio
+                    if (a && a != audio)
+                        StopSound(a.aO5snd)
+
+                    wshp.actaudio = audio
+                },
+                OnEnter = (e) => {
+                    const audio = e.target
+                    audio.setAttribute('src', audio.aO5snd.url)
+                    efirsts.forEach(efirst => audio.removeEventListener(efirst, OnEnter))
+                }
+
+            for (const audio of audios) {
+                const aO5 = audio.aO5snd = {
+                    url: '',
+                    audio: audio,
+                    sound: { state: wshp.setClass.stop, },
+                    name: C.MakeObjName(audio),
+                    o5attrs: C.GetAttrs(audio.attributes),
+                }
+
+                const name = C.MakeObjName(audio),
+                    ori = wshp.OriForTag(audio, 'src', 'audio_play')
+
+                if (ori.url) {
+                    const url = TryEncode(ori, audio),
+                        src = audio.getAttribute('src')
+                    if (ori.url != src) {
+                        aO5.url = url
+                        efirsts.forEach(efirst => audio.addEventListener(efirst, OnEnter))
+                    }
+                    if (url != src)
+                        urlattrs.push({ snd: name, atr: 'src', url: url, 'ориг.': ori.url })
+
+                    audio.addEventListener('play', e => { OnPlay(e.target) })
+                }
+                else
+                    errs.Add(name, 'PrepUrlsAudio()', `тег 'audio'`, '', `Нет 'audio_play', 
+                            ${'data-' + aO5.srcAtr}, ${'_' + aO5.srcAtr}, ${aO5.srcAtr}`)
+            }
+
+            if (urlattrs.length > 0) C.ConsoleInfo(`Всего выполнено подстановок snd/audio`, urlattrs.length, urlattrs)
+
+            if (errs.length > 0)
+                C.ConsoleError(`${wshp.W.modul}: ошибки перекодировки тегов с ${wshp.W.class}`, errs.length, errs)
+        },
+    })
+    
+	if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
+    console.log(`}---< ${document.currentScript.src.indexOf(`/${olga5_modul}.`) > 0 ? 'дозагружен' : 'подключён '}:  ${olga5_modul}/Imgs.js`)
 })();
 /* global window, document, console */
 /*jshint asi:true  */
@@ -458,7 +635,7 @@ img.${olga5_class}.${css._clsPlay} {
             wshp = window.olga5[olga5_modul],
             a = document.createElement('a'),
             FullUrl = (url) => {
-                if (url.match(/https?:/i)) return url
+                if (C.IsFullUrl(url)) return url
                 else {
                     a.href = url
                     return a.href
@@ -486,8 +663,8 @@ img.${olga5_class}.${css._clsPlay} {
                     maps.set(url, { img: nimg, err: '' })
 
                     nimg.addEventListener('load', () => {
-                        if (C.consts.o5debug > 0)
-                            C.ConsoleInfo(`GetImgForRef: загружен url= ${url}`)
+                        if (C.consts.o5debug >1)
+                            console.log(`GetImgForRef: загружен url= ${url}`)
                         if (url.trim() == '')
                             alert('url=?')
 
@@ -509,7 +686,7 @@ img.${olga5_class}.${css._clsPlay} {
                     if (!isinmap)
                         maps.set(url, { img: img.cloneNode(true), err: '' })
                     if (C.consts.o5debug > 1)
-                        console.log(`olga5_Imgs ${isinmap ? 'повтор' : 'добавлен'} url=${url} для img.id='${img.id}' ${s}`)
+                        console.log(`olga5_Imgs ${isinmap ? 'повтор  ' : 'добавлен'} url=${url} для img.id='${img.id}' ${s}`)
                 }
                 else
                     console.error(`olga5_Imgs : попытка добавить` + (img ? ` пустой src для img.id='${img.id}'` : ` пустой  <img>`))
@@ -632,6 +809,8 @@ img.${olga5_class}.${css._clsPlay} {
     }
 
     window.olga5[olga5_modul].Imgs = Imgs
+    
+	if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
     console.log(`}---< ${document.currentScript.src.indexOf(`/${olga5_modul}.`) > 0 ? 'дозагружен' : 'подключён '}:  ${olga5_modul}/Imgs.js`)
 })();
 /* global document, window, console*/
@@ -639,312 +818,90 @@ img.${olga5_class}.${css._clsPlay} {
 /*jshint esversion: 6*/
 (function () {              // ---------------------------------------------- o5snd ---
 	'use strict';
-	let o5debug = 0,
-		C = null,
-		wshp = null,
-		timera = ''
 
 	const
 		W = {
 			modul: 'o5snd',
-			Init: WndInit,
-			// src: document.currentScript.src,
+			Init: SndInit,
 			class: 'olga5_snd',
 			consts: `		
 				o5shift_speed=0.5 # при Shift - замедлять вдвое;
 				o5return_time=0.3 # при возобновлении "отмотать" 0.3 сек ;
 			`,
 			urlrfs: 'btn_play="", btn_stop=',
-		},
-
-		currentScript = document.currentScript,
-		urlattrs = [],
-		errs = [],
-		TryEncode = (ori, tag) => {
-			const wref = C.DeCodeUrl(W.urlrfs, ori.url, tag ? tag.aO5snd.o5attrs : '')
-			if (wref.err.length > 0)
-				errs.Add(C.MakeObjName(tag), ori.url, "декодир. ссылки", ori.atr, wref.err)
-			return wref.url
-		},
-		setClass = {
-			stop: 'stop', play: 'play', pause: 'pause',
-			SetC: (aO5, state) => {
-				if (o5debug > 1) console.log(`--> setClass.SetC (${aO5.name}, '${state}')`)
-				const classList = (aO5.image.play ? aO5.image.play : aO5.snd).classList
-				if (state == setClass.play) {
-					const image = aO5.image
-					if (image.play) {
-						image.stop.style.display = 'none'
-						image.play.style.display = aO5.modis.dspl
-					}
-					classList.add(wshp.CSS._clsPlay)
-					classList.remove(wshp.CSS._clsPause)
-				}
-				else if (state == setClass.pause) {
-					classList.remove(wshp.CSS._clsPlay)
-					classList.add(wshp.CSS._clsPause)
-				}
-				else if (state == setClass.stop) {
-					classList.remove(wshp.CSS._clsPlay)
-					classList.remove(wshp.CSS._clsPause)
-				}
-				else alert(`setClass.SetC: state='${state}'`)
-				aO5.sound.state = state
+			incls: {
+				names: ['AO5snd', 'Imgs', 'Prep'],
+				actscript: document.currentScript,
 			}
 		},
-		StopSound = aO5 => {
-			if (o5debug > 1) console.log(`--> StopSound (${aO5.name})`)
-			wshp.actaudio = null
-
-			const image = aO5.image,
-				audio = aO5.audio ? aO5.audio : aO5.sound.audio
-
-			audio.pause()
-			audio.currentTime = 0
-			aO5.sound.state = setClass.stop
-
-			if (image && image.play) {
-				image.play.style.display = 'none'
-				image.stop.style.display = aO5.modis.dspl
-			}
-
-			if (audio !== aO5.audio)
-				setClass.SetC(aO5, setClass.stop)
-		},
-		StopSoundOnPage = e => {
-			if (wshp.actaudio)
-				StopSound(wshp.actaudio.aO5snd)
-		},
-		OriForTag = (tag, ref, atnam) => {
-			const ori = { url: '', atr: '' },
-				attr = atnam ? C.GetAttribute(tag.aO5snd.o5attrs, atnam) : ''
-			if (attr)
-				Object.assign(ori, { url: attr.value, atr: atnam })
-			else
-				if (ref) {
-					const td = C.TagDes(tag, ref)
-					if (td)
-						Object.assign(ori, { url: td.orig, atr: td.from })
-				}
-			return ori
-		},
-		PrepareAudios = () => {
-			const audios = C.GetTagsByTagName('audio', W.modul),
-				efirsts = ['mouseenter', 'focusin'],
-				OnPlay = (audio) => {
-					const a = wshp.actaudio
-					if (a && a != audio)
-						StopSound(a.aO5snd)
-
-					wshp.actaudio = audio
-				},
-				OnEnter = (e) => {
-					const audio = e.target
-					audio.setAttribute('src', audio.aO5snd.url)
-					efirsts.forEach(efirst => audio.removeEventListener(efirst, OnEnter))
-				}
-
-			for (const audio of audios) {
-				audio.aO5snd = {
-					url: '',
-					audio: audio,
-					sound: { state: setClass.stop, },
-					name: C.MakeObjName(audio),
-					o5attrs: C.GetAttrs(audio.attributes),
-				}
-
-				const name = C.MakeObjName(audio),
-					ori = OriForTag(audio, 'src', 'audio_play')
-
-				if (ori.url) {
-					const url = TryEncode(ori, audio),
-						src = audio.getAttribute('src')
-					if (ori.url != src) {
-						audio.aO5snd.url = url
-						efirsts.forEach(efirst => audio.addEventListener(efirst, OnEnter))
-					}
-					if (url != src)
-						urlattrs.push({ snd: name, atr: 'src', url: url, 'ориг.': ori.url })
-
-					audio.addEventListener('play', e => { OnPlay(e.target) })
-				}
-				else
-					errs.Add(name, 'PrepUrlsAudio()', `тег 'audio'`, '', `Нет 'audio_play', 
-						${'data-' + aO5.srcAtr}, ${'_' + aO5.srcAtr}, ${aO5.srcAtr}`)
-			}
-		},
-		PrepareSnds = function (mtags) {
-			const btns = { stop: '', play: '' },
-				DecodeAttrs = (mtag) => {
-					const snd = mtag.tag,
-						scls = snd.className,
-						aO5 = snd.aO5snd,
-						modis = aO5.modis,
-						ers = []
-					// if (aO5.name == "#05")
-					// 	console.log('')
-					if (!snd.classList) snd.classList = wshp.CSS.NewClassList(snd) // да... и такое бывает - в IE после Blogger		
-					for (const qual of mtag.quals) {
-						const c = qual.substring(0, 1).toUpperCase()
-
-						if ('AOLFN'.indexOf(c) >= 0)
-							switch (c) {
-								case 'A': modis.alive = true
-									break
-								case 'O': modis.over = true
-									break
-								case 'L': modis.loop = true
-									break
-								case 'F': if (!snd.classList.contains(wshp.CSS._clsFreeImg))
-									snd.classList.add(wshp.CSS._clsFreeImg)
-									break
-								case 'N': modis.none = true
-									break
-								default: ers.push(qual)
-							}
-						else
-							modis.aplay = qual.replace(/^[`'"]?\s*|\s*[`'"]?$/g, '')
-					}
-
-					if (ers.length > 0)
-						errs.Add(aO5.name, scls, 'квалиф. класса', ers.join(', '), "ошибочные квалиф.")
-
-					// if (modis.alive && aO5.snd.tagName.toUpperCase() == 'A')
-					// 	errs.Add(aO5.name, scls, `тег <A>`, 'трудности с остановкой звука', "не рекомендуется 'Alive'")
-
-					if (!modis.aplay && !modis.none)
-						errs.Add(aO5.name, scls, `игнор остальных квалиф.`, 'audio_play', "отсутствие квалиф.")
-
-					if (aO5.modis.none) snd.classList.add(wshp.CSS._clsNone)
-
-					if (!snd.alt || (snd.alt.trim() == '')) snd.alt = snd.title.trim()
-				},
-				PrepOther = aO5 => {
-					const snd = aO5.snd,
-						srcAtr = aO5.srcAtr,
-						ori = OriForTag(snd, srcAtr, '')
-
-					if (ori.url) {
-						const url = TryEncode(ori, snd)
-						if (url != snd[srcAtr]) {
-							snd.setAttribute(srcAtr, url)
-							urlattrs.push({ snd: aO5.name, atr: srcAtr, url: url, 'ориг.': ori.url })
-						}
-					}
-					else
-						errs.Add(aO5.name, 'PrepUrlsAudio()', `тег <${aO5.tagName}>`, '', `Нет ${'data-' + srcAtr}, ${'_' + srcAtr} или ${srcAtr}`)
-
-					if (ori.atr == 'data-' + srcAtr || ori.atr == '_' + srcAtr)
-						snd.removeAttribute(ori.atr)	// чтоб другие модули не повторяли
-
-				},
-				GetBtnUrl = (atr) => {
-					const ori = { url: W.urlrfs[atr], atr: atr }
-
-					if (ori.url) {
-						const url = TryEncode(ori, null)
-						if (url != ori.url)
-							urlattrs.push({ snd: atr, atr: ori.atr, url: url, 'ориг.': ori.url })
-						return url
-					}
-				}
-
-			for (const mtag of mtags) {
-				const snd = mtag.tag,
-					tagName = snd.tagName.toLowerCase()
-
-				if (snd.tagName.match(/audio/i)) continue
-
-				const aO5 = wshp.AO5snd(snd, C)
-
-				if (mtag.quals && mtag.quals.length > 0) {
-					DecodeAttrs(mtag)
-
-					const ori = { url: aO5.modis.aplay, atr: 'audio_play' }
-					if (ori.url) {
-						const url = TryEncode(ori, snd)
-						aO5.parms.audio_play = url
-						urlattrs.push({ snd: aO5.name, atr: ori.atr, url: url, 'ориг.': ori.url })
-					}
-				}
-				else // if (!aO5.modis.none)
-					errs.Add(aO5.name, 'PrepUrlsSnd()', `для тега <${aO5.tagName}> '${aO5.name}' `, '', `нет 'audio_play' или иных атрибутов url'а`)
-
-				if (aO5.image.stop) {
-					if (!wshp.imgs) {
-						wshp.imgs = wshp.Imgs(C)
-						btns.stop = GetBtnUrl('btn_stop') || ''
-						btns.play = GetBtnUrl('btn_play') || ''
-					}
-					const urlatr = wshp.imgs.prepImage(aO5, btns, TryEncode)
-					if (urlatr.snd)
-						urlattrs.push(urlatr)
-
-					if (snd.src) wshp.imgs.regiBySrc(snd)
-				}
-				else
-					if (aO5.srcAtr) // если есть адрес - пробую перекодировать
-						PrepOther(aO5)
-
-				aO5.waitActivate(snd)
-
-				Object.freeze(aO5.modis)
-				Object.freeze(aO5.parms)
-			}
-
-			for (const eve of ['blur', 'pagehide', 'dblclick'])
-				document.addEventListener(eve, StopSoundOnPage)
-		},
-		IncludedInit = function () {
-			C.ParamsFill(W, wshp.CSS(W.class))
-
-			const mtags = C.GetTagsByClassName(W.class, W.modul)
-			PrepareSnds(mtags)
-			PrepareAudios()
-
-			if (urlattrs.length > 0) C.ConsoleInfo(`Всего выполнено подстановок snd/audio`, urlattrs.length, urlattrs)
-
-			if (errs.length > 0)
-				C.ConsoleError(`${W.modul}: ошибки перекодировки тегов с ${W.class}`, errs.length, errs)
-
-			console.timeEnd(timera)
-			window.dispatchEvent(new CustomEvent('olga5_sinit', { detail: { modul: W.modul } }))
+		css = { _clsError: `_error`, _clsLoad: `_load`, _clsPause: `_pause`, _clsPlay: `_play`, _clsNone: `_none`, o5freeimg: `o5freeimg`, },
+		o5css = `
+		.${W.class}:not(.${css._clsNone}) {
+			cursor: pointer;
 		}
-
-	function WndInit(c) {
-		C = c
-		o5debug = C.consts.o5debug
-		timera = '                                                                <   инициирован ' + W.modul
-		console.time(timera)
-		if (o5debug > 1)
-			console.log(` __________________________________________\n   начало  иниц.:   ${W.modul}`)
-
-		const W2 = {
-			modul: W.modul,
-			names: ['CSS', 'AO5snd', 'Imgs'],
-			actscript: currentScript,
-			iniFun: IncludedInit,
-			args: []
+		.${W.class}.${css._clsPlay} {
+			cursor: progress;
+			animation: olga5_viewTextWash 5s infinite linear;
 		}
-		Object.freeze(W2)
+		.${W.class}.${css._clsPause} {
+			cursor: wait;
+			animation: none;
+		}
+		.${W.class}.${css._clsError} {
+			opacity: 0.5;
+			outline: 2px dotted black;
+			cursor: help;
+		}
+		.${W.class}.${css._clsLoad} {
+			opacity: 0.5;
+			outline: 1px dotted black;
+			cursor: wait;
+		}
+		img.${W.class}:not(.${css.o5freeimg}) {
+			background-color: transparent;
+			position: inherit;
+			padding: 0 !important;
+			vertical-align: bottom;
+			border-radius: 50%;
+			box-shadow: none !important;
+			animation: none;
+			max-height: 28px;
+			max-width:  28px;
+		}
+		img.${W.class}.${css._clsPlay} {
+			animation: olga5_sndImgSwing 2s infinite linear;
+		}
+		@keyframes olga5_viewTextWash {
+			100%,0% {background-color: white;color: aqua;}
+			75%,25% {background-color: gold;}
+			50% {background-color: coral;color: blue;    }
+		}
+		@keyframes olga5_sndImgSwing {
+			100%,50%,0% {transform: rotateZ(0deg);}
+			25% {transform: rotateZ(33deg);}
+			75% {transform: rotateZ(-33deg);}
+		}
+	`
+	function SndInit(c) {
+		const wshp = window.olga5[W.modul]
 
-		if (!window.olga5[W.modul]) window.olga5[W.modul] = {}
-		wshp = window.olga5[W.modul]
-		wshp.StopSound = StopSound
-		wshp.OriForTag = OriForTag
-		wshp.setClass = setClass
+		wshp.CSS = o5css
 
-		C.IncludeScripts(W2)
-	}
+		c.ParamsFill(W, o5css)
 
-	errs.Add = function (name, url, txt, atr, err) {
-		this.push({ snd: name, 'источник': url, 'пояснение': txt, val: atr, 'ошибка': err })
+		const mtags = c.SelectByClassName(W.class, W.modul)
+		wshp.Prepare(mtags)
+		window.dispatchEvent(new CustomEvent('olga5_sinit', { detail: { modul: W.modul } }))
 	}
 
 	if (!window.olga5) window.olga5 = []
+	if (!window.olga5[W.modul]) window.olga5[W.modul] = {}
+	
+	Object.assign(window.olga5[W.modul], { W: W, })
 	if (!window.olga5.find(w => w.modul == W.modul)) {
 		window.olga5.push(W)
-		console.log(`}---< ${document.currentScript.src.indexOf(`/${W.modul}.`) > 0 ? 'загружен  ' : 'включён   '}:  ${W.modul}.js`)
+		if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
+			console.log(`}---< ${document.currentScript.src.indexOf(`/${W.modul}.`) > 0 ? 'загружен  ' : 'включён   '}:  ${W.modul}.js`)
 		window.dispatchEvent(new CustomEvent('olga5_sload', { detail: { modul: W.modul } }))
 	} else
 		console.error(`Повтор загрузки '${W.modul}`)

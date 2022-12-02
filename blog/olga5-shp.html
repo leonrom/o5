@@ -17,7 +17,7 @@
 	       Ceza1-25=sounds+/Ceza1-25.mp3;
 
 		    мой-блог=https://turkceile.blogspot.com/2017/02/; # --- только для o5shp ---;
-        _блог_Olga=http://turkish4dummies.blogspot.com;
+        _блог_Olga=http://turkish4dummies1.blogspot.com/;
 			">
       </script>
   <script data-src='+o5snd.js' btn_play='images + /play.png' btn_stop='images + /play_Freepik.png'>
@@ -63,18 +63,18 @@
 			   div id='shp_1÷4'
 			... -->
 
-<body id='body'>
-  <div class="separator" style="clear: both;display:none"><img alt="" border="0" width="200" data-original-height="529"
-      data-original-width="707"
-      src="https://1.bp.blogspot.com/-7itlS0xWJNo/YEsTdFMovcI/AAAAAAAAEQo/QkYBh8diN_IkenQsf50m3Z3ItIpL9tNBACPcBGAsYHg/s200/shp.png" />
-  </div>
-  <div id="div_strt" class="olga5_Start" dir="ltr" trbidi="on">
+<body id='body'>  
+  <div id="div_strt" class="olga5_Start:o5pop,o5ref,o5shp" dir="ltr" trbidi="on">
+    <img alt="" border="0" width="200" style="display:none"
+			data-original-height="599" data-original-width="662"
+			src="https://1.bp.blogspot.com/-7itlS0xWJNo/YEsTdFMovcI/AAAAAAAAEQo/QkYBh8diN_IkenQsf50m3Z3ItIpL9tNBACPcBGAsYHg/s200/shp.png"
+	  />
     <p class="olga5_page_header" id='shp0'>
       Организация <i>зависаний</i> элементов HTML-страницы
     </p>
 
     <h3 id='head_1'>1. Общие сведения</h3>
-    <div>
+    <div  id="div_strt2">
       <p>
         Скрипт <code>o5shp.js</code> входит в <i>библиотеку</i>
         <span o5popup='+ ./help/o5help.html; width: 430, height: 390'><code>Olga5</code></span>&nbsp;и 
@@ -122,7 +122,8 @@
         достаточно просматривать скроллингом позиционирование блочных фрагментов фрейма.
       </p>
 
-      <div id="shp-demo" class="olga5_shp:Up:Top" olga5_frames="i:olga5_Start_hr,n" olga5_owners="id:kst" style="margin-left: 22px;padding:4px;padding-left: 0px;
+      <!-- <div id="shp-demo" class="olga5_shp:Up:Top" olga5_frames="i:olga5-Start_hr,n" olga5_owners="id:kst" style="margin-left: 22px;padding:4px;padding-left: 0px; -->
+      <div id="shp-demo" class="olga5_shp:Up:Top" olga5_owners="id:kst" style="margin-left: 22px;padding:4px;padding-left: 0px;
             direction: rtl; background-color: palegreen; outline: solid 3px darkgray;
             width: calc(99% - 23px);height: 333px; overflow: scroll;overflow-x: hidden;
             /* transform: scale(0.8); */
@@ -130,7 +131,7 @@
         <div id="o5-1"
           style="overflow-y:hidden; direction: ltr;background-color:inherit;cursor: default;padding-left: 6px;">
           <p>
-            Рассматриваемая песня Таркана для меня - <i>лучшая</i> из известного (мне) у Него...
+            Рассматриваемая песня Таркана для меня - <i>лучшая</i> из известного (мне) у Него... 
           </p>
           <p>
             Во-первых, в ней отсутствуют "любовные терзания". Ну... <i>почти</i> отсутствуют, потому, что
@@ -507,7 +508,7 @@
       </ul>
       <p>
         Квалификаторы объяснены ниже.
-        Для куплета 17&div;20 задано подвисание не под <i>первым блоком</i>, а под предыдущим куплетом,-
+        Для куплета 17&div;20 подвисание специально задано не под <i>первым блоком</i>, а под предыдущим куплетом,-
         как бы из-за отсутствует между ними поясняющих текстов.
         То, что часть куплетов, вытолкнутая после <i>подвисания</i>)
         позже оказывается видимой под <i>первым блоком</i>
@@ -518,7 +519,7 @@
       <p>
         Временное отключение <i>зависания</i> блока (ради освобождения места),
         выполняется двойным кликом по его <u>неактивной части</u>.
-        Например, для <i>первого блока</i> 'дваждыкликать' следует где-то по тексту песни,
+        Например, для <i>первого блока</i> <i>дваждыкликать</i> следует где-то по тексту песни,
         т.к. клики по изображению перехватываются обработчиком <b>Youtube</b>'а.
       </p>
       <p>
@@ -538,11 +539,13 @@
       <p class="olga5_codeTextSeparate">
         &lt;script src='olga5/<b>o5shp.js</b>'&gt;&lt;/script&gt;
         <br />
+         ...
+        <br />
         <i>&lt;script src='olga5/o5common.js' o5debug=2 o5init_events&gt;&lt;/script&gt;</i>
       </p>
       <p>
         Здесь дополнительное (выделенное курсивом) подключение
-        <a href="блог_o5 + /olga5-all.html" target="olga5_add">o5common.js</a> -
+        <a href="блог_o5 + /olga5-all.html" target="olga5-addPage">o5common.js</a> -
         обязательно.
       </p>
       <!-- <p>
@@ -773,7 +776,12 @@
         находящейся в <span title="обычно невидимая из-за заданного начального скроллина">начале</span> его
         HTML-страницы.
         Заполнение веб-страниц, размеры их окон и значения скроллингов в примерах
-        подобраны для более-менее наглядной иллюстрации тех или иных особенностей параметров.
+        подобраны для более-менее наглядной иллюстрации особенностей параметров.
+      </p>
+      <p class="moecomment">
+        Для показа всплывающих окон в предусмотренных размерах может потребоваться настройка браузера: 
+        например, <b title="104.0.2 (64-bit) для MX Linux-1.0">FireFox</b> по-умолчанию 
+        <i>всплывает</i> окна в развёрнутом (на весь экран) виде. 
       </p>
       <p>
         Для вызова примеров следует кликнуть кнопку <b>показать</b> справа в заголовках 5.1, 5.2 и 5.3.
@@ -854,7 +862,7 @@
       </p>
 
       <h4 id='head_52'>5.2. Фреймы и <i>овнеры</i> (владельцы)
-        <input id='shp2' type="button" value="показать" onclick="window.olga5.PopUp(this, 'тесты + shp2.html','')">
+        <input id='shp2' type="button" value="показать" onclick="window.olga5.PopUp(this, 'тесты + shp2.html','w:666')">
       </h4>
       <p>
         Пример иллюстрирует варианты задания <i>фреймов</i> (задаются теговым атрибутом <b>olga5_frames</b>),
@@ -942,8 +950,8 @@
       </p>
       <ul>
         <li><b>w</b> - ширину рамки: 0 либо 3px;</li>
-        <li><b>c</b> - цвет рамки: '<i>greenyellow</i>' либо 'transparent', либо 'lightgreen';</li>
-        <li><b>b</b> - цвет фона: '<i>greenyellow</i>' либо 'transparent', либо 'lightgreen'.</li>
+        <li><b>c</b> - цвет рамки: '<i>greenyellow</i>' либо '<i>transparent</i>', либо '<i>lightgreen</i>';</li>
+        <li><b>b</b> - цвет фона: аналогично как '<b>c</b>'.</li>
       </ul>
       Здесь '<i>greenyellow</i>' - это цвета фонов у <b>shp0</b> и у вложенного в него <b>div2</b>.
       <p>

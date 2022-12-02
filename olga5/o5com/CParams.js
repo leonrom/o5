@@ -143,7 +143,7 @@
 			}
 
 			if (o5css) InitCSS(W, o5css)
-
+  
 			const isnew = !!scrpt.script,
 				attrs = isnew ? C.GetAttrs(scrpt.script.attributes) : C.o5attrs
 
@@ -156,7 +156,8 @@
 
 				for (const nam in C[p]) {
 					const source = C.constsurl.hasOwnProperty(nam) ? C.save.urlName : `ядро`
-					if (!xs.hasOwnProperty(nam)) xs[nam] = { val: C[p][nam], source: source }
+					if (!xs.hasOwnProperty(nam)) 
+						xs[nam] = { val: C[p][nam], source: source }
 				}
 				if (isnew) {
 					W[p] = {}	// преобразовываю в объект
@@ -166,7 +167,8 @@
 						const urls = {}
 						for (const nam in xs) urls[nam] = xs[nam].val
 						DeCodeUrlRfs(urls, `${W.modul}: `)
-						for (const nam in xs) xs[nam].url = urls[nam]
+						for (const nam in xs) 
+							xs[nam].url = urls[nam]
 					}
 					else
 						for (const nam in C.constsurl)
@@ -210,6 +212,6 @@
 		return true
 	}
 
-	if (window.location.search.match(/(\&|\?|\s)is(-|_)debug\s*(\s|$|\?|#|&|=\s*\d*)/))
+	if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
 		console.log(`}---> подключен ${olga5_modul}/${modulname}.js`)
 })();

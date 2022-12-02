@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>sel1_</title>
+    <link rel="shortcut icon" href="./favicon.svg" type="image/x-icon">
+</head>
+
+<body id="body">
+
+    <style>
+        #cx1a,
+        .CDIV {
+            background: antiquewhite;
+            border: 1px solid;
+            font-size: small;
+            font-family: monospace;
+            min-height: 11px;
+            min-width: 444px;
+            height: fit-content;
+            width: fit-content;
+            overflow-y: auto;
+            margin-bottom: 5px;
+            padding-right: 8px;
+        }
+
+        td {
+            padding-left: 4px;
+            padding-right: 8px;
+        }
+
+        pre {
+            display: block;
+            font-family: monospace;
+            white-space: pre;
+            margin: 0;
+        }
+    </style>
+    <script>
+        window.addEventListener('olga5_ready', e => {
+            const C = window.olga5.C,
+                start = document.getElementById('start'),
+                strt = start.innerHTML,
+                html = document.getElementById('html'),
+                td1 = document.getElementById('td1'),
+                td2 = document.getElementById('td2'),
+                MakeObjName = obj => C.MakeObjName(obj).substring(1),
+                PrtS = mtags => {
+                    for (const mtag of mtags)
+                        mtag.tag.innerHTML += (mtag.tag.innerHTML.trim() ? '<br\>' : '') +
+                            `<b>${MakeObjName(mtag.tag)}</b>: исх.className= "${mtag.origcls}"<br\>` +
+                            `<span style="margin-left: 30px;">&nbsp;рез.className= "${mtag.tag.className}"</span>` +
+                            `<span style="margin-left: 30px;"> <b>квалиф</b>.: ${mtag.quals.length > 0 ? mtag.quals.join(', ') : ' -'}</span>`
+                },
+                Prt = (fun, query) => {
+                    const tags = C[fun](query, ''),
+                        ss = [],
+                        add = td1.innerHTML ? '<br/>  ' : '  '
+                    tags.forEach(tag => { ss.push(MakeObjName(tag)) })
+                    td1.innerHTML += add + `C.<b>${fun}</b> ( '${query}',  '' )`
+                    td2.innerHTML += add + `${ss.join(', ')}`
+                }
+
+            C.QuerySelectorInit(document.querySelectorAll("[class *= 'olga5_Start']"))
+
+            Prt('GetTagsByQueryes', '[o5popup],[title]')
+            Prt('GetTagsByIds', "i_p3, s0, cx1")
+            Prt('GetTagsByTagNames', 'h4, p')
+            Prt('GetTagsByClassNames', 'p3b, XXX')
+
+            PrtS(C.SelectByClassName('XXX', ''))
+
+            html.innerText = strt
+        })
+    </script>
+    <div id="start">
+        <h4>Содержимое документа</h4>
+        (тут все классы выделены заглавными буквами)
+        <div class='XXX CDIV' title="тестовый текст" style="height: 222px;overflow-y: scroll;">
+            <pre id="html">
+            </pre>
+        </div>
+
+        <h4>функции выборки</h4>
+        <table class="CDIV XXX">
+            <tbody>
+                <tr>
+                    <td id="td1"></td>
+                    <td id="td2"></td>
+                </tr>
+            </tbody>
+        </table>
+        <i>В GetTagsByClassNames() найдены лишь те XXX, после которых пробел </i>
+
+        <h4>функция SelectByClassName()</h4>
+
+        <div class="olga5_Start" id="s0">
+            <i>Синтаксис без кавычек, если нету двух слов подряд</i>
+            <i>Простой синтаксис</i>
+            <div id="cx0" class="CDIV XXX CDLA" title="простой класс">
+            </div>
+            <i>Простой синтаксис с квалификаторами</i>
+            <div id="cx1a" class="XXX:loop,main">
+            </div>
+            <div id="cx1b" class="CDIV XXX:loop,main CDLA">
+            </div>
+            <i>Синтаксис с пробелами и кавычками</i>
+            <div id="cx2" class="CDIV CDLA:a XXX:over : a-11_z: loop :  '  sounds + Ceza1-25.mp3'CDLA">
+            </div>
+            <i>Синтаксис с комбинированными разделителями '<b>:</b>' и '<b>,</b>'</i>
+            <div id="cx3" class="CDIV CDLB:a XXX:over,a-11_z,loop,  '  sounds + Ceza1-25.mp3'  CDLA ">
+            </div>
+            <i>Синтаксис без кавычек, если нету двух слов подряд. Обработка дубля <b>XXX</b></i>
+            <div id="cx4"
+                class='CDIV CDLB:d XXX:over : a-11_z: loop :     + Ceza1-25.mp3   CDIV XXX : loop, main  CDLA'>
+            </div>
+            <i>Обнаруживается и изменяется только первое вхождение класса</i>
+            <div id="cx5" class=' XXX : loop, main CDIV CDLB:a XXX : over, second CDLA'>
+            </div>   
+            <!-- <div id="cx6" class="XXX:alive:f:'+tt + /gitme.mp3' olga5_shp:None">
+            </div>
+            <div id="cx7" class="olga5_snd:alive:f:'+tt + /gitme.mp3' XXX:None">
+            </div> -->
+            <h4 id="u1">дальше теги <b>p</b>: </h4>
+            <p id="i_p1" class="p1">какой-то текст в <b>p1</b></p>
+            <p id="i_p2" title="тест">какой-то текст в <b>p2</b></p>
+            <p id="i_p3" class="p3a">какой-то текст в <b>p3a</b></p>
+            <p id="i_p3" class="p3b" o5popup="1">какой-то текст в <b>p3b</b></p>
+        </div>
+    </div>
+    <script src='http://localhost/o5/olga5/o5com.js' o5consts="o5debug=2; "></script>
+</body>
+
+</html>

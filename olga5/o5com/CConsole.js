@@ -27,11 +27,12 @@
 				type = styp.substr(0, 1).toUpperCase(),
 				clr1 = clrtypes[type],
 				clr2 = "margin-left:0.4rem; background: white; color: black; border: solid " +
-					(tab ? "1px gray;" : "1px bisque;"),
-				Is_debug = () => { return (C && C.consts && C.consts.o5debug != undefined) ? C.consts.o5debug : false }
-			if (type != 'A' && type != 'E' && Is_debug() <= 0) // когда НЕ выдаётся сообщение
-				return
-
+					(tab ? "1px gray;" : "1px bisque;")
+				// Is_debug = () => { return (C && C.consts && C.consts.o5debug != undefined) ? C.consts.o5debug : false }
+			// if (type != 'A' && type != 'E' && Is_debug() <= 0) // когда НЕ выдаётся сообщение
+			// 	return
+			// if (txt.match(/o5shp\: найдены селекторы/))
+			// console.log()
 			if (add === null || typeof add === 'undefined' || add === '') console.groupCollapsed('%c%s', (padd + clr1), txt)
 			else
 				if (Number.isInteger(add)) console.groupCollapsed('%c%s%c%s', (padd + clr1), txt, (padd), add + ' ')
@@ -108,38 +109,23 @@
 				}
 			}
 			console.table()
-			console.groupCollapsed(` ... трассировка вызовов :`)
+			// console.groupCollapsed(` ... трассировка вызовов :`)
 			console.trace()
+			// console.groupEnd()
 			console.groupEnd()
-			console.groupEnd()
-
-			// console.log('-------- groupEnd()')
-			// console.groupEnd()
-			// console.groupEnd()
-			// console.groupEnd()
-			// console.groupEnd()
 		}
 
 	wshp[modulname] = () => {
-		// if (C.consts.o5debug > 0) console.log(`}===  инициализация ${olga5_modul}/${modulname}.js`)
 		Object.assign(C, {
 			ConsoleMsg: ConsoleMsg,
-			ConsoleAlert: function (txt, add, tab) {
-				ConsoleMsg('alert', txt, add, tab);
-			},
-			ConsoleError: function (txt, add, tab) {
-				ConsoleMsg('error', txt, add, tab);
-			},
-			ConsoleSign: function (txt, add, tab) {
-				ConsoleMsg('sign', txt, add, tab);
-			},
-			ConsoleInfo: function (txt, add, tab) {
-				ConsoleMsg('info', txt, add, tab)
-			},
+			ConsoleAlert: (txt, add, tab) => ConsoleMsg('alert', txt, add, tab),
+			ConsoleError: (txt, add, tab) => ConsoleMsg('error', txt, add, tab),
+			ConsoleSign: (txt, add, tab) => ConsoleMsg('sign', txt, add, tab),
+			ConsoleInfo: (txt, add, tab) => ConsoleMsg('info', txt, add, tab),
 		})
 		return true
 	}
 
-	if (window.location.search.match(/(\&|\?|\s)is(-|_)debug\s*(\s|$|\?|#|&|=\s*\d*)/))
+	if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
 		console.log(`}---> подключен ${olga5_modul}/${modulname}.js`)
 })();

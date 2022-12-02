@@ -10,55 +10,42 @@
 	if (!window.olga5.C) window.olga5.C = {}
 	if (!window.olga5[olga5_modul]) window.olga5[olga5_modul] = {}
 
-	let o5owners = null
 	const wshp = window.olga5[olga5_modul],
 		C = window.olga5.C,
-		Modul = function (owner, modul) {
-			return owner.modules.length == 0 || !modul || owner.modules.find(m => { return m == modul })
-		},
-		TagsByClassName = (start, cls) => {
-			const smatch = new RegExp(`\\b` + cls + `(\\s*:\\s*(([\`'"])(.*?)\\3|[^\`'":\\s]*))*`, 'i'),
-				sels = start.querySelectorAll("[class *= '" + cls + "']"),
-				tags = []
-
-			for (const tag of sels) {
-				// if (tag.id == 'i3ee')
-				// 	console.log()
-				const ms = tag.className.match(smatch)
-				if (ms) {
-					const quals = [],
-						m = ms[0],
-						ss = m.match(/:\s*(([`'"])(.*?)\2|[^`'":]*)/gm)
-
-					tag.className = tag.className.replace(m, cls)// ВСЕГДА убираю квалификаторы (остальные в ms - не трогать!)
-					if (ss)
-						for (const s of ss)
-							quals.push(s.replace(/^\s*:\s*|\s*$/g, '')) // кавычки пока оставляю
-					if (C.consts.o5debug > 2)
-						console.log(`TagsByClassName: id='${tag.id}',  '${m}', \n\t${quals}`)
-					tags.push({ tag: tag, quals: quals, origcls: m.trim() })
+		Match = scls => new RegExp(`\\b` + scls + `(\\s*[,:+]\\s*((([\`'"\\(\\[])(.*?)\\4)|[\\w\\-\\.]*))*(\\s|$)`),
+		// Match = scls => new RegExp(`\\b` + scls + `(\\s*[,:+]\\s*((([\`'"])(.*?)\\4)|[+\\s*\\-\\w]*))*`),
+		// Match = scls => new RegExp(`\\b` + scls + `[,:]*[^\\s\\)]*`),
+		mquals = /\s*[:,]\s*/,
+		GetTagsBy = (modul, fun, ask) => {
+			const list = [],
+				errs = [],
+				nams = ask.split(ask.match(/;/) ? /\s*;\s*/ : /\s*,\s*/)
+			for (const owner of C.owners)
+				if (owner.modules.length == 0 || !modul ||
+					owner.modules.find(m => { return m == modul })) {
+					const Fun = owner.start[fun]
+					if (Fun)
+						for (const nam of nams) {
+							const tags = Fun.call(owner.start, nam)
+							if (tags)
+								for (const tag of tags)
+									if (!list.includes(tag))
+										list.push(tag)
+						}
+					else
+						errs.push({ tag: C.MakeObjName(owner.start), Fun: fun })
 				}
-			}
-			return tags
-		},
-		QuerySelectorInit = () => {
-			o5owners = []
-			const mtags = TagsByClassName(document, C.olga5_Start)
-			if (mtags.length == 0)
-				mtags.push({ tag: document, quals: [] })
-			for (const mtag of mtags) {
-				const modules = []
-				for (const modul of mtag.quals)
-					modules.push(modul)
-				o5owners.push({ start: mtag.tag, modules: modules }) // , Modul: Modul })
-			}
+			if (errs.length > 0)
+				C.ConsoleError(`Ошибочные запросы функций для тегов`, errs.length, errs)
+			return list
 		}
 
 	wshp[modulname] = () => {
 		// if (C.consts.o5debug > 0) console.log(`}===  инициализация ${olga5_modul}/${modulname}.js`)
 		Object.assign(C, {
-			olga5_Start: 'olga5_Start',
+			owners: [],
 			scrpts: [],
+			Match:Match,
 			MakeObjName: function (obj, len) { // моё формирование имени объекта
 				if (obj) {
 					const nam = Object.is(obj, window) ? '#window' : (
@@ -73,57 +60,72 @@
 				else
 					return 'null';
 			},
-			ClearOwners: function () { // эт чтоб переситыать по-новому
-				o5owners = null
+			GetTagsByQueryes: (queryes, modul) => {
+				return GetTagsBy(modul, 'querySelectorAll', queryes)
 			},
-			GetTagsByQuery: function (query, modul) {
-				if (o5owners === null) QuerySelectorInit()
-				const nodes = []
-				for (const owner of o5owners)
-					if (Modul(owner, modul)) {
-						const tags = owner.start.querySelectorAll(query)
-						if (tags && tags.length > 0)
-							for (const tag of tags)
-								nodes.push(tag)
+			GetTagsByIds: (ids, modul) => {
+				const nams = ids.split(/\s*,\s*/)
+				nams.forEach((nam, i, nams) => { nams[i] = '#' + nam });
+				return GetTagsBy(modul, 'querySelectorAll', nams.join(','))
+			},
+			GetTagsByClassNames: (classnams, modul) => {
+				return GetTagsBy(modul, 'getElementsByClassName', classnams)
+			},
+			GetTagsByTagNames: (tagnams, modul) => {
+				return GetTagsBy(modul, 'getElementsByTagName', tagnams)
+			},
+			SelectByClassName: (classnam, modul) => {
+				const tags = GetTagsBy(modul, 'querySelectorAll', '[class *=' + classnam + ']'),
+					match = Match(classnam),
+					rez = []
+				for (const tag of tags) {
+					const ms = tag.className.match(match)
+					if (ms) {
+						const quals = [],
+							m = ms[0],
+							ss = m.split(mquals)
+
+						tag.className = tag.className.replace(m, classnam+' ')// ВСЕГДА убираю квалификаторы
+						for (let j = 1; j < ss.length; j++)
+							quals.push(ss[j].trim())
+						rez.push({ tag: tag, quals: quals, origcls: ms.input })
 					}
-				return nodes;
-			},
-			GetTagById: function (id, modul) {
-				if (o5owners === null) QuerySelectorInit()
-				for (const owner of o5owners) {
-					// const tt =  owner.start.querySelector('#' + id)
-					const start = owner.start,
-						tag = start.getElementById ? start.getElementById(id) : start.querySelector('#' + id)
-					if (tag && Modul(owner, modul))
-						return tag
 				}
+				return rez
 			},
-			GetTagsByClassName: function (classname, modul) {
-				if (o5owners === null) QuerySelectorInit()
-				const mtags = []
-				for (const owner of o5owners) {
-					const tags = TagsByClassName(owner.start, classname)
-					if (tags && tags.length > 0 && Modul(owner, modul))
-						mtags.push(...tags)
-				}
-				return mtags
-			},
-			GetTagsByTagName: function (tagname, modul) {
-				if (o5owners === null) QuerySelectorInit()
-				const list = [],
-					tagnams = tagname.split(',')
-				for (const owner of o5owners)
-					if (Modul(owner, modul))
-						for (const tagnam of tagnams) {
-							const tags = owner.start.getElementsByTagName(tagnam.trim())
-							if (tags && tags.length > 0)
-								list.push(...tags)
+			QuerySelectorInit: (starts, scls) => {
+				C.owners.splice(0, C.owners.length)
+
+				const match = Match(scls),
+					errs = []
+				if (!starts||starts.length == 0)
+					C.owners.push({ start: document.body, modules: [], origcls: 'document' }) // специально чуть по-иному
+				else
+					for (const tag of starts) {
+						const quals = [],
+							m=tag.className.trim(),
+							ms = m.match(match)
+						if (ms) {
+							tag.className = tag.className.replace(ms[0], scls)// ВСЕГДА убираю квалификаторы (остальные в ms - не трогать!)
+
+							const ss = m.split(mquals)
+							for (let j = 1; j < ss.length; j++) {
+								const modul = ss[j]
+
+								if (C.scrpts.find(scrpt => scrpt.modul == modul)) quals.push(modul)
+								else errs.push(modul)
+							}
 						}
-				return list
+						C.owners.push({ start: tag, modules: quals, origcls: m }) // специально чуть по-иному
+						if (C.consts.o5debug > 2)
+							console.log(`QuerySelectorInit: id='${tag.id}',  '${m}', \n\t${quals}`)
+					}
+				if (errs.length > 0)
+					C.ConsoleError(`Неопределены квалификаторы для '${scls}': `, errs.join(', '))
 			}
 		})
 		return true
 	}
-	if (window.location.search.match(/(\&|\?|\s)is(-|_)debug\s*(\s|$|\?|#|&|=\s*\d*)/))
+	if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
 		console.log(`}---> подключен ${olga5_modul}/${modulname}.js`)
 })();

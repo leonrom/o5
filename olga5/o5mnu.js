@@ -181,7 +181,7 @@
 			if (target && !target.o5menus.ready) target.o5menus.ready = true
 		},
 		GoTo = function (o5menus) {
-			const tag = C.GetTagById(o5menus.ref)
+			const tag = docummen.getElementById(o5menus.ref)
 			if (tag) {
 				tag.scrollIntoView({ block: o5menus.block, behavior: "smooth" })
 				// if (win.scrollY != 0) window.scrollBy(0, win.scrollY)
@@ -326,7 +326,7 @@
 
 	function Init(c) {
 		C = c
-		const timera = '                                                                <   инициирован ' + W.modul,
+		const 
 			InitByText = (menu, tag) => {// если есть такой атрибут}
 				const regval = /^["'`;{\s]*|["'`},\s]*$/g,
 					lis = menu.match(/{[^}]*}/g) || [],
@@ -346,7 +346,6 @@
 							errs.push({ li: li, pair: pair })
 						}
 					}
-					// C.ConsoleInfo("item= ", li.id, item)
 					items.push(item)
 				}
 				if (errs.length > 0)
@@ -357,10 +356,6 @@
 
 		if (C.consts.o5nomnu > 0) C.ConsoleInfo(`Меню отключено по o5nomnu=${C.consts.o5nomnu}`)
 		else {
-			console.time(timera)
-			if (C.consts.o5debug > 1)
-				console.log(` __________________________________________\n   начало  иниц.:   ${W.modul} `)
-
 			if (!W.isReady) {
 				c.ParamsFill(W, o5css)
 				window.olga5.Menu = MnuInit
@@ -370,18 +365,11 @@
 			if (menu)	// если есть такой атрибут}
 				InitByText(menu)
 
-			const mtags = C.GetTagsByClassName('olga5_menudef', W.modul)
-			if (mtags)
-				mtags.forEach(mtag => {
-					InitByText(mtag.tag.innerText.trim(), mtag.tag)
+			const tags = C.GetTagsByClassNames('olga5_menudef', W.modul)
+			if (tags)
+				tags.forEach(tag => {
+					InitByText(tag.innerText.trim(), tag)
 				})
-			document.addEventListener('visibilitychange', e => {
-				if (e.detail && e.detail.unload) { // это от моего Unload()  в IniScripts
-					console.log(` ЗАКРЫТИЕ unload=${e.detail.unload}`)
-				}
-			})
-
-			console.timeEnd(timera)
 		}
 		window.dispatchEvent(new CustomEvent('olga5_sinit', { detail: { modul: W.modul } }))
 	}
@@ -389,6 +377,8 @@
 	if (!window.olga5) window.olga5 = []
 	if (!window.olga5.find(w => w.modul == W.modul)) {
 		window.olga5.push(W)
+		
+	if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
 		console.log(`}---< ${document.currentScript.src.indexOf(`/${W.modul}.`) > 0 ? 'загружен  ' : 'включён   '}:  ${W.modul}.js`)
 		window.dispatchEvent(new CustomEvent('olga5_sload', { detail: { modul: W.modul } }))
 	} else

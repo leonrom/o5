@@ -8,19 +8,15 @@
 //
 (function () {              // ---------------------------------------------- o5com ---
 	'use strict'
-	const olga5_modul = "o5com",
-		// modulname= 'o5com',
-		timera = '                                                                <   инициирован ' + olga5_modul
+	const olga5_modul = "o5com"
 
 	if (!window.olga5) window.olga5 = []
 	if (!window.olga5.C) window.olga5.C = {}
 	if (!window.olga5[olga5_modul]) window.olga5[olga5_modul] = {}
 
-	const C = window.olga5.C
-
-	const wshp = window.olga5[olga5_modul],
-		modnames = ['CConsole', 'CEncode', 'CApi', 'CParams', 'TagsRef', 'IniScripts'],
-
+	const modnames = ['CConsole', 'CEncode', 'CApi', 'CParams', 'TagsRef', 'IniScripts'],
+		wshp = window.olga5[olga5_modul],
+		C = window.olga5.C,
 		IncludeScripts = ({ modul = '', names = [], actscript = C.o5script, iniFun = {}, args = [] }) => {
 			const nams = {},
 				o5timload = C.o5script.attributes['o5timload'] || 3,
@@ -35,16 +31,21 @@
 						console.error(`Для ${modul} недозагрузились скрипты: ${s} (таймер o5timload=${o5timload}с.)`)
 					load.timeout = 0
 				},
-				OnLoad = (name) => {
+				OnLoad = name => {
+					const lefts = []
 					nams[name] = true
 					for (const nam in nams)
-						if (!nams[nam]) return
+						if (!nams[nam]) lefts.push(nam)
 
-					if (load.timeout > 0) {
-						window.clearTimeout(load.timeout)
-						load.timeout = 0
+					if (C.consts.o5debug > 1)
+						console.log(`загружено включение '${name}' осталось [${lefts.join(', ')}]`)
+					if (lefts.length == 0) {
+						if (load.timeout > 0) {
+							window.clearTimeout(load.timeout)
+							load.timeout = 0
+						}
+						iniFun(args)
 					}
-					iniFun(args)
 				},
 				OnError = (name, e) => {
 					console.error(`Для ${name} ошибка дозагрузки '${name}' (из ${e.target.src})`)
@@ -78,7 +79,7 @@
 							(obj.id && obj.id.length > 0) ? ('#' + obj.id) : (
 								('[' + obj.tagName ? obj.tagName : (obj.nodeName ? obj.nodeName : '?') + ']') +
 								'.' + (obj.className ? obj.className : '?'))) : 'НЕОПР.'
-						console.log(`Вставляю скрипт ${name.padEnd(13)}  перед  ${modul + '.js'} (в parentNode=${MakeObjName(actscript.parentNode)})`)
+						console.log(`вставка ${(name + '.js').padEnd(15)}  перед  ${modul + '.js'} (в parentNode=${MakeObjName(actscript.parentNode)})`)
 					}
 
 					if (actscript.parentNode)
@@ -91,16 +92,19 @@
 							}
 				}
 			}
+			// console.log('--------------------- load.timeout='+load.timeout)
 			if (!load.timeout) iniFun(args)
 		},
 		RunO5com = () => {
+			const timera = '}----<<<   ' + `-------  инициирован -------  --------------     '` + olga5_modul.padEnd(12) + `'  (ядро)`,
+				_url_olga5 = C.o5script.src.match(/\S*\//)[0],
+				errs = []
 			console.time(timera)
+
 			Object.assign(C, {
 				IncludeScripts: IncludeScripts,
 			})
 
-			const _url_olga5 = C.o5script.src.match(/\S*\//)[0],
-				errs = []
 			for (const modname of modnames) {
 				if (wshp[modname]) wshp[modname](_url_olga5)
 				else
@@ -118,6 +122,7 @@
 		},
 		TryToDigit = x => {
 			if (typeof x === 'undefined') return true
+			if (x === !!x) return x
 			const val = ('' + x).replace(C.repQuotes, '')
 
 			const i = parseInt(val)
@@ -128,8 +133,7 @@
 			return rez.replace(/\t+/g, ' ').trim()
 		},
 		GetAttribute = (attrs, name) => { // нахождение значения 'attr' в массиве атрибутов 'attrs'
-			const nams = [name, 'data-' + name, '_' + name, 'data_' + name]
-			for (const nam of nams)
+			for (const nam of [name, 'data-' + name, '_' + name, 'data_' + name])
 				if (attrs.hasOwnProperty(nam)) return attrs[nam]
 		},
 		GetAttrs = attributes => {
@@ -214,7 +218,10 @@
 		Repname: Repname,
 		o5script: document.currentScript,
 		o5attrs: GetAttrs(document.currentScript.attributes),
-		cstate: { activated: false }, // общее состояние 
+		cstate: {	 			// общее состояние 
+			activated: false, 	// признак, что было одно из activateEvents = ['click', 'keyup', 'resize']
+			depends: null,  	// только для подключенных скриптов, но с учетом как o5depends, так и очередности в задании и атрибута async
+		},
 		urlrfs: {
 			_url_html: GetBaseHR('href'),
 			_url_root: GetBaseHR('root'),
@@ -222,18 +229,17 @@
 		},
 		consts: {
 			o5debug: 0, o5nomnu: 0, o5noact: 0, o5timload: 3, o5only: 0,
-			o5incls: '', o5doscr: 'olga5_sdone',
-			o5init_events: 'DOMContentLoaded, readystatechange, transitionstart, transitionend, message',
-			isDOMContentLoaded: false
+			o5incls: '',
+			o5doscr: 'olga5_sdone',
+			o5iblog: !!document.URL.match(/\/\/.*.blogspot\..*\//i),
+			o5depends: "pusto; o5pop; o5inc; o5ref= o5inc; o5snd:o5ref, o5inc; o5shp=o5snd, o5ref; o5shp:o5inc; o5inc; o5mnu= o5inc",
+			o5init_events: 'DOMContentLoaded',
+			o5done_events: 'beforeunload, olga5_unload',
 		},
 		constsurl: {},
-		depends: { spisok: "o5ref o5inc, o5pop, o5snd:o5ref o5inc; o5shp=o5snd o5ref, o5shp:o5inc, o5blog o5mnu o5inc, o5mnu o5inc" },
 		save: { hash: null, xs: null, p: '', n1: -1, urlName: 'url', libName: 'ядро', }, // сохранение для "красивой" печати - потом удалю
-		// urlSaveName: 'url',
-		// libSaveName: 'ядро'		
 	})
 
-	document.addEventListener('DOMContentLoaded', e => C.consts.isDOMContentLoaded = true, { once: true })
 	const xs = {}, // временное хранилилище для считываемых параметров
 		p = 'consts',
 		defs = C[p]
@@ -246,6 +252,8 @@
 	for (const nam in xs) defs[nam] = xs[nam].val
 
 	IncludeScripts({ modul: olga5_modul, names: modnames, actscript: C.o5script, iniFun: RunO5com, })
+	if (![0, 1, 2, 3].includes(C.consts.o5debug))
+	C.consts.o5debug=1
 
 	const activateEvents = ['click', 'keyup', 'resize'],
 		SetActivated = e => {
@@ -253,7 +261,6 @@
 			activateEvents.forEach(activateEvent => document.removeEventListener(activateEvent, SetActivated))
 		}
 	activateEvents.forEach(activateEvent => document.addEventListener(activateEvent, SetActivated))
-	//и почему таки не меняется изображение?
-
+	
 	console.log(`}---< загружено ядро библиотеки`)
 })();

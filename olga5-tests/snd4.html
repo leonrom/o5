@@ -16,8 +16,7 @@
 		myTunes-icon='images + /myMusikIT.png' # --- только для o5snd ---;
 
 		мой-блог=https://turkceile.blogspot.com/2017/02/   # --- только для o5shp ---;
-		_мой-блог=https://ariturlearn.blogspot.com/2017/02 # --- только для o5shp ---;
-		_блог_Olga=https://turkish4dummies.blogspot.com;
+		_мой-блог=https://ariturlearn.blogspot.com/2017/02 # --- только для o5shp ---; 
 		"
 ></script>
 <script data-src='+o5snd.js'	
@@ -38,7 +37,6 @@ o5urlrfs="
 	_блог_o5 = '_url_olga5+../2020/02';
 	sounds=https://archive.org/download/clouds_20200310;
 	images=_url_olga5 + ../blog/media/image;
-	_тесты = '_url_olga5 + ../olga5-tests';
 	# _url_html=' адрес текущей страницы (этот и 2 следующих - закомментированы)';
 	# _url_root='# адрес сайта (с текущей страницей)';
 	# _url_olga5='# адрес загрузки файла o5common.js';
@@ -47,7 +45,7 @@ o5urlrfs="
 </head>
 
 <body style="margin: 0 0.1em 0 0.3em;">
-	<div class='example'>
+	<div class='example, olga5_Start'>
 	<style>
 		#div1{
 			background-color: aliceblue;
@@ -77,7 +75,7 @@ o5urlrfs="
 	
 	<span>Примеры подключения <b>&lt;img&gt;</b> с вызовом всех модулей ядра библиотеки. 
 		<br/> Для звучания - кликнуть по иконке (или навести на неё - для 4, 5 и 6&lt;a&gt;)</span>
-	<div id='div1' class="olga5_shp:Up:Top" olga5_frames="i:olga5_Start_hr,n" olga5_owners="n">		
+	<div id='div1' class="olga5_shp:Up:Top" olga5_frames="i:olga5-Start_hr,n" olga5_owners="n">		
 		<p style="text-align: left;text-align: -moz-left;text-align: -webkit-left;margin: 4px;font-size: small;">
 			Ссылки на аудиофайл содержащие пробелы д.б. записана в 
 			<span title="в любой паре одинаковых из `'">кавычках</span>, как в <b>2</b>, <b>3</b>
@@ -140,7 +138,7 @@ o5urlrfs="
 				</tr> 
 				<tr>
 					<td>5</td>
-					<td><img class='dlassaaa:A olga5_snd:over : aЯё: loop :  "  sounds + Ceza1-25.mp3" ' title="img05" id='05'
+					<td><img class='dlassaaa:A olga5_snd:over : a-11_z: loop :  "  sounds + Ceza1-25.mp3" ' title="img05" id='05'
 							src=solfedjio />
 					</td>
 					<td>&lt;<b>img</b> class='dlassaaa:A olga5_snd:<b>o</b>ver&nbsp;:&nbsp;<b>a</b>Яё:&nbsp;<b>l</b>oop&nbsp; :&nbsp;&nbsp; "&nbsp;&nbsp; sounds + Ceza1-25.mp3" '
@@ -152,10 +150,10 @@ o5urlrfs="
 				<tr>
 					<td>6</td>
 					<td>
-						<a id='6' class='olga5_snd:href' target="olga5_add" href="sounds+/Ceza1-25.mp3"
+						<a id='6' class='olga5_snd:href' target="olga5-addPage" href="sounds+/Ceza1-25.mp3"
 							title="кликни чтобы прослушать">&lt;<b>a</b>&gt;</a>
 						<br />
-						<a id='6a' class='olga5_snd:over:href' target="olga5_add" href=Ceza1-25.mp3
+						<a id='6a' class='olga5_snd:over:href' target="olga5-addPage" href=Ceza1-25.mp3
 							title="задержи курсор чтобы прослушать">&lt;<b>a</b>&gt;</a>
 						<br />
 						<b id='6b' class="olga5_snd:alive:'sounds+ /Ceza2-25.mp3'" 
@@ -163,13 +161,13 @@ o5urlrfs="
 						</b>
 					</td>
 					<td>
-						&lt;<b>a</b> class='olga5_snd:<b>href</b>' target="olga5_add" href="sounds+/Ceza1-25.mp3" &gt;
-						<a id='7' class='olga5_snd:href' target="olga5_add" href="sounds+/Ceza1-25.mp3"
+						&lt;<b>a</b> class='olga5_snd:<b>href</b>' target="olga5-addPage" href="sounds+/Ceza1-25.mp3" &gt;
+						<a id='7' class='olga5_snd:href' target="olga5-addPage" href="sounds+/Ceza1-25.mp3"
 							title="кликни чтобы прослушать">кликнуть тут</a>
 						&lt;/a&gt;
 						<br />
-						&lt;<b>a</b> class='olga5_snd:<b>over</b>:<b>href</b>' target="olga5_add" href=Ceza1-25 &gt;
-						<a id='7a' class='olga5_snd:over:href' target="olga5_add" href="sounds+/Ceza1-25.mp3"
+						&lt;<b>a</b> class='olga5_snd:<b>over</b>:<b>href</b>' target="olga5-addPage" href=Ceza1-25 &gt;
+						<a id='7a' class='olga5_snd:over:href' target="olga5-addPage" href="sounds+/Ceza1-25.mp3"
 							title="задержи курсор чтобы прослушать">навести курсор</a>
 						&lt;/a&gt;
 						<br />

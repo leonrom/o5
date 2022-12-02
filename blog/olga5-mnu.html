@@ -18,7 +18,6 @@
 	    { span: '' },
 	    { span: 'Меню блога и страниц', ref: '/olga5-mnu.html', title: 'страница еще редактируется', class: dsbl },
 	    { span: 'Подключение к Blogger`у', ref: '/olga5-blog.html', title: 'страница еще редактируется', class: dsbl },
-	    { span: 'Дополнительный отладчик', ref: '/olga5-debug.html', title: 'страница еще редактируется', class: dsbl },
 	"></script>
 	<script data-src='+o5ref.js' o5tag_attrs="img=image_play; a,img,audio=href,data-href,src" o5urlrfs="images=_url_olga5 + ../blog/media/image;
 			sounds=https://archive.org/download/clouds_20200310;
@@ -41,7 +40,7 @@
 	<script o5debug='2' src='../olga5/o5com.js' o5urlrfs="
 		_блог_o5='https://olga-5.blogspot.com/2020/02';
 		_moe=https://rombase.h1n.ru/o5;
-		_тесты='_url_olga5 + ../olga5-tests' ;
+		тесты='_url_olga5 + ../olga5-tests' ;
 		images = '_url_olga5 + ../blog/media/image';
 		#_url_html адрес текущей страницы (этот и 2 следующих - закомментированы);
 		#_url_root адрес сайта (с текущей страницей) ;
@@ -59,24 +58,27 @@
 </head>
 
 <body>
-	<div class="olga5_Start" dir="ltr" trbidi="on">
-
-		<!-- <div class="olga5_diagonal"> статья &nbsp; ещё&nbsp; редактируется</div> -->
+	<div class="olga5_Start:o5pop" dir="ltr" trbidi="on">
+	<img alt="" border="0" width="200" style="display:none"
+		data-original-height="599" data-original-width="662"
+		src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEg6LLFM-Fd_Ge-bT0fkkaE2rZ3OREguTy1Nx21_14g1vRXX4nT4H0_K755dr-Q0GBmelhcThIVGXkI79Zu9KuwJgDYtUWzpM0f0sixBZZE7oy1DDjTo5Y9PX9uDmQeMZqgtoC0OFzQRDlz6l0Kk0ump0K5XyEhqVX7Q-W2EhyKJSDagbzAYp9uY3ZQ2/s200/mnu.png"
+	/>
 		<div class="div1">
-			<p class="olga5_page_header olga5_popup"
+			<!-- <p class="olga5_page_header olga5_popup"
 				onmouseup="window.olga5.PopShow('', 666, 555, '_url_html+./olga5-help.html?o5nomnu')">
 				Скрипт генерации одного или нескольких навигационных меню
 				<span o5popup='+ ./help/o5help.html; width: 430, height: 390'> библиотеки</span>&nbsp;
-				&nbsp;<a id="a_1" href="_блог_o5 + /olga5-all.html" target="olga5_add"><code>Olga5</code></a>&nbsp;
-			</p>
+				&nbsp;<a id="a_1" href="_блог_o5 + /olga5-all.html" target="olga5-addPage"><code>Olga5</code></a>&nbsp;
+			</p> -->
 			<p>
-				В статье описывается способ подключения меню, созданного на (почти) чистом CSS,
+				Описывается скрипт генерации одного или нескольких навигационных меню, 
+				созданных на (почти) чистом CSS,
 				где <b>JavaScript</b>-вставки используются только для выполнения действий, указанных в меню.
 			</p>
 			<p>
 				В одном документе может содержаться несколько <i>менюшек</i>. 
 				В комплексном
-				<b class="olga5_popup" onmouseup="window.olga5.PopShow('', 555, 333, '_тесты+/mnu1.html')">примере</b>
+				<b class="olga5_popup" onmouseup="window.olga5.PopShow('', 555, 333, 'тесты+/mnu1.html')">примере</b>
 				показаны различные способы подключения меню.
 				Предусмотрено 3 способу задания меню:
 			</p>

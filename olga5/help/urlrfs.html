@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<title>olga5-urlrfs</title>
+	<link rel="shortcut icon" href="+../blog/favicon.svg" type="image/x-icon">
+
+	<link data-href='+../blog/csss/olga5.tableCode.css' media='screen' rel='stylesheet' />
+	<link data-href='+../blog/csss/olga5.textNshow.css' media='screen' rel='stylesheet' />
+	<link data-href='+../blog/csss/olga5.addStyles.css' media='screen' rel='stylesheet' />
+
+	<link data-href='+../blog/csss/olga5.tableKuplet.css' media='screen' rel='stylesheet' />
+	<link data-href='+../blog/csss/tests.css' media='screen' rel='stylesheet' />
+
+	<script data-src='+o5pop.js'></script>
+	<script data-src='+o5mnu.js' o5consts="scrollY=-32"></script>
+	<script src='http://localhost/o5/olga5/o5com.js'></script>
+</head>
+
+<body>
+	<div class="olga5_Start" dir="ltr" trbidi="on">
+		<p class="olga5_page_header olga5_popup"
+			onmouseup="window.olga5.PopShow('', 666, 555, '_url_html+./olga5-help.html?o5nomnu')">
+			Использование <i>именованных</i> ссылок и маскировка атрибутов в <i>библиотеке</i><code>Olga5</code>.
+		</p>
+
+		<p>
+			В модулях <i>библиотеки</i> широко используются т.н. <i>именованные</i> ссылки.
+			Они требуются в ситуациях, когда стандартного тега
+			<span id='span1' class="olga5_popup"
+				onclick="window.olga5.PopUp(this, 'https://ru.w3docs.com/uchebnik-html/html-teg-base.html', 'width:720, height:800')">&lt;base&gt;</span>
+			становится недостаточно:
+		</p>
+		<ul>
+			<li>текстовые части страниц размещены на одном сервере, а <b>JS</b> и <b
+					style="font-family: monospace;">CSS</b> коды - на другом, ну а мультимедиа-ресурсы - на третьем;
+			</li>
+			<li>приходится вставлять десятки-сотни ссылок, рассортированных по различным папкам на серверах;</li>
+			<li>разработка и отладка программ выполняется на одном сервере, их размещение - на другом, а используются
+				вообще где-то в <b>Blogger</b>'е.</li>
+		</ul>
+		<p>
+			В этих случаях удобно часть (или <i>части</i>) строки <b>url</b>'а заменять символическим именем,
+			определённым в атрибуте '<b>o5urlrfs</b>' скрипта ядра <i>библиотеки</i> (смотри
+			<span o5popup='+ ../blog/olga5-all.html?o5nomnu#head_62; width: 666, height: 444'>п. 6.2</span>
+			её описания).
+		</p>
+
+		<p>
+			<span o5popup='+ ../olga5-tests/ref1.html; width: 430, height: 111'>Пример</span>
+			использования:
+		</p>
+		<table class="olga5_tableCode">
+			<tbody>
+				<tr>
+					<td>
+						<pre>&nbsp;<br/>1<br/>2<br/>3<br/>4<br/>5<br/>6<br/>7<br/>8<br/>9<br/>10<br/>11<br/>12<br/>13<br/>14<br/>15<br/>16<br/>17<br/>18<br/>19<br/>20<br/>21<br/>22<br/>23<br/>24<br/>25<br/>26<br/>27</pre>
+					</td>
+					<td>
+						<pre>
+<span class="olga5_tableName">пример с <b>o5ref.js</b></span>
+&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;ru&quot;&gt;
+&lt;head&gt;
+    &lt;meta http-equiv=&quot;content-type&quot; content=&quot;text/html; charset=UTF-8&quot;&gt;
+    &lt;title&gt;ref1&lt;/title&gt;
+
+    &lt;script src='+./<code>o5ref.js</code>'        
+        <b><i>o5tag_attrs</i></b>='<b>a</b>= href, src; <b>img</b>=src; <b>i</b>, <b>b</b>=owm'
+    &gt;&lt;/script&gt;
+    &lt;script async src='../olga5/o5common.js' o5debug=2 
+        <b><i>o5urlrfs</i></b>="
+            <b>мой-сервер</b>= https://rombase.h1n.ru/ ;
+            <b>lib</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= o5/olga5/;
+            <b>images</b>&nbsp;&nbsp;&nbsp;= <b>мой-сервер</b> + /media
+        "		
+    &gt;&lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;	
+    Открыть содержимое <b>o5ref.js</b> по именованной ссылке:
+    '<i><b>href</b>="мой-сервер + lib + o5ref.js"</i>':	<br/> 
+	&lt;div class='<b>olga5_Start</b>:o5ref'&gt;
+	    &lt;a href="мой-сервер + lib + o5ref.js"&gt;Обрабатываема ссылка&lt;/a&gt;
+	&lt;/div&gt; 
+	&lt;a href="мой-сервер + lib + o5ref.js" &gt;Не обрабатываема ссылка&lt;/a&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</pre>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<p>
+			Здесь именованные ссылки задаются скриптовым атрибутом
+			<b>o5urlrfs</b> в ядре библиотеки (скрипте <code>o5common.js</code>) в строках 12&div;143.
+			В теле документа они использованы в стр. 23 и 25 (но обработаны будут лишь в стр. 23,-
+			подробнее см.:
+			<span o5popup='+ ../blog//olga5-all.html?o5nomnu#head_43; width: 666, height: 444'>Область действия
+				инициализации</span>
+			).
+		</p>
+		<p class='moecomment'>
+			1) Обработка именованных ссылок тут выполнится <u>только</u> в стр. 23 потому,
+			что в документе присутствуют теги с классом '<b>olga5_Start</b>' и
+			строка 23 находится внутри тега с таким классом и квалификатором '<b>o5ref</b>' (в отличие от строки 25).
+		</p>
+		<p class='moecomment'>
+			2) Здесь в стр. 7 символ '<b>+</b>' задаёт нахождение
+			<code>o5ref.js</code> там же, где и <code>o5common.js</code>.
+		</p>
+		<p>
+			Наименования <i>ссылок</i> произвольны, регистронезависимы,
+			символы '<b>-</b>' и '<b>_</b>' считаются идентичными.
+		</p>
+		<p>
+			Кроме ссылок, перечисленных в атрибуте <b>o5urlrfs</b> , программа может использовать (подставлять)
+			предопределённые
+			<i>именованные</i> ссылки <b>_url_root</b>, <b>_url_html</b> и <b>_url_olga5</b>
+			(подразумеваемая в стр. 7 слева от знака '<b>+</b>'),
+			создаваемые (автоматически) скриптом <b>common.js</b> и могущие быть переопределёнными в <b>o5urlrfs</b>.
+		</p>
+
+		<p>
+			Общий синтаксис задания атрибутов определён
+			<span id='span2' title="Ссылка на описание ядра библиотеки 'Olga5'" class="olga5_popup"
+				onclick="window.olga5.PopUp(this, '+ ../blog/olga5-all.html?o5nomnu#head_6', 'width:720, height:800')">здесь</span>.
+		</p>
+
+		<p>
+			Обработка <i>именованных</i> ссылок в значениях <b>url</b>'ов
+			определяется следующим алгоритмом:
+		</p>
+		<ul>
+			<li>в значении (в <b>url</b>-строке) отделяется <i>правая часть</i>, начинающаяся символом '<b>?</b>';</li>
+			<li>оставшаяся строка делится на подстроки символом
+				'<b title="при его отсутствии получается одна подстрока"> + </b>'.
+				;</li>
+			<li>если слева от первого '<b>+</b>' пусто, то в первую подстроку подставляется значение <b>_url_olga5</b>
+				(см. <span o5popup='+ ../blog/olga5-all.html?o5nomnu#head_62; width: 666, height: 444'>п. 6.2</span>)
+			</li>
+			<li>если в каждой подстроке отсутствуют '<b>/</b>' и/или '<b>.</b>',
+				то она считается <i>именованной</i> ссылкой,
+				приводится к нижнему регистру и символы '<b>-</b>' заменяются на '<b>_</b>';</li>
+			<li>формируется новая <b>url</b>-строка подстановкой вместо <i>ссылок</i> их <i>значениий</i>
+				(и добавлением <i>правой части</i>).</li>
+		</ul>
+		<p>
+			<i>Значение</i> обычно берётся из атрибута <b>o5urlrfs</b>.
+			Но, если оно совпадает с
+			<u>наименованием</u> <i>иного</i> атрибута того же самого тега, то в ссылку подсталяется
+			<i title="которое также может совпадать с наименованием какого-то иного атрибута :)">значение</i>
+			сего <i>иного</i> атрибута.
+		</p>
+		<p>
+			Результат определения ссылок  
+			<span o5popup='+ ../olga5-tests/ref1.html; width: 430, height: 111'>примера</span>
+			можно увидеть в его информационной строке после 
+			<span title="нужно навести курсор на ссылку и задержать, пока не появится полный адрес">наведения </span> курсора на ссылку, либо
+			посмотреть в сообщении "Суммарно ссылки модуля"
+			журнала <i>console.log</i> после <i>ручного</i> запуска <i>примера</i> с включенной отладкой <b>o5debug</b>.
+		</p>
+		<p>
+			При замене частей адресных строк на <i>именованные</i> ссылки разбивку следует производить <u>только</u> "по
+			слэшам".
+			Распределение символов '<span class="olga5_codeText"><b>/</b></span>' между началами и концами разбиваемых
+			подстрок,-
+			т.е. между остающимися в значении теговского атрибута и 'забираемыми' в значение
+			<i>именованной</i> ссылки в общем-то произвольно, однако рекомендуется, чтобы:
+		</p>
+		<ul>
+			<li>все ссылки, оставшиеся в адресных строках, <b>начинались</b> слэшем;</li>
+			<li>все значения массива <i>именованных</i> ссылок <b>не заканчивались</b> слэшем.</li>
+		</ul>
+		<p>
+			Можно не опасаться появление в результирующем <b>url</b>'е двух слэшей подряд,
+			т.к. программа автоматически заменяет группы слэшей одним символом '<span
+				class="olga5_codeText"><b>/</b></span>'
+			(однако при этом выдаётся диагностическое сообщение).
+			Так же можно (но не рекомендуется) опускать разбивочные слэши,-
+			программа сама будет пытаться <span title="с записью сообщения в console.log">добавить</span> таковые при их
+			отсутствии.
+			Хотя, пожалуй, лучше всё делать аккуратно и единообразно.
+		</p>
+		<p>
+			Неполные строки результирующего <b>url</b>'а,- т.е. не содержащие '<b>://</b>', дополняются слева
+			<span title="определяется браузером автоматически">значением</span> <b>document.baseURI</b>.
+			Это значение содержит значение тега &lt;<b>base</b>&gt; (в заголовке HTML-файла), а при его отсутствии -
+			адрес текущей страницы.
+			Возможный один лишний слэш при этой состыковке удаляется автоматически.
+		</p>
+
+		<p>
+			Обычно при использовании <i>именованных</i> ссылок браузер, после попытки их загрузки,
+			выдает сообщения "<i><b><small>net::ERR_ABORTED&nbsp;404</small></b></i>".
+			Чтобы избежать этого предусмотрена возможность
+			как бы замаскировать стандартные атрибуты <b>src</b> и <b>href</b>
+			использованием вместо них дополнительных атрибутов <b>_src</b> и <b>_href</b> соответственно.
+		</p>
+		<p>
+			Например, если в <b>div</b> с классом '<i>olga5_Start:o5ref</i>' добавить тег
+		</p>
+		<p class="olga5_codeTextSeparate">
+			&lt;img alt="Пример" <b>_src</b>="<b>images</b>+/pict.png" /&gt;
+		</p>
+		<p>
+		содержащий маскирующий атрибут '<b>_src</b>',
+		то после <span title="выполняемой автоматически данным сроиптом">подстановки</span> значения
+		именованной ссылки <b>images</b> он окажется преобразованным в
+		</p>
+		<p class="olga5_codeTextSeparate">
+			&lt;img alt="Пример" <b>src</b>="https://rombase.h1n.ru/media/pict.png" /&gt;
+		</p>
+		<p>
+			При этом не будет ни попытки его загрузки, ни сообщения '<i><b><small>404</small></b></i>'.
+		</p>
+		<br />
+		<!-- ===================================================================================== -->
+		<!-- <pre id="menu-pre" class="olga5_menudef" style="display:none">
+				{span: 'Статья', id:"moemenu", right: '5px',top: '5px',add: '266px',,},
+				{span: '1. Именованные ссылки',			ref: 'head_1'},
+				{span: '2. Маскировка атрибутов',	ref: 'head_2'},
+				{span: '3. Рекомендации по отладке',	ref: 'head_3'},
+		</pre> -->
+	</div>
+</body>
+
+</html>

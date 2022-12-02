@@ -31,7 +31,7 @@
 		// ... иные функции/операторы инициализации заданные внутри  "WndInit(c)"
 
 		/* информирование ядра библиотеки о завершении инициализации */
-		console.log(`                                                                <   инициирован:  ${W.modul}.js`)
+		// console.log(` инициирован:  ${W.modul}.js`)
 		window.dispatchEvent(new CustomEvent('olga5_sinit', { detail: { modul: W.modul } }))
 	}
 

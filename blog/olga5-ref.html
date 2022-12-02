@@ -35,14 +35,14 @@
 	src='https://rombase.h1n.ru/o5/olga5/o5common.js'
 	src='http://localhost/o5/olga5/o5common.js' 
 	_блог_o5 = 'https://olga-5.blogspot.com/2020/02' 
-    _тесты='http://rombase.h1n.ru/o5/olga5-tests'
-    _тесты='http://localhost/o5/olga5-tests'  
+    тесты='http://rombase.h1n.ru/o5/olga5-tests'
+    тесты='http://localhost/o5/olga5-tests'  
 -->
 	<script src='http://localhost/o5/olga5/o5com.js' 
 		o5consts="o5debug=2" 
 		o5urlrfs="
 			_блог_o5 = '_url_olga5+../2020/02';
-			_тесты = '_url_olga5 + ../olga5-tests';
+			тесты = '_url_olga5 + ../olga5-tests';
 			images = _url_olga5 + ../blog/media/image;
 			# _url_html='# адрес текущей страницы (этот и 2 следующих - закомментированы)';
 			# _url_root='# адрес сайта (с текущей страницей)';
@@ -52,7 +52,12 @@
 </head>
 
 <body>
-	<div class="olga5_Start" dir="ltr" trbidi="on">
+	<div class="olga5_Start:o5pop,o5ref,o5shp" dir="ltr" trbidi="on">
+		<img alt="" border="0" width="200" style="display:none"
+			data-original-height="599" data-original-width="662"
+			src="https://1.bp.blogspot.com/-opJj3td2qGQ/YEsTLcPWdRI/AAAAAAAAEQg/C1qCdQsEf-87IkDtZdPI_6K5VsBlNnFVACPcBGAsYHg/s200/ref.png"
+		/>
+
 		<p class="olga5_page_header">
 			Подстановка <i>именованных</i> ссылок в теги <b>HTML</b>-документа.
 		</p>
@@ -63,8 +68,14 @@
 				Скрипт <code>o5ref.js</code> входит в <i>библиотеку</i>
 				<span 
 					o5popup = '+ ./help/o5help.html; width: 555, height: 390'><code>Olga5</code></span>&nbsp;и 
-				выполняет подстановку <i>именованных</i>&nbsp;
-				ссылок в тегах, заданных обязательным атрибутом <b>o5tag_attrs</b> и находящихся в
+				выполняет подстановку
+				<a href="+ ./help/urlrfs.html" target="olga5-addPage">
+					<b title="полное описание предлагаемых именованных ссылок">именованных&nbsp;ссылок</b>
+				</a>.
+				<!-- <a 
+					href = '+ ./help/urlrfs.html; width: 555, height: 390'><b><u>именованных&nbsp;ссылок</u></b></span> -->
+				
+				в тегах, заданных обязательным атрибутом <b>o5tag_attrs</b> и находящихся в
 				<span  class="olga5_popup" o5popup='./olga5-all.html?o5nomnu#head_43; width: 666, height: 444'>областях</span>
 				действия инициализации данного скрипта.
 				При его отсутствии модуль не выполняет никаких действий, а в системный журнал выдаётся предупреждающее
@@ -82,7 +93,7 @@
 					onclick="window.olga5.PopUp(this, './olga5-all.html?o5nomnu#head_6', 'width:720, height:800')">здесь</span>,
 				а подробности использования <i>именованных</i> ссылок -
 				<span id='span2' title="Ссылка на описание ядра библиотеки 'Olga5'" class="olga5_popup"
-					onclick="window.olga5.PopUp(this, './olga5-urlrfs.html?o5nomnu#head_1', 'width:720, height:800')">здесь</span>.
+					onclick="window.olga5.PopUp(this, './help/urlrfs.html?o5nomnu#head_1', 'width:720, height:800')">здесь</span>.
 			</p>
 			<p>
 				Атрибут <b>o5tag_attrs</b> задает массив из <i>пар</i> списков: тегов и теговых атрибутов,
@@ -118,7 +129,7 @@
 			<p>
 				Как пример подключения <code>o5ref.js</code> рассматривается
 				<code class="olga5_popup"
-					onclick="window.olga5.PopShow('', 500, 288, '_тесты+/ref2.html')">HTML-файл</code>:
+					onclick="window.olga5.PopShow('', 500, 288, 'тесты+/ref2.html')">HTML-файл</code>:
 			</p>
 
 			<div id="kst">
@@ -205,7 +216,7 @@
 			<p>
 				Правильность работы приведенного выше				
 				<span class="olga5_popup"
-					onclick="window.olga5.PopShow('', 500, 288, '_тесты+/ref2.html')">HTML-файла</span>:
+					onclick="window.olga5.PopShow('', 500, 288, 'тесты+/ref2.html')">HTML-файла</span>:
 				подтверждается (после клика по ссылке) отображением иконок и загрузкой/звучанием аудио-файла (в 5-м
 				теге).
 				Также результаты подстановок можно посмотреть на закладке <i>Elements</i> окна отладчика
@@ -300,7 +311,7 @@
 			</p>
 			<p>
 				Перед самостоятельным поиском ошибок проверьте текст на валидность, например
-				<a href="https://validator.w3.org/#validate_by_input" target="olga5_add">здесь</a>.
+				<a href="https://validator.w3.org/#validate_by_input" target="olga5-addPage">здесь</a>.
 			</p>
 			<p>
 				И наконец: если не получается самостоятельно исправить,- отправьте автору блога ссылку на страницу

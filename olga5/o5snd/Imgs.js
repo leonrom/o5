@@ -44,8 +44,8 @@
                     maps.set(url, { img: nimg, err: '' })
 
                     nimg.addEventListener('load', () => {
-                        if (C.consts.o5debug > 0)
-                            C.ConsoleInfo(`GetImgForRef: загружен url= ${url}`)
+                        if (C.consts.o5debug >1)
+                            console.log(`GetImgForRef: загружен url= ${url}`)
                         if (url.trim() == '')
                             alert('url=?')
 
@@ -67,7 +67,7 @@
                     if (!isinmap)
                         maps.set(url, { img: img.cloneNode(true), err: '' })
                     if (C.consts.o5debug > 1)
-                        console.log(`olga5_Imgs ${isinmap ? 'повтор' : 'добавлен'} url=${url} для img.id='${img.id}' ${s}`)
+                        console.log(`olga5_Imgs ${isinmap ? 'повтор  ' : 'добавлен'} url=${url} для img.id='${img.id}' ${s}`)
                 }
                 else
                     console.error(`olga5_Imgs : попытка добавить` + (img ? ` пустой src для img.id='${img.id}'` : ` пустой  <img>`))
@@ -76,7 +76,7 @@
                 newimg.className = img.className
                 if (img.attributes.style) {
                     if (!newimg.attributes.style)
-                        newimg.setAttribute('style', {})
+                        newimg.setAttribute('style', '')
                     newimg.attributes.style.nodeValue += img.attributes.style.nodeValue
                 }
             },
@@ -190,5 +190,7 @@
     }
 
     window.olga5[olga5_modul].Imgs = Imgs
+    
+	if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
     console.log(`}---< ${document.currentScript.src.indexOf(`/${olga5_modul}.`) > 0 ? 'дозагружен' : 'подключён '}:  ${olga5_modul}/Imgs.js`)
 })();

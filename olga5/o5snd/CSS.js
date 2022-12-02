@@ -91,5 +91,7 @@ img.${olga5_class}.${css._clsPlay} {
         }
         return cls
     }
+    
+	if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
     console.log(`}---< ${document.currentScript.src.indexOf(`/${olga5_modul}.`) > 0 ? 'дозагружен' : 'подключён '}:  ${olga5_modul}/CSS.js`)
 })();

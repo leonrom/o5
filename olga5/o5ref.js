@@ -13,53 +13,53 @@
 			consts: 'o5tag_attrs=,',
 			urlrfs: '',
 		},
-		ParseTagAttrs = (params) => {
+		ParseTagAttrs = params => {
 			const errs = [],
-				mtags = {}
-			for (const nam in params) {
-				const param = params[nam]
+				otags = {}
+			for (const pnam in params) {
+				const param = params[pnam]
 				if (!param)
 					errs.push({ 'где': `nam='${nam}'`, err: `пустой параметр` })
 				else {
-					const regexp = /\s*,\s*/g,
-						tags = nam.split(regexp),
+					const regexp = /\s*[,;]+\s*/g,
+						nams = pnam.split(regexp),
 						attrs = param.split(regexp)
 
 					for (const attr of attrs)
 						if (attr && attr.match(/\s+/)) {
-							errs.push({ par: `в значении '${nam}=${attr}'`, err: `пробелы заменены ','` })
+							errs.push({ par: `в значении '${pnam}=${attr}'`, err: `пробелы заменены ','` })
 							attr.replace(/\s+/g, ',')
 						}
 
-					for (const tag of tags) {
-						if (!tag) {
+					for (const nam of nams) {
+						if (!nam) {
 							errs.push({ par: `nam='${nam}'`, err: `пустой 'тег' в параметре` })
 							continue
 						}
-						if (!mtags[tag]) mtags[tag] = {}
+						if (!otags[nam]) otags[nam] = {}
 						for (const attr of attrs) {
 							if (attr)
-								if (!mtags[tag][attr]) mtags[tag][attr] = 0// счетчик использования
+								if (!otags[nam][attr]) otags[nam][attr] = 0// счетчик использования
 						}
 					}
 				}
 			}
 			if (errs.length > 0)
 				C.ConsoleError(`Ошибки в параметрах`, 'o5tag_attrs', errs)
-			return mtags
+			return otags
 		},
-		ConvertUrls = function (mtags) {
+		ConvertUrls = otags=> {
 			let tagnams = ''
-			for (const nam in mtags)
+			for (const nam in otags)
 				tagnams += (tagnams ? ',' : '') + nam
 
-			const tags = C.GetTagsByTagName(tagnams, W.modul),
+			const tags = C.GetTagsByTagNames(tagnams, W.modul),
 				undefs = [],
 				rez = []
 
 			for (const tag of tags) {
 				const nam = C.MakeObjName(tag),
-					attrs = mtags[(tag.tagName.toLowerCase())],
+					attrs = otags[(tag.tagName.toLowerCase())],
 					o5attrs = C.GetAttrs(tag.attributes)
 
 				for (const attr in attrs)
@@ -97,35 +97,31 @@
 	let no_o5tag_attrs = false
 	function RefInit(c) {
 		C = c
-		const o5tag_attrs = 'o5tag_attrs',
-			timera = '                                                                <   инициирован ' + W.modul
-		console.time(timera)
-
-		if (C.consts.o5debug > 1)
-			console.log(` __________________________________________\n   начало  иниц.:   ${W.modul}`)
 
 		c.ParamsFill(W)
 
-		const s = W.consts[o5tag_attrs]
+		const o5tag_attrs = 'o5tag_attrs',
+		 s = W.consts[o5tag_attrs]
 
 		if (s) {
 			const params = C.SplitParams(s, o5tag_attrs),
-				mtags = ParseTagAttrs(params)
-			C.ConsoleInfo(`Модуль ${W.modul} : обрабатываемые атрибуты тегов`, o5tag_attrs, mtags)
-			ConvertUrls(mtags)
+				otags = ParseTagAttrs(params)
+			C.ConsoleInfo(`Модуль ${W.modul} : обрабатываемые атрибуты тегов`, o5tag_attrs, otags)
+			ConvertUrls(otags)
 		}
 		else if (!no_o5tag_attrs) {
 			no_o5tag_attrs = true
 			C.ConsoleError(`${W.modul}.js: неопределено значение атрибута '${o5tag_attrs}'`)
 		}
 
-		console.timeEnd(timera)
 		window.dispatchEvent(new CustomEvent('olga5_sinit', { detail: { modul: W.modul } }))
 	}
 
 	if (!window.olga5) window.olga5 = []
 	if (!window.olga5.find(w => w.modul == W.modul)) {
 		window.olga5.push(W)
+		
+	if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
 		console.log(`}---< ${document.currentScript.src.indexOf(`/${W.modul}.`) > 0 ? 'загружен  ' : 'включён   '}:  ${W.modul}.js`)
 		window.dispatchEvent(new CustomEvent('olga5_sload', { detail: { modul: W.modul } }))
 	} else

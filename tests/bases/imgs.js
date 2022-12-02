@@ -32,6 +32,7 @@ function Imgs() {
 				nimg.loading = 'eager'
 
 				nimg.addEventListener('load', () => {
+					if (C.o5debug < 0)
 					console.log(`olga5_Imgs загружен url=${url}`)
 					Resolve({ img: nimg, new: true })
 				}, { once: true })

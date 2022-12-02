@@ -16,7 +16,7 @@
 	<script>
 		window.addEventListener('olga5_ready', function () { Init1() })
 	</script>
-	<div class='example'>
+	<div class='example' id="example-1">
 		<div class='cboxed'>
 			<span>видимость</span><br />
 			<input type="checkbox" id="shdwcb" onclick="CC()" title="видимость исходников для объектов 'shp'">shdws: тени<br>
@@ -98,7 +98,7 @@
 				в чём можно убедиться, изменив ширину окна браузера.
 			</p>
 			<p>
-				При сбросе <i>подвисания</i> объект (с неменшим <b>level</b>'ом) оказывается там,
+				При сбросе <i>подвисания</i> объект (с неменьшим <b>level</b>'ом) оказывается там,
 				где в этот момент скроллина находится его прототип,
 				(который можно увидеть, включив <b>CheckBox <i>shdws</i></b>).
 			</p>

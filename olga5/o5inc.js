@@ -3,14 +3,27 @@
 /*jshint esversion: 6*/
 (function () {              // ---------------------------------------------- o5inc ---	
 	'use strict'
-	let C = null
+	const mdebug = window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=)(\s*\d*)/)
+	let C = {
+		consts: { o5debug: mdebug ? (mdebug[5] ? mdebug[5] : 1) : 0 },
+		Match: scls => new RegExp(`\\b` + scls + `[,:]*[^\\s\\)]*`),
+		ConsoleInfo: (head, len, rezs) => {
+			console.groupCollapsed(head + ' - OK')
+			console.table(rezs)
+			console.groupEnd()
+		},
+		ConsoleError: (head, ne, rezs) => {
+			console.groupCollapsed(head + ` - есть ${ne} ошибок!`)
+			console.table(rezs)
+			console.groupEnd()
+		},
+	}
 	const
 		W = {
 			modul: 'o5inc',
 			Init: Includes,
 			// src: document.currentScript.src,
 		},
-		timera = '                                                                <   инициирован ' + W.modul,
 		incls = {},
 		act = {
 			div: null,
@@ -27,15 +40,9 @@
 
 						rezs.push({ url: incl.url, err: err, status: incl.status, load: incl.text, bad_selector: incl.undef })
 					}
-					console.timeEnd(timera)
 
-					if (C)
-						(ne == 0 ? C.ConsoleInfo : C.ConsoleError)(head, rezs.length, rezs)
-					else {
-						console.groupCollapsed(head + (ne > 0 ? ` - есть ${ne} ошибок!` : ''))
-						console.table(rezs)
-						console.groupEnd()
-					}
+					if (ne) C.ConsoleError(head, ne, rezs)
+					else C.ConsoleInfo(head, 'OK', rezs)
 					window.dispatchEvent(new CustomEvent('olga5_sinit', { detail: { modul: W.modul } }))
 				}
 			}
@@ -49,13 +56,13 @@
 						ori = ss[0].trim()
 
 					if (!incls[ori]) {
-						const wref = (C && C.DeCodeUrl) ? C.DeCodeUrl(C.urlrfs, ori, '') : { url: ori, err: '' },
+						const wref = (C.DeCodeUrl) ? C.DeCodeUrl(C.urlrfs, ori, '') : { url: ori, err: '' },
 							text = wref.err ? `Перекодирование` : ``
 
 						incls[ori] = { tagids: [], status: 0, text: text, err: wref.err, undef: '', url: wref.url }
 						Object.seal(incls[ori])
 					}
-					incls[ori].tagids.push({ tag: tag, selector: (ss[1] ? ss[1] : '') })
+					incls[ori].tagids.push({ tag: tag, selector: ss[1] }) // (ss[1] ? ss[1] : '') })
 					// tag.attributes.removeNamedItem(o5include)// 'это на потом: чтобы могло искать и обрабатывать вложенные
 				}
 		},
@@ -67,10 +74,12 @@
 			C.ConsoleError(`Не определён incl-источник загрузки для url='${_url}'`)
 		},
 		OnLoad = function () {
-			if (C.consts.o5debug > 0) console.log("}========  OnLoad() 1 -----------------------------------------------")
 			const xhr = this,
-				ok = xhr.status == 200,
-				incl = FindIncl(xhr._url)
+				ok = xhr.status == 200
+
+			if (C.consts.o5debug > 0) console.log(`}========  o5inc.OnLoad(${xhr.status})  ------ ${xhr._url}`)
+
+			const incl = FindIncl(xhr._url)
 
 			if (incl) {
 				Object.assign(incl, { status: xhr.status, text: xhr.statusText, err: ok ? 0 : 2 })
@@ -83,15 +92,42 @@
 						res = (i1 > 0 ? s.substring(i1, i2) : s).trim()
 
 					for (const tagid of incl.tagids) {
-						if (tagid.selector) {
-							if (!act.div) act.div = document.createElement('div')  // первый и единственный раз
-							act.div.innerHTML = res
+						let sel = tagid.selector
+						if (sel) {
+							if (!act.div) {
+								act.div = document.createElement('div')  // первый и единственный раз
+								act.div.innerHTML = res
+							}
 
-							const tag = act.div.querySelector(tagid.selector)
+							let tag = null,
+								ts = null
 
-							if (tag) tagid.tag.innerHTML = tagid.tag.innerHTML + tag.innerHTML
+							switch (sel[0]) {
+								case '': tag = act.div
+									break
+								case '[': tag = act.div.querySelector(sel)
+									break
+								case '#': tag = act.div.querySelector(`[id='${sel.substring(1)}']`)
+									break
+								case '.':
+									const cls = sel.substring(1),
+										match = C.Match(cls)
+									ts = act.div.querySelectorAll(`[class *='${cls}']`)
+									if (ts)
+										for (const t of ts)
+											if (t.className.match(match)) {
+												tag = t
+												break
+											}
+									break
+								default: ts = act.div.getElementsByTagName(sel)
+									if (ts) tag = ts[0]
+							}
+
+							if (tag) tagid.tag.innerHTML += tag.innerHTML
 							else {
-								console.error(`inc: не определён селектор '${tagid.selector}' (м.б. ошибка парности тегов <div>)`)
+								if (C.consts.o5debug > 1)
+									console.error(`inc: не определён селектор '${tagid.selector}' (м.б. ошибка парности тегов <div>)`)
 								incl.undef += (incl.undef ? ',' : '') + tagid.selector
 								incl.err = 1
 							}
@@ -100,7 +136,7 @@
 					}
 				}
 			}
-			if (C.consts.o5debug > 0) console.log("}========  OnLoad() 2 -----------------------------------------------")
+			if (C.consts.o5debug > 2) console.log("}========  OnLoad() 2 -----------------------------------------------")
 			act.DecFinish()
 		},
 		OnError = function (e) {
@@ -111,10 +147,9 @@
 			act.DecFinish()
 		}
 
-	function Includes() {
-		console.time(timera)
-		C = window.olga5.C
-		if (C.consts.o5debug > 0) console.log("}========  Includes() 1 -----------------------------------------------")
+	function Includes(c) {
+		if (c) C = c
+		if (C.consts.o5debug > 0) console.log(`}========  o5inc.Includes()   ------ ${c ? 'из библиотеки' : 'автономно'}`)
 
 		SelInclDests()
 		for (const ori in incls) {
@@ -130,12 +165,19 @@
 			act.DecFinish()
 	}
 
+	window.addEventListener("DOMContentLoaded", e => {
+		if (!window.olga5.C) // библиотеки-то - НЕТУ
+			Includes()
+	})
+
 	if (!window.olga5) window.olga5 = []
 	if (!window.olga5.find(w => w.modul == W.modul)) {
 		window.olga5.push(W)
-		console.log(`}---< ${document.currentScript.src.indexOf(`/${W.modul}.`) > 0 ? 'загружен  ' : 'включён   '}:  ${W.modul}.js`)
+
+		if (C.consts.o5debug > 0)
+			console.log(`}---< ${document.currentScript.src.indexOf(`/${W.modul}.`) > 0 ? 'загружен  ' : 'включён   '}:  ${W.modul}.js`)
 		window.dispatchEvent(new CustomEvent('olga5_sload', { detail: { modul: W.modul } }))
 	} else
 		console.error(`Повтор загрузки '${W.modul}`)
-	window.olga5[W.modul] = { W: W } // ради автономного доступ по-имени
+	// window.olga5[W.modul] = { W: W } // ради автономного доступ по-имени
 })();

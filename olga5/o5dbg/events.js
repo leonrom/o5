@@ -10,7 +10,8 @@
 	console.time(timera)
 
 	let mybody = null
-	const excls = `key*, mouse*,device*,pointer*, animati*,*screen*,wheel,scroll`.replace(/[\s\n]/g, '').split(','),
+	// const excls = `key*, mouse*,device*,pointer*, animati*,*screen*,wheel,scroll`.replace(/[\s\n]/g, '').split(','),
+	const excls = `key*, mouse*, pointer*`.replace(/[\s\n]/g, '').split(','),
 		addocevs = `DOMContentLoaded`,
 		phases = ['NONE', 'CAPTURING', 'AT_TARGET', 'BUBBLING',],
 		myclr = "background: aqua; color: black;",
@@ -30,18 +31,12 @@
 				doc = document.URL.match(/\/[^\/]*$/)[0].substring(1);
 			(window.opener ? window.opener : window).
 				console.log('%c%s', myclr, `${W.modul} ---> ` + name.padEnd(20) +
-					// '  ' + key.toUpperCase() + '      ' +
+					
 					'[ ' + (wins[o] ? 'win' : '').padEnd(3) +
 					', ' + (docs[o] ? 'doc' : '').padEnd(3) + ' ] ' +
+					'  ' + key.toUpperCase() + ' ' +
 					' ' + e.timeStamp.toFixed(1).padEnd(6) +
 					`  ${e.eventPhase}=${phases[e.eventPhase].padEnd(10)}` +
-				
-					`  ${document.querySelector('.olga5_Start') ? 'olga5_Start' : ' -    '}` +
-					`  ${document.getElementById('o5mnuscript') ? 'o5mnuscript' : ' -    '}` +
-					`  ${document.getElementById('o5mnu-blog') ? 'o5mnu-blog' : ' -   '}` +
-					`  ${document.getElementById('o5moemnu') ? 'o5moemnu' : ' - '}` +
-					`  ${document.getElementById('olga5_popup_internal') ? '..._internal' : ' -     '}` +
-					
 					'  ' + doc+
 					``)
 		},
@@ -96,11 +91,12 @@
 		{}
 	)
 	let s = `${'событие: '.padEnd(33)}  win doc искл.`
+	console.groupCollapsed('обрабатываемые события')
 	for (const nam in salls) {
 		const all = salls[nam]
-		s += '\n' + `${nam.padEnd(33)}  ${all.win}  ${all.doc} ${all.exl}`
+		console.log(`${nam.padEnd(33)}  ${all.win}  ${all.doc} ${all.exl}`)
 	}
-	console.log(s)
+	console.groupEnd()
 
 	console.timeEnd(timera)
 

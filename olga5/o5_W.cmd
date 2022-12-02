@@ -9,7 +9,7 @@ type o5shp\AO5shp.js o5shp\DoInit.js o5shp\DoResize.js o5shp\DoScroll.js ^
      o5shp.js ^
    > o5shp!.js  2>>o5.log
 
-type o5snd\AO5snd.js o5snd\CSS.js o5snd\Imgs.js ^
+type o5snd\AO5snd.js o5snd\Prep.js o5snd\Imgs.js ^
      o5snd.js ^
    > o5snd!.js  2>>o5.log
 

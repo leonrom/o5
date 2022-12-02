@@ -56,7 +56,7 @@
                 AddError: (aO5, mrk, txt) => {
                     if (!aO5.sound.errIs[mrk]) {
                         errTypes.SetT(aO5, mrk, true)
-                        C.ConsoleError(`"${errTypes[mrk]}" (${mrk})` + (txt ? (` (${txt})`) : '') + ` для '${aO5.name}'`)
+                        C.ConsoleError(`"${errTypes[mrk]}" (${mrk})` + (txt ? ` ${txt}` : '') + ` для '${aO5.name}'`)
 
                         aO5.sound.errIs.errs = true
                         if (!aO5.snd.classList.contains(_clsError))
@@ -147,7 +147,7 @@
                             type: 'error', Act: (snd, e) => {
                                 const aO5 = snd.aO5snd
                                 errTypes.AddError(aO5, 'неЗагружен',
-                                    `\n"${e.target.src}" \n(т.е. это при audio_play= '${aO5.parms.audio_play}', attrs.aplay= '${aO5.modis.aplay}') `)
+                                    `\n(это при audio_play= '${aO5.parms.audio_play}', attrs.aplay= '${aO5.modis.aplay}') `)
                             }
                         },
                         {

@@ -14,7 +14,6 @@
         debugids = []  // 'shp_text' // 'shp_1÷4' // 'shp-demo' // 'shp_text'        
 
     const wshp = window.olga5[olga5_modul],
-        W = window.olga5.find(w => w.modul == olga5_modul), // так делать во всех подмодулях 
         IsFloat001 = (s) => { return Math.abs(parseFloat(s) > 0.01) },
         prevsPO5 = {},
         MyJoinO5s = (aO5s) => {
@@ -27,7 +26,7 @@
                 return
 
             pO5.prevs.push(pO5.current)
-            if (pO5.isBody || pO5.current.aO5shp) {
+            if (pO5.isFinal || pO5.current.aO5shp) {
                 if (o5debug > 1) console.log("FillBords:  " + strt + " == конец")
                 Object.assign(pO5.cdif, { ct: true, cl: true, cr: true, cb: true })
             }
@@ -53,7 +52,18 @@
             }
 
             if (o5debug > 0) pO5.PutBords(pO5, "FillBords:  " + strt + " +> ")
-        }
+        },
+        Finish = () => {
+            const hash = C.save.hash
+            if (hash) { // делать именно когда загружен документ (например - тут)
+                const tag = document.getElementById(hash)
+                if (tag) tag.scrollIntoView({ alignToTop: true, block: 'start', behavior: "auto" })
+                else
+                    C.ConsoleError(`Неопределён hash= '${hash}' в адресной строке`)
+            }
+            // window.dispatchEvent(new window.Event('resize'))
+        },
+        blogPanels = ['overview-content', 'viewitem-panel']
 
     class PO5 {
         constructor(current, aO5) {
@@ -61,21 +71,21 @@
             this.id = current.id
             this.name = C.MakeObjName(current)
             this.isBody = current == document.body || current.nodeName == 'BODY'
+            this.isFinal = this.isBody || blogPanels.find(cls => current.classList.contains(cls)) // this.classList.contains('overview-content')
             this.isDIV = current.tagName.match(/\bdiv\b/i)  // == "DIV"
             if (o5debug > 2)
                 console.log("создаётся pO5 для '" + this.name + "'")
             FillBords(this, 'pO5=' + this.name + (aO5 ? (' для aO5=' + aO5.name) : ''))
-            Object.seal(this.prevs);
 
-            this.PO5Colors(0);
-
-            Object.seal(this.pos);
-            Object.seal(this.located);
-            Object.seal(this.colors);
-            Object.seal(this.scroll);
-            Object.seal(this.act);
-            Object.seal(this.cdif);
-            Object.freeze(this);
+            this.PO5Colors(0)
+            Object.seal(this.prevs)
+            Object.seal(this.pos)
+            Object.seal(this.located)
+            Object.seal(this.colors)
+            Object.seal(this.scroll)
+            Object.seal(this.act)
+            Object.seal(this.cdif)
+            Object.freeze(this)
         }
         add = { top: 0, left: 0, right: 0, bottom: 0 }
         owns = { own: null }
@@ -138,46 +148,19 @@
 
     Object.assign(wshp, {
         name: 'страница',
-        wini: {},
         aO5s: [],
+        nests: [],
+        wasResize: false,
         aO5str: '', // строка рез. вложенности (для демок  и отладки)
         TestCC3a: function (pO5) { // для теста CC3a в alltst.js
             pO5.PO5Colors(0)
             FillBords(pO5, 'pO5=' + C.MakeObjName(pO5.current))
         },
-        Finish: () => {
-            if (W.consts.o5debug > 1)
-                console.log(`==================== Finish ====${wshp.wini.finish ? 'повторно' : '========'}========`)
-            if (wshp.wini.finish) return
-
-            const hash = C.save.hash
-            if (hash) { // делать именно когда загружен документ (например - тут)
-                const tag = document.getElementById(hash)
-                if (tag) tag.scrollIntoView({ alignToTop: true, block: 'start', behavior: "auto" })
-                else
-                    C.ConsoleError(`Неопределён hash= '${hash}' в адресной строке`)
-            }
-            wshp.wini.finish = true
-            console.timeEnd(wshp.timera)
-            window.dispatchEvent(new CustomEvent('olga5_sinit', { detail: { modul: olga5_modul } }))
-            window.dispatchEvent(new window.Event('resize'))
-        },
-        DoInit: function ([E, clasn, timera]) { // тут 'E' не используется
+        DoInit: () => {
             C = window.olga5.C
-            o5debug = W.consts.o5debug
-            wshp.timera = timera
+            o5debug = wshp.W.consts.o5debug
             const timeInit = Date.now() + Math.random(),
-                OnScroll = function (e) {
-                    // HideShdws(wshp.aO5s)
-                    if (wshp.wasResize) { //  && !wshp.extraInit) {
-                        const pO5 = (e.target == document ? document.body : e.target).pO5
-                        if (pO5) {
-                            const aO5s = (pO5.owns.own ? pO5.owns.own : wshp).aO5s
-                            wshp.DoScroll(aO5s, e.timeStamp)
-                        }
-                    }
-                },
-                mtags = C.GetTagsByClassName(wshp.class, olga5_modul),
+                mtags = C.SelectByClassName(wshp.W.class, olga5_modul),
                 errs = [],
                 MakeAO5s = () => {
                     const
@@ -212,14 +195,13 @@
                     wshp.aO5str = ''
                     ClearO5s(wshp.aO5s)
 
+                    wshp.FillClasses()
                     for (const mtag of mtags) {
                         const dt = DecodeType(mtag.quals),
                             shp = mtag.tag
 
                         if (dt.err) errs.push({ shp: C.MakeObjName(shp), className: mtag.origcls, err: dt.err })
 
-                        // shp.classList.remove(mtag.origcls)// ВСЕГДА убираю квалификаторы из наименования класса
-                        // shp.classList.add(clasn)
                         if (!dt.cls.none)
                             wshp.MakeAO5(shp, dt.cls, PO5)
                     }
@@ -250,105 +232,57 @@
 
                     SetLevels(aO5s, 0)
 
-                    if (o5debug > 1) console.log("\t\t  >> DoResize " + ('' + Date.now()).substr(-6) + ", вложенности объектов: " + aO5str + "")
+                    if (o5debug > 1)
+                        console.log(" >> яDoResize " + ('' + Date.now()).substr(-6) + ", вложенности объектов: \n\t  " + aO5str)
                     return aO5str
                 }
-            // DoShps = () => {
-            //     const mtags = C.GetTagsByClassName(wshp.class, olga5_modul)
-            //     if (W.consts.o5debug > 0) {
-            //         const sels = []
-            //         for (const mtag of mtags)
-            //             sels.push({ id: mtag.tag.id, class: mtag.tag.className, tag: mtag.tag.tagName, })
-            //         if (sels.length > 0) C.ConsoleInfo(`o5shp: найдены селекторы:`, sels.length, sels)
-            //         else C.ConsoleError(`o5shp: НЕ найдены селекторы с '${wshp.class}'`)
-            //     }
-
-            //     MakeAO5s(mtags)
-            //     wshp.nests = []
-            //     wshp.aO5str = SetLevelsAll(wshp.aO5s)
-
-            //     if (wshp.aO5s.length > 0)
-            //         wshp.CloneAO5s(wshp)
-            //     // else
-            //         wshp.Finish()
-
-            //     // window.setTimeout(() => { //1?
-            //     //     wshp.DoResize(wshp.aO5s)
-            //     // }, 1)
-            // }
 
             MakeAO5s()
-            wshp.nests = []
+
             wshp.aO5str = SetLevelsAll(wshp.aO5s)
 
-            if (wshp.aO5s.length > 0) {
-                wshp.CloneAO5s(wshp)
-
-                window.addEventListener('resize', e => wshp.DoResize(wshp.aO5s, e))
-                document.addEventListener('scroll', OnScroll, true)
-
-                Object.assign(wshp.wini, { finish: false, hide: false })
-            }
-            // else
-            wshp.Finish()
 
             if (o5debug > 0) {
                 const sels = []
                 for (const mtag of mtags)
-                    sels.push({ id: mtag.tag.id, class: mtag.tag.className, tag: mtag.tag.tagName, })
+                    sels.push({ name: C.MakeObjName(mtag.tag), origcls: mtag.origcls, class: mtag.tag.className, quals: mtag.quals.join(', '), })
                 if (sels.length > 0) C.ConsoleInfo(`o5shp: найдены селекторы:`, sels.length, sels)
-                else C.ConsoleError(`o5shp: НЕ найдены селекторы с '${wshp.class}'`)
+                else
+                    if (!C.consts.o5iblog)
+                        C.ConsoleInfo(`o5shp: НЕ найдены селекторы с '${wshp.W.class}'`)
 
                 let etimeStamp = 0
                 document.addEventListener('click', (e) => { // для отладки  !!!!!!!!!!!!!!!!!!
                     if (e.timeStamp > etimeStamp + 0.1)
-                        if (!e.target.classList.contains('olga5_shp')) // OnReSize(e)        
-                            wshp.DoResize(wshp.aO5s, e)
+                        if (!e.target.classList.contains('olga5_shp'))
+                            e => wshp.DoResize()
                     etimeStamp = e.timeStamp
                 })
             }
 
+            if (wshp.aO5s.length > 0) {
+                wshp.AO5shp()
+                wshp.DoResize()
+                wshp.DoScroll (wshp.aO5s) 
+
+                window.addEventListener('resize', wshp.DoResize)
+                document.addEventListener('scroll', e => {
+                    const pO5 = (e.target == document ? document.body : e.target).pO5
+                    if (pO5) {
+                        const aO5s = (pO5.owns.own ? pO5.owns.own : wshp).aO5s
+                        wshp.DoScroll(aO5s, e.timeStamp)
+                    }
+                }, true)
+            }
+
+            Finish()
+
             errs.splice(0, errs.length)
             mtags.splice(0, mtags.length)
-            //             // window.setTimeout(DoShps, 1)
-            //             DoShps()
-            // // ??            // wshp.DoResize(wshp.aO5s)
         }
     })
 
-    // window.addEventListener('o5first_scroll', (e) => {
-    //     if (o5debug > 0) {
-    //         const rez = [],
-    //             ResultInfo = (aO5s, tab) => { //подготовка итоговой сводки
-    //                 for (const aO5 of aO5s) {
-    //                     const pO5 = aO5.prev.pO5
-    //                     let s = '',
-    //                         j = pO5.prevs.length
-    //                     while (j-- > 0) {
-    //                         if (!pO5.prevs[j].pO5)
-    //                             alert('!pO5.prevs[j].pO5 ?')
-    //                         s += (s ? ', ' : '') + pO5.prevs[j].pO5.name
-    //                     }
-    //                     rez.push({ aO5: tab + aO5.name, pO5: pO5.name, prevs: s })
-    //                     if (aO5.aO5s.length > 0)
-    //                         ResultInfo(aO5.aO5s, tab + '+---')
-    //                 }
-    //             }
-
-    //         ResultInfo(wshp.aO5s, '')
-
-    //         if (rez.length > 0) C.ConsoleInfo('Вложенности объектов: ' + wshp.aO5str + ' ', rez.length, rez)
-    //         else C.ConsoleError('Нет ссылок `shp`, т.е. нет тегов с классом : ', wshp.class)
-    //         if (prevsPO5.length > 0)
-    //             C.ConsoleInfo('Вложенности prevs-контейнеров ', null, prevsPO5)
-    //     }
-    //     wshp.Finish()
-    // }, { once: true, capture: true })
-
-    // window.addEventListener('olga5_update', (e) => {
-    //     wshp.DoResize(wshp.aO5s)
-    // }, { once: true, capture: true })
-
-    console.log(`}---< ${document.currentScript.src.indexOf(`/${olga5_modul}.`) > 0 ? 'дозагружен' : 'подключён '}:  ${olga5_modul}/DoInit.js`)
+    if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
+        console.log(`}---< ${document.currentScript.src.indexOf(`/${olga5_modul}.`) > 0 ? 'дозагружен' : 'подключён '}:  ${olga5_modul}/DoInit.js`)
 })();
 

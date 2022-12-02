@@ -50,27 +50,30 @@ audio {
 }
 
 .olga5_diagonal {
-	background: yellow;
-	width: 177px;
-	right: 0;
-	border: 1px solid black;
-	position: absolute;
-	top: 111px;
-	left: 66px;
-	padding: 12px;
-	padding-left: 44px;
-	border-radius: 15px;
-	opacity: 0.8;
-	-webkit-transform: rotate(-45deg);
-	-moz-transform: rotate(-45deg);
-	-o-transform: rotate(-45deg);
-	-ms-transform: rotate(-45deg);
-	transform: rotate(-45deg);
-	z-index: 11111;
-	color: darkred;
-	font-style: normal;
-	font-family: sans-serif;
-	font-weight: bold;
+    background: yellow;
+    width: 177px;
+    right: 0;
+    border: 1px solid black;
+    position: absolute;
+    top: 55px;
+    left: 12px;
+    padding: 18px;
+    /* padding-left: 44px; */
+    border-radius: 15px;
+    opacity: 0.8;
+    -webkit-transform: rotate(-45deg);
+    -moz-transform: rotate(-45deg);
+    -o-transform: rotate(-45deg);
+    -ms-transform: rotate(-45deg);
+    transform: rotate(-35deg);
+    z-index: 11111;
+    color: darkred;
+    font-style: normal;
+    font-family: sans-serif;
+    font-weight: bold;
+    text-align: center;
+    width: 211px;
+    display: block;
 }
 
 .olga5_divimg {

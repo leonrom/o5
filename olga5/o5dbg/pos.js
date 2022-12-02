@@ -3,9 +3,7 @@
 /*jshint esversion: 6*/
 (function () {
 	'use strict'
-	const W = { modul: 'pos' },
-		timera = `}---< включено:  ${W.modul}.js и ожидается событие 'DOMContentLoaded'`
-	console.time(timera)
+	const W = { modul: 'pos' }
 
 	let mposPos = null, // объект, в котором позиция мыши
 		mposAct = null // текущий двигаемый объект (тот же самый)
@@ -150,7 +148,6 @@
 	}
 
 	document.addEventListener('DOMContentLoaded', MousePos)
-	console.timeEnd(timera)
 
 	window.dispatchEvent(new CustomEvent('olga5_sload', { detail: { modul: W.modul } }))
 })();

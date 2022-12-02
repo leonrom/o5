@@ -20,7 +20,7 @@
         },
         attrs = document.currentScript.attributes,
         navbarName = 'navbar-iframe-container',
-        hr_id = 'olga5_Start_hr',
+        hr_id = 'olga5-Start_hr',
         canvasH = 29,
         o5css = `
 aside,
@@ -153,7 +153,6 @@ canvas{
         //                 { span: '' },
         //                 { span: 'Меню блога и страниц', ref: '/olga5-mnu.html', title: 'страница еще редактируется', class: dsbl },
         //                 { span: 'Подключение к Blogger`у', ref: '/olga5-blog.html', title: 'страница еще редактируется', class: dsbl },
-        //                 { span: 'Дополнительный отладчик', ref: '/olga5-debug.html', title: 'страница еще редактируется', class: dsbl },
         //             ])
         //             else
         //                 C.ConsoleError("для '" + W.modul + ".js' нет подключенного модуля 'window.olga5.Menu'", 'o5mnu')
@@ -194,22 +193,12 @@ canvas{
             // document.
             window.addEventListener('resize', CanvasSize)
         },
-        SetNavBar = function (node) {
-            navbar = node
-
-            const navlbl = 'navbar-iframe'
-            // for (const navlbl of navlbls) {
-            if (document.getElementById(navlbl)) {
-                FillNavBar()
-                return
-            }
-            // }
-
+        ObserveNavbar = (tag, id) => {
             let mo = null
             const CheckNavLbls = (mutations) => {
                 for (const mutation of mutations)
                     for (const node of mutation.addedNodes)
-                        if (node.id == navlbl) {
+                        if (node.id == id) {
                             FillNavBar()
                             mo.disconnect()
                             mo = null
@@ -217,34 +206,60 @@ canvas{
                         }
             }
             mo = new MutationObserver(CheckNavLbls)
-            mo.observe(navbar, { 'childList': true, 'subtree': true });
+            mo.observe(tag, { 'childList': true, 'subtree': true });
+        },
+        SetNavBar = function (navbar) {
+            const navlbl = 'navbar-iframe'
+            // for (const navlbl of navlbls) {
+            if (document.getElementById(navlbl)) {
+                FillNavBar()
+                return
+            }
+            ObserveNavbar(navbar, navlbl)
+
+            // let mo = null
+            // const CheckNavLbls = (mutations) => {
+            //     for (const mutation of mutations)
+            //         for (const node of mutation.addedNodes)
+            //             if (node.id == navlbl) {
+            //                 FillNavBar()
+            //                 mo.disconnect()
+            //                 mo = null
+            //                 return
+            //             }
+            // }
+            // mo = new MutationObserver(CheckNavLbls)
+            // mo.observe(navbar, { 'childList': true, 'subtree': true });
         },
         MakeNavBar = function (c) {
             navbar = document.getElementById(navbarName)
             if (navbar) SetNavBar(navbar)
-            else {
-                let mo = null
-                const CheckNavLbls = (mutations) => {
-                    for (const mutation of mutations)
-                        for (const node of mutation.addedNodes)
-                            if (node.id == navbarName) {
-                                SetNavBar(node)
-                                mo.disconnect()
-                                mo = null
-                                return
-                            }
-                }
-                mo = new MutationObserver(CheckNavLbls)
-                mo.observe(document, { 'childList': true, 'subtree': true });
-            }
+            else
+                ObserveNavbar(document, navbarName)
+            // {
+            //     let mo = null
+            //     const CheckNavLbls = (mutations) => {
+            //         for (const mutation of mutations)
+            //             for (const node of mutation.addedNodes)
+            //                 if (node.id == navbarName) {
+            //                     SetNavBar(node)
+            //                     mo.disconnect()
+            //                     mo = null
+            //                     return
+            //                 }
+            //     }
+            //     mo = new MutationObserver(CheckNavLbls)
+            //     mo.observe(document, { 'childList': true, 'subtree': true });
+            // }
         },
         AddRefToO5 = function () {
-            // const pagers = document.getElementsByClassName('blog-pager')
             const pagers = document.getElementsByClassName('post-outer-container')
 
             if (pagers && pagers.length > 0) {
                 const myref = document.createElement('div'),
-                    pager = pagers[pagers.length - 1]
+                    pager = pagers[pagers.length - 1],
+                    id = 'olga5_post-body-container'
+                myref.id = id
                 myref.style = `
                     font-family: monospace;
                     font-size: 10px;
@@ -253,19 +268,21 @@ canvas{
                     margin: 1px 1px 16px 3px;
                     `
                 myref.innerHTML = 'Использовалась <i>библиотека</i> &nbsp;' +
-                    '<a href="https://olga-5.blogspot.com/2020/02/olga5-all.html" style="font-size: 12px;" target="olga5_add"><code>Olga5</code></a>'
+                    '<a href="https://olga-5.blogspot.com/2020/02/olga5-all.html" style="font-size: 12px;" target="olga5-addPage"><code>Olga5</code></a>'
                 // pagers[pagers.length-1].appendChild(myref)
 
                 const posts = document.getElementsByClassName('post-body-container')
                 if (posts && posts.length > 0) {
                     for (const post of posts)
-                        post.appendChild(myref)
+                        if (!post.getElementById(id))
+                            post.appendChild(myref)
                 }
-                else {
-                    const comments = pager.getElementsByClassName('comments')
-                    if (comments.length > 0) pager.insertBefore(myref, comments[0]);
-                    else pager.appendChild(myref)
-                }
+                else
+                    if (!pager.getElementById(id)) {
+                        const comments = pager.getElementsByClassName('comments')
+                        if (comments.length > 0) pager.insertBefore(myref, comments[0]);
+                        else pager.appendChild(myref)
+                    }
             }
         },
         RemoveUnused = () => {
@@ -283,11 +300,6 @@ canvas{
     function BlogInit(c) { // Модуль инициализации скрипта
         // console.log(`}===> ини:  ${W.modul}.js`)
         C = c
-        const timera = '                                                                <   инициирован ' + W.modul
-        console.time(timera)
-        if (C.consts.o5debug > 1) {
-            console.log(` __________________________________________\n   начало  иниц.:   ${W.modul}`)
-        }
         if (!W.isReady) {
             if (NoAttr('o5nocss')) C.ParamsFill(W, o5css)
             else c.ParamsFill(W)
@@ -299,9 +311,7 @@ canvas{
         }
 
         RemoveUnused()
-        // FillMenu()
-
-        console.timeEnd(timera)
+        
         window.dispatchEvent(new CustomEvent('olga5_sinit', { detail: { modul: W.modul } }))
     }
 
@@ -309,6 +319,8 @@ canvas{
     if (!window.olga5) window.olga5 = []
     if (!window.olga5.find(w => w.modul == W.modul)) {
         window.olga5.push(W)
+        
+	if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
         console.log(`}---< ${document.currentScript.src.indexOf(`/${W.modul}.`) > 0 ? 'загружен  ' : 'включён   '}:  ${W.modul}.js`)
         window.dispatchEvent(new CustomEvent('olga5_sload', { detail: { modul: W.modul } }))
     } else

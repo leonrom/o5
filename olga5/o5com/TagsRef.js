@@ -13,7 +13,7 @@
 	if (!window.olga5) window.olga5 = []
 	if (!window.olga5.C) window.olga5.C = {}
 	if (!window.olga5[olga5_modul]) window.olga5[olga5_modul] = {}
-	let trn = 0
+	
 	const wshp = window.olga5[olga5_modul],
 		C = window.olga5.C,
 		// regExp = /[^\/\s+]+$/
@@ -36,8 +36,8 @@
 			}
 			addnew.setAttribute(adrName, url)
 			// change.dataset.o5_old = 1 // это нужно, если не удалять оригинал
-			if (err || C.consts.o5debug > 1)
-				console.log(`добавляю тег <${tagName}> с атрибутом ${adrName}=${url} ${err ? ' с ошибками' : ''}`)
+			// if (err || C.consts.o5debug > 1)
+			// 	console.log(`добавляю тег <${tagName}> с атрибутом ${adrName}=${url} ${err ? ' с ошибками' : ''}`)
 
 			// if (trn>=7)
 			// 	console.log()
@@ -99,19 +99,12 @@
 						continue
 					}
 
-				// if (needs[td.modul])needs[td.modul]=0
-				// else (if )
-				// if (Igns(td.modul)) {
-				// 	if (C.consts.is_debug > 1) console.log(`   -"-    игнорируется: orig=${td.orig}`)
-				// 	continue
-				// }
-
 				if (load_snm[td.modul])
 					errs.push({ tag: td.modul, ref: td.orig, txt: 'повторная загрузка модуля' })
 				load_snm[td.modul] = td.orig // перезаписываю!
 
 				const w = window.olga5.find(w => w.modul == td.modul),
-					scrpt = { modul: td.modul, orig: td.orig, act: { W: w }, script: script, }
+					scrpt = { modul: td.modul, orig: td.orig, act: { W: w, need:false }, script: script, }
 				let dochg = ''
 				if (!w || td.code == '_' || (td.trans && td.code != 'data-')) {
 					dochg = !w ? 'новый  ' : 'замена '
@@ -124,12 +117,11 @@
 						if (wref.err)
 							errs.push({ tag: td.modul, ref: td.from, txt: wref.err })
 						url = wref.url
-						// scrpt.script = ReplaceTag('script', script, 'src', wref.url, errs)
 					}
 					scrpt.script = ReplaceTag('script', script, 'src', url, errs)
 				}
 
-				C.scrpts.push(scrpt)	//	{ modul: td.modul, orig: td.orig, act: { W: null }, script: replace, })
+				C.scrpts.push(scrpt)
 				scrs.push({
 					modul: scrpt.modul,
 					orig: scrpt.orig,
@@ -143,9 +135,59 @@
 				if (!C.scrpts.find(scrpt => scrpt.modul == modul))
 					// if (!igns(modul)) {
 					if (!igns.includes(modul)) {
-						C.scrpts.push({ modul: modul, orig: '', act: { W: w }, script: C.o5script })
+						C.scrpts.push({ modul: modul, orig: '', act: { W: w, need:false  }, script: C.o5script })
 						scrs.push({ modul: modul, orig: '', src: C.o5script.src, txt: `из скомпилированного` })
 					}
+			}
+
+			/* строю зависимости криптов (сначала идут скомпилированные) - сначала по 'o5depends'*/
+			const ss = C.consts['o5depends'].split(/\s*[;]+\s*/)
+			for (const s of ss) {
+				const uu = s.trim().split(/\s*[:=]+\s*/), // split(/[:=]/), // 
+					u = uu[0],
+					rfs = uu[1] ? uu[1].split(/\s*,\s*/) : []
+				if (u) {
+					const scrpt = C.scrpts.find(scrpt => scrpt.modul == u)
+					if (scrpt) {
+						scrpt.depends ||= []
+						for (const rf of rfs) {
+							const scr = C.scrpts.find(scrpt => scrpt.modul == rf)
+							if (scr) scrpt.depends.push(scr)
+						}
+					}
+				}
+			}
+			/* -"- тепер для остальны */
+			const sdeps = [],
+				cdeps = []
+			for (const scrpt of C.scrpts) {
+				if (!scrpt.depends)
+					scrpt.depends = scrpt.script.attributes.hasOwnProperty('async') ? [] : cdeps.concat(sdeps)
+				if (scrpt.orig) sdeps.push(scrpt)
+				else cdeps.push(scrpt)
+			}
+			/* в отладочном режиме - делаю проверку*/
+			if (C.consts.o5debug > 0) {
+				let scrpt = null
+				const list = [],
+					errs = [],
+					ChectForRev = (modul, depends) => {
+						let ok = true
+						list.push(modul)
+						for (const depend of depends)
+							if (depend === scrpt) {
+								errs.push({ scrpt: scrpt.modul, refs: list.join('-> ') })
+								ok = false
+							}
+						if (depends.length > 0 && ok)
+							for (const depend of depends)
+								ChectForRev(depend.modul, depend.depends)
+						list.pop()
+					}
+				for (scrpt of C.scrpts)
+					ChectForRev(scrpt.modul, scrpt.depends)
+				if (errs.length > 0)
+					C.ConsoleError(`зацикленные ссылки в зависимостях модулей`, errs.length, errs)
 			}
 
 			const errneeds = []
@@ -176,7 +218,8 @@
 				C.ConsoleError(`Ошибки в преобразовании SCRIPT `, errs.length, errs)
 
 			for (const scrpt of C.scrpts) {
-				Object.assign(scrpt.act, { done: 0, strt: 0, timeout: 0 })
+				Object.assign(scrpt.act, { done: 0, strt: 0, timeout: 0, timera: null, incls: null, })
+				Object.seal(scrpt.act)
 				Object.freeze(scrpt)
 			}
 			Object.freeze(C.scrpts)
@@ -219,14 +262,10 @@
 		}
 
 	wshp[modulname] = () => {
-		// тут еще не определен 'C.consts'                if (C.consts.o5debug > 0) 
-		// console.log(`}===  инициализация ${olga5_modul}/${modulname}.js`)
-
 		ConvertScripts()
 		ConvertLinks()
-
 	}
 
-	if (window.location.search.match(/(\&|\?|\s)is(-|_)debug\s*(\s|$|\?|#|&|=\s*\d*)/))
+	if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
 		console.log(`}---> подключен ${olga5_modul}/${modulname}.js`)
 })();

@@ -420,16 +420,17 @@ function Init2() {
 }
 function Init3x() {
     "use strict"
-    console.log('Init3() 1a')
+    // console.log('Init3() 1a')
     if (!IsInitEvents()) return
-    console.log('Init3() 1b')
+    // console.log('Init3() 1b')
     const wshp = window.olga5.o5shp,
         div1 = document.getElementById('div1'),
         div2 = document.getElementById('div2'),
         shp0 = document.getElementById('shp0'),
         cb1w = document.getElementById("bord1w"),
         cb1c = document.getElementById("bord1c"),
-        cb1b = document.getElementById("bord1b")
+        cb1b = document.getElementById("bord1b"),
+        tab1 = document.getElementById('tab1')
 
     styleCC3a = tab1.getAttribute('style')
     cb1w.indeterminate = false
@@ -444,7 +445,7 @@ function Init3x() {
     CC()
     CC1()
     CC3()
-    console.log('Init3() 2', 'div1=' + (div1 ? 'OK' : '?'), 'shp0=' + (shp0 ? 'OK' : '?'))
+    // console.log('Init3() 2', 'div1=' + (div1 ? 'OK' : '?'), 'shp0=' + (shp0 ? 'OK' : '?'))
 
     // shpX_BordNames()
     const
@@ -454,7 +455,7 @@ function Init3x() {
     if (div1) window.setTimeout(Scroll1, 10)
     // if (div2) div2.scrollTo(0, 91)
     // if (shp0) shp0.scrollTo(0, 195)
-    console.log('Init3() 3 ' + shp0.id + ':  scrollTop:=' + shp0.scrollTop)
+    // console.log('Init3() 3 ' + shp0.id + ':  scrollTop:=' + shp0.scrollTop)
 
     shpX_SetWindow(777, 399)
     window.scrollTo(0, 333)
@@ -464,7 +465,7 @@ function Init3x() {
 
 function Init3() {
     "use strict"
-    console.log('Init3() 0 1')
+    // console.log('Init3() 0 1')
     window.setTimeout(Init3x(), 1)
 }
 
