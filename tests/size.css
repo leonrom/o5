@@ -11,7 +11,7 @@ div.olga5_shp {
     height: 88px;
 }
 
-div.olga5_shp_shdw {
+div.olga5_shp.olga5-ignore {
     background-color: yellow;
     border: 12px solid red;
     outline: solid 8px blue;

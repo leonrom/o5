@@ -125,11 +125,9 @@
 			}
 		},
 		PrintParams = (modul, xs, p, n1) => {
-			if (C.consts.o5debug > 0) {
-				let n2 = 0
-				for (const nam in xs) n2++
-				C.ConsoleInfo(`${modul}: все константы '${p}' `, `${('' + n2).padStart(2)} (своих=${('' + n1).padStart(2)})`, xs)
-			}
+			let n2 = 0
+			for (const nam in xs) n2++
+			C.ConsoleInfo(`${modul}: все константы '${p}' `, `${('' + n2).padStart(2)} (своих=${('' + n1).padStart(2)})`, xs)
 		},
 		ParamsFill = function (W, o5css) {
 			if (W.isReady)
@@ -143,31 +141,38 @@
 			}
 
 			if (o5css) InitCSS(W, o5css)
-  
-			const isnew = !!scrpt.script,
-				attrs = isnew ? C.GetAttrs(scrpt.script.attributes) : C.o5attrs
+
+			const m1 = /\s+|\/\/.*$/gm,
+				isnew = !!scrpt.script,
+				attrs = isnew ? C.GetAttrs(scrpt.script.attributes) : C.o5attrsParamsFillFromScript
+
+			W.origs = {
+				consts: (W.consts || '').replace(m1, ''),
+				urlrfs: (W.urlrfs || '').replace(m1, '')
+			}
 
 			for (const p of ['consts', 'urlrfs']) {
 				const xs = {} // временное хранилилище для считываемых параметров
-				
-				let askps = {}
-				if (W[p])   // т.е. если параметр был передан отдельно. Если еще не обрабатывался - SplitParams
-					askps = (typeof W[p] === 'object') ? W[p] : SplitParams(W[p], p, ';,')
+
+				// let askps = {}
+				// if (W[p])   // т.е. если параметр был передан отдельно. Если еще не обрабатывался - SplitParams
+				// 	askps = (typeof W[p] === 'object') ? W[p] : SplitParams(W[p], p, ';,')
 
 				for (const nam in C[p]) {
 					const source = C.constsurl.hasOwnProperty(nam) ? C.save.urlName : `ядро`
-					if (!xs.hasOwnProperty(nam)) 
+					if (!xs.hasOwnProperty(nam))
 						xs[nam] = { val: C[p][nam], source: source }
 				}
 				if (isnew) {
-					W[p] = {}	// преобразовываю в объект
-					const n1 = C.ParamsFillFromScript(xs, askps, attrs, p)
+					const askps = SplitParams(W.origs[p], p, ';,'),
+						n1 = C.ParamsFillFromScript(xs, askps, attrs, p)
 
+					W[p] = {}	// преобразовываю в объект
 					if (p == 'urlrfs') {
 						const urls = {}
 						for (const nam in xs) urls[nam] = xs[nam].val
 						DeCodeUrlRfs(urls, `${W.modul}: `)
-						for (const nam in xs) 
+						for (const nam in xs)
 							xs[nam].url = urls[nam]
 					}
 					else
@@ -178,7 +183,7 @@
 					for (const nam in xs)
 						W[p][nam] = xs[nam].val
 
-					PrintParams(W.modul, xs, p, n1)
+					if (C.consts.o5debug > 0) PrintParams(W.modul, xs, p, n1)
 				}
 				else
 					C.ConsoleInfo(`${W.modul}: параметры и ссылки берутся только из скрипта ядра библиотеки`)
@@ -193,7 +198,7 @@
 			SplitParams: SplitParams,
 		})
 
-		PrintParams(C.consts, C.save.xs, C.save.p, C.save.n1)
+		if (C.consts.o5debug > 0) PrintParams(C.consts, C.save.xs, C.save.p, C.save.n1)
 
 		const p = 'urlrfs',
 			xs = {}, // временное хранилилище для считываемых параметров
@@ -205,7 +210,7 @@
 		DeCodeUrlRfs(defs, C.save.libName)
 
 		for (const nam in defs) { xs[nam].url = defs[nam] }
-		PrintParams(C.save.libName, xs, p, n1)
+		if (C.consts.o5debug > 0) (C.save.libName, xs, p, n1)
 
 		// delete C.save
 		Object.freeze(C)

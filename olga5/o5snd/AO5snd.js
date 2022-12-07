@@ -14,7 +14,7 @@
         let isNotAllowedError = false
         const wshp = window.olga5[olga5_modul],
             ss = wshp.setClass,
-            _clsError = wshp.CSS._clsError,
+            olga5sndError = wshp.CSS.olga5sndError,
             W = window.olga5.find(w => w.modul == olga5_modul), // так делать во всех подмодулях 
             o5debug = W.consts.o5debug,
             o5shift_speed = W.consts.o5shift_speed < 0.2 ? 0.2 : W.consts.o5shift_speed,
@@ -59,8 +59,8 @@
                         C.ConsoleError(`"${errTypes[mrk]}" (${mrk})` + (txt ? ` ${txt}` : '') + ` для '${aO5.name}'`)
 
                         aO5.sound.errIs.errs = true
-                        if (!aO5.snd.classList.contains(_clsError))
-                            aO5.snd.classList.add(_clsError)
+                        if (!aO5.snd.classList.contains(olga5sndError))
+                            aO5.snd.classList.add(olga5sndError)
                     }
                 },
                 RemError: (aO5, mrk) => {
@@ -74,8 +74,8 @@
                                 return
 
                         aO5.sound.errIs.errs = false
-                        if (aO5.snd.classList.contains(_clsError))
-                            aO5.snd.classList.remove(_clsError)
+                        if (aO5.snd.classList.contains(olga5sndError))
+                            aO5.snd.classList.remove(olga5sndError)
                     }
                 }
             },
@@ -176,8 +176,8 @@
                                     wshp.StopSound(aO5)
                             }
                         },
-                        { type: 'loadstart', Act: snd => snd.classList.add(wshp.CSS._clsLoad) },
-                        { type: 'loadeddata', Act: snd => snd.classList.remove(wshp.CSS._clsLoad) },
+                        { type: 'loadstart', Act: snd => snd.classList.add(wshp.CSS.olga5sndLoad) },
+                        { type: 'loadeddata', Act: snd => snd.classList.remove(wshp.CSS.olga5sndLoad) },
                         { type: 'abort', Act: (snd, e) => PlayError(snd.aO5snd, e) },
                         { type: 'stalled', Act: (snd, e) => PlayError(snd.aO5snd, e) },
                     ],

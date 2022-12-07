@@ -11,40 +11,27 @@
 			modul: 'o5shp',
 			Init: ShpInit,
 			class: 'olga5_shp',
-			consts: `o5shp_dummy=0.123 # просто так, для проверок в all0_.html`,
+            consts: `		
+				o5shp_dummy=0.123; //  просто так, для проверок в all0_.html
+                olga5_frames='s';
+                olga5_owners='b';
+			`,
 			incls: {
 				names: ['DoScroll', 'DoResize', 'AO5shp', 'DoInit'],
 				actscript: document.currentScript,
 			},
 		},
+		olga5cart = 'olga5-cart',
+		olga5ifix = 'olga5-ifix',
 		o5css = `
-.${W.class} {
-    // pointer-events: auto;
-}
-.${W.class}_gask{
-	left : 0;
-	top : 0;
-	position : absolute;
-	height : 100%;
-	width : 100%;
-}
-/* .${W.class}_shdw {    opacity: 0.0; }  - вбивать конкретно в STYLE*/
-.${W.class}_cart {
-    opacity: 1.0;
-    background-color:transparent;
-    // cursor: pointer;
-    direction : ltr; // эти 4 д.б. тут чтобы "перебить" из shp
+.${olga5cart} {
     position : fixed;
-	// position : absolute;
-    display : block;
-    z-index : 0;
-    padding : 0;
-    margin : 0;
-    border:none;
-    overflow: hidden;
-    // pointer-events: none; // не обрабатывать события    - ПРОВЕРИТЬ в браузерах !!!!!!!!!!!!!!!!!
+    // overflow : hidden;
+    background-color : transparent;
+    direction : ltr; // эти 4 д.б. тут чтобы "перебить" из shp
+	opacity: 0;  // это только вначале
 }
-.${W.class}_cart.isFix {
+.${olga5cart}.${olga5ifix} {
 	cursor: pointer;
 }`
 
@@ -59,8 +46,8 @@
 
 	if (!window.olga5) window.olga5 = []
 	if (!window.olga5[W.modul]) window.olga5[W.modul] = {}
-	
-	Object.assign(window.olga5[W.modul], { W: W, })
+
+	Object.assign(window.olga5[W.modul], { W: W, olga5cart: olga5cart, olga5ifix: olga5ifix, })
 	if (!window.olga5.find(w => w.modul == W.modul)) {
 		window.olga5.push(W)
 		if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))

@@ -62,8 +62,7 @@
                     C.ConsoleError(`Неопределён hash= '${hash}' в адресной строке`)
             }
             // window.dispatchEvent(new window.Event('resize'))
-        },
-        blogPanels = ['overview-content', 'viewitem-panel']
+        }
 
     class PO5 {
         constructor(current, aO5) {
@@ -71,12 +70,14 @@
             this.id = current.id
             this.name = C.MakeObjName(current)
             this.isBody = current == document.body || current.nodeName == 'BODY'
-            this.isFinal = this.isBody || blogPanels.find(cls => current.classList.contains(cls)) // this.classList.contains('overview-content')
+            this.isFinal = this.isBody || 
+                ['overview-content', 'viewitem-panel'].find(cls => current.classList.contains(cls)) 
             this.isDIV = current.tagName.match(/\bdiv\b/i)  // == "DIV"
             if (o5debug > 2)
                 console.log("создаётся pO5 для '" + this.name + "'")
             FillBords(this, 'pO5=' + this.name + (aO5 ? (' для aO5=' + aO5.name) : ''))
 
+            this.nst = window.getComputedStyle(current)
             this.PO5Colors(0)
             Object.seal(this.prevs)
             Object.seal(this.pos)
@@ -87,6 +88,7 @@
             Object.seal(this.cdif)
             Object.freeze(this)
         }
+        nst = {}
         add = { top: 0, left: 0, right: 0, bottom: 0 }
         owns = { own: null }
         aO5s = []
@@ -99,8 +101,7 @@
         PO5Colors = (timeStamp) => {
             const pO5 = this,
                 cc = pO5.colors,
-                current = pO5.current,
-                nst = window.getComputedStyle(current),
+                nst = pO5.nst,
                 cd = {
                     ct: IsFloat001(nst.borderTopWidth),
                     cl: IsFloat001(nst.borderLeftWidth),
@@ -113,7 +114,7 @@
                         GRGB = (i) => { return ("0" + parseInt(rgb[i], 10).toString(16)).slice(-2) }
                     return (rgb && rgb.length === 4) ? "#" + GRGB(1) + GRGB(2) + GRGB(3) : ''
                 },
-                c = CN(nst, 'background')
+                c = CN(pO5.nst, 'background')
             for (const bord of ['top', 'left', 'right', 'bottom'])
                 pO5.add[bord] = parseFloat(nst.getPropertyValue('border-' + bord + '-width'))
             Object.assign(cc, {
@@ -195,7 +196,7 @@
                     wshp.aO5str = ''
                     ClearO5s(wshp.aO5s)
 
-                    wshp.FillClasses()
+                    // wshp.FillClasses()
                     for (const mtag of mtags) {
                         const dt = DecodeType(mtag.quals),
                             shp = mtag.tag
@@ -254,8 +255,10 @@
                 let etimeStamp = 0
                 document.addEventListener('click', (e) => { // для отладки  !!!!!!!!!!!!!!!!!!
                     if (e.timeStamp > etimeStamp + 0.1)
-                        if (!e.target.classList.contains('olga5_shp'))
-                            e => wshp.DoResize()
+                        if (!e.target.classList.contains(wshp.W.class)){
+                            wshp.DoResize()
+                            wshp.DoScroll (wshp.aO5s) 
+                        }
                     etimeStamp = e.timeStamp
                 })
             }

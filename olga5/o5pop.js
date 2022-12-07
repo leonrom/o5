@@ -135,10 +135,9 @@
         },
         attrs = document.currentScript.attributes,
         timerms = 1000 * ((attrs && attrs.o5timer) ? parseFloat(attrs.o5timer.value) : 2.1),
-        cls_Act = W.class + '_Act',
-        // cls_PopUp = W.class + '_PopUp',
-        cls_errArg = W.class + '_errArg',
-        namo5css = W.class + '_internal',
+        cls_Act = W.class + '-Act',
+        cls_errArg = W.class + '-errArg',
+        namo5css = W.class + '-internal',
         o5css = `
 .${W.class},
 .${W.class + 'C'},

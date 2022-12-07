@@ -211,6 +211,7 @@
 
 	Object.assign(C, {
 		repQuotes: /^\s*['"`]?\s*|\s*['"`]?\s*$/g,  // необязат. первая и последняя кавычки с окруж. пробелами,
+		olga5ignore:'olga5-ignore',
 		TryToDigit: TryToDigit,
 		ParamsFillFromScript,
 		GetAttrs: GetAttrs,

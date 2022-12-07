@@ -1,20 +1,9 @@
 сделать с mdebug как в o5inc.js
 
-gask
 
-    left: 0;
-    top: 0;
-    position: absolute;
-    height: fit-content;
-    width: fit-content;
-    display: contents;
-
-cart
-
-    width: fit-content;
-    height: fit-content;
-
-убрать gask ??
+    padding : 0;
+    margin : 0;
+    border:none;
 
 давать инициализацию толькодля тех, которые указаны в olga5_Start 
 проверить все модули на отсутствие ненужных констант! Написать об этом в доке

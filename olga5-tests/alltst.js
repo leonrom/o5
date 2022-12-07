@@ -117,8 +117,8 @@ function CC() {
     "use strict";
     const shdwcb = document.getElementById('shdwcb'),
         cartcb = document.getElementById('cartcb'),
-        shdws = document.getElementsByClassName('olga5_shp_shdw'),
-        carts = document.getElementsByClassName('olga5_shp_cart'),
+        shdws = document.getElementsByClassName('olga5_shp olga5-ignore'),
+        carts = document.getElementsByClassName('olga5-cart'),
         SetOpacity = (shps, val, o) => {
             for (const shp of shps) {
                 shp.style.opacity = val ? 1 : o
@@ -132,13 +132,11 @@ function CC() {
 const outlin = { e: '', eOffset: '' }
 function OL(cb) {
     "use strict";
-    const // shp = document.getElementById(id),
-        shdws = document.getElementsByClassName('olga5_shp_shdw'),
-        carts = document.getElementsByClassName('olga5_shp_cart'),
+    const shps = document.getElementsByClassName('olga5_shp'),
         cntls = document.getElementsByClassName('olga5_shp_copy')
     if (outlin.e == '') {
-        for (const cart of carts) {
-            const nst = window.getComputedStyle(cart)
+        for (const shp of shps) {
+            const nst = window.getComputedStyle(shp)
             if (parseFloat(nst.outlineWidth) > 0.1) {
                 outlin.e = nst.outlineColor + ' ' + nst.outlineStyle + ' ' + nst.outlineWidth
                 outlin.eOffset = nst.outlineOffset
@@ -146,13 +144,12 @@ function OL(cb) {
             }
         }
     }
-    for (const objs of [carts, shdws, cntls])
+    for (const objs of [shps, cntls])
         for (const obj of objs) {
             obj.style.outline = cb.checked ? outlin.e : 'none'
             obj.style.outlineOffset = cb.checked ? outlin.eOffset : '0'
         }
     cb.nextSibling.nodeValue = cb.checked ? 'с ' : 'без '
-    // cb.innerText = cb.checked ? 'с <i>outline</i>' : 'без <i>outline</i>'
 }
 
 function shpX_ChgDirPos(cb) {

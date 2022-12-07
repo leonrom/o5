@@ -214,8 +214,7 @@
         },
         SavePos = (aO5) => {
             if (aO5.act.dspl) { //  вообще-то тут два вариантта: либо после сталкивания пропадает совсем, либо попадает на своё место, но уже под верхний                  
-                const isFix = 'isFix',
-                    shp = aO5.shp,
+                const shp = aO5.shp,
                     posC = aO5.posC,
                     posS = aO5.posS,
                     cart = aO5.cart
@@ -232,12 +231,8 @@
                     top: (posS.top) + 'px',
                     left: (posS.left) + 'px',
                 })
-                if (aO5.fix.putV) cart.classList.add(isFix)
-                else cart.classList.remove(isFix)
-                // const isput = aO5.fix.putV
-                // const isput = aO5.fix.putV,
-                //     isfix = cart.classList.contains(isFix)
-                // if ((isput && !isfix) || (!isput && isfix)) cart.classList.add(isFix)
+                if (aO5.fix.putV) cart.classList.add(wshp.olga5ifix)
+                else cart.classList.remove(wshp.olga5ifix)
             }
         },
         DebugShowBounds = (aO5s) => {
@@ -421,19 +416,21 @@
         timeStamp = etimeStamp ? etimeStamp : (Date.now() + Math.random())
 
         if (aO5s.length > 0) {
-            if (timeStamp && wshp.W.consts.o5debug > 2) {
+            const debug=timeStamp && wshp.W.consts.o5debug > 2
+            if (debug) 
                 console.groupCollapsed(`  старт Scroll для '` + (() => {
                     let s = ''
                     aO5s.forEach(aO5 => { s += (s ? ', ' : '') + aO5.name })
                     return s
                 })() + "'" + ' (t=' + (Date.now() - datestart) + ')')
+
+            Scroll(aO5s)
+
+            if (debug) {
                 console.trace("трассировка вызовов ")
                 console.groupEnd()
             }
-
-            Scroll(aO5s)
         }
-        // DoScrollEnd()
         document.dispatchEvent(o5shp_scroll)
     }
 

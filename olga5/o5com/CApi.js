@@ -45,7 +45,7 @@
 		Object.assign(C, {
 			owners: [],
 			scrpts: [],
-			Match:Match,
+			Match: Match,
 			MakeObjName: function (obj, len) { // моё формирование имени объекта
 				if (obj) {
 					const nam = Object.is(obj, window) ? '#window' : (
@@ -69,7 +69,12 @@
 				return GetTagsBy(modul, 'querySelectorAll', nams.join(','))
 			},
 			GetTagsByClassNames: (classnams, modul) => {
-				return GetTagsBy(modul, 'getElementsByClassName', classnams)
+				const tags = GetTagsBy(modul, 'getElementsByClassName', classnams),
+					rez = []
+				for (const tag of tags)
+					if (!tag.classList.contains(C.olga5ignore))
+						rez.push(tag)
+				return rez
 			},
 			GetTagsByTagNames: (tagnams, modul) => {
 				return GetTagsBy(modul, 'getElementsByTagName', tagnams)
@@ -78,19 +83,20 @@
 				const tags = GetTagsBy(modul, 'querySelectorAll', '[class *=' + classnam + ']'),
 					match = Match(classnam),
 					rez = []
-				for (const tag of tags) {
-					const ms = tag.className.match(match)
-					if (ms) {
-						const quals = [],
-							m = ms[0],
-							ss = m.split(mquals)
+				for (const tag of tags)
+					if (!tag.classList.contains(C.olga5ignore)) {
+						const ms = tag.className.match(match)
+						if (ms) {
+							const quals = [],
+								m = ms[0],
+								ss = m.split(mquals)
 
-						tag.className = tag.className.replace(m, classnam+' ')// ВСЕГДА убираю квалификаторы
-						for (let j = 1; j < ss.length; j++)
-							quals.push(ss[j].trim())
-						rez.push({ tag: tag, quals: quals, origcls: ms.input })
+							tag.className = tag.className.replace(m, classnam + ' ')// ВСЕГДА убираю квалификаторы
+							for (let j = 1; j < ss.length; j++)
+								quals.push(ss[j].trim())
+							rez.push({ tag: tag, quals: quals, origcls: ms.input })
+						}
 					}
-				}
 				return rez
 			},
 			QuerySelectorInit: (starts, scls) => {
@@ -98,12 +104,12 @@
 
 				const match = Match(scls),
 					errs = []
-				if (!starts||starts.length == 0)
+				if (!starts || starts.length == 0)
 					C.owners.push({ start: document.body, modules: [], origcls: 'document' }) // специально чуть по-иному
 				else
 					for (const tag of starts) {
 						const quals = [],
-							m=tag.className.trim(),
+							m = tag.className.trim(),
 							ms = m.match(match)
 						if (ms) {
 							tag.className = tag.className.replace(ms[0], scls)// ВСЕГДА убираю квалификаторы (остальные в ms - не трогать!)

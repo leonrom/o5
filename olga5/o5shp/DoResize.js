@@ -54,15 +54,15 @@
                                 cc = s.split(':'),
                                 u = cc[0].trim(),
                                 t = u.length > 0 ? u[0].toUpperCase() : '?'
-                            if (!typs.includes(t))
-                                errs.push({ name: aO5.name, str: s, err: "тип ссылки не начинается одним из '" + typs + "'" })
-                            else {
+                            if (typs.includes(t)) {
                                 const cod = cc.length > 1 ? cc[1].trim() : '',
                                     num = cc.length > 2 ? MyRound(cc[2]) : 1,
                                     fix = cc.length > 2 ? cc[2].toUpperCase() == 'F' : false
 
                                 AddNew(blng.asks, { typ: t, cod: cod, num: num, nY: num, ok: false, fix: fix, bords: [] })
                             }
+                            else
+                                errs.push({ name: aO5.name, str: s, err: "тип ссылки не начинается одним из '" + typs + "'" })
                         }
                     }
                 },
@@ -131,7 +131,7 @@
                 AskScrolls = (pO5) => {
                     const minScrollW = 3,
                         current = pO5.current,
-                        nst = window.getComputedStyle(current),
+                        nst = pO5.nst,
                         dw = minScrollW + MyRound(nst.borderLeftWidth) + MyRound(nst.borderRightWidth) + MyRound(nst.paddingLeft) + MyRound(nst.paddingRight),
                         dh = MyRound(nst.borderTopWidth) + MyRound(nst.borderBottomWidth) + MyRound(nst.paddingTop) + MyRound(nst.paddingBottom)
                     Object.assign(pO5.scroll, {
@@ -209,7 +209,7 @@
         }
 
     let showerr = true
-    wshp.DoResize = function (shp) {
+    wshp.DoResize = function () {
         /* 
         фактически - д.б. 1 раз. - при первом скроллинге,
         но для отладки - может вызываться повторно

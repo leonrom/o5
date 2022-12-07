@@ -44,16 +44,16 @@
                         image.stop.style.display = 'none'
                         image.play.style.display = aO5.modis.dspl
                     }
-                    classList.add(wshp.CSS._clsPlay)
-                    classList.remove(wshp.CSS._clsPause)
+                    classList.add(wshp.CSS.olga5sndPlay)
+                    classList.remove(wshp.CSS.olga5sndPause)
                 }
                 else if (state == wshp.setClass.pause) {
-                    classList.remove(wshp.CSS._clsPlay)
-                    classList.add(wshp.CSS._clsPause)
+                    classList.remove(wshp.CSS.olga5sndPlay)
+                    classList.add(wshp.CSS.olga5sndPause)
                 }
                 else if (state == wshp.setClass.stop) {
-                    classList.remove(wshp.CSS._clsPlay)
-                    classList.remove(wshp.CSS._clsPause)
+                    classList.remove(wshp.CSS.olga5sndPlay)
+                    classList.remove(wshp.CSS.olga5sndPause)
                 }
                 else alert(`setClass.SetC: state='${state}'`)
                 aO5.sound.state = state
@@ -115,8 +115,8 @@
                                     break
                                 case 'L': modis.loop = true
                                     break
-                                case 'F': if (!snd.classList.contains(wshp.CSS.o5freeimg))
-                                    snd.classList.add(wshp.CSS.o5freeimg)
+                                case 'F': if (!snd.classList.contains(wshp.CSS.olga5freeimg))
+                                    snd.classList.add(wshp.CSS.olga5freeimg)
                                     break
                                 case 'N': modis.none = true
                                     break
@@ -132,7 +132,7 @@
                     if (!modis.aplay && !modis.none)
                         errs.Add(aO5.name, scls, `игнор остальных квалиф.`, 'audio_play', "нету аудио-квалиф.")
 
-                    if (aO5.modis.none) snd.classList.add(wshp.CSS._clsNone)
+                    if (aO5.modis.none) snd.classList.add(wshp.CSS.olga5sndNone)
 
                     if (!snd.alt || (snd.alt.trim() == '')) snd.alt = snd.title.trim()
                 },

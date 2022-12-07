@@ -19,30 +19,31 @@
 				actscript: document.currentScript,
 			}
 		},
-		css = { _clsError: `_error`, _clsLoad: `_load`, _clsPause: `_pause`, _clsPlay: `_play`, _clsNone: `_none`, o5freeimg: `o5freeimg`, },
+		css = { olga5sndError: `olga5-sndError`, olga5sndLoad: `olga5-sndLoad`, olga5sndPause: `olga5-sndPause`,
+			olga5sndPlay: `olga5-sndPlay`, olga5sndNone: `olga5-sndNone`, olga5freeimg: `olga5-freeimg`, },
 		o5css = `
-		.${W.class}:not(.${css._clsNone}) {
+		.${W.class}:not(.${css.olga5sndNone}) {
 			cursor: pointer;
 		}
-		.${W.class}.${css._clsPlay} {
+		.${W.class}.${css.olga5sndPlay} {
 			cursor: progress;
 			animation: olga5_viewTextWash 5s infinite linear;
 		}
-		.${W.class}.${css._clsPause} {
+		.${W.class}.${css.olga5sndPause} {
 			cursor: wait;
 			animation: none;
 		}
-		.${W.class}.${css._clsError} {
+		.${W.class}.${css.olga5sndError} {
 			opacity: 0.5;
 			outline: 2px dotted black;
 			cursor: help;
 		}
-		.${W.class}.${css._clsLoad} {
+		.${W.class}.${css.olga5sndLoad} {
 			opacity: 0.5;
 			outline: 1px dotted black;
 			cursor: wait;
 		}
-		img.${W.class}:not(.${css.o5freeimg}) {
+		img.${W.class}:not(.${css.olga5freeimg}) {
 			background-color: transparent;
 			position: inherit;
 			padding: 0 !important;
@@ -53,7 +54,7 @@
 			max-height: 28px;
 			max-width:  28px;
 		}
-		img.${W.class}.${css._clsPlay} {
+		img.${W.class}.${css.olga5sndPlay} {
 			animation: olga5_sndImgSwing 2s infinite linear;
 		}
 		@keyframes olga5_viewTextWash {

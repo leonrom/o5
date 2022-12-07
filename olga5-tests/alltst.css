@@ -55,6 +55,7 @@
     height: fit-content;    
     overflow-x: hidden;
     padding-bottom: 3px;
+    min-width: 123px;
 }
 
 .cboxed span {
@@ -97,7 +98,7 @@
     font-family: monospace;
 }
 
-div.olga5_shp_shdw.container,
+div.olga5_shp.olga5-ignore.container,
 .container {
     /* display: flow-root; */
     display: block;
@@ -157,7 +158,6 @@ div.olga5_shp_shdw.container,
 }
 
 div.olga5_shp_copy,
-div.olga5_shp_shdw,
 div.olga5_shp {
     background-color: yellow;
     border: 12px solid red;

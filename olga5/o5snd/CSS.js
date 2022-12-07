@@ -11,32 +11,32 @@
     if (!window.olga5[olga5_modul]) window.olga5[olga5_modul] = {}
 
     const wshp = window.olga5[olga5_modul],
-        css = { _clsError: `_error`, _clsLoad: `_load`, _clsPause: `_pause`, _clsPlay: `_play`, _clsNone: `_none`, o5freeimg: `o5freeimg`, }
+        css = { olga5sndError: `_error`, olga5sndLoad: `_load`, olga5sndPause: `_pause`, olga5sndPlay: `_play`, olga5sndNone: `_none`, olga5freeimg: `olga5freeimg`, }
 
     function CSS(olga5_class) {
         return `
-.${olga5_class}:not(.${css._clsNone}) {
+.${olga5_class}:not(.${css.olga5sndNone}) {
     cursor: pointer;
 }
-.${olga5_class}.${css._clsPlay} {
+.${olga5_class}.${css.olga5sndPlay} {
     cursor: progress;
     animation: olga5_viewTextWash 5s infinite linear;
 }
-.${olga5_class}.${css._clsPause} {
+.${olga5_class}.${css.olga5sndPause} {
     cursor: wait;
     animation: none;
 }
-.${olga5_class}.${css._clsError} {
+.${olga5_class}.${css.olga5sndError} {
     opacity: 0.5;
     outline: 2px dotted black;
     cursor: help;
 }
-.${olga5_class}.${css._clsLoad} {
+.${olga5_class}.${css.olga5sndLoad} {
     opacity: 0.5;
     outline: 1px dotted black;
     cursor: wait;
 }
-img.${olga5_class}:not(.${css.o5freeimg}) {
+img.${olga5_class}:not(.${css.olga5freeimg}) {
     background-color: transparent;
     position: inherit;
     padding: 0 !important;
@@ -47,7 +47,7 @@ img.${olga5_class}:not(.${css.o5freeimg}) {
     max-height: 28px;
     max-width:  28px;
 }
-img.${olga5_class}.${css._clsPlay} {
+img.${olga5_class}.${css.olga5sndPlay} {
     animation: olga5_sndImgSwing 2s infinite linear;
 }
 @keyframes olga5_viewTextWash {
