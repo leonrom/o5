@@ -45,13 +45,29 @@
                 tag.classList.remove(cls_errArg)
             }
         },
+        m_par_dlm = /=|:/,
+        SplitPars = (ss, pars, refs) => {
+            let url = ''
+
+            for (const s of ss)
+                if (s.match(m_par_dlm)) {
+                    const uu = s.split(m_par_dlm),
+                        nam = uu[0].trim()
+
+                    if (nam.match(/\bid\b/i)) refs.push(nam)
+                    else
+                        pars.push({ nam: nam, val: (uu[1] || '').replace(repQuotes, '') })
+                }
+                else url = s
+            return url
+        },
         SplitArgs = args => {
             const pars = [],
                 refs = []
 
             let iurl = -1
             for (let i = 0; i < 3; i++)
-                if (args[i].match && args[i].match(/\/|\+/)) {
+                if (args[i] && args[i].match && !args[i].match(m_par_dlm)) {
                     iurl = i
                     break
                 }
@@ -60,15 +76,8 @@
                 act = x ? (x.attributes ? x : document.getElementById(x)) : null,
                 ss = (args[iurl + 1] || '').split(/;|,/)
 
-            for (const s of ss) {
-                const uu = s.split(/=|:/),
-                    nam = uu[0].trim()
+            SplitPars(ss, pars, refs)
 
-                if (uu.length > 1)
-                    pars.push({ nam: nam, val: (uu[1] || '').replace(repQuotes, '') })
-                else
-                    refs.push(nam)
-            }
             if (x && !act)
                 C.ConsoleError(`Не найден сигнальный тег ${x} (url='${url}')`)
             return { url: url, act: act, pars: pars, refs: refs }
@@ -90,8 +99,8 @@
     }
     window.olga5.PopShow = function () { //  устарешая обёртка  ---- nam, width, height, url
         const e = arguments.callee.caller.arguments[0],
-            tag = e.currentTarget,
-            attr = `on` + e.type,
+            // tag = e.currentTarget,
+            // attr = `on` + e.type,
             n = (arguments.length > 3) ? 1 : 0,
             nam = n > 0 ? arguments[0] : '',
             width = arguments[n + 0],
@@ -99,15 +108,18 @@
             url = arguments[n + 2],
             pars = `width=${width},height=${height}`  // --------------------------------------------------------------------
 
-        tag.removeAttribute(attr)
-        tag.setAttribute(attr, `${o5callp}('${nam}', '${url}', '${pars}')`)
+        // tag.removeAttribute(attr)
+        // tag.setAttribute(attr, `${o5callp}('${nam}', '${url}', '${pars}')`)
 
         PopUp(e, [nam, url, pars])
+
+        // e.cancelBubble = true
+        // ShowWin(tag, e.type, { act: nam, url: url, pars: pars, refs: r.refs })  r.refs ??
     }
 
     'use strict'
 
-    const repQuotes = /^\s*['"`]?\s*|\s*['"`]?\s*$/g, 
+    const repQuotes = /^\s*['"`]?\s*|\s*['"`]?\s*$/g,
         click = 'click',
         o5popup = 'o5popup',
         aclicks = ['click', 'keyup', 'keydown', 'keypress']
@@ -259,7 +271,7 @@ img.${W.class} {
         CorrectDefaults = (parms) => {
             const ss = parms ? parms.replace(repQuotes, '').split(/[,;]/) : []
             ss.forEach(s => {
-                const uu = s.split(/=|:/),
+                const uu = s.split(m_par_dlm),
                     nam = uu[0].trim().toLowerCase(),
                     u = uu[1] ? uu[1].trim() : ''
                 if (u) {
@@ -293,20 +305,20 @@ img.${W.class} {
 
             const ss = ap.split(/,|;/),
                 pars = [],
-                refs = []
-            let url = ''
+                refs = [],
+                url = SplitPars(ss, pars, refs)
 
-            for (const s of ss)
-                if (s.match(/\/|\+/)) url = s
-                else {
-                    const uu = s.split(/=|:/),
-                        nam = uu[0].trim()
+            // let url = ''
+            // for (const s of ss)
+            //     if (s.match(m_par_dlm)) {
+            //         const uu = s.split(m_par_dlm),
+            //             nam = uu[0].trim()
+            //         if (nam.match(/\bid\b/i)) refs.push(nam)
+            //         else
+            //             pars.push({ nam: nam, val: (uu[1] || '').replace(repQuotes, '') })
+            //     }
+            //     else url = s
 
-                    if (uu.length > 1)
-                        pars.push({ nam: nam, val: (uu[1] || '').replace(repQuotes, '') })
-                    else
-                        refs.push(nam)
-                }
             if (!url && !tag.id)
                 C.ConsoleError(`Неопределён 'url' для тега ${C.MakeObjName(tag)} с параметрами (${ap})`)
             return { url: url, act: tag, pars: pars, refs: refs }
@@ -628,9 +640,9 @@ img.${W.class} {
     }
 
     window.addEventListener("DOMContentLoaded", e => {
-		if (!window.olga5.C) // библиотеки-то - НЕТУ
+        if (!window.olga5.C) // библиотеки-то - НЕТУ
             init.Run()
-	})
+    })
 
     if (!window.olga5.find(w => w.modul == W.modul)) {
         window.olga5.push(W)
@@ -639,6 +651,6 @@ img.${W.class} {
             console.log(`}---< ${document.currentScript.src.indexOf(`/${W.modul}.`) > 0 ? 'загружен  ' : 'включён   '}:  ${W.modul}.js`)
         window.dispatchEvent(new CustomEvent('olga5_sload', { detail: { modul: W.modul } }))
     } else
-        console.error(`Повтор загрузки '${W.modul}`)
+        console.error('%c%s', "background: yellow; color: black;border: solid 2px red;", `Повтор загрузки '${W.modul}`)
     // -------------- o5pop
 })();

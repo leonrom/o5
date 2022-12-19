@@ -42,8 +42,11 @@
 					}
 
 					if (ne) C.ConsoleError(head, ne, rezs)
-					else C.ConsoleInfo(head, 'OK', rezs)
+					else
+						if (C.consts.o5debug > 0) C.ConsoleInfo(head, 'OK', rezs)
+						
 					window.dispatchEvent(new CustomEvent('olga5_sinit', { detail: { modul: W.modul } }))
+					window.dispatchEvent(new CustomEvent('olga5-incls', { detail: { modul: W.modul } })) // для тестов
 				}
 			}
 		},
@@ -178,6 +181,6 @@
 			console.log(`}---< ${document.currentScript.src.indexOf(`/${W.modul}.`) > 0 ? 'загружен  ' : 'включён   '}:  ${W.modul}.js`)
 		window.dispatchEvent(new CustomEvent('olga5_sload', { detail: { modul: W.modul } }))
 	} else
-		console.error(`Повтор загрузки '${W.modul}`)
+		console.error('%c%s', "background: yellow; color: black;border: solid 2px red;", `Повтор загрузки '${W.modul}`)
 	// window.olga5[W.modul] = { W: W } // ради автономного доступ по-имени
 })();

@@ -43,18 +43,22 @@
                             CalcParentLocate(parent.pO5)
         },
         PrepareBords = (aO5) => {
-            const a = { to: null, le: null, ri: null, bo: null },
+            const bO5 = document.body.pO5,
+                a = { to: bO5, le: bO5, ri: bO5, bo: bO5 },
                 Located = (bords, a) => {
                     for (const bord of bords) {
                         const pO5 = bord.pO5,
                             pos = pO5.pos
                         if (pos.top != pos.bottom) {
-                            if (!a.to || a.to.pos.top < pos.top) a.to = pO5
-                            if (!a.bo || a.bo.pos.bottom > pos.bottom) a.bo = pO5
+                            // if (!a.to || !a.to.pos) {
+                            //     console.log()
+                            // }
+                            if (a.to == null || a.to == bO5 || a.to.pos.top < pos.top) a.to = pO5
+                            if (a.bo == null || a.bo == bO5 || a.bo.pos.bottom > pos.bottom) a.bo = pO5
                         }
                         if (pos.left != pos.right) {
-                            if (!a.le || a.le.pos.left < pos.left) a.le = pO5
-                            if (!a.ri || a.ri.pos.right > pos.right) a.ri = pO5
+                            if (a.le == null || a.le == bO5 || a.le.pos.left < pos.left) a.le = pO5
+                            if (a.ri == null || a.ri == bO5 || a.ri.pos.right > pos.right) a.ri = pO5
                         }
                     }
                 }
@@ -74,7 +78,7 @@
                 Located([ask.bords[0]], a)
             Object.assign(aO5.hovered, a)
 
-            Object.assign(a, { to: null, le: null, ri: null, bo: null })
+            Object.assign(a, { to: bO5, le: bO5, ri: bO5, bo: bO5 })
 
             for (const ask of aO5.located.asks)
                 Located(ask.bords, a)
@@ -82,6 +86,12 @@
 
             for (const hoverMarks of ['to', 'le', 'ri', 'bo']) {
                 const pO5 = aO5.hovered[hoverMarks]
+                // if (!pO5 || !pO5.located) {
+                //     console.log()
+                //     for (const ask of aO5.hovered.asks)
+                //         Located([ask.bords[0]], a)
+                // }
+
                 if (pO5.located.timeStamp != timeStamp) { // чтобы не повторяться для одинаковых
                     Located(pO5.prevs, pO5.located)
                     pO5.located.timeStamp = timeStamp
@@ -226,8 +236,8 @@
                     display: '',
                 })
                 Object.assign(shp.style, {
-                    width: (posS.width - aO5.addSize.w) + 'px', // именно! Если 'offset' то вылезут бордюры,
-                    height: (posS.height - aO5.addSize.h) + 'px', // aO5.clientHeight + 'px',
+                    // width: (posS.width - aO5.addSize.w) + 'px', // именно! Если 'offset' то вылезут бордюры,
+                    // height: (posS.height - aO5.addSize.h) + 'px', // aO5.clientHeight + 'px',
                     top: (posS.top) + 'px',
                     left: (posS.left) + 'px',
                 })
@@ -333,8 +343,8 @@
 
                     const b = aO5.shdw.getBoundingClientRect()
                     Object.assign(aO5.posW, { top: b.top, left: b.left, height: b.height, width: b.width })
-                    Object.assign(aO5.posC, { top: b.top, left: b.left, height: b.height, width: b.width })
-                    Object.assign(aO5.posS, { top: 0, left: 0, height: b.height, width: b.width })
+                    Object.assign(aO5.posC, aO5.posW)
+                    Object.assign(aO5.posS, { top: 0, left: 0, })
                     onscr = aO5.posW.top < aO5.located.bo.pos.bottom //aO5.act.first.pO5.pos.bottom) {
                 }
                 if (onscr) {
@@ -416,8 +426,8 @@
         timeStamp = etimeStamp ? etimeStamp : (Date.now() + Math.random())
 
         if (aO5s.length > 0) {
-            const debug=timeStamp && wshp.W.consts.o5debug > 2
-            if (debug) 
+            const debug = timeStamp && wshp.W.consts.o5debug > 2
+            if (debug)
                 console.groupCollapsed(`  старт Scroll для '` + (() => {
                     let s = ''
                     aO5s.forEach(aO5 => { s += (s ? ', ' : '') + aO5.name })

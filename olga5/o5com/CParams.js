@@ -186,7 +186,7 @@
 					if (C.consts.o5debug > 0) PrintParams(W.modul, xs, p, n1)
 				}
 				else
-					C.ConsoleInfo(`${W.modul}: параметры и ссылки берутся только из скрипта ядра библиотеки`)
+				if (C.consts.o5debug > 0) C.ConsoleInfo(`${W.modul}: параметры и ссылки берутся только из скрипта ядра библиотеки`)
 			}
 		}
 

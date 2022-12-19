@@ -9,11 +9,15 @@
 	<link href='alltst.css' media='screen' rel='stylesheet' />
 	<script src='alltst.js'></script>
 
-	<script defer src='../olga5/o5shp.js'></script>
+	<script  src='../olga5/o5shp.js'></script>
 	<script src='../olga5/o5common.js' o5debug=0></script>
 </head>
 
 <body id="body">
+	<script>
+		const eve = document.head.querySelector("script[src*='o5shp.js']") ? 'olga5-incls' : 'olga5_ready' 
+		window.addEventListener(eve, Init4, { once: true })
+	</script>
 
 	<div class='example, olga5_Start'>
 	<div class='cboxed'>
@@ -247,9 +251,6 @@
 	<div class="divSmall">пустышка</div>
 	<div class="divSmall">КОНЕЦ</div>
 </div>
-	<script>
-		window.addEventListener('olga5_ready', function () { Init4() })
-	</script>
 </body>
 
 </html>

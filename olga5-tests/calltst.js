@@ -1,6 +1,6 @@
 /* global console, window */
 /* exported shp_WinOpen*/
-/* exported shp_Init, Init0, Init1, Init2 */
+/* exported shp_Init, Init0, Init1, Init2, Init3 */
 /* exported shp1_ChangeContainers(), shp2_ChangeContainers(), shp3_ChangeContainers(), */
 
 /*jshint asi:true  */

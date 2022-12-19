@@ -6,71 +6,63 @@
 	<title>olga5-snd</title>
 	<!-- <link rel="shortcut icon" href="+../blog/favicon.svg" type="image/x-icon"> -->
 
-	<link data-href="+../blog/favicon.svg" type="image/x-icon" rel="shortcut icon olga5" />
-	<link data-href='+o5ini.css' media='screen' rel='stylesheet' />
+    <link href='+../blog/favicon.svg' rel='shortcut icon' type='image/x-icon' />
+    <link data-href='+o5ini.css' media='screen' rel='stylesheet' />
 
-	<script data-src='+o5mnu.js' o5consts="scrollY=-32"></script>
-	<script data-src='+o5pop.js'></script>
-	<script data-src='+o5ref.js' o5tag_attrs="
-			a,img,audio=href,data-href,src,_src" o5urlrfs="  
+    <script data-src='+ o5inc.js'></script>
+    <script data-src='+ o5shp.js'></script>
+    <script data-src='+ o5pop.js' o5noclick='0'></script>
+    <script data-src='+ o5mnu.js' o5consts='scrollY=-32'></script>
+    <script data-src='+ o5ref.js' 
+		o5tag_attrs="img=image_play;a,img,audio=href,data-href,src,_src;"
+		o5urlrfs="  
 			myTunes-icon='images + /myMusikIT.png' # --- только для o5snd ---;
+		"
+	></script>
+    <script data-src='+ o5snd.js' 
+		btn_stop='images + /icons8-youtube-music-48.png' 
+		btn_play='images + /icons8-youtube-music-50.png'
+		o5consts="
+			o5shift_speed =0.5 
+		"
+		o5urlrfs="
+			Ceza1-25=sounds+/Ceza1-25.mp3;
+			Ceza2-25=sounds+/Ceza2-25.mp3;
+			imageplay=images + /play.png;
+			solfedjio=images+ /solfedjio.png;
+		"
+	></script>
+    <script data-src='+ add/pusto.js' moe-attr='мой атрибут'></script>
 
-			мой-блог=https://turkceile.blogspot.com/2017/02/   # --- только для o5shp ---;
-			#мой-блог=https://ariturlearn.blogspot.com/2017/02 # --- только для o5shp ---;
-			#блог_Olga=https://turkish4dummies.blogspot.com;
-		"></script>
-	<script data-src='+o5snd.js' o5consts="o5shift_speed =2 " o5urlrfs="
-		Ceza1-25=sounds+/Ceza1-25.mp3;
-		Ceza2-25=sounds+/Ceza2-25.mp3;
-		imageplay=images + /play.png;
-		solfedjio=images+ /solfedjio.png;
-	" btn_stop='images + /icons8-youtube-music-48.png' btn_play='images + /icons8-youtube-music-50.png'></script>
-	<script data-src='+o5shp.js'></script>
-	<script data-src='+add/pusto.js' o5consts="moe-attr='мой атрибут'"></script>
-
-	<link data-href='+../blog/csss/olga5.tableCode.css' media='screen' rel='stylesheet' />
-	<link data-href='+../blog/csss/olga5.textNshow.css' media='screen' rel='stylesheet' />
-	<link data-href='+../blog/csss/olga5.addStyles.css' media='screen' rel='stylesheet' />
-	<link data-href='+../blog/csss/olga5.tableKuplet.css' media='screen' rel='stylesheet' />
-	<link data-href='+../blog/csss/tests.css' media='screen' rel='stylesheet' />
-
+    <link data-href='+../blog/csss/olga5.tableCode.css' media='screen' rel='stylesheet' />
+    <link data-href='+../blog/csss/olga5.textNshow.css' media='screen' rel='stylesheet' />
+    <link data-href='+../blog/csss/olga5.addStyles.css' media='screen' rel='stylesheet' />
+    <link data-href='+../blog/csss/olga5.menuPopDn.css' media='screen' rel='stylesheet' />
+    <link data-href='+../blog/csss/olga5.tableKuplet.css' media='screen' rel='stylesheet' />
+    <link data-href='+../blog/csss/tests.css' media='screen' rel='stylesheet' />
 
 	<!-- 
-	src='https://rombase.neocities.org/olga5/o5common.js'
-	src='https://rombase.h1n.ru/o5/olga5/o5common.js'
-	src='http://localhost/o5/olga5/o5common.js' 
-	_блог_o5 = 'https://olga-5.blogspot.com/2020/02' 
-    тесты='http://rombase.h1n.ru/o5/olga5-tests'
-    тесты='http://localhost/o5/olga5-tests'  
--->
-	<!-- <script src='http://localhost/o5/olga5/o5com.js' 
-		o5consts="o5debug=2; "
-	    o5urlrfs="
-			_блог_o5 = '_url_olga5+../2020/02';
-			sounds=https://archive.org/download/clouds_20200310;
-			images=_url_olga5 + ../blog/media/image;
-			тесты = '_url_olga5 + ../olga5-tests';
-			# _url_html='# адрес текущей страницы (этот и 2 следующих - закомментированы)';
-			# _url_root='# адрес сайта (с текущей страницей)';
-			# _url_olga5='# адрес загрузки файла o5common.js';
-	"></script> -->
-	<script src='http://localhost/o5/olga5/o5com.js' 
-	o5consts="o5debug=2; "
-	o5urlrfs="
-		_блог_o5 = '_url_olga5+../2020/02';
-		server= https://rombase.h1n.ru/o5;
-		media = server + /blog/media;
-		sounds= media + /audio;
-		images= media + /image;
-		тесты = server + /olga5-tests;
-		# _url_html='# адрес текущей страницы (этот и 2 следующих - закомментированы)';
-		# _url_root='# адрес сайта (с текущей страницей)';
-		# _url_olga5='# адрес загрузки файла o5common.js';
-"></script>
+		src='https://rombase.h1n.ru/o5/olga5/o5.js'
+		src='http://localhost/o5/olga5/o5.js'  	
+	-->
+    <script src='http://localhost/o5/olga5/o5.js'
+		o5debug='0' 
+        o5incls='o5pop,o5mnu,o5snd,o5shp,o5ref' 
+        o5urlrfs="
+            _блог_o5 = '_url_html+../2020/02';
+			media = + ../blog/media;
+            sounds= media + /audio;
+            images= media + /image;
+            тесты = + ../olga5-tests;   
+            # _url_html=`# адрес текущей страницы (этот и 2 следующих - закомментированы)`;   
+            # _url_root=`# адрес сайта (с текущей страницей)`;    
+            # _url_olga5=`# адрес загрузки файла o5common.js`;   
+        " 
+	></script>
 </head>
 
 <body>
-	<div class="olga5_Start:o5pop,o5ref:o5shp:o5snd" dir="ltr" trbidi="on">
+	<div class="olga5_Start:o5pop,o5ref:o5shp:o5snd:o5mnu" dir="ltr" trbidi="on">
 		<!-- <div class="separator" style="clear: both;display:none">
 			<a
 				href="https://1.bp.blogspot.com/-rW1sKeagSVE/YEsS7GAONII/AAAAAAAAEQY/bSKdPPC_2ccI-0-0DFUfZt2QRRfjOW52QCPcBGAsYHg/s662/snd.png"
@@ -112,17 +104,14 @@
 				</li>
 			</ul>
 			<p>
-				Данный скрипт, подобно остальным скриптам
-				<span o5popup='+ ./help/o5help.html; width: 430, height: 390'> библиотеки</span>,&nbsp;
+				Данный скрипт, подобно остальным скриптам <i>библиотеки</i>
 				может быть подключен не только к отдельным HTML-страницам,
 				но и функционировать внутри <b>Blogger</b>'а, в частности на шаблоне <i>Dynamic View</i>.
 				Скрипт обрабатывает (наряду с &lt;<b>audio</b>&gt;) теги , у которых задан класс <b>olga5_snd</b>,
 				находящиеся в
-				<span o5popup='./olga5-all.html?o5nomnu#head_43; width: 666, height: 444'>областях действия</span>
+				<span o5popup='./olga5-all.html?o5nomnu#head_43; width: 666, height: 444'>областях&nbsp;действия</span>
 				его инициализации.
-				Скрипт должен использоваться обязательно в паре с ядром <i>библиотеки</i>
-				<span id='o5pop' o5popup='./olga5-all.html?o5nomnu; width: 666, height: 444'> <code>o5common.js</code>
-				</span>.
+				Скрипт должен использоваться обязательно в паре с ядром <i>библиотеки</i> <code>o5common.js</code>.
 				Для обработки именованных ссылок также (но не обязательно) может подключаться скрипт
 				<span id='o5pop' o5popup='./olga5-ref.html?o5nomnu; width: 666, height: 444'> <code>o5ref.js</code>
 				</span>.
@@ -419,7 +408,7 @@
 				<i>отложенную</i> загрузку файла.
 			</p>
 			<p>
-				Остановка звучания выполняется уводом курсора. Для тегов с квалификатором <b>alive</b>
+				Остановка звучания выполняется уводом курсора, при  этом для тегов с квалификатором <b>alive</b>
 				нужно сначала кликнуть по тегу, поставив звучание на паузу, и уже потом увести курсор.
 				Также звучание останавливается двойным кликом на
 				<span
@@ -427,8 +416,9 @@
 				что полезно при зацикливании <i>непонятно-какого-аудио</i>.
 			</p>
 			<p>
-				Нажатие клавиши <b>shift</b> при клике задаёт воспроизведение аудио вдвое медленнее
-				(см. ниже об атрибуте <b>o5shift_speed</b>).
+				Нажатие клавиши <b>shift</b> при клике задаёт воспроизведение аудио с скоростью кратной 
+				<b>o5shift_speed</b>
+				(по умодчанию 0.5,- см. нтже п.2).
 			</p>
 			<p>
 				<i>Скрипт</i> автоматически синхронизирует звучание всех тегов: как с классом <b>olga5_snd</b>,
@@ -437,7 +427,10 @@
 			<p>
 				Показанный выше пример (с дополнительными пояснениями) можно посмотреть
 				<span class="olga5_popup" onclick="window.olga5.PopShow('',  700, 488, 'тесты+/snd4.html')">
-					тут</span> в виде отдельного файла.
+					тут</span> в виде отдельного файла. 
+			</p>
+			<p class="moecomment">
+				Перед проверкой звучания по наведению курсора не забудьте активировать окно (например, кликом мыши).
 			</p>
 		</div>
 
@@ -601,7 +594,7 @@
 						<td>
 							<pre>
 <span class="olga5_tableName">стили подключения тега &lt;<b>img</b>&gt;</span>
-img.olga5_shp:not(.<b>olga5freeimg</b>) {
+img.olga5_shp:not(.<b>olga5-freeimg</b>) {
     background-color: transparent;
     position: inherit;
     padding: 0 !important;
@@ -619,7 +612,7 @@ img.olga5_shp:not(.<b>olga5freeimg</b>) {
 			</table>
 			<p>
 				откуда видно, что для отмены использование данного <b>CSS</b>'а следует (к классам этого тега)
-				добавить класс <b>olga5freeimg</b>. Тот же эффект будет если
+				добавить класс <b>olga5-freeimg</b>. Тот же эффект будет если
 				в теговом классе <b>olga5_snd</b> указать уточняющий квалификатор <b>F</b><i>reeImg</i>.
 				Впрочем, можно просто задавать тегу конкретные стили атрибутом <b>style</b>.
 			</p>
@@ -629,7 +622,7 @@ img.olga5_shp:not(.<b>olga5freeimg</b>) {
 		<div>
 			<p>
 				Отображение состояния тегов проигрывании аудио, определяется <b>CSS</b>-правилами, прошитыми в файле
-				CSS.js (в составе данного модуля). Изменить их можно только редактированием этого файла.
+				o5snd.js (в составе данного модуля). Изменить их можно только редактированием этого файла.
 				Впрочем, после подстановки значений в названия атрибутов, эти правила могут быть выделены в отдельный
 				CSS-файл для подключения через тег &lt;<b>link</b>&gt;.
 			</p>
@@ -770,7 +763,7 @@ img.olga5_shp:not(.<b>olga5freeimg</b>) {
 			<br />
 		</div>
 		<!-- ===================================================================================== -->
-		<pre id="menu-pre" class="olga5_menudef" style="display:none">
+		<pre id="menu-pre" class="olga5-menuhidden" style="display:none">
 			{ span: 'Статья', id: "moemenu", right: '5px', top: '5px', add: '233px', small: '1' },
 				{ span: '1. Общие сведения', ref: 'snd_1', add: '333px' },
 					{ span: '1.1. Иллюстрация вариантов обработки аудио', ref: 'snd_11', ret: '1' },

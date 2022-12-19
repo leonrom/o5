@@ -21,6 +21,13 @@
             for (const aO5 of aO5s) s += (s ? ', ' : '') + aO5.name
             return s
         },
+        SwitchOpacity = aO5s =>{
+            for (const aO5 of aO5s){
+                aO5.shdw.style.opacity = 0
+                aO5.cart.style.opacity = 1
+                SwitchOpacity(aO5.aO5s)
+            }
+        },
         FillBords = (pO5, strt) => { // РЕКУРСИЯ !
             if (pO5.prevs.length > 0)
                 return
@@ -171,6 +178,7 @@
                             for (const qual of quals) {
                                 const tt = qual.replaceAll(/-/g, '=').split('='),
                                     c = tt[0].substr(0, 1).toUpperCase()
+                                    
                                 if (c != '' && !isNaN(c)) cls.level = Number(c)
                                 else if (c == 'N') cls.none = true
                                 else if (c == 'K') cls.kill = true
@@ -234,7 +242,7 @@
                     SetLevels(aO5s, 0)
 
                     if (o5debug > 1)
-                        console.log(" >> яDoResize " + ('' + Date.now()).substr(-6) + ", вложенности объектов: \n\t  " + aO5str)
+                        console.log(" >> SetLevelsAll " + ('' + Date.now()).substr(-6) + ", вложенности объектов: \n\t  " + aO5str)
                     return aO5str
                 }
 
@@ -255,10 +263,8 @@
                 let etimeStamp = 0
                 document.addEventListener('click', (e) => { // для отладки  !!!!!!!!!!!!!!!!!!
                     if (e.timeStamp > etimeStamp + 0.1)
-                        if (!e.target.classList.contains(wshp.W.class)){
+                        if (!e.target.classList.contains(wshp.W.class))
                             wshp.DoResize()
-                            wshp.DoScroll (wshp.aO5s) 
-                        }
                     etimeStamp = e.timeStamp
                 })
             }
@@ -266,7 +272,7 @@
             if (wshp.aO5s.length > 0) {
                 wshp.AO5shp()
                 wshp.DoResize()
-                wshp.DoScroll (wshp.aO5s) 
+                SwitchOpacity(wshp.aO5s)
 
                 window.addEventListener('resize', wshp.DoResize)
                 document.addEventListener('scroll', e => {

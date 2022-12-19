@@ -227,3 +227,10 @@ font-style: italic;
 margin-block-start: 0em;
 margin-block-end: 0em;
 }
+.moeattention{
+    background-color: bisque;
+    border: 1px solid lightgreen;
+    border-radius: 5px;
+    padding-left: 0.3em;
+    padding-right: 0.3em;
+}

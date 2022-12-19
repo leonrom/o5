@@ -12,7 +12,8 @@
 
 	const wshp = window.olga5[olga5_modul],
 		C = window.olga5.C,
-		Match = scls => new RegExp(`\\b` + scls + `(\\s*[,:+]\\s*((([\`'"\\(\\[])(.*?)\\4)|[\\w\\-\\.]*))*(\\s|$)`),
+		Match = scls => new RegExp(`\\b` + scls + `(\\s*[,:+]\\s*((([\`'"\\(\[])(.*?)\\4)|[^\\s\`'":,+]*))*(\\s*|$)`),
+		// Match = scls => new RegExp(`\\b` + scls + `(\\s*[,:+]\\s*((([\`'"\\(\\[])(.*?)\\4)|[\\w\\-\\.]*))*(\\s|$)`),
 		// Match = scls => new RegExp(`\\b` + scls + `(\\s*[,:+]\\s*((([\`'"])(.*?)\\4)|[+\\s*\\-\\w]*))*`),
 		// Match = scls => new RegExp(`\\b` + scls + `[,:]*[^\\s\\)]*`),
 		mquals = /\s*[:,]\s*/,
@@ -79,7 +80,7 @@
 			GetTagsByTagNames: (tagnams, modul) => {
 				return GetTagsBy(modul, 'getElementsByTagName', tagnams)
 			},
-			SelectByClassName: (classnam, modul) => {
+			SelectByClassName: (classnam, modul, do_not_replace_class) => {
 				const tags = GetTagsBy(modul, 'querySelectorAll', '[class *=' + classnam + ']'),
 					match = Match(classnam),
 					rez = []
@@ -88,10 +89,12 @@
 						const ms = tag.className.match(match)
 						if (ms) {
 							const quals = [],
-								m = ms[0],
+								m = ms[0].trim(),
 								ss = m.split(mquals)
 
-							tag.className = tag.className.replace(m, classnam + ' ')// ВСЕГДА убираю квалификаторы
+							if (!do_not_replace_class)  // кромк IniScript-теста ВСЕГДА убираю квалификаторы
+								tag.className = tag.className.replace(m, classnam + ' ')
+
 							for (let j = 1; j < ss.length; j++)
 								quals.push(ss[j].trim())
 							rez.push({ tag: tag, quals: quals, origcls: ms.input })
@@ -109,10 +112,10 @@
 				else
 					for (const tag of starts) {
 						const quals = [],
-							m = tag.className.trim(),
-							ms = m.match(match)
+							ms = tag.className.match(match),
+							m = ms[0].trim()
 						if (ms) {
-							tag.className = tag.className.replace(ms[0], scls)// ВСЕГДА убираю квалификаторы (остальные в ms - не трогать!)
+							tag.className = tag.className.replace(m, scls)// ВСЕГДА убираю квалификаторы (остальные в ms - не трогать!)
 
 							const ss = m.split(mquals)
 							for (let j = 1; j < ss.length; j++) {
@@ -134,4 +137,27 @@
 	}
 	if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
 		console.log(`}---> подключен ${olga5_modul}/${modulname}.js`)
+		/*
+		тестирование Match()
+		\bolga5_snd(\s*[,:+]\s*((([`'"\(\[])(.*?)\4)|[^\s`'":,+]*))*(\s*|$)
+
+		olga5_snd
+aaa olga5_snd: q: q  asa
+aaa olga5_snd: q : q : a  asa
+aaa olga5_snd:over : a-11_z : loop  asa
+aaa olga5_snd:over : 'a-11_z : loop'  asa
+olga5_snd:аудио_файл  asa
+olga5_snd:+аудио_файл  asa
+olga5_snd:+ аудио_файл  asa
+olga5_snd: + аудио_файл  asa
+olga5_snd: + аудио_файл +bb asa
+olga5_snd:аудио_файл  : " sd  ffg sa" asa
+aaa olga5_snd:аудио_файл  : " sd  ffg sa" asa
+aaa olga5_snd : аудио_файл  : ' sd  ' ffg sa" asa
+aaa olga5_snd: xZa:'ёй-sounds_2 + /gitme.mp3 bbb:O'asa
+aaa olga5_snd: Lяя :Aюю:'ёй-sounds_2 + /gitme.mp3 bbb:O'asa
+aaa olga5_snd: Lяя :Aюю :'ёй-sounds_2 + /gitme.mp3 bbb:O' asa
+aaa dlassaaa:A olga5_snd:over : a-11_z: loop :  "  sounds + Ceza1-25.mp3" 
+
+		*/
 })();

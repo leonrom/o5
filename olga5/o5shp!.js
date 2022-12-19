@@ -12,8 +12,8 @@
 
     let C = null,
         debugids = ['shp_text', 'shp_1÷4']
+
     const wshp = window.olga5[olga5_modul],
-        // W = window.olga5.find(w => w.modul == olga5_modul), // так делать во всех подмодулях 
         MyRound = (s) => { return Math.round(parseFloat(s)) },
         SetClick = (aO5, clk, next) => {
             if (next) aO5.act.underClick = clk
@@ -51,10 +51,7 @@
                 else posC.top = bottom - posC.height
             }
             Object.assign(aO5.fix, { putV: putV, iO5: iO5 })
-        }
-
-    const clones = [],
-        // eClone = new window.Event('olga5_cloned'),
+        },
         DoShpClick = function (e) {
             const
                 MarkClick = (aO5) => {
@@ -75,125 +72,106 @@
                 MarkClick(shp.aO5shp)
             }
         },
-        ChangeIDshdw = (aO5) => {
-            const nam = '_shdw',
-                ids = aO5.shdw.querySelectorAll("[id]")
-            ids.forEach(id => {
-                id.setAttribute('id', id.id + nam)
-            })
+        Clone = function (aO5) {
+            if (C.consts.o5debug > 1)
+                console.log(`----------------- клонирую '${aO5.name}' -----------`)
 
-            const classList = aO5.shdw.classList
-            for (const c of classList)
-                if (wshp.o5classes.includes(c.split(':')[0].trim()))
-                    classList.remove(c)
-        },
-        SetClasses = (aO5) => {
-            for (const nam of ['cart', 'gask', 'shdw']) {
-                const obj = aO5[nam]
-
-                obj.classList.remove(wshp.W.class)
-                obj.classList.add(wshp.W.class + '_' + nam)
-
-                obj.id = aO5.shp.id + '_' + nam
-                obj.aO5shp = aO5 // чтобы найти при обработке клика
-            }
-        },
-        ReplaceProps = (aO5) => {
             const shp = aO5.shp,
-                shdw = aO5.shdw,
-                gask = aO5.gask,
-                cart = aO5.cart,
-                nst = aO5.nst,
+                cart = aO5.cart = document.createElement('div'),
+                shdw = aO5.shdw = shp.cloneNode(true),
                 posC = shp.getBoundingClientRect()
 
-            aO5.addSize = (() => {
-                const GPV = nam => { return MyRound(nst.getPropertyValue(nam)) },
-                    pW = GPV('padding-left') + GPV('padding-right'),
-                    pH = GPV('padding-top') + GPV('padding-bottom'),
-                    bW = GPV('border-left-width') + GPV('border-right-width'),
-                    bH = GPV('border-top-width') + GPV('border-bottom-width')
-                return { w: pW + bW, h: pH + bH }
-            })()
+            // cart
+            Object.assign(cart.style, {
+                width: (posC.width) + 'px',
+                height: (posC.height) + 'px',
+                left: (posC.left) + 'px',
+                top: (posC.top) + 'px',
+            })
+            cart.aO5shp = aO5 // чтобы найти при обработке клика
+            cart.pO5 = null
 
+            cart.classList.add(wshp.olga5cart)
+
+            // коррекция shdw
+            shdw.classList.add(C.olga5ignore)
+
+            const add = '_shdw',
+                parentNode = shp.parentNode,
+                ids = shdw.querySelectorAll("[id]")
+
+            ids.forEach(id => {
+                if (id.hasAttribute('id'))
+                    id.setAttribute('id', id.id + add)
+            })
+            if (shp.id) shdw.id = shp.id + add
+
+            wshp.W.origs.consts.split(/;|,/).forEach(c => {
+                shdw.removeAttribute(c.split(/=|:/)[0])
+            })
             if (aO5.cls.dirV == 'D') shdw.style.height = '0.1px' // на экране НЕ должно занимать месо
-            // const overflowY = nst.getPropertyValue('overflow-y'),
-            //     overflowX = nst.getPropertyValue('overflow-x') 
-            gask.style.overflowY = 'visible'
-            gask.style.overflowX = 'visible'
-            cart.style.overflowY = 'hidden'// (shp.style.overflowY != '') ? shp.style.overflowY : 'hidden'// (overflowY && overflowY!='auto'?overflowY:'hidden')
-            cart.style.overflowX = 'hidden'// (shp.style.overflowX != '') ? shp.style.overflowX : 'hidden'// (overflowX && overflowX!='auto'?overflowX:'hidden')
 
-            for (const excl of [// тут НЕ должно быть сокращений типа margin='0, 0, 0, 0'!
-                // { nam: 'cursor', val: '' },
-                { nam: 'position', val: 'absolute' },
-                { nam: 'left', val: '0px' },
-                { nam: 'top', val: '0px' },
-                { nam: 'margin-top', val: '0px' },
-                { nam: 'margin-right', val: '0px' },
-                { nam: 'margin-bottom', val: '0px' },
-                { nam: 'margin-left', val: '0px' },
-                { nam: 'margin', val: '0' },
-                { nam: 'bottom', val: '' }, { nam: 'right', val: '' }, // { nam: 'opacity', val: '0' },
-            ])
-                shp.style[excl.nam] = excl.val
-
-            shp.style.display = 'block'
-
-            const props = ['outline-color', 'outline-offset', 'outline-style', 'outline-width', 'zoom', 'transform']
-            for (const prop of props) { // перестановка свойств в контейнер
+            // коррекция shp
+            const GPV = nam => { return MyRound(nst.getPropertyValue(nam)) },
+                nst = window.getComputedStyle(shp) // д.б. до replaceChild()
+            Object.assign(aO5.addSize, {
+                w: GPV('padding-left') + GPV('padding-right') + GPV('border-left-width') + GPV('border-right-width'),
+                h: GPV('padding-top') + GPV('padding-bottom') + GPV('border-top-width') + GPV('border-bottom-width')
+            })
+//             const PN=n=>{   
+//                 const nst1 = window.getComputedStyle(shp)
+//                 const nst2 = window.getComputedStyle(shdw)
+//                 console.log('shp  : '+shp.id +"  zoom="+nst.zoom+", trans="+nst.transform+", zoom="+shp.style.zoom+", trans="+shp.style.transform+"   =====  " +n)
+//                 console.log('shdw : '+shdw.id+"  zoom="+nst2.zoom+", trans="+nst2.transform+", zoom="+shdw.style.zoom+", trans="+shdw.style.transform+"")
+//                 console.log('shp1 : '+shp.id +"  zoom="+nst1.zoom+", trans="+nst1.transform )
+//                 // console.log('shdw: '+shp.id+"  outlineWidth='"+nst2.outlineWidth+"' outline='"+nst2.outline+"' zoom="+nst2.zoom+", transform='"+nst2.transform+"'")
+//             }
+// PN(1)
+            for (const prop of [   // перенос нужных "внешних" свойств на cart 
+                'outline-color', 'outline-offset', 'outline-style', 'outline-width'
+            ]) {
                 const wi = nst.getPropertyValue(prop)
                 if (wi && wi.length > 0) {
                     shp.style[prop] = ''
                     cart.style[prop] = wi
                 }
             }
+            for (const prop of [   // перенос нужных "внешних" свойств на shdw 
+                'zoom', 'transform'
+            ]) {
+                const wi = nst.getPropertyValue(prop)
+                if (wi && wi.length > 0) {
+                    shp.style[prop] = ''
+                    shdw.style[prop] = wi
+                }
+            }
 
-            Object.assign(cart.style, {
-                width: (posC.width) + 'px',
-                height: (posC.height) + 'px',
-                left: (posC.left) + 'px',
-                top: (posC.top) + 'px',
-                display: '',
-            })
-        },
-        Clone = function (aO5) {
-            const shp = aO5.shp
+            parentNode.replaceChild(shdw, shp)  // д.б. перед коррекцией shp но после shdw
 
-            clones.push({ shp: shp, ready: false })
-            aO5.shdw = shp.cloneNode(true) // клонирую с внутренностями ?!
-            ChangeIDshdw(aO5)
+            // коррекция значения атрибута style
+            const sn = [
+                'position: relative', 'left:0', 'top:0', 'width:100%', 'height:100%',
+                'margin-top: 0', 'margin-right: 0', 'margin-bottom: 0', 'margin-left: 0', 'margin: 0'
+            ]
+            for (const s of sn) {
+                const uu = s.split(/\s*:\s*/)
+                shp.style[uu[0]] = uu[1]
+            }
 
-            aO5.gask = document.createElement('div') // чтобы создать требуемое (для shp) позиционирование
-            aO5.cart = document.createElement('div')
-            aO5.cart.pO5 = null
+            cart.appendChild(shp)
+            parentNode.insertBefore(cart, shdw)
 
-            aO5.shdw.style.opacity = 1 // после первого OnScroll или OnResize все будут = 0
-            aO5.cart.style.opacity = 0 // после первого OnScroll или OnResize все будут = 1
-
-            SetClasses(aO5)
-            // ChangeIDshdw(aO5)
-
-            ReplaceProps(aO5)
-            aO5.shp.parentNode.replaceChild(aO5.shdw, aO5.shp)  // д.б. после ReplaceProps(aO5)
-
-            // ChangeShpProps(aO5)
-            aO5.gask.appendChild(aO5.shp)
-
-            aO5.cart.appendChild(aO5.gask)
-            C.AppendChild(document.body, aO5.cart)
-
-            for (const o of [aO5.cart, aO5.gask, aO5.posW, aO5.posC, aO5.posS])
-                Object.seal(o)
+            for (const o of [cart, aO5.posW, aO5.posC, aO5.posS]) Object.seal(o)
             Object.freeze(aO5)
 
-            if (wshp.W.consts.o5debug > 2)
-                console.log('----------------- aO5 ----  ' + aO5.name)
-            aO5.shp.addEventListener('dblclick', DoShpClick, { capture: true, passive: true })
+// PN(2)
+            shp.addEventListener('dblclick', DoShpClick, { capture: true, passive: true })
 
-            clones.find(clone => clone.shp === aO5.shp).ready = true
-
-            wshp.AO5shp(aO5)
-        }
+            // wshp.AO5shp(aO5)
+            for (const iO5 of aO5.aO5s)
+                Clone(iO5)
+        },
+        Tbelong = { attr: '', to: null, le: null, ri: null, bo: null }
 
     class AO5 {
         constructor(shp, cls) {
@@ -201,7 +179,6 @@
             this.id = shp.id
             this.shp = shp
             this.prev = shp.parentElement
-            this.nst = window.getComputedStyle(shp)
             Object.assign(this.cls, cls)
 
             for (const nam of ['cls', 'old', 'addSize', 'act', 'fix', 'hovered', 'located', 'posW', 'posC', 'posS'])
@@ -215,19 +192,18 @@
         addSize = { w: 0, h: 0 }
         act = { dspl: true, wasKilled: false, wasClick: false, underClick: false, pushedBy: null, }
         fix = { putV: '', iO5: null, iO5up: null }
-        hovered = { act: 'hovered', attr: '', asks: [], to: null, le: null, ri: null, bo: null }
-        located = { act: 'located', attr: '', asks: [], to: null, le: null, ri: null, bo: null }
+        hovered = Object.assign({ act: 'hovered', asks: [], }, Tbelong) // массивы д.б.персонально
+        located = Object.assign({ act: 'located', asks: [], }, Tbelong)
         posW = { top: 0, left: 0, height: 0, width: 0 }
-        posS = { top: 0, left: 0, height: 0, width: 0 }
-        posC = { top: 0, left: 0, height: 0, width: 0, z: 1, zheight: 0, zwidth: 0 } // добален z==zoom
+        posC = Object.assign({}, this.posW)
+        posS = {top: 0, left: 0, }
+        sizS = {height: 0, width: 0, }
 
         cart = null
-        gask = null
         shdw = null
 
         Show = () => Show(this)
         Hide = () => Hide(this)
-        Clone = () => Clone(this)
         DoFixV = (iO5) => DoFixV(this, iO5)
         SetClick = (clk) => SetClick(this, clk)
     }
@@ -235,14 +211,16 @@
     // --------------------------------------------------------------------- //    
 
     Object.assign(wshp, {
-        o5classes: [],  // какие классы подключены библииекой
-        FillClasses: () => {
-            C = window.olga5.C
-            for (const scrpt of C.scrpts)
-                if (scrpt.act.W && scrpt.act.W.class) // если скрипт уже подгружен (т.е. он - перед o5shp.js)
-                    wshp.o5classes.push(scrpt.act.W.class)
-        },
+        // o5classes: [],  // какие классы подключены библииекой
+        // FillClasses: () => {
+        //     C = window.olga5.C
+        //     for (const scrpt of C.scrpts)
+        //         if (scrpt.act.W && scrpt.act.W.class) // если скрипт уже подгружен (т.е. он - перед o5shp.js)
+        //             wshp.o5classes.push(scrpt.act.W.class)
+        // },
         MakeAO5: (shp, cls, PO5) => {
+            C = window.olga5.C
+
             shp.aO5shp = new AO5(shp, cls)
             const aO5 = shp.aO5shp
             let pO5 = aO5.prev.pO5
@@ -274,19 +252,15 @@
             aO5s.push(aO5)
 
             if (shp.tagName.match(/\b(img|iframe|svg)\b/i) && !shp.complete) {
-                C.ConsoleInfo(`ожидается завершение загрузки '${aO5.name}'`)
-                shp.addEventListener('load', e => wshp.DoResize(shp))
+                if (C.consts.o5debug > 0) C.ConsoleInfo(`ожидается завершение загрузки '${aO5.name}'`)
+                shp.addEventListener('load', e => {
+                    wshp.DoResize(shp)
+                })
             }
         },
-        AO5shp: aO5 => {
-            const aO5s = (aO5 ? aO5 : wshp).aO5s
-            C = window.olga5.C
-
-            if (C.consts.o5debug > 1)
-                console.log(`----------------- клонирую ${aO5s.length} шт. для '${aO5 ? aO5.name : 'document'}' -----------`)
-
-            for (const aO5 of aO5s)
-                aO5.Clone()
+        AO5shp: () => {
+            for (const aO5 of wshp.aO5s)
+                Clone(aO5)
         }
     })
 
@@ -315,6 +289,13 @@
             let s = ''
             for (const aO5 of aO5s) s += (s ? ', ' : '') + aO5.name
             return s
+        },
+        SwitchOpacity = aO5s =>{
+            for (const aO5 of aO5s){
+                aO5.shdw.style.opacity = 0
+                aO5.cart.style.opacity = 1
+                SwitchOpacity(aO5.aO5s)
+            }
         },
         FillBords = (pO5, strt) => { // РЕКУРСИЯ !
             if (pO5.prevs.length > 0)
@@ -357,8 +338,7 @@
                     C.ConsoleError(`Неопределён hash= '${hash}' в адресной строке`)
             }
             // window.dispatchEvent(new window.Event('resize'))
-        },
-        blogPanels = ['overview-content', 'viewitem-panel']
+        }
 
     class PO5 {
         constructor(current, aO5) {
@@ -366,12 +346,14 @@
             this.id = current.id
             this.name = C.MakeObjName(current)
             this.isBody = current == document.body || current.nodeName == 'BODY'
-            this.isFinal = this.isBody || blogPanels.find(cls => current.classList.contains(cls)) // this.classList.contains('overview-content')
+            this.isFinal = this.isBody || 
+                ['overview-content', 'viewitem-panel'].find(cls => current.classList.contains(cls)) 
             this.isDIV = current.tagName.match(/\bdiv\b/i)  // == "DIV"
             if (o5debug > 2)
                 console.log("создаётся pO5 для '" + this.name + "'")
             FillBords(this, 'pO5=' + this.name + (aO5 ? (' для aO5=' + aO5.name) : ''))
 
+            this.nst = window.getComputedStyle(current)
             this.PO5Colors(0)
             Object.seal(this.prevs)
             Object.seal(this.pos)
@@ -382,6 +364,7 @@
             Object.seal(this.cdif)
             Object.freeze(this)
         }
+        nst = {}
         add = { top: 0, left: 0, right: 0, bottom: 0 }
         owns = { own: null }
         aO5s = []
@@ -394,8 +377,7 @@
         PO5Colors = (timeStamp) => {
             const pO5 = this,
                 cc = pO5.colors,
-                current = pO5.current,
-                nst = window.getComputedStyle(current),
+                nst = pO5.nst,
                 cd = {
                     ct: IsFloat001(nst.borderTopWidth),
                     cl: IsFloat001(nst.borderLeftWidth),
@@ -408,7 +390,7 @@
                         GRGB = (i) => { return ("0" + parseInt(rgb[i], 10).toString(16)).slice(-2) }
                     return (rgb && rgb.length === 4) ? "#" + GRGB(1) + GRGB(2) + GRGB(3) : ''
                 },
-                c = CN(nst, 'background')
+                c = CN(pO5.nst, 'background')
             for (const bord of ['top', 'left', 'right', 'bottom'])
                 pO5.add[bord] = parseFloat(nst.getPropertyValue('border-' + bord + '-width'))
             Object.assign(cc, {
@@ -465,6 +447,7 @@
                             for (const qual of quals) {
                                 const tt = qual.replaceAll(/-/g, '=').split('='),
                                     c = tt[0].substr(0, 1).toUpperCase()
+                                    
                                 if (c != '' && !isNaN(c)) cls.level = Number(c)
                                 else if (c == 'N') cls.none = true
                                 else if (c == 'K') cls.kill = true
@@ -490,7 +473,7 @@
                     wshp.aO5str = ''
                     ClearO5s(wshp.aO5s)
 
-                    wshp.FillClasses()
+                    // wshp.FillClasses()
                     for (const mtag of mtags) {
                         const dt = DecodeType(mtag.quals),
                             shp = mtag.tag
@@ -528,7 +511,7 @@
                     SetLevels(aO5s, 0)
 
                     if (o5debug > 1)
-                        console.log(" >> яDoResize " + ('' + Date.now()).substr(-6) + ", вложенности объектов: \n\t  " + aO5str)
+                        console.log(" >> SetLevelsAll " + ('' + Date.now()).substr(-6) + ", вложенности объектов: \n\t  " + aO5str)
                     return aO5str
                 }
 
@@ -540,7 +523,7 @@
             if (o5debug > 0) {
                 const sels = []
                 for (const mtag of mtags)
-                    sels.push({ id: mtag.tag.id, class: mtag.tag.className, tag: mtag.tag.tagName, })
+                    sels.push({ name: C.MakeObjName(mtag.tag), origcls: mtag.origcls, class: mtag.tag.className, quals: mtag.quals.join(', '), })
                 if (sels.length > 0) C.ConsoleInfo(`o5shp: найдены селекторы:`, sels.length, sels)
                 else
                     if (!C.consts.o5iblog)
@@ -549,8 +532,8 @@
                 let etimeStamp = 0
                 document.addEventListener('click', (e) => { // для отладки  !!!!!!!!!!!!!!!!!!
                     if (e.timeStamp > etimeStamp + 0.1)
-                        if (!e.target.classList.contains('olga5_shp'))
-                            e => wshp.DoResize()
+                        if (!e.target.classList.contains(wshp.W.class))
+                            wshp.DoResize()
                     etimeStamp = e.timeStamp
                 })
             }
@@ -558,7 +541,7 @@
             if (wshp.aO5s.length > 0) {
                 wshp.AO5shp()
                 wshp.DoResize()
-                wshp.DoScroll (wshp.aO5s) 
+                SwitchOpacity(wshp.aO5s)
 
                 window.addEventListener('resize', wshp.DoResize)
                 document.addEventListener('scroll', e => {
@@ -637,15 +620,15 @@
                                 cc = s.split(':'),
                                 u = cc[0].trim(),
                                 t = u.length > 0 ? u[0].toUpperCase() : '?'
-                            if (!typs.includes(t))
-                                errs.push({ name: aO5.name, str: s, err: "тип ссылки не начинается одним из '" + typs + "'" })
-                            else {
+                            if (typs.includes(t)) {
                                 const cod = cc.length > 1 ? cc[1].trim() : '',
                                     num = cc.length > 2 ? MyRound(cc[2]) : 1,
                                     fix = cc.length > 2 ? cc[2].toUpperCase() == 'F' : false
 
                                 AddNew(blng.asks, { typ: t, cod: cod, num: num, nY: num, ok: false, fix: fix, bords: [] })
                             }
+                            else
+                                errs.push({ name: aO5.name, str: s, err: "тип ссылки не начинается одним из '" + typs + "'" })
                         }
                     }
                 },
@@ -681,15 +664,30 @@
             if (errs.length > 0 && showerr)
                 Error("Ошибки в атрибутах  для тегов", errs.length, errs)
         },
+        CalcSize = (aO5s) => {
+            for (const aO5 of aO5s) {
+                const pos = aO5.shdw.getBoundingClientRect(),
+                    add = aO5.addSize,
+                    w = aO5.sizS.width
+
+                Object.assign(aO5.sizS, { width: (pos.width - add.w), height: (pos.height - add.h) })
+                Object.assign(aO5.shp.style, { width: aO5.sizS.width + 'px', height: aO5.sizS.height + 'px' })
+
+                CalcSize(aO5.aO5s)
+
+                if (o5debug > 2)
+                    console.log(`${aO5.name} : pos.width=${pos.width}, add.w=${add.w}, sizS.width=${aO5.sizS.width}, старое=${w}`)
+            }
+        },
         SortAll = (aO5s) => { // сортировка и индексация
             const nest = aO5s.nest
 
             if (o5debug > 2)
                 console.log('  >> яSortAll (' + nest + '): aO5s=' + MyJoinO5s(aO5s));
-
+            ``
             for (const aO5 of aO5s) {
-                const pos = aO5.shdw.getBoundingClientRect()
-                Object.assign(aO5.posW, { top: pos.top, left: pos.left, width: pos.width, height: pos.height })
+                const b = aO5.shdw.getBoundingClientRect()
+                Object.assign(aO5.posW, { top: b.top, left: b.left })
             }
             aO5s.sort((a1, a2) => { // для вызовов (для работы)
                 const i1 = Math.round(parseFloat(a1.posW.top)),
@@ -714,7 +712,7 @@
                 AskScrolls = (pO5) => {
                     const minScrollW = 3,
                         current = pO5.current,
-                        nst = window.getComputedStyle(current),
+                        nst = pO5.nst,
                         dw = minScrollW + MyRound(nst.borderLeftWidth) + MyRound(nst.borderRightWidth) + MyRound(nst.paddingLeft) + MyRound(nst.paddingRight),
                         dh = MyRound(nst.borderTopWidth) + MyRound(nst.borderBottomWidth) + MyRound(nst.paddingTop) + MyRound(nst.paddingBottom)
                     Object.assign(pO5.scroll, {
@@ -778,8 +776,6 @@
                             for (const ask of blng.asks)
                                 FillAsk(aO5, ask, blng.act)
                         }
-                        aO5.shdw.style.opacity = 0
-                        aO5.cart.style.opacity = 1
 
                         if (aO5.aO5s.length > 0)
                             FillBlngs(aO5.aO5s)
@@ -788,11 +784,11 @@
 
             FillBlngs(aO5s)
             if (errs.length > 0 && showerr)
-                C.ConsoleError("При старте (в  'яDoResize'): не опр. ссылки на контейнеры ", errs.length, errs)
+                C.ConsoleError("При старте (в  'DoResize'): не опр. ссылки на контейнеры ", errs.length, errs)
         }
 
     let showerr = true
-    wshp.DoResize = function (shp) {
+    wshp.DoResize = function () {
         /* 
         фактически - д.б. 1 раз. - при первом скроллинге,
         но для отладки - может вызываться повторно
@@ -815,7 +811,9 @@
 
         ReadAttrsAll(aO5s, showerr)
         SortAll(aO5s)
+        CalcSize(aO5s)
         FillBlngsAll(aO5s, showerr, timeStamp)
+        wshp.DoScroll(wshp.aO5s)
         showerr = false
     }
 
@@ -867,18 +865,22 @@
                             CalcParentLocate(parent.pO5)
         },
         PrepareBords = (aO5) => {
-            const a = { to: null, le: null, ri: null, bo: null },
+            const bO5 = document.body.pO5,
+                a = { to: bO5, le: bO5, ri: bO5, bo: bO5 },
                 Located = (bords, a) => {
                     for (const bord of bords) {
                         const pO5 = bord.pO5,
                             pos = pO5.pos
                         if (pos.top != pos.bottom) {
-                            if (!a.to || a.to.pos.top < pos.top) a.to = pO5
-                            if (!a.bo || a.bo.pos.bottom > pos.bottom) a.bo = pO5
+                            // if (!a.to || !a.to.pos) {
+                            //     console.log()
+                            // }
+                            if (a.to == null || a.to == bO5 || a.to.pos.top < pos.top) a.to = pO5
+                            if (a.bo == null || a.bo == bO5 || a.bo.pos.bottom > pos.bottom) a.bo = pO5
                         }
                         if (pos.left != pos.right) {
-                            if (!a.le || a.le.pos.left < pos.left) a.le = pO5
-                            if (!a.ri || a.ri.pos.right > pos.right) a.ri = pO5
+                            if (a.le == null || a.le == bO5 || a.le.pos.left < pos.left) a.le = pO5
+                            if (a.ri == null || a.ri == bO5 || a.ri.pos.right > pos.right) a.ri = pO5
                         }
                     }
                 }
@@ -898,7 +900,7 @@
                 Located([ask.bords[0]], a)
             Object.assign(aO5.hovered, a)
 
-            Object.assign(a, { to: null, le: null, ri: null, bo: null })
+            Object.assign(a, { to: bO5, le: bO5, ri: bO5, bo: bO5 })
 
             for (const ask of aO5.located.asks)
                 Located(ask.bords, a)
@@ -906,6 +908,12 @@
 
             for (const hoverMarks of ['to', 'le', 'ri', 'bo']) {
                 const pO5 = aO5.hovered[hoverMarks]
+                // if (!pO5 || !pO5.located) {
+                //     console.log()
+                //     for (const ask of aO5.hovered.asks)
+                //         Located([ask.bords[0]], a)
+                // }
+
                 if (pO5.located.timeStamp != timeStamp) { // чтобы не повторяться для одинаковых
                     Located(pO5.prevs, pO5.located)
                     pO5.located.timeStamp = timeStamp
@@ -1038,8 +1046,7 @@
         },
         SavePos = (aO5) => {
             if (aO5.act.dspl) { //  вообще-то тут два вариантта: либо после сталкивания пропадает совсем, либо попадает на своё место, но уже под верхний                  
-                const isFix = 'isFix',
-                    shp = aO5.shp,
+                const shp = aO5.shp,
                     posC = aO5.posC,
                     posS = aO5.posS,
                     cart = aO5.cart
@@ -1051,17 +1058,13 @@
                     display: '',
                 })
                 Object.assign(shp.style, {
-                    width: (posS.width - aO5.addSize.w) + 'px', // именно! Если 'offset' то вылезут бордюры,
-                    height: (posS.height - aO5.addSize.h) + 'px', // aO5.clientHeight + 'px',
+                    // width: (posS.width - aO5.addSize.w) + 'px', // именно! Если 'offset' то вылезут бордюры,
+                    // height: (posS.height - aO5.addSize.h) + 'px', // aO5.clientHeight + 'px',
                     top: (posS.top) + 'px',
                     left: (posS.left) + 'px',
                 })
-                if (aO5.fix.putV) cart.classList.add(isFix)
-                else cart.classList.remove(isFix)
-                // const isput = aO5.fix.putV
-                // const isput = aO5.fix.putV,
-                //     isfix = cart.classList.contains(isFix)
-                // if ((isput && !isfix) || (!isput && isfix)) cart.classList.add(isFix)
+                if (aO5.fix.putV) cart.classList.add(wshp.olga5ifix)
+                else cart.classList.remove(wshp.olga5ifix)
             }
         },
         DebugShowBounds = (aO5s) => {
@@ -1162,8 +1165,8 @@
 
                     const b = aO5.shdw.getBoundingClientRect()
                     Object.assign(aO5.posW, { top: b.top, left: b.left, height: b.height, width: b.width })
-                    Object.assign(aO5.posC, { top: b.top, left: b.left, height: b.height, width: b.width })
-                    Object.assign(aO5.posS, { top: 0, left: 0, height: b.height, width: b.width })
+                    Object.assign(aO5.posC, aO5.posW)
+                    Object.assign(aO5.posS, { top: 0, left: 0, })
                     onscr = aO5.posW.top < aO5.located.bo.pos.bottom //aO5.act.first.pO5.pos.bottom) {
                 }
                 if (onscr) {
@@ -1245,19 +1248,21 @@
         timeStamp = etimeStamp ? etimeStamp : (Date.now() + Math.random())
 
         if (aO5s.length > 0) {
-            if (timeStamp && wshp.W.consts.o5debug > 2) {
+            const debug = timeStamp && wshp.W.consts.o5debug > 2
+            if (debug)
                 console.groupCollapsed(`  старт Scroll для '` + (() => {
                     let s = ''
                     aO5s.forEach(aO5 => { s += (s ? ', ' : '') + aO5.name })
                     return s
                 })() + "'" + ' (t=' + (Date.now() - datestart) + ')')
+
+            Scroll(aO5s)
+
+            if (debug) {
                 console.trace("трассировка вызовов ")
                 console.groupEnd()
             }
-
-            Scroll(aO5s)
         }
-        // DoScrollEnd()
         document.dispatchEvent(o5shp_scroll)
     }
 
@@ -1277,40 +1282,27 @@
 			modul: 'o5shp',
 			Init: ShpInit,
 			class: 'olga5_shp',
-			consts: `o5shp_dummy=0.123 # просто так, для проверок в all0_.html`,
+            consts: `		
+				o5shp_dummy=0.123; //  просто так, для проверок в all0_.html
+                olga5_frames='s';
+                olga5_owners='b';
+			`,
 			incls: {
 				names: ['DoScroll', 'DoResize', 'AO5shp', 'DoInit'],
 				actscript: document.currentScript,
 			},
 		},
+		olga5cart = 'olga5-cart',
+		olga5ifix = 'olga5-ifix',
 		o5css = `
-.${W.class} {
-    // pointer-events: auto;
-}
-.${W.class}_gask{
-	left : 0;
-	top : 0;
-	position : absolute;
-	height : 100%;
-	width : 100%;
-}
-/* .${W.class}_shdw {    opacity: 0.0; }  - вбивать конкретно в STYLE*/
-.${W.class}_cart {
-    opacity: 1.0;
-    background-color:transparent;
-    // cursor: pointer;
-    direction : ltr; // эти 4 д.б. тут чтобы "перебить" из shp
+.${olga5cart} {
     position : fixed;
-	// position : absolute;
-    display : block;
-    z-index : 0;
-    padding : 0;
-    margin : 0;
-    border:none;
-    overflow: hidden;
-    // pointer-events: none; // не обрабатывать события    - ПРОВЕРИТЬ в браузерах !!!!!!!!!!!!!!!!!
+    overflow : hidden;
+    background-color : transparent;
+    direction : ltr; // эти 4 д.б. тут чтобы "перебить" из shp
+	opacity: 0;  // это только вначале
 }
-.${W.class}_cart.isFix {
+.${olga5cart}.${olga5ifix} {
 	cursor: pointer;
 }`
 
@@ -1325,13 +1317,13 @@
 
 	if (!window.olga5) window.olga5 = []
 	if (!window.olga5[W.modul]) window.olga5[W.modul] = {}
-	
-	Object.assign(window.olga5[W.modul], { W: W, })
+
+	Object.assign(window.olga5[W.modul], { W: W, olga5cart: olga5cart, olga5ifix: olga5ifix, })
 	if (!window.olga5.find(w => w.modul == W.modul)) {
 		window.olga5.push(W)
 		if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
 			console.log(`}---< ${document.currentScript.src.indexOf(`/${W.modul}.`) > 0 ? 'загружен  ' : 'включён   '}:  ${W.modul}.js`)
 		window.dispatchEvent(new CustomEvent('olga5_sload', { detail: { modul: W.modul } }))
 	} else
-		console.error(`Повтор загрузки '${W.modul}`)
+		console.error('%c%s', "background: yellow; color: black;border: solid 2px red;", `Повтор загрузки '${W.modul}`)
 })();

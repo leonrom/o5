@@ -67,9 +67,9 @@ function shpX_GetFrams(t, nom) {
     let s = (fbody && fbody.checked) ? ',N' : ''
     for (let i = 1; i < 9; i++) {
         const div = document.getElementById(t + 'div' + i + nom)
-        if (div) s += div.checked ? (',i:div' + i) : ''
+        if (div) s += div.checked ? ((s ? ',' : '') + 'i:div' + i) : ''
     }
-    s += (fshp0 && fshp0.checked) ? ',i:shp0' : ''
+    s += (fshp0 && fshp0.checked) ? ((s ? ',' : '') + 'i:shp0') : ''
     return s
 }
 
@@ -117,6 +117,8 @@ function CC() {
     "use strict";
     const shdwcb = document.getElementById('shdwcb'),
         cartcb = document.getElementById('cartcb'),
+        cartc0 = document.getElementById('cartc0'),
+        cartc1 = document.getElementById('cartc1'),
         shdws = document.getElementsByClassName('olga5_shp olga5-ignore'),
         carts = document.getElementsByClassName('olga5-cart'),
         SetOpacity = (shps, val, o) => {
@@ -124,18 +126,29 @@ function CC() {
                 shp.style.opacity = val ? 1 : o
             }
             return val ? 'видно' : 'тени'
+        },
+        SetOpacit2 = (cart, val, o) => {
+            cart.style.opacity = val ? 1 : o            
+            return val ? 'видно' : 'тени'
         }
     if (shdws && shdwcb) shdwcb.nextSibling.nodeValue = 'shdws: ' + SetOpacity(shdws, shdwcb.checked, 0.22)
     if (carts && cartcb) cartcb.nextSibling.nodeValue = 'carts: ' + SetOpacity(carts, cartcb.checked, 0.11)
+    if (cartc0) cartc0.nextSibling.nodeValue = 'cart0: ' + SetOpacit2(carts[0], cartc0.checked, 0.11)
+    if (cartc1) cartc1.nextSibling.nodeValue = 'cart1: ' + SetOpacit2(carts[1], cartc1.checked, 0.11)
 }
 
 const outlin = { e: '', eOffset: '' }
 function OL(cb) {
     "use strict";
     const shps = document.getElementsByClassName('olga5_shp'),
-        cntls = document.getElementsByClassName('olga5_shp_copy')
+        copys = document.getElementsByClassName('olga5_shp_copy'),
+        cntls = document.getElementsByClassName('olga5-cart')
     if (outlin.e == '') {
         for (const shp of shps) {
+
+            const nst1 = window.getComputedStyle(shp)
+            console.log(shp.id + "  outlineWidth='" + nst1.outlineWidth + "' outline='" + nst1.outline + "'")
+
             const nst = window.getComputedStyle(shp)
             if (parseFloat(nst.outlineWidth) > 0.1) {
                 outlin.e = nst.outlineColor + ' ' + nst.outlineStyle + ' ' + nst.outlineWidth
@@ -144,7 +157,7 @@ function OL(cb) {
             }
         }
     }
-    for (const objs of [shps, cntls])
+    for (const objs of [shps, cntls, copys])
         for (const obj of objs) {
             obj.style.outline = cb.checked ? outlin.e : 'none'
             obj.style.outlineOffset = cb.checked ? outlin.eOffset : '0'
@@ -359,6 +372,7 @@ function StartBordNames() {
 function Init0() {
     "use strict";
     if (!IsInitEvents()) return
+    console.log('Init0() --------------')
 
     const shp1 = document.getElementById('shp1')
     if (shp1) {
@@ -376,6 +390,8 @@ function Init0() {
 function Init1() {
     "use strict";
     if (!IsInitEvents()) return
+    console.log('Init2() --------------')
+
     for (let i = 0; i < 3; i++) {
         document.getElementById('pshp' + (i + 1)).title = "плавно сдвигает"
         document.getElementById('ashp' + (i + 1)).title = "сможет подвиснуть по возврате в 'доподвисабельное' состояние"
@@ -393,6 +409,7 @@ function Init1() {
 function Init2() {
     "use strict";
     if (!IsInitEvents()) return
+    console.log('Init2() --------------')
 
     const wshp = window.olga5.o5shp,
         div1 = document.getElementById('div1'),
@@ -417,8 +434,6 @@ function Init2() {
 }
 function Init3x() {
     "use strict"
-    // console.log('Init3() 1a')
-    if (!IsInitEvents()) return
     // console.log('Init3() 1b')
     const wshp = window.olga5.o5shp,
         div1 = document.getElementById('div1'),
@@ -447,7 +462,7 @@ function Init3x() {
     // shpX_BordNames()
     const
         Scroll0 = () => { shp0.scrollTo(0, 195) },
-        Scroll2 = () => { div2.scrollTo(0, 91);  if (shp0) window.setTimeout(Scroll0, 10) },
+        Scroll2 = () => { div2.scrollTo(0, 91); if (shp0) window.setTimeout(Scroll0, 10) },
         Scroll1 = () => { div1.scrollTo(0, 122); if (div2) window.setTimeout(Scroll2, 10) }
     if (div1) window.setTimeout(Scroll1, 10)
     // if (div2) div2.scrollTo(0, 91)
@@ -462,13 +477,16 @@ function Init3x() {
 
 function Init3() {
     "use strict"
-    // console.log('Init3() 0 1')
-    window.setTimeout(Init3x(), 1)
+    if (!IsInitEvents()) return
+    console.log('Init3() --------------')
+    Init3x()
+    // window.setTimeout(Init3x(), 1)
 }
 
 function Init4() {
     "use strict"
     if (!IsInitEvents()) return
+    console.log('Init4() --------------')
 
     const wshp = window.olga5.o5shp,
         div1 = document.getElementById('div1'),

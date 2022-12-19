@@ -98,15 +98,30 @@
             if (errs.length > 0 && showerr)
                 Error("Ошибки в атрибутах  для тегов", errs.length, errs)
         },
+        CalcSize = (aO5s) => {
+            for (const aO5 of aO5s) {
+                const pos = aO5.shdw.getBoundingClientRect(),
+                    add = aO5.addSize,
+                    w = aO5.sizS.width
+
+                Object.assign(aO5.sizS, { width: (pos.width - add.w), height: (pos.height - add.h) })
+                Object.assign(aO5.shp.style, { width: aO5.sizS.width + 'px', height: aO5.sizS.height + 'px' })
+
+                CalcSize(aO5.aO5s)
+
+                if (o5debug > 2)
+                    console.log(`${aO5.name} : pos.width=${pos.width}, add.w=${add.w}, sizS.width=${aO5.sizS.width}, старое=${w}`)
+            }
+        },
         SortAll = (aO5s) => { // сортировка и индексация
             const nest = aO5s.nest
 
             if (o5debug > 2)
                 console.log('  >> яSortAll (' + nest + '): aO5s=' + MyJoinO5s(aO5s));
-
+            ``
             for (const aO5 of aO5s) {
-                const pos = aO5.shdw.getBoundingClientRect()
-                Object.assign(aO5.posW, { top: pos.top, left: pos.left, width: pos.width, height: pos.height })
+                const b = aO5.shdw.getBoundingClientRect()
+                Object.assign(aO5.posW, { top: b.top, left: b.left })
             }
             aO5s.sort((a1, a2) => { // для вызовов (для работы)
                 const i1 = Math.round(parseFloat(a1.posW.top)),
@@ -195,8 +210,6 @@
                             for (const ask of blng.asks)
                                 FillAsk(aO5, ask, blng.act)
                         }
-                        aO5.shdw.style.opacity = 0
-                        aO5.cart.style.opacity = 1
 
                         if (aO5.aO5s.length > 0)
                             FillBlngs(aO5.aO5s)
@@ -205,7 +218,7 @@
 
             FillBlngs(aO5s)
             if (errs.length > 0 && showerr)
-                C.ConsoleError("При старте (в  'яDoResize'): не опр. ссылки на контейнеры ", errs.length, errs)
+                C.ConsoleError("При старте (в  'DoResize'): не опр. ссылки на контейнеры ", errs.length, errs)
         }
 
     let showerr = true
@@ -232,7 +245,9 @@
 
         ReadAttrsAll(aO5s, showerr)
         SortAll(aO5s)
+        CalcSize(aO5s)
         FillBlngsAll(aO5s, showerr, timeStamp)
+        wshp.DoScroll(wshp.aO5s)
         showerr = false
     }
 

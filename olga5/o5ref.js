@@ -19,7 +19,7 @@
 			for (const pnam in params) {
 				const param = params[pnam]
 				if (!param)
-					errs.push({ 'где': `nam='${nam}'`, err: `пустой параметр` })
+					errs.push({ 'где': `nam='${pnam}'`, err: `пустой параметр` })
 				else {
 					const regexp = /\s*[,;]+\s*/g,
 						nams = pnam.split(regexp),
@@ -48,7 +48,7 @@
 				C.ConsoleError(`Ошибки в параметрах`, 'o5tag_attrs', errs)
 			return otags
 		},
-		ConvertUrls = otags=> {
+		ConvertUrls = otags => {
 			let tagnams = ''
 			for (const nam in otags)
 				tagnams += (tagnams ? ',' : '') + nam
@@ -68,26 +68,27 @@
 						if (tagattr) {
 							const ori = tagattr.nodeValue,
 								wref = C.DeCodeUrl(W.urlrfs, ori, o5attrs)
-								
+
 							if (wref.err)
 								undefs.push({ 'имя (refs)': nam, 'атрибут': attr, 'адрес': ori, 'непонятно': wref.err })
-// 1?							else
-								if (wref.url && ori != wref.url) {
-									const a = (attr[0] == '_') ? attr.substring(1) : attr // (attr == '_src') ? 'src' : ((attr == '_href') ? 'href' : attr)
-									if (a != attr)     	// если обработано без ошибок, то удаляю - чтоб другие модули не повторяли
-										tag.removeAttribute(attr)
+							// 1?							else
+							if (wref.url && ori != wref.url) {
+								const a = (attr[0] == '_') ? attr.substring(1) : attr // (attr == '_src') ? 'src' : ((attr == '_href') ? 'href' : attr)
+								if (a != attr)     	// если обработано без ошибок, то удаляю - чтоб другие модули не повторяли
+									tag.removeAttribute(attr)
 
-									tag.setAttribute(a, wref.url)
+								tag.setAttribute(a, wref.url)
 
-									rez.push({ nam: nam, attr: (attr + (a != attr ? ` (${a})` : ``)), src: ori, rez: wref.url })
-									attrs[attr]++
-								}
+								rez.push({ nam: nam, attr: (attr + (a != attr ? ` (${a})` : ``)), src: ori, rez: wref.url })
+								attrs[attr]++
+							}
 						}
 					}
 			}
 
 			if (rez.length < 1) C.ConsoleError(`${W.modul}: не выполнено ни одной подстановки?`)
-			else C.ConsoleInfo(`${W.modul}: выполнено подстановок для тегов:`, rez.length, rez)
+			else
+				if (C.consts.o5debug > 0) C.ConsoleInfo(`${W.modul}: выполнено подстановок для тегов:`, rez.length, rez)
 
 			if (undefs.length > 0)
 				C.ConsoleAlert(`${W.modul}: неопределённые адреса: `, undefs.length, undefs)
@@ -101,12 +102,12 @@
 		c.ParamsFill(W)
 
 		const o5tag_attrs = 'o5tag_attrs',
-		 s = W.consts[o5tag_attrs]
+			s = W.consts[o5tag_attrs]
 
 		if (s) {
 			const params = C.SplitParams(s, o5tag_attrs),
 				otags = ParseTagAttrs(params)
-			C.ConsoleInfo(`Модуль ${W.modul} : обрабатываемые атрибуты тегов`, o5tag_attrs, otags)
+			if (C.consts.o5debug > 0) C.ConsoleInfo(`${W.modul}: обрабатываемые атрибуты тегов`, o5tag_attrs, otags)
 			ConvertUrls(otags)
 		}
 		else if (!no_o5tag_attrs) {
@@ -120,10 +121,10 @@
 	if (!window.olga5) window.olga5 = []
 	if (!window.olga5.find(w => w.modul == W.modul)) {
 		window.olga5.push(W)
-		
-	if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
-		console.log(`}---< ${document.currentScript.src.indexOf(`/${W.modul}.`) > 0 ? 'загружен  ' : 'включён   '}:  ${W.modul}.js`)
+
+		if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
+			console.log(`}---< ${document.currentScript.src.indexOf(`/${W.modul}.`) > 0 ? 'загружен  ' : 'включён   '}:  ${W.modul}.js`)
 		window.dispatchEvent(new CustomEvent('olga5_sload', { detail: { modul: W.modul } }))
 	} else
-		console.error(`Повтор загрузки '${W.modul}`)
+		console.error('%c%s', "background: yellow; color: black;border: solid 2px red;", `Повтор загрузки '${W.modul}`)
 })();

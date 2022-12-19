@@ -26,7 +26,7 @@
 		o5css = `
 .${olga5cart} {
     position : fixed;
-    // overflow : hidden;
+    overflow : hidden;
     background-color : transparent;
     direction : ltr; // эти 4 д.б. тут чтобы "перебить" из shp
 	opacity: 0;  // это только вначале
@@ -54,5 +54,5 @@
 			console.log(`}---< ${document.currentScript.src.indexOf(`/${W.modul}.`) > 0 ? 'загружен  ' : 'включён   '}:  ${W.modul}.js`)
 		window.dispatchEvent(new CustomEvent('olga5_sload', { detail: { modul: W.modul } }))
 	} else
-		console.error(`Повтор загрузки '${W.modul}`)
+		console.error('%c%s', "background: yellow; color: black;border: solid 2px red;", `Повтор загрузки '${W.modul}`)
 })();

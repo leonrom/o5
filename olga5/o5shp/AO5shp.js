@@ -111,19 +111,24 @@
             })
             if (aO5.cls.dirV == 'D') shdw.style.height = '0.1px' // на экране НЕ должно занимать месо
 
-            parentNode.replaceChild(shdw, shp)  // д.б. перед коррекцией shp но после shdw
-
             // коррекция shp
-
-            const nst = window.getComputedStyle(shdw), // д.б. именно shdw (shp м.б. лишь до replaceChild())
-                GPV = nam => { return MyRound(nst.getPropertyValue(nam)) }
+            const GPV = nam => { return MyRound(nst.getPropertyValue(nam)) },
+                nst = window.getComputedStyle(shp) // д.б. до replaceChild()
             Object.assign(aO5.addSize, {
                 w: GPV('padding-left') + GPV('padding-right') + GPV('border-left-width') + GPV('border-right-width'),
                 h: GPV('padding-top') + GPV('padding-bottom') + GPV('border-top-width') + GPV('border-bottom-width')
             })
-
-            for (const prop of [   // перенос нужных "внешних" свойств на cart
-                'zoom', 'transform'
+//             const PN=n=>{   
+//                 const nst1 = window.getComputedStyle(shp)
+//                 const nst2 = window.getComputedStyle(shdw)
+//                 console.log('shp  : '+shp.id +"  zoom="+nst.zoom+", trans="+nst.transform+", zoom="+shp.style.zoom+", trans="+shp.style.transform+"   =====  " +n)
+//                 console.log('shdw : '+shdw.id+"  zoom="+nst2.zoom+", trans="+nst2.transform+", zoom="+shdw.style.zoom+", trans="+shdw.style.transform+"")
+//                 console.log('shp1 : '+shp.id +"  zoom="+nst1.zoom+", trans="+nst1.transform )
+//                 // console.log('shdw: '+shp.id+"  outlineWidth='"+nst2.outlineWidth+"' outline='"+nst2.outline+"' zoom="+nst2.zoom+", transform='"+nst2.transform+"'")
+//             }
+// PN(1)
+            for (const prop of [   // перенос нужных "внешних" свойств на cart 
+                'outline-color', 'outline-offset', 'outline-style', 'outline-width'
             ]) {
                 const wi = nst.getPropertyValue(prop)
                 if (wi && wi.length > 0) {
@@ -131,10 +136,21 @@
                     cart.style[prop] = wi
                 }
             }
+            for (const prop of [   // перенос нужных "внешних" свойств на shdw 
+                'zoom', 'transform'
+            ]) {
+                const wi = nst.getPropertyValue(prop)
+                if (wi && wi.length > 0) {
+                    shp.style[prop] = ''
+                    shdw.style[prop] = wi
+                }
+            }
+
+            parentNode.replaceChild(shdw, shp)  // д.б. перед коррекцией shp но после shdw
 
             // коррекция значения атрибута style
             const sn = [
-                'position: relative', 'left:0', 'top:0',
+                'position: relative', 'left:0', 'top:0', 'width:100%', 'height:100%',
                 'margin-top: 0', 'margin-right: 0', 'margin-bottom: 0', 'margin-left: 0', 'margin: 0'
             ]
             for (const s of sn) {
@@ -148,6 +164,7 @@
             for (const o of [cart, aO5.posW, aO5.posC, aO5.posS]) Object.seal(o)
             Object.freeze(aO5)
 
+// PN(2)
             shp.addEventListener('dblclick', DoShpClick, { capture: true, passive: true })
 
             // wshp.AO5shp(aO5)
@@ -178,8 +195,9 @@
         hovered = Object.assign({ act: 'hovered', asks: [], }, Tbelong) // массивы д.б.персонально
         located = Object.assign({ act: 'located', asks: [], }, Tbelong)
         posW = { top: 0, left: 0, height: 0, width: 0 }
-        posS = Object.assign({}, this.posW)
-        posC = Object.assign({}, this.posW, { z: 1, zheight: 0, zwidth: 0 })// добален z==zoom
+        posC = Object.assign({}, this.posW)
+        posS = {top: 0, left: 0, }
+        sizS = {height: 0, width: 0, }
 
         cart = null
         shdw = null
@@ -201,6 +219,8 @@
         //             wshp.o5classes.push(scrpt.act.W.class)
         // },
         MakeAO5: (shp, cls, PO5) => {
+            C = window.olga5.C
+
             shp.aO5shp = new AO5(shp, cls)
             const aO5 = shp.aO5shp
             let pO5 = aO5.prev.pO5
@@ -232,13 +252,13 @@
             aO5s.push(aO5)
 
             if (shp.tagName.match(/\b(img|iframe|svg)\b/i) && !shp.complete) {
-                C.ConsoleInfo(`ожидается завершение загрузки '${aO5.name}'`)
-                shp.addEventListener('load', e => wshp.DoResize(shp))
+                if (C.consts.o5debug > 0) C.ConsoleInfo(`ожидается завершение загрузки '${aO5.name}'`)
+                shp.addEventListener('load', e => {
+                    wshp.DoResize(shp)
+                })
             }
         },
         AO5shp: () => {
-            C = window.olga5.C
-
             for (const aO5 of wshp.aO5s)
                 Clone(aO5)
         }

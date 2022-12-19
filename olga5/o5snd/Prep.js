@@ -44,22 +44,22 @@
                         image.stop.style.display = 'none'
                         image.play.style.display = aO5.modis.dspl
                     }
-                    classList.add(wshp.CSS.olga5sndPlay)
-                    classList.remove(wshp.CSS.olga5sndPause)
+                    classList.add(wshp.css.olga5sndPlay)
+                    classList.remove(wshp.css.olga5sndPause)
                 }
                 else if (state == wshp.setClass.pause) {
-                    classList.remove(wshp.CSS.olga5sndPlay)
-                    classList.add(wshp.CSS.olga5sndPause)
+                    classList.remove(wshp.css.olga5sndPlay)
+                    classList.add(wshp.css.olga5sndPause)
                 }
                 else if (state == wshp.setClass.stop) {
-                    classList.remove(wshp.CSS.olga5sndPlay)
-                    classList.remove(wshp.CSS.olga5sndPause)
+                    classList.remove(wshp.css.olga5sndPlay)
+                    classList.remove(wshp.css.olga5sndPause)
                 }
                 else alert(`setClass.SetC: state='${state}'`)
                 aO5.sound.state = state
             }
         },
-        OriForTag : (tag, ref, atnam) => {
+        OriForTag: (tag, ref, atnam) => {
             const ori = { url: '', atr: '' },
                 attr = atnam ? C.GetAttribute(tag.aO5snd.o5attrs, atnam) : ''
             if (attr)
@@ -115,8 +115,8 @@
                                     break
                                 case 'L': modis.loop = true
                                     break
-                                case 'F': if (!snd.classList.contains(wshp.CSS.olga5freeimg))
-                                    snd.classList.add(wshp.CSS.olga5freeimg)
+                                case 'F': if (!snd.classList.contains(wshp.css.olga5freeimg))
+                                    snd.classList.add(wshp.css.olga5freeimg)
                                     break
                                 case 'N': modis.none = true
                                     break
@@ -132,7 +132,7 @@
                     if (!modis.aplay && !modis.none)
                         errs.Add(aO5.name, scls, `игнор остальных квалиф.`, 'audio_play', "нету аудио-квалиф.")
 
-                    if (aO5.modis.none) snd.classList.add(wshp.CSS.olga5sndNone)
+                    if (aO5.modis.none) snd.classList.add(wshp.css.olga5sndNone)
 
                     if (!snd.alt || (snd.alt.trim() == '')) snd.alt = snd.title.trim()
                 },
@@ -144,6 +144,7 @@
                     if (ori.url) {
                         const url = TryEncode(ori, snd)
                         if (url != snd[srcAtr]) {
+                            // console.log('setAttribute',srcAtr, url)
                             snd.setAttribute(srcAtr, url)
                             urlattrs.push({ snd: aO5.name, atr: srcAtr, url: url, 'ориг.': ori.url })
                         }
@@ -260,13 +261,14 @@
                             ${'data-' + aO5.srcAtr}, ${'_' + aO5.srcAtr}, ${aO5.srcAtr}`)
             }
 
-            if (urlattrs.length > 0) C.ConsoleInfo(`Всего выполнено подстановок snd/audio`, urlattrs.length, urlattrs)
+            if (urlattrs.length > 0)
+                if (C.consts.o5debug > 0) C.ConsoleInfo(`Всего выполнено подстановок snd/audio`, urlattrs.length, urlattrs)
 
             if (errs.length > 0)
                 C.ConsoleError(`${wshp.W.modul}: ошибки перекодировки тегов с ${wshp.W.class}`, errs.length, errs)
         },
     })
-    
-	if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
-    console.log(`}---< ${document.currentScript.src.indexOf(`/${olga5_modul}.`) > 0 ? 'дозагружен' : 'подключён '}:  ${olga5_modul}/Imgs.js`)
+
+    if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
+        console.log(`}---< ${document.currentScript.src.indexOf(`/${olga5_modul}.`) > 0 ? 'дозагружен' : 'подключён '}:  ${olga5_modul}/Imgs.js`)
 })();

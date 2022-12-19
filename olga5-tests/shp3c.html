@@ -14,7 +14,8 @@
 
 <body id="body">
 	<script>
-		window.addEventListener('olga5_ready', function() { Init3() })
+		const eve = document.head.querySelector("script[src*='o5shp.js']") ? 'olga5-incls' : 'olga5_ready' 
+		window.addEventListener(eve, Init3, { once: true })
 	</script>
 
 	<div o5include='./shp3.html?.example'></div>

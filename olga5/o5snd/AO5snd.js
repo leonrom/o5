@@ -14,7 +14,7 @@
         let isNotAllowedError = false
         const wshp = window.olga5[olga5_modul],
             ss = wshp.setClass,
-            olga5sndError = wshp.CSS.olga5sndError,
+            olga5sndError = wshp.css.olga5sndError,
             W = window.olga5.find(w => w.modul == olga5_modul), // так делать во всех подмодулях 
             o5debug = W.consts.o5debug,
             o5shift_speed = W.consts.o5shift_speed < 0.2 ? 0.2 : W.consts.o5shift_speed,
@@ -176,8 +176,8 @@
                                     wshp.StopSound(aO5)
                             }
                         },
-                        { type: 'loadstart', Act: snd => snd.classList.add(wshp.CSS.olga5sndLoad) },
-                        { type: 'loadeddata', Act: snd => snd.classList.remove(wshp.CSS.olga5sndLoad) },
+                        { type: 'loadstart', Act: snd => snd.classList.add(wshp.css.olga5sndLoad) },
+                        { type: 'loadeddata', Act: snd => snd.classList.remove(wshp.css.olga5sndLoad) },
                         { type: 'abort', Act: (snd, e) => PlayError(snd.aO5snd, e) },
                         { type: 'stalled', Act: (snd, e) => PlayError(snd.aO5snd, e) },
                     ],

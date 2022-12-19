@@ -166,7 +166,7 @@
     background-color: aqua ! important;
 }
 
-.olga5_menudef{
+.olga5-menuhidden{
 	display:none;
 }
 `,
@@ -181,7 +181,7 @@
 			if (target && !target.o5menus.ready) target.o5menus.ready = true
 		},
 		GoTo = function (o5menus) {
-			const tag = docummen.getElementById(o5menus.ref)
+			const tag = document.getElementById(o5menus.ref)
 			if (tag) {
 				tag.scrollIntoView({ block: o5menus.block, behavior: "smooth" })
 				// if (win.scrollY != 0) window.scrollBy(0, win.scrollY)
@@ -365,7 +365,7 @@
 			if (menu)	// если есть такой атрибут}
 				InitByText(menu)
 
-			const tags = C.GetTagsByClassNames('olga5_menudef', W.modul)
+			const tags = C.GetTagsByClassNames('olga5-menuhidden', W.modul)
 			if (tags)
 				tags.forEach(tag => {
 					InitByText(tag.innerText.trim(), tag)
@@ -382,5 +382,5 @@
 		console.log(`}---< ${document.currentScript.src.indexOf(`/${W.modul}.`) > 0 ? 'загружен  ' : 'включён   '}:  ${W.modul}.js`)
 		window.dispatchEvent(new CustomEvent('olga5_sload', { detail: { modul: W.modul } }))
 	} else
-		console.error(`Повтор загрузки '${W.modul}`)
+		console.error('%c%s', "background: yellow; color: black;border: solid 2px red;", `Повтор загрузки '${W.modul}`)
 })();

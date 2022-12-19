@@ -71,7 +71,7 @@
 	function SndInit(c) {
 		const wshp = window.olga5[W.modul]
 
-		wshp.CSS = o5css
+		wshp.css = css
 
 		c.ParamsFill(W, o5css)
 
@@ -90,6 +90,6 @@
 			console.log(`}---< ${document.currentScript.src.indexOf(`/${W.modul}.`) > 0 ? 'загружен  ' : 'включён   '}:  ${W.modul}.js`)
 		window.dispatchEvent(new CustomEvent('olga5_sload', { detail: { modul: W.modul } }))
 	} else
-		console.error(`Повтор загрузки '${W.modul}`)
-	// -------------- o5snd
+		// console.error(`Повтор загрузки '${W.modul}`)
+		console.error('%c%s', "background: yellow; color: black;border: solid 2px red;", `Повтор загрузки '${W.modul}`)	
 })();

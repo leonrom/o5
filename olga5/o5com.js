@@ -96,7 +96,7 @@
 			if (!load.timeout) iniFun(args)
 		},
 		RunO5com = () => {
-			const timera = '}----<<<   ' + `-------  инициирован -------  --------------     '` + olga5_modul.padEnd(12) + `'  (ядро)`,
+			const timera = `}----<<< ----- инициировано ядро библиотеки ----- '${olga5_modul}' `,
 				_url_olga5 = C.o5script.src.match(/\S*\//)[0],
 				errs = []
 			console.time(timera)

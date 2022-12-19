@@ -64,7 +64,7 @@
 			... -->
 
 <body id='body'>  
-  <div id="div_strt" class="olga5_Start:o5pop,o5ref,o5shp" dir="ltr" trbidi="on">
+  <div id="div_strt" class="olga5_Start:o5pop,o5ref,o5shp,o5mnu" dir="ltr" trbidi="on">
     <img alt="" border="0" width="200" style="display:none"
 			data-original-height="599" data-original-width="662"
 			src="https://1.bp.blogspot.com/-7itlS0xWJNo/YEsTdFMovcI/AAAAAAAAEQo/QkYBh8diN_IkenQsf50m3Z3ItIpL9tNBACPcBGAsYHg/s200/shp.png"
@@ -881,9 +881,10 @@
       </p>
 
       <h4 id='head_52'>5.2. Фреймы и <i>овнеры</i> (владельцы)
-        <input id='shp2' type="button" value="показать" onclick="window.olga5.PopUp(this, 'тесты + shp2.html','w:666')">
+        <input id='shp1' type="button" value="показать" onclick="window.olga5.PopUp(this, 'тесты + shp2.html','w:666')">
       </h4>
       <p>
+        <!-- <input id='shp2' type="button" value="Пример" onclick="window.olga5.PopUp(this, 'тесты + shp2.html','w:666')"> -->
         Пример иллюстрирует варианты задания <i>фреймов</i> (задаются теговым атрибутом <b>olga5_frames</b>),
         на границах которых подвисает <i>объект</i> (здесь <i>объект</i> - синоним <b>shp1</b>)
         и <i>овнеров</i> (владельцев <i>объекта</i>, задаваемых теговым атрибутом <b>olga5_owners</b>),
@@ -1002,9 +1003,7 @@
         На рисунке видно что обрезание снизу теперь будет выполняться тегом <b>tab1</b>.
       </p>
 
-      <h4 id='head_54'>5.4. Комментарии к разработке модулей
-        <span o5popup='+ ./help/o5help.html; width: 430, height: 390'> библиотеки</span>&nbsp;
-      </h4>
+      <h4 id='head_54'>5.4. К разработке новых модулей</h4>
       <p>
         Нижеследующее м.б. полезно при разработке новых модулей для <i></i>библиотеки</i>.
       </p>
@@ -1031,19 +1030,19 @@
         <b>2.</b> При использовании скрипта предусмотрено, что двойной клик на <i>подвисшем</i> теге
         временно освобождает его от прилипания к заданной границе.
         Поэтому, при написании <i>кликовских</i> обработчиков для объектов вложенных в <i>подвисабельный</i> тег
-        следует в них (в обработчиках) <span title="например, в конце программы">писать</span>:
+        следует в них (в обработчиках) предусмотреть:
         <br />
         <span class='olga5_codeText'><i>event</i>.<b>cancelBubble</b> = <code>true</code>;</span>.
       </p>
-      <p>
+      <!-- <p>
         <b>3.</b> Для подвисабельных объектов оба свойства <i>overflow</i> всегда принимается 'hidden',
         независимо от CSS свойств классов тега. Чтобы изменить <b>overflowX</b> или <b>overflowY</b>
         следует указать соответствующее значение в атрибуте <b>style</b> в самом теге.
-      </p>
+      </p> -->
       <br />
     </div>
     <!-- ===================================================================================== -->
-    <pre id="menu-pre" class="olga5_menudef" style="display:none">
+    <pre id="menu-pre" class="olga5-menuhidden" style="display:none">
         { span: 'Статья', id: "moemenu", right: '5px', top: '5px', add: '233px', },
           { span: '1. Общие сведения', ref: 'head_1' },
           { span: '2. Иллюстрация работы', ref: 'head_2' },
@@ -1051,12 +1050,12 @@
           { span: '4. Задание зависания блока', ref: 'head_4', add: '255px' },
             { span: '4.1. Квалификаторы класса olga5_shp', ref: 'head_41', },
             { span: '4.2. Дополнительные атрибуты тега', ref: 'head_42', },
-            { span: '4.3. Реализация зависания', ref: 'head_43', },
+            { span: '4.3. Реализация зависания', ref: 'head_43', ret: 1},
           { span: '5. Демонстрационные примеры', ref: 'head_5', add: '255px' },
             { span: '5.1. Варианты подвисания &nbsp;<i>объектов</i>', ref: 'head_51' },
             { span: '5.2. Фреймы и &nbsp;<i>овнеры</i>&nbsp; (владельцы)', ref: 'head_52' },
-            { span: '5.3. Вложенные &nbsp;<i>объекты</i>', ref: 'head_53', ret: 1 },
-            { span: '5.4. Комментарии к разработке модулей библиотеки', ref: 'head_54', ret: 1 },
+            { span: '5.3. Вложенные &nbsp;<i>объекты</i>', ref: 'head_53',  },
+            { span: '5.4. К разработке новых модулей', ref: 'head_54', ret: 1 },
 		</pre>
   </div>
 </body>

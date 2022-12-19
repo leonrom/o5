@@ -17,7 +17,7 @@
 		C = window.olga5.C,
 		padd = "padding-left:0.5rem;",
 		clrtypes = {
-			'A': "background: yellow; color: black;border: solid 3px blue;",
+			'A': "background: yellow; color: black;border: solid 3px red;",
 			'E': "background: yellow; color: black;border: solid 1px gold;",
 			'S': "background: blue;   color: white;border: solid 1px bisque;",
 			'I': "background: beige;  color: black;border: solid 1px bisque;",

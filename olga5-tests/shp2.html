@@ -9,16 +9,30 @@
 	<link href='alltst.css' media='screen' rel='stylesheet' />
 	<script src='alltst.js'></script>
 
-	<script src='../olga5/o5shp.js'></script>
+	<script src='../olga5/o5shp!.js'></script>
 	<script src='../olga5/o5common.js' o5debug=0></script>
 </head>
 
 <body id="body">
-	<script>
-		window.addEventListener('olga5_ready', function () { Init2() })
-	</script>
 	<div class='example, olga5_Start'>
+		<script>
+			const eve = document.head.querySelector("script[src*='o5shp.js']") ? 'olga5-incls' : 'olga5_ready' 
+			window.addEventListener(eve, Init2, { once: true })
+		</script>
+		<!-- <style>
+			#shp1 {
+				zoom: 1.1;
+				transform: matrix(0.7, 0.7, 0, 1, 0, 0);
+			}
 
+			#cshp1 {
+				zoom: 1.21;
+			}
+
+			ccshp1 {
+				zoom: 1.02;
+			}
+		</style> -->
 		<div class='cboxed'>
 			<span>видимость</span><br />
 			<input type="checkbox" id="shdwcb" onclick="CC()" title="видимость исходников для объектов 'shp'"> видимость
@@ -77,7 +91,8 @@
 			<ul>
 				<li>"<b>Где</b>" - место где будет <i>подвисать</i> объект,- вверху или внизу фрейма;</li>
 				<li>"<b>Когда</b>" направление движения во фрейме, по достижении которого объект подвиснет (согласно
-					<b>CheckBox</b>'у "<b>Где</b>").</li>
+					<b>CheckBox</b>'у "<b>Где</b>").
+				</li>
 			</ul>
 			<p>
 				CheckBox'ы под заголовком "зависать-<b>frames</b>" позволяют указать фреймы, на которых будет
@@ -104,7 +119,8 @@
 			</p>
 			<ul>
 				<li>в первой строке, после "к.=" значения квалификаторов класса <b>olga5_shp</b> согласно заданным
-					<b>Где</b> и <b>Когда</b>;</li>
+					<b>Где</b> и <b>Когда</b>;
+				</li>
 				<li>во 2-й и 3-й строках значения <b>olga5_frames</b> и <b>olga5_owners</b> тега <b>id='shp1'</b>,
 					соответственно <b>CheckBox</b>'ам <b>frames</b> и <b>owners</b></li>
 				<li>в строке '<b>f:</b>' перечислены фреймы (<b>t</b><i>op</i>, <b>b</b><i>ottom</i> и другие )
@@ -144,8 +160,7 @@
 									</p>
 
 								</td>
-								<!-- <td id="cshp1" style="overflow-y:auto;overflow-x:scroll;"> -->
-								<td id="cshp1">
+								<td id="cshp1" class="ccshp1">
 									<div id="shp1" class="olga5_shp:Up:Top" olga5_frames='s'>
 										<p>название объекта</p>
 									</div>
@@ -156,7 +171,7 @@
 					<div class="divSmall">пустышка</div>
 					<div class="divSmall">пустышка</div>
 					<div class="divSmall">пустышка</div>
-					<div class="divSmall olga5_shp:k" id='k1'>						
+					<div class="divSmall olga5_shp:k" id='k1'>
 						<p style="height: 74px;"><b>Kill:0</b><br />контейнер
 						</p>
 					</div>

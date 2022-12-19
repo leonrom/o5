@@ -17,21 +17,25 @@
 	let page = null,
 		cc = null
 
+	const myclr = "background: blue; color: white;border: none;"
 	class MyTimer {
-		constructor(text, myclr) {
+		constructor(text) {
 			this.text = text
-			this.myclr = myclr
 			Object.seal(this.act)
 			Object.freeze(this)
 		}
 		act = { time: 0, name: '' }
-		myclr = ''
 		text = ''
-		Stop = (add, err) => {
+		Stop = (add) => {
+			// console.log('...=', this.act.time,  this.act.name)
 			if (this.act.time) {
-				console[err ? 'error' : 'log']('%c%s',
-					myclr, this.text + (' ' + (Number(new Date()) - this.act.time)).padStart(8) + ' ms',
-					' ' + this.act.name + (add ? ' [' + add + ']' : ''))
+				const dt = (' ' + (Number(new Date()) - this.act.time)).padStart(8) + ' ms',
+					name=dt + ' ' + this.act.name.padStart(12)
+				if (add)
+					console.error('%c%s', "background: yellow; color: black;border: none;",
+						this.text +  name + ' [' + add + ']')
+				else
+					console.log('%c%s', myclr, this.text +  name)
 				this.act.time = 0
 			}
 		}
@@ -41,13 +45,13 @@
 
 			this.act.time = Number(new Date())
 			this.act.name = name
+			// console.log('...+', this.act.time,  this.act.name)
 		}
 	}
 	const wshp = window.olga5[olga5_modul],
 		C = window.olga5.C,
 		olga5Start = 'olga5_Start',
 		completeState = "complete",
-		myclr = "background: blue; color: white;border: none;",
 		DocURL = () => document.URL.match(/[^?&#]*/)[0].trim(),
 		IsPageUrl = url => !!(url && url.match(/\.html([?&#]|$)/)),
 		/**
@@ -105,16 +109,16 @@
 				const start = page.pact.start
 				for (const scrpt of C.scrpts) {
 					const act = scrpt.act
-					if (!act.timera)
-						act.timera = new MyTimer('}----<<<   -------  инициирован    ', myclr)
+					if (!act.timera)			
+						act.timera = new MyTimer(`}<<<---             инициирован `)
 					if (start != act.strt && act.W && !act.incls)
 						if (act.need && act.W.Init) {
 							const depend = scrpt.depends.find(depend => (depend.act.need && depend.act.done != start))
 							if (!depend) {
 								if (cc.o5debug > 1)
-									console.log(` __________________________________________  ${act.W.modul} `)
+									console.log(`}>>>---     ______ начало нинициализации _____     ${act.W.modul} `)
 								act.strt = start
-								act.timera.Start(act.W.modul.padStart(12))
+								act.timera.Start(act.W.modul)
 								act.W.Init(C)
 							}
 						} else
@@ -141,7 +145,7 @@
 					const nam = `загружены включения для '${modul}'`,
 						scrpt = C.scrpts.find(scrpt => scrpt.modul == modul)
 					if (cc.o5debug > 1)
-						console.log(`яLoadDone: '${nam}'`)
+						console.log(`LoadDone: '${nam}'`)
 
 					scrpt.act.incls = ''
 					InitScripts(nam)
@@ -196,7 +200,7 @@
 				act = scrpt.act,
 				lefts = []
 
-			act.timera.Stop('', true)
+			act.timera.Stop('')
 			act.done = act.strt
 			C.scrpts.forEach(scr => {
 				if (scr.act.done != start && scr.act.need)
@@ -222,7 +226,7 @@
 		childs = []
 		pact = {
 			url: '', start: 0, timToFinish: 0, isloaded: false, isinited: false, timini: 0,
-			timerp: new MyTimer("}==  КОНЕЦ  обработки  страницы    ", myclr)
+			timerp: new MyTimer("}==  КОНЕЦ  обработки  страницы ")
 		}
 
 		Finish = istimeout => {
@@ -232,14 +236,15 @@
 				document.body.classList.remove(page.cls)
 
 			if (page.errs.length > 0) {
-				C.ConsoleError(`Скрипты ${istimeout ? 'НЕ' : ''} завершились с ошибками`, page.errs.length, page.errs)
+				C.ConsoleError(`Скрипты ${istimeout ? 'НЕ' : ''} завершились (есть ошибки)`, page.errs.length, page.errs)
 				page.errs.splice(0, page.errs.length) //  могут еще завершиться и без ошибок
 			}
-			page.pact.timerp.Stop(istimeout ? 'по таймеру!' : '', true)
+			page.pact.timerp.Stop(istimeout ? 'таймер' : '')
 
 			if (!istimeout)
 				page.pact.isinited = true
 
+			// const eve = document.scripts.find(script=>script.src.match(/o5shp.js/)) //head.querySelector('script[src*=o5shp.js]') ? 'olga5-incls' : 'olga5_ready'
 			window.dispatchEvent(new window.Event('olga5_ready'))
 		}
 		Unload = e => {
@@ -323,8 +328,8 @@
 			for (const scrpt of C.scrpts) { // делаем при каждой инициализации
 				if (C.owners.length == 0) scrpt.act.need = true
 				else {
-					if (!scrpt.hasOwnProperty('act')||!scrpt.act.hasOwnProperty('need')) 
-					console.log('1111')
+					if (!scrpt.hasOwnProperty('act') || !scrpt.act.hasOwnProperty('need'))
+						console.log('1111')
 					scrpt.act.need = false
 					for (const owner of C.owners) {  // ничего не указано - считаем все заданными!
 						if (owner.modules.length == 0) scrpt.act.need = true
@@ -355,7 +360,7 @@
 				Prt(C.GetTagsByIds("div_strt", modul))
 				Prt(C.GetTagsByClassNames('olga5_page_header, olga5_shp', modul))
 				Prt(C.GetTagsByTagNames('div,p', modul))
-				Prt(C.SelectByClassName('olga5_shp', modul))
+				Prt(C.SelectByClassName('olga5_shp', modul, true))
 				console.groupEnd()
 			}
 			if (C.consts.o5doscr) {  // запуск встроенных криптоав

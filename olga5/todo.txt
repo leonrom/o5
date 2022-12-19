@@ -1,9 +1,9 @@
-сделать с mdebug как в o5inc.js
+olga5-all:
+  ini.css  не закрыт
 
-
-    padding : 0;
-    margin : 0;
-    border:none;
+ CopyStyle  копировать все рассчитанные сфойства через nst
+ 
+ сделать с mdebug как в o5inc.js
 
 давать инициализацию толькодля тех, которые указаны в olga5_Start 
 проверить все модули на отсутствие ненужных констант! Написать об этом в доке
@@ -73,7 +73,7 @@ dblclick
 
 переключать видимость cart-shdw  после скроллина, а вначале  cart - невидимый
 
-в докуингтпции про меню написять про display:none в <pre id="menu-pre" class="olga5_menudef" style="display:none">    
+в докуингтпции про меню написять про display:none в <pre id="menu-pre" class="olga5-menuhidden" style="display:none">    
 
 
 отредактировать   olga5-blog.html:

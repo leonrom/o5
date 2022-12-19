@@ -17,7 +17,7 @@
 		C = window.olga5.C,
 		padd = "padding-left:0.5rem;",
 		clrtypes = {
-			'A': "background: yellow; color: black;border: solid 3px blue;",
+			'A': "background: yellow; color: black;border: solid 3px red;",
 			'E': "background: yellow; color: black;border: solid 1px gold;",
 			'S': "background: blue;   color: white;border: solid 1px bisque;",
 			'I': "background: beige;  color: black;border: solid 1px bisque;",
@@ -304,7 +304,8 @@
 
 	const wshp = window.olga5[olga5_modul],
 		C = window.olga5.C,
-		Match = scls => new RegExp(`\\b` + scls + `(\\s*[,:+]\\s*((([\`'"\\(\\[])(.*?)\\4)|[\\w\\-\\.]*))*`),
+		Match = scls => new RegExp(`\\b` + scls + `(\\s*[,:+]\\s*((([\`'"\\(\[])(.*?)\\4)|[^\\s\`'":,+]*))*(\\s*|$)`),
+		// Match = scls => new RegExp(`\\b` + scls + `(\\s*[,:+]\\s*((([\`'"\\(\\[])(.*?)\\4)|[\\w\\-\\.]*))*(\\s|$)`),
 		// Match = scls => new RegExp(`\\b` + scls + `(\\s*[,:+]\\s*((([\`'"])(.*?)\\4)|[+\\s*\\-\\w]*))*`),
 		// Match = scls => new RegExp(`\\b` + scls + `[,:]*[^\\s\\)]*`),
 		mquals = /\s*[:,]\s*/,
@@ -337,7 +338,7 @@
 		Object.assign(C, {
 			owners: [],
 			scrpts: [],
-			Match:Match,
+			Match: Match,
 			MakeObjName: function (obj, len) { // моё формирование имени объекта
 				if (obj) {
 					const nam = Object.is(obj, window) ? '#window' : (
@@ -361,28 +362,36 @@
 				return GetTagsBy(modul, 'querySelectorAll', nams.join(','))
 			},
 			GetTagsByClassNames: (classnams, modul) => {
-				return GetTagsBy(modul, 'getElementsByClassName', classnams)
+				const tags = GetTagsBy(modul, 'getElementsByClassName', classnams),
+					rez = []
+				for (const tag of tags)
+					if (!tag.classList.contains(C.olga5ignore))
+						rez.push(tag)
+				return rez
 			},
 			GetTagsByTagNames: (tagnams, modul) => {
 				return GetTagsBy(modul, 'getElementsByTagName', tagnams)
 			},
-			SelectByClassName: (classnam, modul) => {
+			SelectByClassName: (classnam, modul, do_not_replace_class) => {
 				const tags = GetTagsBy(modul, 'querySelectorAll', '[class *=' + classnam + ']'),
 					match = Match(classnam),
 					rez = []
-				for (const tag of tags) {
-					const ms = tag.className.match(match)
-					if (ms) {
-						const quals = [],
-							m = ms[0],
-							ss = m.split(mquals)
+				for (const tag of tags)
+					if (!tag.classList.contains(C.olga5ignore)) {
+						const ms = tag.className.match(match)
+						if (ms) {
+							const quals = [],
+								m = ms[0].trim(),
+								ss = m.split(mquals)
 
-						tag.className = tag.className.replace(m, classnam+' ')// ВСЕГДА убираю квалификаторы
-						for (let j = 1; j < ss.length; j++)
-							quals.push(ss[j])
-						rez.push({ tag: tag, quals: quals, origcls: ms.input })
+							if (!do_not_replace_class)  // кромк IniScript-теста ВСЕГДА убираю квалификаторы
+								tag.className = tag.className.replace(m, classnam + ' ')
+
+							for (let j = 1; j < ss.length; j++)
+								quals.push(ss[j].trim())
+							rez.push({ tag: tag, quals: quals, origcls: ms.input })
+						}
 					}
-				}
 				return rez
 			},
 			QuerySelectorInit: (starts, scls) => {
@@ -390,15 +399,15 @@
 
 				const match = Match(scls),
 					errs = []
-				if (!starts||starts.length == 0)
+				if (!starts || starts.length == 0)
 					C.owners.push({ start: document.body, modules: [], origcls: 'document' }) // специально чуть по-иному
 				else
 					for (const tag of starts) {
 						const quals = [],
-							m=tag.className.trim(),
-							ms = m.match(match)
+							ms = tag.className.match(match),
+							m = ms[0].trim()
 						if (ms) {
-							tag.className = tag.className.replace(ms[0], scls)// ВСЕГДА убираю квалификаторы (остальные в ms - не трогать!)
+							tag.className = tag.className.replace(m, scls)// ВСЕГДА убираю квалификаторы (остальные в ms - не трогать!)
 
 							const ss = m.split(mquals)
 							for (let j = 1; j < ss.length; j++) {
@@ -420,6 +429,29 @@
 	}
 	if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
 		console.log(`}---> подключен ${olga5_modul}/${modulname}.js`)
+		/*
+		тестирование Match()
+		\bolga5_snd(\s*[,:+]\s*((([`'"\(\[])(.*?)\4)|[^\s`'":,+]*))*(\s*|$)
+
+		olga5_snd
+aaa olga5_snd: q: q  asa
+aaa olga5_snd: q : q : a  asa
+aaa olga5_snd:over : a-11_z : loop  asa
+aaa olga5_snd:over : 'a-11_z : loop'  asa
+olga5_snd:аудио_файл  asa
+olga5_snd:+аудио_файл  asa
+olga5_snd:+ аудио_файл  asa
+olga5_snd: + аудио_файл  asa
+olga5_snd: + аудио_файл +bb asa
+olga5_snd:аудио_файл  : " sd  ffg sa" asa
+aaa olga5_snd:аудио_файл  : " sd  ffg sa" asa
+aaa olga5_snd : аудио_файл  : ' sd  ' ffg sa" asa
+aaa olga5_snd: xZa:'ёй-sounds_2 + /gitme.mp3 bbb:O'asa
+aaa olga5_snd: Lяя :Aюю:'ёй-sounds_2 + /gitme.mp3 bbb:O'asa
+aaa olga5_snd: Lяя :Aюю :'ёй-sounds_2 + /gitme.mp3 bbb:O' asa
+aaa dlassaaa:A olga5_snd:over : a-11_z: loop :  "  sounds + Ceza1-25.mp3" 
+
+		*/
 })();
 /* global document, window, console, Map*/
 /* exported olga5_menuPopDn_Click*/
@@ -548,11 +580,9 @@
 			}
 		},
 		PrintParams = (modul, xs, p, n1) => {
-			if (C.consts.o5debug > 0) {
-				let n2 = 0
-				for (const nam in xs) n2++
-				C.ConsoleInfo(`${modul}: все константы '${p}' `, `${('' + n2).padStart(2)} (своих=${('' + n1).padStart(2)})`, xs)
-			}
+			let n2 = 0
+			for (const nam in xs) n2++
+			C.ConsoleInfo(`${modul}: все константы '${p}' `, `${('' + n2).padStart(2)} (своих=${('' + n1).padStart(2)})`, xs)
 		},
 		ParamsFill = function (W, o5css) {
 			if (W.isReady)
@@ -566,31 +596,38 @@
 			}
 
 			if (o5css) InitCSS(W, o5css)
-  
-			const isnew = !!scrpt.script,
-				attrs = isnew ? C.GetAttrs(scrpt.script.attributes) : C.o5attrs
+
+			const m1 = /\s+|\/\/.*$/gm,
+				isnew = !!scrpt.script,
+				attrs = isnew ? C.GetAttrs(scrpt.script.attributes) : C.o5attrsParamsFillFromScript
+
+			W.origs = {
+				consts: (W.consts || '').replace(m1, ''),
+				urlrfs: (W.urlrfs || '').replace(m1, '')
+			}
 
 			for (const p of ['consts', 'urlrfs']) {
 				const xs = {} // временное хранилилище для считываемых параметров
-				
-				let askps = {}
-				if (W[p])   // т.е. если параметр был передан отдельно. Если еще не обрабатывался - SplitParams
-					askps = (typeof W[p] === 'object') ? W[p] : SplitParams(W[p], p, ';,')
+
+				// let askps = {}
+				// if (W[p])   // т.е. если параметр был передан отдельно. Если еще не обрабатывался - SplitParams
+				// 	askps = (typeof W[p] === 'object') ? W[p] : SplitParams(W[p], p, ';,')
 
 				for (const nam in C[p]) {
 					const source = C.constsurl.hasOwnProperty(nam) ? C.save.urlName : `ядро`
-					if (!xs.hasOwnProperty(nam)) 
+					if (!xs.hasOwnProperty(nam))
 						xs[nam] = { val: C[p][nam], source: source }
 				}
 				if (isnew) {
-					W[p] = {}	// преобразовываю в объект
-					const n1 = C.ParamsFillFromScript(xs, askps, attrs, p)
+					const askps = SplitParams(W.origs[p], p, ';,'),
+						n1 = C.ParamsFillFromScript(xs, askps, attrs, p)
 
+					W[p] = {}	// преобразовываю в объект
 					if (p == 'urlrfs') {
 						const urls = {}
 						for (const nam in xs) urls[nam] = xs[nam].val
 						DeCodeUrlRfs(urls, `${W.modul}: `)
-						for (const nam in xs) 
+						for (const nam in xs)
 							xs[nam].url = urls[nam]
 					}
 					else
@@ -601,10 +638,10 @@
 					for (const nam in xs)
 						W[p][nam] = xs[nam].val
 
-					PrintParams(W.modul, xs, p, n1)
+					if (C.consts.o5debug > 0) PrintParams(W.modul, xs, p, n1)
 				}
 				else
-					C.ConsoleInfo(`${W.modul}: параметры и ссылки берутся только из скрипта ядра библиотеки`)
+				if (C.consts.o5debug > 0) C.ConsoleInfo(`${W.modul}: параметры и ссылки берутся только из скрипта ядра библиотеки`)
 			}
 		}
 
@@ -616,7 +653,7 @@
 			SplitParams: SplitParams,
 		})
 
-		PrintParams(C.consts, C.save.xs, C.save.p, C.save.n1)
+		if (C.consts.o5debug > 0) PrintParams(C.consts, C.save.xs, C.save.p, C.save.n1)
 
 		const p = 'urlrfs',
 			xs = {}, // временное хранилилище для считываемых параметров
@@ -628,7 +665,7 @@
 		DeCodeUrlRfs(defs, C.save.libName)
 
 		for (const nam in defs) { xs[nam].url = defs[nam] }
-		PrintParams(C.save.libName, xs, p, n1)
+		if (C.consts.o5debug > 0) (C.save.libName, xs, p, n1)
 
 		// delete C.save
 		Object.freeze(C)
@@ -928,21 +965,25 @@
 	let page = null,
 		cc = null
 
+	const myclr = "background: blue; color: white;border: none;"
 	class MyTimer {
-		constructor(text, myclr) {
+		constructor(text) {
 			this.text = text
-			this.myclr = myclr
 			Object.seal(this.act)
 			Object.freeze(this)
 		}
 		act = { time: 0, name: '' }
-		myclr = ''
 		text = ''
-		Stop = (add, err) => {
+		Stop = (add) => {
+			// console.log('...=', this.act.time,  this.act.name)
 			if (this.act.time) {
-				console[err ? 'error' : 'log']('%c%s',
-					myclr, this.text + (' ' + (Number(new Date()) - this.act.time)).padStart(8) + ' ms',
-					' ' + this.act.name + (add ? ' [' + add + ']' : ''))
+				const dt = (' ' + (Number(new Date()) - this.act.time)).padStart(8) + ' ms',
+					name=dt + ' ' + this.act.name.padStart(12)
+				if (add)
+					console.error('%c%s', "background: yellow; color: black;border: none;",
+						this.text +  name + ' [' + add + ']')
+				else
+					console.log('%c%s', myclr, this.text +  name)
 				this.act.time = 0
 			}
 		}
@@ -952,13 +993,13 @@
 
 			this.act.time = Number(new Date())
 			this.act.name = name
+			// console.log('...+', this.act.time,  this.act.name)
 		}
 	}
 	const wshp = window.olga5[olga5_modul],
 		C = window.olga5.C,
 		olga5Start = 'olga5_Start',
 		completeState = "complete",
-		myclr = "background: blue; color: white;border: none;",
 		DocURL = () => document.URL.match(/[^?&#]*/)[0].trim(),
 		IsPageUrl = url => !!(url && url.match(/\.html([?&#]|$)/)),
 		/**
@@ -1016,16 +1057,16 @@
 				const start = page.pact.start
 				for (const scrpt of C.scrpts) {
 					const act = scrpt.act
-					if (!act.timera)
-						act.timera = new MyTimer('}----<<<   -------  инициирован    ', myclr)
+					if (!act.timera)			
+						act.timera = new MyTimer(`}<<<---             инициирован `)
 					if (start != act.strt && act.W && !act.incls)
 						if (act.need && act.W.Init) {
 							const depend = scrpt.depends.find(depend => (depend.act.need && depend.act.done != start))
 							if (!depend) {
 								if (cc.o5debug > 1)
-									console.log(` __________________________________________  ${act.W.modul} `)
+									console.log(`}>>>---     ______ начало нинициализации _____     ${act.W.modul} `)
 								act.strt = start
-								act.timera.Start(act.W.modul.padStart(12))
+								act.timera.Start(act.W.modul)
 								act.W.Init(C)
 							}
 						} else
@@ -1052,7 +1093,7 @@
 					const nam = `загружены включения для '${modul}'`,
 						scrpt = C.scrpts.find(scrpt => scrpt.modul == modul)
 					if (cc.o5debug > 1)
-						console.log(`яLoadDone: '${nam}'`)
+						console.log(`LoadDone: '${nam}'`)
 
 					scrpt.act.incls = ''
 					InitScripts(nam)
@@ -1107,7 +1148,7 @@
 				act = scrpt.act,
 				lefts = []
 
-			act.timera.Stop('', true)
+			act.timera.Stop('')
 			act.done = act.strt
 			C.scrpts.forEach(scr => {
 				if (scr.act.done != start && scr.act.need)
@@ -1133,7 +1174,7 @@
 		childs = []
 		pact = {
 			url: '', start: 0, timToFinish: 0, isloaded: false, isinited: false, timini: 0,
-			timerp: new MyTimer("}==  КОНЕЦ  обработки  страницы    ", myclr)
+			timerp: new MyTimer("}==  КОНЕЦ  обработки  страницы ")
 		}
 
 		Finish = istimeout => {
@@ -1143,14 +1184,15 @@
 				document.body.classList.remove(page.cls)
 
 			if (page.errs.length > 0) {
-				C.ConsoleError(`Скрипты ${istimeout ? 'НЕ' : ''} завершились с ошибками`, page.errs.length, page.errs)
+				C.ConsoleError(`Скрипты ${istimeout ? 'НЕ' : ''} завершились (есть ошибки)`, page.errs.length, page.errs)
 				page.errs.splice(0, page.errs.length) //  могут еще завершиться и без ошибок
 			}
-			page.pact.timerp.Stop(istimeout ? 'по таймеру!' : '', true)
+			page.pact.timerp.Stop(istimeout ? 'таймер' : '')
 
 			if (!istimeout)
 				page.pact.isinited = true
 
+			// const eve = document.scripts.find(script=>script.src.match(/o5shp.js/)) //head.querySelector('script[src*=o5shp.js]') ? 'olga5-incls' : 'olga5_ready'
 			window.dispatchEvent(new window.Event('olga5_ready'))
 		}
 		Unload = e => {
@@ -1234,8 +1276,8 @@
 			for (const scrpt of C.scrpts) { // делаем при каждой инициализации
 				if (C.owners.length == 0) scrpt.act.need = true
 				else {
-					if (!scrpt.hasOwnProperty('act')||!scrpt.act.hasOwnProperty('need')) 
-					console.log('1111')
+					if (!scrpt.hasOwnProperty('act') || !scrpt.act.hasOwnProperty('need'))
+						console.log('1111')
 					scrpt.act.need = false
 					for (const owner of C.owners) {  // ничего не указано - считаем все заданными!
 						if (owner.modules.length == 0) scrpt.act.need = true
@@ -1266,7 +1308,7 @@
 				Prt(C.GetTagsByIds("div_strt", modul))
 				Prt(C.GetTagsByClassNames('olga5_page_header, olga5_shp', modul))
 				Prt(C.GetTagsByTagNames('div,p', modul))
-				Prt(C.SelectByClassName('olga5_shp', modul))
+				Prt(C.SelectByClassName('olga5_shp', modul, true))
 				console.groupEnd()
 			}
 			if (C.consts.o5doscr) {  // запуск встроенных криптоав
@@ -1471,7 +1513,7 @@
 			if (!load.timeout) iniFun(args)
 		},
 		RunO5com = () => {
-			const timera = '}----<<<   ' + `-------  инициирован -------  --------------     '` + olga5_modul.padEnd(12) + `'  (ядро)`,
+			const timera = `}----<<< ----- инициировано ядро библиотеки ----- '${olga5_modul}' `,
 				_url_olga5 = C.o5script.src.match(/\S*\//)[0],
 				errs = []
 			console.time(timera)
@@ -1586,6 +1628,7 @@
 
 	Object.assign(C, {
 		repQuotes: /^\s*['"`]?\s*|\s*['"`]?\s*$/g,  // необязат. первая и последняя кавычки с окруж. пробелами,
+		olga5ignore:'olga5-ignore',
 		TryToDigit: TryToDigit,
 		ParamsFillFromScript,
 		GetAttrs: GetAttrs,

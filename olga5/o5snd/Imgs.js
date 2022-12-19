@@ -53,7 +53,8 @@
                     }, { once: true })
 
                     nimg.addEventListener('error', e => {
-                        Reject(`GetImgForRef: для url=${url}- ошибка ${e.message ? e.message : 'не определен (?)'}`)
+                        // Reject(`GetImgForRef: для url=${url}- ошибка ${e.message ? e.message : 'не определен (?)'}`)
+                        Reject({err:`GetImgForRef ошибка: ${e.message ? e.message : 'не определен'}`, url:url})
                     }, { once: true })
                 }
             }),
@@ -130,9 +131,12 @@
                     img.parentNode.insertBefore(newimg, img.nextSibling)
                     img.parentNode.removeChild(img)
                     img = null
-                }).catch(err => {
-                    C.ConsoleError(`SetImgByRef.${err}`)
+                }).catch(reject => {
+                    C.ConsoleError(reject.err,reject.url.replace(/https?:\/\//, ''))
                 })
+                // }).catch(err => {
+                //     C.ConsoleError(`SetImgByRef.${err}`)
+                // })
             },
             PrepImage = (aO5, btns, TryEncode) => {
                 const urlatr = {},
