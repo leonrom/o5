@@ -105,7 +105,8 @@
                     w = aO5.sizS.width
 
                 Object.assign(aO5.sizS, { width: (pos.width - add.w), height: (pos.height - add.h) })
-                Object.assign(aO5.shp.style, { width: aO5.sizS.width + 'px', height: aO5.sizS.height + 'px' })
+                Object.assign(aO5.shp.style, { width: 100 + '%', height: aO5.sizS.height + 'px' })
+                // Object.assign(aO5.shp.style, { width: aO5.sizS.width + 'px', height: aO5.sizS.height + 'px' })
 
                 CalcSize(aO5.aO5s)
 

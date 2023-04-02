@@ -91,7 +91,7 @@
 				if (C.consts.o5debug > 0) C.ConsoleInfo(`${W.modul}: выполнено подстановок для тегов:`, rez.length, rez)
 
 			if (undefs.length > 0)
-				C.ConsoleAlert(`${W.modul}: неопределённые адреса: `, undefs.length, undefs)
+				C.ConsoleError(`${W.modul}: неопределённые адреса: `, undefs.length, undefs)
 			// if (unreal.length > 0) C.ConsoleAlert(`${W.modul}: непонятные адреса: `, unreal.length, unreal)
 		}
 	// --------------------------------------------------------	
@@ -1717,7 +1717,8 @@
                     w = aO5.sizS.width
 
                 Object.assign(aO5.sizS, { width: (pos.width - add.w), height: (pos.height - add.h) })
-                Object.assign(aO5.shp.style, { width: aO5.sizS.width + 'px', height: aO5.sizS.height + 'px' })
+                Object.assign(aO5.shp.style, { width: 100 + '%', height: aO5.sizS.height + 'px' })
+                // Object.assign(aO5.shp.style, { width: aO5.sizS.width + 'px', height: aO5.sizS.height + 'px' })
 
                 CalcSize(aO5.aO5s)
 
@@ -3626,16 +3627,17 @@ aaa dlassaaa:A olga5_snd:over : a-11_z: loop :  "  sounds + Ceza1-25.mp3"
 				return
 			}
 
-			if (o5css) InitCSS(W, o5css)
+			if (o5css) InitCSS(W, o5css) 
 
 			const m1 = /\s+|\/\/.*$/gm,
 				isnew = !!scrpt.script,
 				attrs = isnew ? C.GetAttrs(scrpt.script.attributes) : C.o5attrsParamsFillFromScript
 
-			W.origs = {
-				consts: (W.consts || '').replace(m1, ''),
-				urlrfs: (W.urlrfs || '').replace(m1, '')
-			}
+			if (!W.origs)
+				W.origs = {
+					consts: (W.consts || '').replace(m1, ''),
+					urlrfs: (W.urlrfs || '').replace(m1, '')
+				}
 
 			for (const p of ['consts', 'urlrfs']) {
 				const xs = {} // временное хранилилище для считываемых параметров
@@ -3672,7 +3674,7 @@ aaa dlassaaa:A olga5_snd:over : a-11_z: loop :  "  sounds + Ceza1-25.mp3"
 					if (C.consts.o5debug > 0) PrintParams(W.modul, xs, p, n1)
 				}
 				else
-				if (C.consts.o5debug > 0) C.ConsoleInfo(`${W.modul}: параметры и ссылки берутся только из скрипта ядра библиотеки`)
+					if (C.consts.o5debug > 0) C.ConsoleInfo(`${W.modul}: параметры и ссылки берутся только из скрипта ядра библиотеки`)
 			}
 		}
 

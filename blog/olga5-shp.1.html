@@ -3,56 +3,57 @@
 
 <head>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-  <title>olga5-shp</title>
+  <title>olga5-shp1</title>
+  
+  <link href='+../blog/favicon.svg' rel='shortcut icon' type='image/x-icon' />
   <link data-href='+o5ini.css' media='screen' rel='stylesheet' />
 
-	<!-- <script src='https://rombase.h1n.ru/o5/olga5/o5dbg/events.js'></script> -->
-  <script data-src='+o5shp.js'></script>
-  <script data-src='+o5pop.js'></script>
-  <script data-src='+o5mnu.js' scrollY='-32'></script>
-  <script data-src='+o5ref.js' o5tag_attrs="img=image_play;a,img,audio=href,data-href,src,_src;" o5urlrfs="images=_url_olga5 + ../blog/media/image;
-			   sounds=https://archive.org/download/clouds_20200310;
-
-			   iTunes-icon='images + /myMusikIT.png' # --- только для o5snd ---;
-	       Ceza1-25=sounds+/Ceza1-25.mp3;
-
-		    мой-блог=https://turkceile.blogspot.com/2017/02/; # --- только для o5shp ---;
-        _блог_Olga=http://turkish4dummies1.blogspot.com/;
-			">
-      </script>
-  <script data-src='+o5snd.js' btn_play='images + /play.png' btn_stop='images + /play_Freepik.png'>
-  </script>
-  <script data-src='+add/pusto.js' moe-attr='мой атрибут'></script>
-  <!-- <script o5debug=2 src='https://rombase.neocities.org/olga5/o5common.js' -->
-
-  <link rel="shortcut icon" href="+../blog/favicon.svg" type="image/x-icon" />
+  <script data-src='+ o5inc.js'></script>
+  <script data-src='+ o5shp.js'></script>
+  <script data-src='+ o5pop.js' o5noclick='0'></script>
+  <script data-src='+ o5mnu.js' o5consts='scrollY=-32'></script>
+  <script data-src='+ o5ref.js' 
+	  o5tag_attrs="img=image_play;a,img,audio=href,data-href,src,_src;"
+	  o5urlrfs="  
+		  myTunes-icon='images + /myMusikIT.png' # --- только для o5snd ---;
+	  "
+  ></script>
+  <script data-src='+ o5snd.js' 
+	  btn_stop='images + /icons8-youtube-music-48.png' 
+	  btn_play='images + /icons8-youtube-music-50.png'
+	  o5consts="
+		  o5shift_speed =0.5 
+	  "
+	  o5urlrfs="
+		  Ceza1-25=sounds+/Ceza1-25.mp3;
+		  Ceza2-25=sounds+/Ceza2-25.mp3;
+		  imageplay=images + /play.png;
+		  solfedjio=images+ /solfedjio.png;
+	  "
+  ></script>
+  <script data-src='+ add/pusto.js' moe-attr='мой атрибут'></script>
 
   <link data-href='+../blog/csss/olga5.tableCode.css' media='screen' rel='stylesheet' />
   <link data-href='+../blog/csss/olga5.textNshow.css' media='screen' rel='stylesheet' />
   <link data-href='+../blog/csss/olga5.addStyles.css' media='screen' rel='stylesheet' />
-  <!-- <link href='+../blog/csss/olga5.menuPopDn.css' media='screen' rel='stylesheet' /> -->
-
+  <link data-href='+../blog/csss/olga5.menuPopDn.css' media='screen' rel='stylesheet' />
   <link data-href='+../blog/csss/olga5.tableKuplet.css' media='screen' rel='stylesheet' />
   <link data-href='+../blog/csss/tests.css' media='screen' rel='stylesheet' />
 
-  <!-- 
-    _src='https://rombase.neocities.org/olga5/o5common.js'
-    _src='httpы://rombase.h1n.ru/o5/olga5/o5common.js'  
-    _src='http://localhost/o5/olga5/o5common.js'
--->
-  <script src='http://localhost/o5/olga5/o5com.js' 
-      o5consts="o5debug='1'; o5nomnu='0'; o5noact='0'; o5timload='333';
-          o5init_events='DOMContentLoaded, transitionend, message'
-      " 
-      data-o5urlrfs="
-      тесты='+ ../olga5-tests';
-      блог_o5='https://olga-5.blogspot.com/2020/02';
-      images=_url_olga5 + ../blog/media/image;       
-      # _url_html='# адрес текущей страницы (этот и 2 следующих - закомментированы)';
-      # _url_root='# адрес сайта с текущей страницей';
-      # _url_olga5='# адрес загрузки файла o5common.js';
-    ">
-    </script>
+  <script src='https://rombase.h1n.ru/o5/olga5/o5.js'
+	  o5debug='0' 
+	  o5incls='o5pop,o5mnu,o5snd,o5shp,o5ref' 
+	  o5urlrfs="
+		  _блог_o5 = '_url_html+../2020/02';
+		  media = + ../blog/media;
+		  sounds= media + /audio;
+		  images= media + /image;
+		  тесты = + ../olga5-tests;   
+		  # _url_html=`# адрес текущей страницы (этот и 2 следующих - закомментированы)`;   
+		  # _url_root=`# адрес сайта (с текущей страницей)`;    
+		  # _url_olga5=`# адрес загрузки файла o5common.js`;   
+	  " 
+  ></script>
 </head>
 <!--  структура вложенности (для справки):
 <body id='body'>
@@ -548,6 +549,22 @@
         <a href="блог_o5 + /olga5-all.html" target="olga5-addPage">o5common.js</a> -
         обязательно.
       </p>
+      <!-- <p>
+      Располагать вызывающий тег &lt;<b>script</b>&gt; желательно после вызова
+      <i title="если таковые подключаются">тегов</i> <code>o5ref.js</code> и <code>o5snd.js</code>.
+      Это будет <i>обязательно</i>, если обработка документа ограничена заданными блоками класса
+ 		<span o5popup='./olga5-all.html?o5nomnu#head_43; width: 666, height: 444'> olga5_Start </span>,
+		а подвисабельные блоки содержат <i>именованные</i> ссылки, обрабатываемые названными скриптами.
+    </p> -->
+      <!-- <p>
+        При своей первой инициализации скрипт <code>o5shp.js</code> сам
+        <span title="весь скрипт получился весьма великоват, поэтому для удобства отладки
+		из него отделены отдельные подмодули">дополнительно</span> подгружает модули
+        <b>DoInit.js</b>, <b>AO5shp.js</b> и <b>DoScroll.js</b> из подпапки
+        <span class="olga5_codeText">olga5/<b>o5shp</b></span>.
+          Для синхронизации этих модулей используется событие '<b>olga5_update</b>'
+        (окончание загрузки тега &lt;<b>img</b>&gt;).
+      </p> -->
       <p>
         Cкрипт создает событие '<b>o5shp_scroll</b>',- только для тестов (внешним модулем  'alltst.js') 
       </p>
@@ -621,6 +638,19 @@
         И оба они (как и остальные куплеты) подвисают под блоком с YouTube-роликом, у которого <i>уровень</i>=
         '<b>0</b>'.
       </p>
+      <!-- <p>
+      <span title="демонстрация действия атрибута Kill" style="font-size: small;">
+        появление на экране абзаца из следующего п.4.2, у которого в теге &lt;<b>p</b>&gt; задан класс
+        "class='olga5_shp:<b>Kill</b>'",
+        сбрасывает зависание 'зелёного' примера</span>.
+    </p> -->
+      <!-- <p>      
+      <em>Пояснение:</em> для  разработчиков: квалификаторы '<b>Kill</b>' делят документ (в пределах каждого уровня) на части, 
+        в которых объекты с классом 'olga5_shp' будут 
+        <span title="т.е. их положение будет пересчитываться программой">фактически</span> подвисабельными только у 
+        первой из них,- для которой <i>нижний</i> <b>Kill</b>-объект будет ниже границы видимости кадра. 
+        Это сделано для минимизации пересчёта координат объектов и контейнеров при скроллинге.
+    </p> -->
     
       <h4 id='head_42'>4.2. Дополнительные атрибуты тега</h4>
       <p id="kill" class="olga5_shp:Kill" style="height: 0;"> </p>
@@ -629,6 +659,10 @@
         (специфические для данной <i>библиотеки</i>) атрибуты, каждый из которых определяет <i>список</i> из
         одного или нескольких контейнеров, ограничивающих его <i>подвисание</i>:
       </p>
+      <!-- <p class="moecomment">
+        Предыдущий абзац может чуть подёргиваться при скроллинге потому, 
+        что имеет '<i>class="olga5_shp:Kill"</i>' и каждй рах перепозиционируется.
+      </p> -->
       <ul>
         <li><b>olga5_frames</b> &mdash; контейнеры (например теги &lt;<b>div</b>&gt;), на <b>ближайшей</b> верхней или
           нижней границах
@@ -1001,6 +1035,11 @@
         <br />
         <span class='olga5_codeText'><i>event</i>.<b>cancelBubble</b> = <code>true</code>;</span>.
       </p>
+      <!-- <p>
+        <b>3.</b> Для подвисабельных объектов оба свойства <i>overflow</i> всегда принимается 'hidden',
+        независимо от CSS свойств классов тега. Чтобы изменить <b>overflowX</b> или <b>overflowY</b>
+        следует указать соответствующее значение в атрибуте <b>style</b> в самом теге.
+      </p> -->
       <br />
     </div>
     <!-- ===================================================================================== -->

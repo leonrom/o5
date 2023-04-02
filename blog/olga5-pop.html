@@ -69,7 +69,7 @@
 </head>
 
 <body id="o5body">
-	<div class="olga5_Start:o5pop" dir="ltr" trbidi="on">
+	<div class="olga5_Start:o5pop,o5mnu" dir="ltr" trbidi="on">
 		<img alt="" border="0" width="200"   style="display:none"
 			data-original-height="529" data-original-width="707" 
 			src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiey9cGL7f4R6ltnfUcGzV6UZpTl5lfMkeVlT9VZdxFX9TymRa45A5oQJSy1leJcF8RcjH66uOS577U4ER26uS83d2vBXygZPYC81S2hMe7S3aLHj0ELa7-lUYaG-IXj8DhPlPLD6Eg5a1w1xQxZUtcfwf76VSWa1e1D3p-e3_d3qxfvG-DPWim1INW/s320/pop.png"
@@ -118,12 +118,6 @@
 				Закрытие <i>всплывшего</i> окна выполняется <b>click</b>'ом на вызвавшем теге,
 				независимо от события, вызвавшего его открытие.
 			</p>
-			<!-- <p>
-				Кроме этого,- если у вызывающего тега <i>неопределён</i>
-				параметр <b>group</b> (см. ниж п.3), то <i>всплывшее</i> окно закроется после
-				<b>click</b>'а - клик по основному окну (как в предыдущем примере). Это работает также на сообщениях <b>Blogger</b>'а, 
-				хотя для него можно использовать специальный (см. ниже п.5) атрибут <b>o5noclick</b>.
-			</p> -->
 		</div>
 
 		<h3 id="head_2">2. Визуализация состояния <i>всплытия</i> окна</h3>
@@ -236,11 +230,6 @@
 				то параметры будут браться у <i>первого</i> из них. Поэтому в <i>ссылаемых</i>
 				тегах желательно обрабатывать не более одного события.
 			</p>
-			<!-- <p>
-				На один тег можно <i>повесить</i> несколько функций <b>PopUp</b> для вызова
-				<span title="при различных значениях параметра 'group'">нескольких</span>
-				всплывающих окон для различных событий..
-			</p> -->
 			<p>
 				<i>Список параметров</i> открываемого окна может (не) содержать любые стандартные атрибуты
 				<span class="olga5_popup" onclick="window.olga5.PopUp(this, 
@@ -377,23 +366,6 @@
 				значение <b>o5popup</b> используется только для подстановки (по <b>id</b> тега) в другие
 				вызовы всплывающих окон аналогично как <b>PopUp()</b>.
 			</p>
-			<!-- <p>
-				Скрипт заменяет атрибуты <b>o5popup</b> на вызов функции <b>PopUp()</b>
-				по событию <b>click</b> (которая не будет выполняться при пустом адресе загружаемого документа).
-				Замена выполняется однократно для <u>всех</u> тегов (с таким атрибутом):
-			<ul>
-				<li>автоматически,- при инициализации модуля ядром <i>библиотеки</i>;</li>
-				<li>после клика по любому такому тегу,- при автономной работе скрипта.</li>
-			</ul> -->
-			</p>
-			<!-- <p>
-				При наличии разделителя &nbsp;'<b>;</b>' тегу также автоматически добавляется класс
-				<b>olga5_popup_PopUp</b>,-
-				меняющий вид курсора на 'pointer' и 'включающий' мигание при всплывшем окне,
-				а при его отсутствии разделителя &nbsp;'<b>;</b>'
-				значение <b>o5popup</b> используется только для подстановки (по <b>id</b> тега) в другие
-				вызовы всплывающих окон.
-			</p> -->
 		</div>
 
 		<h3 id="head_5">5. Подключение скрипта</h3>
@@ -459,11 +431,6 @@
 				когда модуль <code>o5pop></code> уже <u>использует</u>&nbsp;ядро <i>библиотеки</i>
 				<code>o5common.js</code>.
 			</p>
-			<!-- <p>
-				<b>Примечаниие:</b> в отличие от вышеприведенных примеров по ссылкам ниже будет открываться пустой фрейм
-				окна, без его заполнения содержимым демо-файла. Это не меняет их сути,
-				но сделано для упрощения логистики ссылок из предыдущего <i>примера</i> (при его вставке в Blogger).
-			</p> -->
 			<p class="moecomment">
 				<b>Напоминание</b>: при появлении всплывших окон они <i>захватывают</i> фокус на себя,
 				поэтому нажатия клавиш действуют на активное <i>всплывшее</i> окно,
@@ -590,14 +557,6 @@
 							<span class='inLine'>...PopUp(&nbsp;&nbsp;'&nbsp;./popup.html', 'p1')&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
 						</span>&nbsp; - &nbsp;&nbsp;&nbsp;- " - ;
 					</li>
-					<!-- <li><span id="li6" class="olga5_popup" onclick="window.olga5.PopUp(this, './popup.html')">
-							<span class='inLine'>...PopUp(this, './popup.html')&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-						</span>&nbsp; - положение и размеры - по-умолчанию;
-					</li>
-					<li><span id="li7" class="olga5_popup" onclick="window.olga5.PopUp('./popup.html')">
-							<span class='inLine'>...PopUp(&nbsp;&nbsp;&nbsp;&nbsp;' ./popup.html ')&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-						</span>&nbsp; - &nbsp;&nbsp;аналогично;
-					</li> -->
 					<li><span id="li6" class="olga5_popup" onclick="window.olga5.PopShow('', 444,333, 'тесты+popup.html')">
 							<span class='inLine'>...PopShow('',444,333,'тесты+popup.html')</span>
 						</span>&nbsp; - &nbsp;&nbsp;&nbsp;как 2, но меньшего размера - через <b>PopShow()</b> ;
@@ -758,25 +717,6 @@
 			{ span: '6. Демонстрационные примеры', ref: 'head_6' },
 			{ span: '7. Дополнительные пояснения', ref: 'head_7' },
 		</pre>
-
-		<!-- <script id="o5mnuscript" olga5_sdone="">
-			console.log(`устанавливаю addEventListener('olga5_ready'...)`);
-			window.addEventListener('olga5_ready', function () {
-				console.log(`выполняю addEventListener('olga5_ready'...)`);
-				if (window.olga5 && window.olga5.Menu)
-					window.olga5.Menu([
-						{ span: 'Статья', id: "mymenu", right: '5px', top: '5px', add: '266px', },
-						{ span: '1. Подключение всплываемого окна', ref: 'head_1' },
-						{ span: '2. Визуализация состояния всплытия окна', ref: 'head_2' },
-						{ span: '3. Аргументы вызова всплываемого окна', ref: 'head_3' },
-						{ span: '4. Использование атрибута o5popup', ref: 'head_4' },
-						{ span: '5. Подключение скрипта', ref: 'head_5' },
-						{ span: '6. Демонстрационные примеры', ref: 'head_6' },
-						{ span: '7. Дополнительные пояснения', ref: 'head_7' },
-					], this)
-			});
-			document.currentScript.setAttribute('olga5_sdone', '1') ;
-		</script> -->
 	</div>
 </body>
 

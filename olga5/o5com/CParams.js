@@ -146,10 +146,11 @@
 				isnew = !!scrpt.script,
 				attrs = isnew ? C.GetAttrs(scrpt.script.attributes) : C.o5attrsParamsFillFromScript
 
-			W.origs = {
-				consts: (W.consts || '').replace(m1, ''),
-				urlrfs: (W.urlrfs || '').replace(m1, '')
-			}
+			if (!W.origs)
+				W.origs = {
+					consts: (W.consts || '').replace(m1, ''),
+					urlrfs: (W.urlrfs || '').replace(m1, '')
+				}
 
 			for (const p of ['consts', 'urlrfs']) {
 				const xs = {} // временное хранилилище для считываемых параметров
@@ -186,7 +187,7 @@
 					if (C.consts.o5debug > 0) PrintParams(W.modul, xs, p, n1)
 				}
 				else
-				if (C.consts.o5debug > 0) C.ConsoleInfo(`${W.modul}: параметры и ссылки берутся только из скрипта ядра библиотеки`)
+					if (C.consts.o5debug > 0) C.ConsoleInfo(`${W.modul}: параметры и ссылки берутся только из скрипта ядра библиотеки`)
 			}
 		}
 

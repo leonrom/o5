@@ -91,7 +91,7 @@
 				if (C.consts.o5debug > 0) C.ConsoleInfo(`${W.modul}: выполнено подстановок для тегов:`, rez.length, rez)
 
 			if (undefs.length > 0)
-				C.ConsoleAlert(`${W.modul}: неопределённые адреса: `, undefs.length, undefs)
+				C.ConsoleError(`${W.modul}: неопределённые адреса: `, undefs.length, undefs)
 			// if (unreal.length > 0) C.ConsoleAlert(`${W.modul}: непонятные адреса: `, unreal.length, unreal)
 		}
 	// --------------------------------------------------------	
