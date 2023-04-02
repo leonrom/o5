@@ -2,7 +2,7 @@
 /*jshint asi:true  */
 /*jshint esversion: 6*/
 /*eslint no-useless-escape: 0*/
-(function () {              // ---------------------------------------------- o5ref ---
+(function () {              // 3---------------------------------------------- o5ref ---
 	'use strict';
 	let C = null
 	const
@@ -11,7 +11,7 @@
 			Init: RefInit,
 			// src: document.currentScript.src,
 			consts: 'o5tag_attrs=,',
-			urlrfs: '',    
+			urlrfs: '',
 		},
 		ParseTagAttrs = params => {
 			const errs = [],
@@ -4646,7 +4646,7 @@ aaa dlassaaa:A olga5_snd:over : a-11_z: loop :  "  sounds + Ceza1-25.mp3"
 			_url_olga5: '' // будет задан при инициализации (document.currentScript.src.match(/\S*\//)[0],)
 		},
 		consts: {
-			o5timload: 0, 	//mtiml ? (mtiml[5] ? mtiml[5] : 1) : (C.o5script.attributes['o5timload'] || 3),
+			o5timload: 3, 	//mtiml ? (mtiml[5] ? mtiml[5] : 1) : (C.o5script.attributes['o5timload'] || 3),
 			o5debug: 0, 	// mdebug ? (mdebug[5] ? mdebug[5] : 1) : (C.o5script.attributes['o5debug'] || 0),
 			o5nomnu: 0, o5noact: 0, o5only: 0,
 			o5incls: '',
