@@ -11,7 +11,7 @@
 			Init: RefInit,
 			// src: document.currentScript.src,
 			consts: 'o5tag_attrs=,',
-			urlrfs: '',
+			urlrfs: '',    
 		},
 		ParseTagAttrs = params => {
 			const errs = [],
