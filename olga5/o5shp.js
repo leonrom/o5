@@ -11,7 +11,7 @@
 			modul: 'o5shp',
 			Init: ShpInit,
 			class: 'olga5_shp',
-            consts: `		
+			consts: `		
 				o5shp_dummy=0.123; //  просто так, для проверок в all0_.html
                 olga5_frames='s';
                 olga5_owners='b';
@@ -49,10 +49,10 @@
 
 	Object.assign(window.olga5[W.modul], { W: W, olga5cart: olga5cart, olga5ifix: olga5ifix, })
 	if (!window.olga5.find(w => w.modul == W.modul)) {
-		window.olga5.push(W)
 		if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
 			console.log(`}---< ${document.currentScript.src.indexOf(`/${W.modul}.`) > 0 ? 'загружен  ' : 'включён   '}:  ${W.modul}.js`)
+		window.olga5.push(W)
 		window.dispatchEvent(new CustomEvent('olga5_sload', { detail: { modul: W.modul } }))
 	} else
-		console.error('%c%s', "background: yellow; color: black;border: solid 2px red;", `Повтор загрузки '${W.modul}`)
+		console.error('%c%s', "background: yellow; color: black;border: solid 2px red;", `}---< Повтор загрузки '${W.modul}`)
 })();

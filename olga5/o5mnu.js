@@ -267,7 +267,7 @@
 					C.InsertBefore(owner, ul, owner.firstChild)
 
 				ul.addEventListener('mousedown', DoMnu, { capture: true })
-				document.addEventListener('click', Clear, { capture: false })
+				window.addEventListener('click', Clear, { capture: false })
 
 				uls[0] = ul
 				const blc = (item0.block || 's')[0].toLowerCase(),
@@ -326,7 +326,7 @@
 
 	function Init(c) {
 		C = c
-		const 
+		const
 			InitByText = (menu, tag) => {// если есть такой атрибут}
 				const regval = /^["'`;{\s]*|["'`},\s]*$/g,
 					lis = menu.match(/{[^}]*}/g) || [],
@@ -376,11 +376,10 @@
 
 	if (!window.olga5) window.olga5 = []
 	if (!window.olga5.find(w => w.modul == W.modul)) {
+		if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
+			console.log(`}---< ${document.currentScript.src.indexOf(`/${W.modul}.`) > 0 ? 'загружен  ' : 'включён   '}:  ${W.modul}.js`)
 		window.olga5.push(W)
-		
-	if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
-		console.log(`}---< ${document.currentScript.src.indexOf(`/${W.modul}.`) > 0 ? 'загружен  ' : 'включён   '}:  ${W.modul}.js`)
 		window.dispatchEvent(new CustomEvent('olga5_sload', { detail: { modul: W.modul } }))
 	} else
-		console.error('%c%s', "background: yellow; color: black;border: solid 2px red;", `Повтор загрузки '${W.modul}`)
+		console.error('%c%s', "background: yellow; color: black;border: solid 2px red;", `}---< Повтор загрузки '${W.modul}`)
 })();

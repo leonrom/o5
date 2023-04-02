@@ -2,26 +2,29 @@
 <html lang="ru">
 
 <head>
-	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8"
+	Content-Security-Policy: default-src 'self' example.com *.example.com
+	>
 	<title>olga5-snd</title>
 	<!-- <link rel="shortcut icon" href="+../blog/favicon.svg" type="image/x-icon"> -->
+	<!-- <script src="https://rombase.h1n.ru/o5/olga5/o5dbg/events.js"></script> -->
 
     <link href='+../blog/favicon.svg' rel='shortcut icon' type='image/x-icon' />
-    <link data-href='+o5ini.css' media='screen' rel='stylesheet' />
-
-    <script data-src='+ o5inc.js'></script>
-    <script data-src='+ o5shp.js'></script>
-    <script data-src='+ o5pop.js' o5noclick='0'></script>
-    <script data-src='+ o5mnu.js' o5consts='scrollY=-32'></script>
-    <script data-src='+ o5ref.js' 
+	<link data-href="+o5ini.css" media="screen" rel="stylesheet" />
+    
+    <script data-src="+ o5inc.js"></script>
+    <script data-src="+ o5shp.js"></script>
+    <script data-src="+ o5pop.js" o5noclick="0"></script>
+    <script data-src="+ o5mnu.js" o5consts="scrollY=-32"></script>
+    <script data-src="+ o5ref.js" 
 		o5tag_attrs="img=image_play;a,img,audio=href,data-href,src,_src;"
 		o5urlrfs="  
-			myTunes-icon='images + /myMusikIT.png' # --- только для o5snd ---;
+			myTunes-icon=\'images + /myMusikIT.png\' # --- только для o5snd ---;
 		"
 	></script>
-    <script data-src='+ o5snd.js' 
-		btn_stop='images + /icons8-youtube-music-48.png' 
-		btn_play='images + /icons8-youtube-music-50.png'
+    <script data-src="+ o5snd.js" 
+		btn_stop="images + /icons8-youtube-music-48.png" 
+		btn_play="images + /icons8-youtube-music-50.png"
 		o5consts="
 			o5shift_speed =0.5 
 		"
@@ -32,31 +35,29 @@
 			solfedjio=images+ /solfedjio.png;
 		"
 	></script>
-    <script data-src='+ add/pusto.js' moe-attr='мой атрибут'></script>
+    <script data-src="+ add/pusto.js" moe-attr="мой атрибут"></script>
 
-    <link data-href='+../blog/csss/olga5.tableCode.css' media='screen' rel='stylesheet' />
-    <link data-href='+../blog/csss/olga5.textNshow.css' media='screen' rel='stylesheet' />
-    <link data-href='+../blog/csss/olga5.addStyles.css' media='screen' rel='stylesheet' />
-    <link data-href='+../blog/csss/olga5.menuPopDn.css' media='screen' rel='stylesheet' />
-    <link data-href='+../blog/csss/olga5.tableKuplet.css' media='screen' rel='stylesheet' />
-    <link data-href='+../blog/csss/tests.css' media='screen' rel='stylesheet' />
+    <link data-href="+../blog/csss/olga5.tableCode.css" media="screen" rel="stylesheet" />
+    <link data-href="+../blog/csss/olga5.textNshow.css" media="screen" rel="stylesheet" />
+    <link data-href="+../blog/csss/olga5.addStyles.css" media="screen" rel="stylesheet" />
+    <link data-href="+../blog/csss/olga5.menuPopDn.css" media="screen" rel="stylesheet" />
+    <link data-href="+../blog/csss/olga5.tableKuplet.css" media="screen" rel="stylesheet" />
+    <link data-href="+../blog/csss/tests.css" media="screen" rel="stylesheet" />
 
 	<!-- 
+		src="../o5/olga5/o5.js"
 		src='https://rombase.h1n.ru/o5/olga5/o5.js'
 		src='http://localhost/o5/olga5/o5.js'  	
 	-->
-    <script src='http://localhost/o5/olga5/o5.js'
-		o5debug='0' 
-        o5incls='o5pop,o5mnu,o5snd,o5shp,o5ref' 
+    <script src="http://localhost/o5/olga5/o5com.js"
+		o5debug="0"
+        o5incls="o5pop,o5mnu,o5snd,o5shp,o5ref"
         o5urlrfs="
-            _блог_o5 = '_url_html+../2020/02';
+            _блог_o5 = \'_url_html+../2020/02\';
 			media = + ../blog/media;
             sounds= media + /audio;
             images= media + /image;
-            тесты = + ../olga5-tests;   
-            # _url_html=`# адрес текущей страницы (этот и 2 следующих - закомментированы)`;   
-            # _url_root=`# адрес сайта (с текущей страницей)`;    
-            # _url_olga5=`# адрес загрузки файла o5common.js`;   
+            тесты = + ../olga5-tests;     
         " 
 	></script>
 </head>
@@ -188,7 +189,7 @@
 					использования:
 				</p>
 				<div id='div1' class="olga5_shp:Up:Top" olga5_frames="i:olga5-Start_hr,n" olga5_owners="id:ks1"
-					style="height:255px;">
+					style="height:255px;    padding-top: 3px;">
 					<style>
 						td>img {
 							height: 32px;
@@ -383,7 +384,7 @@
 						<b>src</b> или <b>href</b> от <u>текущего</u> тега (даже если сами эти атрибуты
 						были определены через префиксы '<b>_</b>' или '<b>data-</b>').
 						Использование таких ссылок можно посмотреть
-						<span class="olga5_popup" onclick="window.olga5.PopShow('',  700, 466, 'тесты+/snd46c.html')">
+						<span class="olga5_popup" onclick="window.olga5.PopShow(  700, 466, 'тесты+/snd46c.html')">
 							тут</span>;
 					</li>
 					<li>если после открытияя страницы сразу навести курсор на тег с квалификатором <b>:over</b>,
@@ -417,7 +418,7 @@
 			</p>
 			<p>
 				Показанный выше пример (с дополнительными пояснениями) можно посмотреть
-				<span class="olga5_popup" onclick="window.olga5.PopShow('',  700, 488, 'тесты+/snd4.html')">
+				<span class="olga5_popup" onclick="window.olga5.PopShow(  700, 488, 'тесты+/snd4.html')">
 					тут</span> в виде отдельного файла. 
 			</p>
 			<p class="moecomment">
@@ -499,7 +500,7 @@
 			<p>
 				Демонстрация различных вариантов отложенного подключения тегов &lt;<b>audio</b>&gt; показана в
 				<code class="olga5_popup"
-					onclick="window.olga5.PopShow('', 500, 400, 'тесты+/snd1.html')">примере</code>.
+					onclick="window.olga5.PopShow( 500, 400, 'тесты+/snd1.html')">примере</code>.
 				Для просмотра (желательно НЕ в браузере FireFox, т.к. в нём теги &lt;<b>audio</b>&gt; плохо
 				отрисовываются) следует кликнуть
 				по ссылке, а для анализа - посмотреть в отладчике исходный код примеров.
@@ -569,7 +570,7 @@
 				Демонстрация и объяснение различных вариантов подключения аудио к <b>img</b>-тегам показаны
 				<code class="olga5_popup"
 					title="Просмотр - клик по ссылке, анализ - см. в отладчике исходный код примеров"
-					onclick="window.olga5.PopShow('', 700, 370, 'тесты+/snd2.html')">тут</code>
+					onclick="window.olga5.PopShow( 700, 370, 'тесты+/snd2.html')">тут</code>
 				(демонстрируется манипуляция иконками,- файл <b>snd2</b>.html).
 			</p>
 			<p>
@@ -659,7 +660,7 @@ img.olga5_shp:not(.<b>olga5-freeimg</b>) {
 			</ul>
 			Здесь в скобках указаны соответствующие номера
 			<span id="snd_11s" class="olga5_popup"
-				onClick="window.olga5.PopShow('', 940, 455,'#snd_11')"><u>иллюстрации&nbsp;1.1</u></span>,
+				onClick="window.olga5.PopShow( 940, 455,'#snd_11')"><u>иллюстрации&nbsp;1.1</u></span>,
 			приведенной выше.
 			<p>
 				Если наименование <i>квалификатора</i> начинается не с одной из перечисленных букв, либо
@@ -749,7 +750,7 @@ img.olga5_shp:not(.<b>olga5-freeimg</b>) {
 				в группе сообщений "Результирующие именованные ссылки".
 				Подробнее об анализе ошибок в <i>именованных</i> ссылках написано в документации по
 				<code class="olga5_popup"
-					onclick="window.olga5.PopShow('', 940, 444, '_url_olga5 + ../blog/olga5-ref.html?o5nomnu#head_4')">o5ref.js</code>.
+					onclick="window.olga5.PopShow( 940, 444, '_url_olga5 + ../blog/olga5-ref.html?o5nomnu#head_4')">o5ref.js</code>.
 			</p>
 			<br />
 		</div>

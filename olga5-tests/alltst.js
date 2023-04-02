@@ -363,7 +363,7 @@ function CC3a(cb, txt) {
 }
 
 function StartBordNames() {
-    document.addEventListener('o5shp_scroll', shpX_BordNames)
+    window.addEventListener('o5shp_scroll', shpX_BordNames)
 
     const wshp = window.olga5.o5shp
     if (wshp) wshp.DoResize()
@@ -383,7 +383,6 @@ function Init0() {
     // shpX_BordNames()
     shpX_SetWindow(599, 411)
     window.scrollTo(0, 99)
-    // document.addEventListener('o5shp_scroll', shpX_BordNames)
     StartBordNames()
 }
 

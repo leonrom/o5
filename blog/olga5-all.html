@@ -147,7 +147,7 @@
 		</p>
 		<p>Пример подключения (к блогу) всех скриптов со всеми их предопределёнными параметрами можно посмотреть
 			<code class="olga5_popup"
-				onmouseup="window.olga5.PopShow('', 555, 555, '+/help/blogger.html')">здесь</code>.
+				onmouseup="window.olga5.PopShow( 555, 555, '+/help/blogger.html')">здесь</code>.
 		</p>
 
 		<h4 id='head_12'>1.2. Инкапсуляция <b>CSS</b>
@@ -206,7 +206,7 @@
 			Подробное описание этих ссылок приведено
 			"<span title="Использование <i>именованных</i> <i>ссылок</i> в библиотеке <code>Olga5</code>"
 				class="olga5_popup"
-				onmouseup="window.olga5.PopShow('', 666, 555, '+./help/urlrfs.html?o5nomnu')">здесь</span>".
+				onmouseup="window.olga5.PopShow( 666, 555, '+./help/urlrfs.html?o5nomnu')">здесь</span>".
 		</p>
 
 		<h4 id='head_14'>1.4. Системные требования</h4>
@@ -300,12 +300,12 @@
 		</ul>
 		<p>
 			Специфические аспекты подключения <i>библиотеки</i> к <b>Blogger</b>'у описаны
-			<code class="olga5_popup" onmouseup="window.olga5.PopShow('', 600, 444, '+../blog/olga5-blog.html')">здесь</code>.
+			<code class="olga5_popup" onmouseup="window.olga5.PopShow( 600, 444, '+../blog/olga5-blog.html')">здесь</code>.
 		</p>
 
 		<h4 id='head_21'>2.1. Пример подключения скриптов</h4>
 		<p>
-			<code class="olga5_popup" onmouseup="window.olga5.PopShow('', 300, 333, 'тесты+/all2.html')">Пример</code>
+			<code class="olga5_popup" onmouseup="window.olga5.PopShow( 300, 333, 'тесты+/all2.html')">Пример</code>
 			подключения нескольких файлов скриптов в секции &lt;<b>head</b>&gt; HTML-страницы:
 		</p>
 
@@ -375,7 +375,7 @@
 						onclick="window.olga5.PopUp(this, './help/urlrfs.html?o5nomnu#head_2?o5nomnu', 'width:720, height:800')">маскирования</i>
 					при использовании именованных
 					<span class="olga5_popup"
-						onmouseup="window.olga5.PopShow('', 666, 555, '_url_html+./olga5-urlrfs.html#head_1?o5nomnu')">ссылок</span>;
+						onmouseup="window.olga5.PopShow( 666, 555, '_url_html+./olga5-urlrfs.html#head_1?o5nomnu')">ссылок</span>;
 				</li>
 				<li><b>&nbsp;&nbsp;15</b> &mdash; скрипт имеет атрибут <b>_src</b> чтобы
 					отладчик не 'ругался' на неопределённый (изначально) адрес "+o5shp.js;</li>
@@ -425,20 +425,20 @@
 		</p>
 		<p>Результирующий файл <code>o5.js</code> в <b>Linux</b> можно создать,
 			например, таким командным
-			<code class="olga5_popup" onmouseup="window.olga5.PopShow('', 533, 377, '+/o5_L.cmd')">файлом</code>.
+			<code class="olga5_popup" onmouseup="window.olga5.PopShow( 533, 377, '+/o5_L.cmd')">файлом</code>.
 			Расширение <i>cmd</i> у него не обязательно,
 			однако первой строкой д.б. '<i>#!/bin/bash</i>' и файл
 			должен быть сделан исполняемым,- командой "<i>chmod +x ...</i>" или редактировнием его свойств.
 		</p>
 		<p>В <b>Windows</b> файл <code>o5.js</code> можно создать,
 			например, таким командным
-			<code class="olga5_popup" onmouseup="window.olga5.PopShow('', 533, 377, '+/o5_W.cmd')">файлом</code>,
+			<code class="olga5_popup" onmouseup="window.olga5.PopShow( 533, 377, '+/o5_W.cmd')">файлом</code>,
 			в котором следует использовать именно команду <b>type</b> а не <b>copy</b>.
 		</p>
 		<p class="moecomment">
 			Очерёдность включения скриптов указана согласно их зависимости
 			(см. <span title=""
-				onmouseup="window.olga5.PopShow('', 666, 555, '_url_html+./olga5-all.html#depends?o5nomnu')">п.
+				onmouseup="window.olga5.PopShow( 666, 555, '_url_html+./olga5-all.html#depends?o5nomnu')">п.
 				1.1</span>)
 
 			Кроме <code>o5.js</code> дополнительно (с демонстрационными целями) компилируются и промежуточные модули,-
@@ -451,9 +451,9 @@
 		</p>
 		<p>
 			<code title="без тегов <title>, <meta> и т.п."
-			class="olga5_popup" onmouseup="window.olga5.PopShow('', 300, 333, 'тесты+/all2c.html')">Пример</code>
+			class="olga5_popup" onmouseup="window.olga5.PopShow( 300, 333, 'тесты+/all2c.html')">Пример</code>
 			<i>развёрнутого</i> подключения объединённого файла почти идентичен показанному в
-			<span class="olga5_popup" onmouseup="window.olga5.PopShow('', 666, 555, '#head_21')">п. 2.1</span>,
+			<span class="olga5_popup" onmouseup="window.olga5.PopShow( 666, 555, '#head_21')">п. 2.1</span>,
 
 			где лишь вместо ссылки на <code>o5common.js</code> (в стр. 16) д.б. записана ссылка на <code>o5.js</code>.
 			При этом фактически загружаться будет только файл <code>o5.js</code>
@@ -461,7 +461,7 @@
 		</p>
 		<p>
 			<code title="без тегов <title>, <meta> и т.п." class="olga5_popup"
-				onmouseup="window.olga5.PopShow('', 300, 333, 'тесты+/all2cc.html')">Пример</code>
+				onmouseup="window.olga5.PopShow( 300, 333, 'тесты+/all2cc.html')">Пример</code>
 			<i>сокращённого</i> подключения объединённого файла:
 		</p>
 		<table class="olga5_tableCode">
@@ -499,7 +499,7 @@
 			<span title="в предполагаемой очерёдности их выполнения-инициализации">последовательности</span>&nbsp;
 			предыдущего примера
 			<span title="" class="olga5_popup"
-				onmouseup="window.olga5.PopShow('', 666, 555, '_url_html+./olga5-all.html#head_21?o5nomnu')">п.
+				onmouseup="window.olga5.PopShow( 666, 555, '_url_html+./olga5-all.html#head_21?o5nomnu')">п.
 				2.1</span>.
 		</p>
 		<p class='moecomment'>
@@ -542,15 +542,15 @@
 			Примеры с различными вариантами (краткие пояснения приведены на страницах этих примеров) подключения
 			скомпилированных скриптов можно посмотреть тут:
 			<code class="olga5_popup"
-				onmouseup="window.olga5.PopShow('', 300, 333, 'тесты+/all2_.html')">all2_.html</code>,
+				onmouseup="window.olga5.PopShow( 300, 333, 'тесты+/all2_.html')">all2_.html</code>,
 			<code class="olga5_popup"
-				onmouseup="window.olga5.PopShow('', 300, 333, 'тесты+/all2c.html')">all2c.html</code> и
+				onmouseup="window.olga5.PopShow( 300, 333, 'тесты+/all2c.html')">all2c.html</code> и
 			<code class="olga5_popup"
-				onmouseup="window.olga5.PopShow('', 300, 333, 'тесты+/all2cc.html')">all2cc.html</code>,
+				onmouseup="window.olga5.PopShow( 300, 333, 'тесты+/all2cc.html')">all2cc.html</code>,
 			а перечни подгружаемых модулей можно проверить на закладках <i>Network</i> отладчика браузера
 			В примере
 			<code class="olga5_popup"
-				onmouseup="window.olga5.PopShow('', 300, 333, 'тесты+/all2a.html')">all2a.html</code>
+				onmouseup="window.olga5.PopShow( 300, 333, 'тесты+/all2a.html')">all2a.html</code>
 			показано подключение скомпилированных <i>скриптов</i> <code>o5shp!.js</code> и <code>o5dbg!.js</code>,
 			при котором не потребуется	последующая
 			(автоматическая) подгрузка скриптов, включаемых в <i>модули</i> <code>o5shp</code> и <code>o5dbg</code>
@@ -707,7 +707,7 @@
 			c содержимым последнего примера.
 			Для ознакомления с его подключением и загрузкой следует кликнуть по ссылке:
 			<code class="olga5_popup"
-				onmouseup="window.olga5.PopShow('', 333, 111, 'тесты+/pusto.html')">пример №3</code>.
+				onmouseup="window.olga5.PopShow( 333, 111, 'тесты+/pusto.html')">пример №3</code>.
 		</p>
 		<p>
 			Подключение нового скрипта <code>pusto.js</code> может быть выполнено так:
@@ -855,7 +855,7 @@
 		</p>
 		<p>Пример задания нескольких блоков с различными <b>olga5_Start</b> и их обработки
 			скриптами <code>o5snd.js</code> и <code>o5ref.js</code> можно посмотреть
-			<code class="olga5_popup" onmouseup="window.olga5.PopShow('', 555, 555, 'тесты+/all4.html')">здесь</code>.
+			<code class="olga5_popup" onmouseup="window.olga5.PopShow( 555, 555, 'тесты+/all4.html')">здесь</code>.
 		</p>
 
 		<h3 id="head_5">5. API&nbsp;<i>библиотеки</i></h3>
@@ -919,7 +919,7 @@
 			<br>
 			<li>декодирование именованных <i title="содержащих символ '+' либо не содержащих ни '.', ни '/'"
 					class="olga5_popup"
-					onmouseup="window.olga5.PopShow('', 666, 555, './help/urlrfs.html?o5nomnu')">ссылок</i>:
+					onmouseup="window.olga5.PopShow( 666, 555, './help/urlrfs.html?o5nomnu')">ссылок</i>:
 				<ul>
 					<!-- <li><b>IsUrlNam</b>(u) &mdash; проверка, что адрес (не содержащий символа '<b>+</b>') 
 						является именованной ссылкой,- т.е. не содержит '<b>.</b>', '<b>/</b>' или '<b>#</b>'.
@@ -1080,15 +1080,15 @@
 					<li><b>olga5_sload</b> &mdash; завершение загрузки каждого модуля (либо как отдельного скрипта,
 						либо в скомпилированном скрипте);
 					</li>
-					<li><b>olga5_sinit</b> &mdash; завершение инициализации каждого модуля;
+					<li><b>olga5_sinit</b> &mdash; завершение инициализации каждого модуля; 
 					</li>
 				</ul>
 			</li>
 			<li>
 				две группы событий: для загрузки и для закрытия страницы, задаваемые (необязательными) параметрами
-				<b>o5init_events</b> и <b>o5done_events</b> (см. ниже п. 6.2)
+				<b>o5init_events</b> и <b>o5done_events</b>, описанные ниже п. 6.2.
 			</li>
-			<li>
+			<!-- <li>
 				события обработки страницы в <b>Blogger</b>'е:
 				<ul>
 					<li><b>transitionend</b> &mdash; завершение загрузки новой страницы (сообщения)
@@ -1104,7 +1104,7 @@
 					<b>Blogger</b> не генерирует предусмотренное для этих целей <b>document</b>-событие
 					<b>visibilitychange</b>, а генерирует ли его аналог - не знаю.
 				</p>
-			</li>
+			</li> -->
 		</ul>
 
 		<p>
@@ -1149,10 +1149,10 @@
 			через <i>скриптовые атрибуты</i> <b>o5consts</b> и <b>o5urlrfs</b> (а также <b>o5depends</b>),
 			которые могут содержать любое количество (соответственно) модульных <i>констант</i> и именованных
 			<i class="olga5_popup"
-				onmouseup="window.olga5.PopShow('', 666, 555, './help/urlrfs.html?o5nomnu')">ссылок</i>,
+				onmouseup="window.olga5.PopShow( 666, 555, './help/urlrfs.html?o5nomnu')">ссылок</i>,
 			разделённых символом '<b>;</b>'. Примеры такой передачи параметров показаны в строках 10, 17 и 20
 			<span title="" class="olga5_popup"
-				onmouseup="window.olga5.PopShow('', 666, 555, '_url_html+./olga5-all.html#head_21?o5nomnu')">п.
+				onmouseup="window.olga5.PopShow( 666, 555, '_url_html+./olga5-all.html#head_21?o5nomnu')">п.
 				2.1</span>.
 		</p>
 		<p>
@@ -1170,7 +1170,7 @@
 			а также те параметры <i>функциональных</i> модулей, которые были изначально указаны в параметрах
 			<b>params</b> и <b>urlrfs</b>
 			<span title="" class="olga5_popup"
-				onmouseup="window.olga5.PopShow('', 666, 555, '_url_html+./olga5-all.html#head_31?o5nomnu')"><i>структуры-ссылки</i></span>,
+				onmouseup="window.olga5.PopShow( 666, 555, '_url_html+./olga5-all.html#head_31?o5nomnu')"><i>структуры-ссылки</i></span>,
 			<b>W</b> на модуль.
 		</p>
 		<p>
@@ -1225,7 +1225,7 @@
 		<p>
 			При <i>развёрнутом</i> подключении <i>функционального</i> модуля
 			(см. п. <i class="olga5_popup"
-				onmouseup="window.olga5.PopShow('', 666, 555, '_url_html+./olga5-all.html?all.html?o5nomnu#head_22')">2.2.
+				onmouseup="window.olga5.PopShow( 666, 555, '_url_html+./olga5-all.html?all.html?o5nomnu#head_22')">2.2.
 				Компиляция скриптов</i> )
 			параметры, определённые в соответствующем скрипте будут недоступны в остальных модулях
 			(в отличие от определённых в <code>o5common.js</code>).
@@ -1366,8 +1366,18 @@
 						<i>атрибута</i> отличном от 1 скрипт снова выполняется
 						(и при этом в нём оператор <i>setAttribute</i> выставит скрипту этот атрибут со значением '1').
 					</li>
+				</ul>
+					<h4>События открытия и закрытия страницы</h4> <br/>
+					<p>
+Списки являются строками, содержащими наименования событий, разделённые символом '<b>,</b>'. 
+Чтобы задать где именно, на <b>window</b>'е или на <b>document</b>'е,- должно генерироаться событие, после его наименования следует указать квалификатор
+ соответственно '<b>W</b>' или '<b>D</b>'. Например  "readystatechange:d". Если квалификатор не указан, то 
+ события [<i>'DOMContentLoaded', 'readystatechange', 'visibilitychange', 'blur'</i>] будут генерироваться на <b>document</b>'е.
+				</p>
+				<p class="moecomment">События <i>библиотеки</i></p> как правило генерируются на <b>window</b>
+			<ul>
 					<li><b>o5init_events</b> &mdash;
-						<span title="разделённыйх символом '<b>,</b>'">список</span> событий на <b>document</b>'е,
+						<span title="разделённыйх символом '<b>,</b>'">список</span> событий,
 						по наступлении одного из которых может произойти инициализация страницы.
 
 						Инициализация начинается по наступлении любого их перечисленных событий если дополнительно
@@ -1384,27 +1394,21 @@
 						<span title="вследсвие ранее наступившего одного из этих событий">загруженного</span> документа.
 						Если требуется гарантированно избежать инициализации то
 						следует указать несуществующие наименования событий или задать атрибут <b>o5noact</b>.
-						Умалчиваемое значение: '<i>DOMContentLoaded</i>'.
-						<br />
-						Если задан или определён параметр <b>o5iblog</b>,
-						то <span title="с проверкой смены URL'а страницы">попытка</span>
-						инициализации будет также выполняться при событии <i><b>transitionend</b></i>
-						и после загрузки или инициализации скрипта;
-					</li>
-					<li><b>o5done_events</b> &mdash;
-						<span title="разделённыйх символом '<b>,</b>'">список</span> событий на <b>document</b>'е,
-						по наступлении одного из которых происходит закрытие окон и объектов.
-						Умалчиваемое значение: '<i>beforeunload</i>, <i>olga5_unload</i>'.
-						<br />
-						Если задан или определён параметр <b>o5iblog</b>, то закрытие
-						будет выполняться также при событиях
-						<i><b>transitionrun</b></i> и/или <i><b>message</b></i> .
+						Умалчиваемое значение: "readystatechange:d, message";
 					</li>
 					<p class="moecomment">
-						События <b>transitionend</b>, <b>transitionrun</b> и <b>message</b> возникают в <b>Blogger'е</b>
-						при смене отображаемой страницы.
+						Событие <b>message</b> возникает в <b>Blogger'е</b> при смене отображаемой страницы.
+					</p>
+					<li><b>o5done_events</b> &mdash;
+						<span title="разделённыйх символом '<b>,</b>'">список</span> событий на <b>window</b>'е,
+						по наступлении одного из которых происходит закрытие окон и объектов.
+						Умалчиваемое значение: "beforeunload, olga5_unload".
+					</li>
+					<p class="moecomment">						
+						Сообщение '<i>olga5_unload</i>' не создаётся в <i>библиотеке</i>, но предусмотрено для использования во внешних программах.
 					</p>
 				</ul>
+
 				<br />
 				Перечисленные константы могут быть переопределены (в очерёдности возрастания приоритета):
 				<ul>
@@ -1439,20 +1443,6 @@
 					<li>как параметр скриптового атрибута <b>o5urlrfs</b>;</li>
 					<li>как отдельный скриптовый атрибут.</li>
 				</ul>
-				<!-- При этом они должны
-				<span
-					title="возможно, после преобразования содержащихся в них иных именованных ссылок">формироваться</span>
-				как <i>абсолютные</i> ссылки,- содержать текст '<b>http(s):</b>' (иначе выдаётся сообщение об ошибке). -->
-			</li>
-			<li>указывает на подключение к <b>Blogger</b>'у - <b>o5iblog</b>,- умолчание
-				устанавливается автоматически в <i>true</i>
-				при наличии в адресе домена <b>URL</b>'а подстроки '<i>.blogspot.</i>'/
-				Ненулевое значение инициирует следующие действия:
-				<ul>
-					<li>при незаданном значении параметра <b>o5init_events</b> задаёт его как
-						'<i>transitionend</i>' (иначе оно будет '<i>DOMContentLoaded</i>').
-					</li>
-				</ul>;
 			</li>
 			<li>зависимости между скриптами - <b>o5depends</b>, уточняющий очередность их инициализации.
 				<p>
@@ -1467,7 +1457,7 @@
 						o5pop; o5inc; o5ref= o5inc; o5snd:o5ref, o5inc; o5shp=o5snd, o5ref; o5shp:o5inc; o5mnu= o5inc
 					</span>", что соответствует требованиям к их очерёдности, описанным в
 					<span class="olga5_popup"
-						onmouseup="window.olga5.PopShow('', 666, 555, '_url_html+./olga5-all.html#depends?o5nomnu')">
+						onmouseup="window.olga5.PopShow( 666, 555, '_url_html+./olga5-all.html#depends?o5nomnu')">
 						п. 1.1</span>.
 				</p>
 				<p>
@@ -1555,7 +1545,7 @@
 		<!-- =================================================================	 -->
 		<p>
 			Использование <b>_url_olga5</b> (с переопределением его значения) иллюстрируется
-			<code class="olga5_popup" onmouseup="window.olga5.PopShow('', 360, 200, 'тесты+/ext2.html')">примером</code>
+			<code class="olga5_popup" onmouseup="window.olga5.PopShow( 360, 200, 'тесты+/ext2.html')">примером</code>
 			<span title="обрабатываемых в <head> документа)">подключения</span> <b>JS</b> и <b>CSS</b> файлов, из
 			которых:
 		</p>
@@ -1645,7 +1635,7 @@
 			можно на закладке '<b><i>Sources</i></b>' отладчика браузера,
 			либо просто посмотрев
 			<code id='ext4' class="olga5_popup"
-				onmouseup="window.olga5.PopShow('ext4', 711, 577, 'тесты+/ext4.html')">скриншот</code>
+				onmouseup="window.olga5.PopShow( 711, 577, 'тесты+/ext4.html')">скриншот</code>
 			протокола загрузки, на котором эллипсами выделены упомянутые файлы.
 		</p>
 		<p> Из этого протокола видно, что адреса, содержащие символ '<b>+</b>' в тегах '<b>link</b>' и '<b>script</b>',
@@ -1665,7 +1655,7 @@
 		</p>
 		<p>
 			Посмотреть эффект от такой подстановки можно открыв окна исходного текста и отладочного результата для
-			<code class="olga5_popup" onmouseup="window.olga5.PopShow('', 500, 144, 'тесты+/ext3.html')">этого</code>
+			<code class="olga5_popup" onmouseup="window.olga5.PopShow( 500, 144, 'тесты+/ext3.html')">этого</code>
 			примера, где будут отсутствовать сообщения о (мнимом) отсутствии файлов <b>o5i1.css</b> и
 			<b>o5p1.js</b>
 		</p>

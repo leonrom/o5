@@ -60,7 +60,7 @@
 			this.y = 0;
 			this.old = { x: 0, y: 0, L: 0, T: 0 };
 
-			div.addEventListener("mousedown", (e) => {
+			div.addEventListener('mousedown', (e) => {
 				const mpos = e.currentTarget.aO5mpos;
 				mpos.MoveStart(e.pageX, e.pageY);
 			});
@@ -130,19 +130,21 @@
 					W = wp ? wp.width : window.innerWidth,
 					H = wp ? wp.height : window.innerHeight
 				Object.assign(viewport, { wp, W, H })
+			},
+			MyMouseMove = (e) => {
+				if (mposAct) mposAct.MoveAct(e.pageX, e.pageY)
+				ShowPos(e)
 			}
+
 		document.body.appendChild(div)
 
 		div.aO5mpos = new Mpos(div)
 		mposPos = div.aO5mpos
 
-		document.addEventListener("resize", SetVP)
-		document.addEventListener("mouselive", StopMoveAct)
-		document.addEventListener("mouseup", StopMoveAct)
-		document.addEventListener("mousemove", function (e) {
-			if (mposAct) mposAct.MoveAct(e.pageX, e.pageY)
-			ShowPos(e)
-		})
+		window.addEventListener('resize', SetVP)
+		document.addEventListener('mouselive', StopMoveAct)
+		document.addEventListener('mouseup', StopMoveAct)
+		document.addEventListener('mousemove', MyMouseMove)
 		SetVP()
 		ShowPos()
 	}

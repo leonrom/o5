@@ -28,16 +28,11 @@
 				clr1 = clrtypes[type],
 				clr2 = "margin-left:0.4rem; background: white; color: black; border: solid " +
 					(tab ? "1px gray;" : "1px bisque;")
-				// Is_debug = () => { return (C && C.consts && C.consts.o5debug != undefined) ? C.consts.o5debug : false }
-			// if (type != 'A' && type != 'E' && Is_debug() <= 0) // когда НЕ выдаётся сообщение
-			// 	return
-			// if (txt.match(/o5shp\: найдены селекторы/))
-			// console.log()
+
 			if (add === null || typeof add === 'undefined' || add === '') console.groupCollapsed('%c%s', (padd + clr1), txt)
 			else
 				if (Number.isInteger(add)) console.groupCollapsed('%c%s%c%s', (padd + clr1), txt, (padd), add + ' ')
 				else console.groupCollapsed('%c%s%c%s', (padd + clr1), txt, (padd + clr2), add + ' ')
-			// console.group(txt)
 
 			const tt = []
 			if (tab) {
@@ -127,5 +122,5 @@
 	}
 
 	if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
-		console.log(`}---> подключен ${olga5_modul}/${modulname}.js`)
+		console.log(`}===< ${document.currentScript.src.indexOf(`/${olga5_modul}.`) > 0 ? 'дозагружен' : 'подключён '}:  ${olga5_modul}/${modulname}.js`)
 })();

@@ -3,30 +3,30 @@
 /* jshint asi:true                   */
 /* jshint esversion: 6               */
 (function () {              // ---------------------------------------------- o5pop ---
-    const o5callp = 'window.olga5.PopUp'
-
     if (!window.olga5) window.olga5 = []
 
     const pard = window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/)
     let o5debug = (pard ? (pard[0].match(/=/) ? parseInt(pard[0].match(/\s*\d+/) || 1) : 1) : 2),
+        focusTime = 0,
         C = {                // заменитель библиотечного
             consts: { o5debug: o5debug },
+            repQuotes: /^\s*((\\')|(\\")|(\\`)|'|"|`)?\s*|\s*((\\')|(\\")|(\\`)|'|"|`)?\s*$/g,
             ConsoleError: (msg, name, errs) => {
-                const txt = `ОШИБКА:: ` + msg + (name ? '  >' + name + '<' : '')
-                console.groupCollapsed(txt)
+                const txt = msg + (name ? ' ' + name + ' ' : '')
+                console.groupCollapsed('%c%s', "background: yellow; color: black;", txt)
                 if (errs && errs.length > 0) console.table(errs)
                 else console.error(txt)
                 console.trace("трассировка вызовов :")
                 console.groupEnd()
             },
-            MakeObjName: obj => obj ? (
+            MakeObjName: obj => (obj ? (
                 (obj.id && obj.id.length > 0) ? ('#' + obj.id) : (
                     ('[' + obj.tagName ? obj.tagName : (obj.nodeName ? obj.nodeName : '?') + ']') +
-                    '.' + (obj.className ? obj.className : '?'))) : 'НЕОПР.',
+                    '.' + (obj.className ? obj.className : '?'))) : 'НЕОПР?'),
             GetTagsByQueryes: query => document.querySelectorAll(query), // второй аргумент - игнорится
         }
 
-    const // phases = ['NONE', 'CAPTURING_PHASE', 'AT_TARGET', 'BUBBLING_PHASE'],
+    const     // phases = ['NONE', 'CAPTURING_PHASE', 'AT_TARGET', 'BUBBLING_PHASE'],                
         SetTagError = (tag, txt, errs) => {  // добавление и протоколирование НОВЫХ ошибок для тегов
             const
                 isnew = tag.title.indexOf(txt) < 0,
@@ -45,86 +45,228 @@
                 tag.classList.remove(cls_errArg)
             }
         },
-        m_par_dlm = /=|:/,
-        SplitPars = (ss, pars, refs) => {
-            let url = ''
-
+        AddPars = (pars, dests, errs, force) => {
+            for (const _par in pars) {
+                const par = _par.toLowerCase()
+                let isp = false
+                for (const nam in dflts) { // ['moes', 'sizs', 'wins']
+                    const dflt = dflts[nam],
+                        dest = dests[nam]
+                    if (dflt.hasOwnProperty(par)) {
+                        if (force || !dest.hasOwnProperty(par))
+                            dest[par] = pars[_par]
+                        isp = true
+                        break
+                    }
+                }
+                if (!isp)
+                    errs.push(`неопределённый параметр '${par}' `)
+            }
+        },
+        CopyPars = (pars, dests, errs, force) => {
+            for (const nam in dflts) { // ['moes', 'sizs', 'wins']
+                const srcs = pars[nam],
+                    dest = dests[nam]
+                for (const _par in srcs) { // например 'sizs'
+                    const par = _par.toLowerCase()
+                    if (force || !dest.hasOwnProperty(par))
+                        dest[par] = srcs[_par]
+                }
+            }
+        },
+        dlmattr = /[\s'"`]*[,;][\s'"`]*/,
+        dlmpar = /[\s'"`]*[:=][\s'"`]*/,
+        SplitPars = (spar, pars, refs, errs, tagname) => {
+            const ss = spar.split(dlmattr)
             for (const s of ss)
-                if (s.match(m_par_dlm)) {
-                    const uu = s.split(m_par_dlm),
-                        nam = uu[0].trim()
+                if (s.trim()) {
+                    const uu = s.split(dlmpar),
+                        u0 = uu[0].replace(C.repQuotes, '')
 
-                    if (nam.match(/\bid\b/i)) refs.push(nam)
-                    else
-                        pars.push({ nam: nam, val: (uu[1] || '').replace(repQuotes, '') })
+                    if (uu.length == 1) refs[u0] = null
+                    else {
+                        const u1 = uu[1].replace(C.repQuotes, '')
+                        let nam = u0.toLowerCase()
+                        if (nam == 'id') refs[u1] = null
+                        else {
+                            if (nam.length == 1) {
+                                if (nam == 'g') nam = 'group'
+                                if (nam == 'n') nam = 'nocss'
+                                else if (nam == 'w') nam = 'width'
+                                else if (nam == 'h') nam = 'height'
+                                else if (nam == 't') nam = 'top'
+                                else if (nam == 'l') nam = 'left'
+                            }
+                            if (!pars.hasOwnProperty(nam))
+                                pars[nam] = u1
+                            else
+                                errs.push(`для  '${tagname}' повтор параметра '${u0}' (без учета регистра и сокращения)`)
+                        }
+                    }
                 }
-                else url = s
-            return url
-        },
-        SplitArgs = args => {
-            const pars = [],
-                refs = []
+                else if (ss.length > 0)
+                    errs.push(`для  '${tagname}' отсутствие параметра в массиве параметров`)
 
-            let iurl = -1
-            for (let i = 0; i < 3; i++)
-                if (args[i] && args[i].match && !args[i].match(m_par_dlm)) {
-                    iurl = i
-                    break
-                }
-            const url = iurl < 0 ? '' : args[iurl],
-                x = iurl > 0 ? args[0] : null,
-                act = x ? (x.attributes ? x : document.getElementById(x)) : null,
-                ss = (args[iurl + 1] || '').split(/;|,/)
-
-            SplitPars(ss, pars, refs)
-
-            if (x && !act)
-                C.ConsoleError(`Не найден сигнальный тег ${x} (url='${url}')`)
-            return { url: url, act: act, pars: pars, refs: refs }
-        },
-        PopUp = function (e, args) {
-            const r = SplitArgs(args)
-            tag = e.currentTarget
-
-            if (args.length < 1 || args.length > 4)
-                C.ConsoleError(`Ошибочное к-во аргументов='${args.length}'`, [` у PopUp() их к-во тут д.б. от 1 до 4)`])
-
-            e.cancelBubble = true
-
-            ShowWin(tag, e.type, { act: r.act, url: r.url, pars: r.pars, refs: r.refs })
+            if (errs.length > 0)
+                C.ConsoleError(`для  '${tagname}' ошибки при разборе строки аргументов`, spar, errs)
         }
 
-    window.olga5.PopUp = function () {
-        PopUp(arguments.callee.caller.arguments[0], arguments)
+    function GetPops(e, args) {
+        'use strict'
+        const tag = e.currentTarget,
+            eve = e.type,
+            CalcTagPars = (eve, tag, args, errs) => {
+                if (!tag.aO5pop) {
+                    tag.aO5pop = Object.assign({}, { name: C.MakeObjName(tag), title: tag.title, tag: tag, apops: {} })
+                    Object.freeze(tag.aO5pop)
+                }
+
+                const ap = tag.getAttribute(o5popup),
+                    pops = tag.aO5pop.apops[eve] = {
+                        tag: tag, eve: eve,                     //для обратного поиска
+                        url: '',
+                        act: tag,
+                        spar: '',                               // это просто для истории
+                        key: tag.aO5pop.name + '(' + eve + ')', // наименование окна
+                        wins: {}, moes: {}, sizs: {},
+                        swins: null, smoes: null,               // будут доопределены позже
+                    }
+
+                if (eve == click && ap) {  // при клике 'o5popup' приоритетнее
+                    const ss = ap.split(/\s*;\s*/)
+                    pops.url = ss[0]
+                    pops.spar = ss[1] || ''
+                } else {
+                    const l = args.length,
+                        nam = l > 0 ? args[0] : '' // имя объекта, на котором д.б. мигание,
+                    pops.url = (l > 1) ? args[1] : ''
+                    pops.spar = (l > 2) ? args[2] : ''
+                    if (nam) {
+                        const istr = typeof nam === 'string',
+                            act = istr ? document.getElementById(nam) : nam
+
+                        if (act) pops.act = act
+                        else
+                            errs.push(`для  '${tag.aO5pop.name}' не найден тег мигания '${istr ? nam : C.MakeObjName(nam)}'`)
+                    }
+                }
+
+                if (C.DeCodeUrl) {
+                    const o5attrs = tag ? C.GetAttrs(tag.attributes) : '',
+                        ori = (pops.url || '').replace(C.repQuotes, ''),
+                        url = (ori.trim() && !ori.match(/[\/.\\#]/)) ? (document.URL + '?o5nomnu#' + ori) : ori,
+                        wref = C.DeCodeUrl(W.urlrfs, url, o5attrs)
+
+                    if (wref.err)
+                        errs.push(`Ошибка перекодирования url='${pops.url}':  ${wref.err}`)
+                    pops.url = wref.url
+                }
+
+                Object.seal(pops)
+
+                if (pops.spar) {
+                    const refs = {},
+                        pars = {}
+
+                    SplitPars(pops.spar, pars, refs, errs, tag.aO5pop.name)
+                    AddPars(pars, pops, errs, false)
+
+                    for (const ref in refs) {
+                        let itag = refs[ref]
+                        if (!itag) {
+                            if (itag !== '') {
+                                itag = document.getElementById(ref)
+                                if (itag) refs[ref] = itag
+                                else {
+                                    refs[ref] = '' // чтл бы больше не пытать
+                                    errs.push(`для  '${tag.aO5pop.name}' в '${eve}' не найден ссылочный тег с id='${ref}'`)
+                                }
+                            }
+                            if (!itag) continue
+                        }
+                        let iargs = null,
+                            ieve = click
+                        const iap = itag.getAttribute(o5popup)
+                        if (iap) {
+                            const ss = ap ? iap.split(/\s*;\s*/) : ['']
+                            iargs = [''].concat(ss)
+                        }
+                        else
+                            for (const iattr of itag.attributes)
+                                if (iattr.value.match(/\.*PopUp\s*\(/)) {
+                                    iargs = iattr.value.match(/(['"])(.*?)\1/g)  // внутри парных кавычек
+
+                                    for (let i = 0; i < iargs.length; i++)
+                                        iargs[i] = iargs[i].replace(C.repQuotes, '')
+                                    ieve = iattr.name.replace('on', '').toLocaleLowerCase()
+                                    break
+                                }
+                        if (iargs) {
+                            CalcTagPars(ieve, itag, iargs, errs)
+                            CopyPars(itag.aO5pop.apops[ieve], pops, errs, false)
+                        }
+                        else {
+                            errs.push(`для  '${tag.aO5pop.name}' в '${eve}' у тега с id='${ref}' отсутствует атрибут '${o5popup}'`)
+                            refs[ref] = '' // чтл бы больше не пытать
+                        }
+                    }
+                }
+                return pops
+            }
+
+        let pops = null
+        const errs = []
+
+        if (tag.aO5pop && tag.aO5pop.apops && tag.aO5pop.apops[eve]) pops = tag.aO5pop.apops[eve]
+        else
+            pops = CalcTagPars(eve, tag, args, errs)
+
+        if (pops.swins === null) {
+            const doubles = { left: 'screenx', top: 'screeny', width: 'innerwidth', height: 'innerheight', },
+                CalcSummString = nam => {
+                    const pars = pops[nam],
+                        ss = []
+                    for (const par in pars) {
+                        const v = ('' + pars[par]).trim(),
+                            val = v.match(/[\d.,]+/) ? v : `'${v}'`
+                        ss.push(par + '=' + val)
+                    }
+                    return ss.join(',')
+                }
+
+            for (const nam in dflts) { // ['moes', 'sizs', 'wins']
+                const pars = dflts[nam],
+                    dest = pops[nam]
+                for (const _par in pars) {  // например 'sizs'
+                    const par1 = _par.toLowerCase(),
+                        par2 = (nam === 'sizs') ? doubles[par1] : ''
+                    if (!dest.hasOwnProperty(par1) && !(par2 && dest.hasOwnProperty(par2))) {
+                        const v = pars[_par]
+                        if (v !== null) dest[par1] = v
+                    }
+                }
+            }
+
+            CalcSizes(pops.sizs, errs, tag.aO5pop.name)  //  для проверки корректности
+
+            pops.swins = CalcSummString('wins')
+            pops.smoes = CalcSummString('moes')
+
+            Object.freeze(pops)
+            for (const nam in dflts)
+                if (dflts.hasOwnProperty(nam))
+                    Object.freeze(pops[nam])
+        }
+
+        if (errs.length > 0)
+            C.ConsoleError(`Ошибки обработки (цепочки) ссылок для тега `, C.MakeObjName(tag), errs)
+        return pops
     }
-    window.olga5.PopShow = function () { //  устарешая обёртка  ---- nam, width, height, url
-        const e = arguments.callee.caller.arguments[0],
-            // tag = e.currentTarget,
-            // attr = `on` + e.type,
-            n = (arguments.length > 3) ? 1 : 0,
-            nam = n > 0 ? arguments[0] : '',
-            width = arguments[n + 0],
-            height = arguments[n + 1],
-            url = arguments[n + 2],
-            pars = `width=${width},height=${height}`  // --------------------------------------------------------------------
-
-        // tag.removeAttribute(attr)
-        // tag.setAttribute(attr, `${o5callp}('${nam}', '${url}', '${pars}')`)
-
-        PopUp(e, [nam, url, pars])
-
-        // e.cancelBubble = true
-        // ShowWin(tag, e.type, { act: nam, url: url, pars: pars, refs: r.refs })  r.refs ??
-    }
-
-    'use strict'
-
-    const repQuotes = /^\s*['"`]?\s*|\s*['"`]?\s*$/g,
-        click = 'click',
-        o5popup = 'o5popup',
-        aclicks = ['click', 'keyup', 'keydown', 'keypress']
 
     const wopens = [], // window.olga5.PopUpwopens // массив открытых окон
+        click = 'click',
+        o5popup = 'o5popup',
+        aclicks = ['click', 'keyup', 'keydown', 'keypress'],
         DClosePops = () => ClosePops(null),
         W = {
             modul: 'o5pop',
@@ -137,13 +279,10 @@
                 o5params=''  // умалчиваемые для mos, sizs, wins
 			`,
         },
-        dflts = {
+        dflts = {  // тут все названия дб. в нижнем ренистре !!!
             moes: { text: '', group: '', head: '', },
-            sizs: { width: 588, height: 345, top: 11, left: -22, },
-            wins: {
-                alwaysRaised: 1, alwaysOnTop: 1, menubar: 0, toolbar: 0, status: 0, resizable: 1, scrollbars: 0,
-                innerwidth: '', innerheight: '', screenx: '', screeny: ''
-            },
+            sizs: { width: 588, height: 345, left: -22, top: 11, innerwidth: null, innerheight: null, screenx: null, screeny: null, },
+            wins: { alwaysraised: 1, alwaysontop: 1, menubar: 0, toolbar: 0, status: 0, resizable: 1, scrollbars: 0, },
         },
         attrs = document.currentScript.attributes,
         timerms = 1000 * ((attrs && attrs.o5timer) ? parseFloat(attrs.o5timer.value) : 2.1),
@@ -193,20 +332,17 @@ img.${W.class} {
 }
 `,
         ClosePop = wopen => {
-            if (o5debug > 1) console.log(`${W.modul}: ClosePop`.padEnd(22) +
+            if (C.consts.o5debug > 1) console.log(`${W.modul}: ClosePop`.padEnd(22) +
                 `${wopen.name}`.padEnd(22))
             if (wopen.time + 444 > (new Date()).getTime()) return
-            const pop = wopen.pop
 
-            const tag = pop.act || pop.tag
+            const act = wopen.pops.act
             if (wopen.text)
-                tag[tag.value ? 'value' : 'innerHTML'] = wopen.text
+                act[act.value ? 'value' : 'innerHTML'] = wopen.text
 
-            if (tag.classList.contains(cls_Act))
-                tag.classList.remove(cls_Act)
+            if (act.classList.contains(cls_Act)) act.classList.remove(cls_Act)
 
-            if (wopen.win.window && !wopen.win.window.closed)
-                wopen.win.close()
+            if (wopen.win.window && !wopen.win.window.closed) wopen.win.close()
 
             const i = wopens.indexOf(wopen)
             if (i > -1)
@@ -221,8 +357,7 @@ img.${W.class} {
             let i = wopens.length
             while (i-- > 0) {
                 const wopen = wopens[i]
-                if (wopen.win && wopen.win.closed)
-                    ClosePop(wopen)
+                if (wopen.win && wopen.win.closed) ClosePop(wopen)
             }
         },
         DoBlinks = isnew => {
@@ -268,30 +403,16 @@ img.${W.class} {
                     console.log(`>>  ИНЗМЕНЕНИЕ CSS   ${W.class} (для модуля ${W.modul}) `)
             css.innerHTML = o5css.replace(/(\/\/.*($|\n))|(\s*($|\n))/g, '\n')
         },
-        CorrectDefaults = (parms) => {
-            const ss = parms ? parms.replace(repQuotes, '').split(/[,;]/) : []
-            ss.forEach(s => {
-                const uu = s.split(m_par_dlm),
-                    nam = uu[0].trim().toLowerCase(),
-                    u = uu[1] ? uu[1].trim() : ''
-                if (u) {
-                    if (dflts.moes.hasOwnProperty(nam)) dflts.moes[nam] = u
-                    else if (dflts.sizs.hasOwnProperty(nam)) dflts.sizs[nam] = u // ConvToValue(nam, u)
-                    else if (dflts.wins.hasOwnProperty(nam)) dflts.wins[nam] = parseInt(u)
-                    else
-                        C.ConsoleError(`неопределённый параметр окна '${nam}' у сриптового атрибута 'o5params'`)
-                }
-            })
-        },
         ClosePops = grp => {    // закрыть все с такой группой и анонимные ('группа' типа 0)
+            'use strict'
             if (wopens.length == 0) return
             let n = 0,
                 i = wopens.length
             while (i-- > 0) {
                 const wopen = wopens[i],
-                    group = wopen.pop.moes.group
+                    group = wopen.pops.moes.group
 
-                if (grp == group || !group || grp === null) {
+                if (grp == group || grp === null || !group || typeof grp === 'event') {
                     ClosePop(wopen)
                     n++
                 }
@@ -299,260 +420,173 @@ img.${W.class} {
             if (o5debug > 0)
                 console.log(`${W.modul}: закрыты ${n} окон группы '${grp === null ? 'всё' : grp}'`)
         },
-        CalcAttrs = tag => {
-            const ap = tag.getAttribute(o5popup)
-            if (!ap) return
-
-            const ss = ap.split(/,|;/),
-                pars = [],
-                refs = [],
-                url = SplitPars(ss, pars, refs)
-
-            // let url = ''
-            // for (const s of ss)
-            //     if (s.match(m_par_dlm)) {
-            //         const uu = s.split(m_par_dlm),
-            //             nam = uu[0].trim()
-            //         if (nam.match(/\bid\b/i)) refs.push(nam)
-            //         else
-            //             pars.push({ nam: nam, val: (uu[1] || '').replace(repQuotes, '') })
-            //     }
-            //     else url = s
-
-            if (!url && !tag.id)
-                C.ConsoleError(`Неопределён 'url' для тега ${C.MakeObjName(tag)} с параметрами (${ap})`)
-            return { url: url, act: tag, pars: pars, refs: refs }
-        },
-        AO5 = tag => {
-            return { name: C.MakeObjName(tag), title: tag.title, tag: tag, pops: {} }
-        },
-        fillPop = {
-            itags: [],
-            AddMissing: (ppars, ipars) => {
-                for (const ipar in ipars)
-                    if (!ppars.hasOwnProperty(ipar)) ppars[ipar] = ipars[ipar]
-            },
-            FillRef: tag => {
-                const AddTag = (Fun, arg, eve) => {
-                    const r = Fun(arg)
-                    if (r) {
-                        tag.aO5pop = Object.assign({}, AO5(tag)) // { name: C.MakeObjName(tag), tag: tag, pops: {} }
-                        tag.aO5pop.pops[o5popup] = fillPop.Fill(tag, { act: r.act, url: r.url, pars: r.pars, refs: r.refs }, eve)
-                    }
-                }
-                AddTag(CalcAttrs, tag, o5popup)
-
-                const ml = /\bolga5\.Pop(Up|Show|Work)\s*\(\s*/,
-                    mr = /\s*\)/,
-                    mful = new RegExp(ml.source + '\\.*' + mr.source, 'i'),
-                    mrep = new RegExp('(' + ml.source + ')|(' + mr.source + ')', 'i')
-                for (const attr of tag.attributes) {
-                    const feve = attr.name.match(/\bon\w+/i)
-                    if (feve) {
-                        const exec = attr.value.match(mful)
-                        if (exec) {
-                            const ss = exec.replace(mrep, '').split(/\s*,\s*/)
-                            AddTag(SplitArgs, ss, o5popup, feve.substring(2))
-                        }
-                    }
-                }
-            },
-            Fill: (tag, add, eve) => {
-                if (o5debug > 1) console.log(`${W.modul}: Fill`.padEnd(22) +
-                    `${C.MakeObjName(tag)}`.padEnd(22) +
-                    ` ${tag.aO5pop ? 'повт.' : 'определение-Eve'}`)
-                if (fillPop.itags.includes(tag)) {
-                    let s = ''
-                    fillPop.itags.forEach(t => s += t.aO5pop.name + '-> ')
-                    C.ConsoleError(`Циклические ссылки на тег: ${s}`)
-                    return
-                }
-                fillPop.itags.push(tag)
-
-                const errs = [],
-                    aO5 = tag.aO5pop,
-                    pop = {
-                        tag: tag,
-                        act: add.act || tag,
-                        url: add.url,           // м.б. изменится после декодирования
-                        pars: '',
-                        key: aO5.name + '(' + eve + ')',  // наименование окна
-                        moes: {}, sizs: {}, wins: {},
-                    }
-
-                for (const par of add.pars) {
-                    let nam = par.nam.toLowerCase()
-                    if (nam) {
-                        if (nam.length == 1) {
-                            if (nam == 'g') nam = 'group'
-                            if (nam == 'n') nam = 'nocss'
-                            else if (nam == 'w') nam = 'width'
-                            else if (nam == 'h') nam = 'height'
-                            else if (nam == 't') nam = 'top'
-                            else if (nam == 'l') nam = 'left'
-                        }
-
-                        const val = par.val.replace(repQuotes, '')
-
-                        if (dflts.moes.hasOwnProperty(nam)) pop.moes[nam] = val
-                        else if (dflts.sizs.hasOwnProperty(nam)) pop.sizs[nam] = val // тут не надо parseInt из-за возм. '%'
-                        else if (dflts.wins.hasOwnProperty(nam)) pop.wins[nam] = parseInt(val)
-                        else
-                            errs.push(`неопределённый параметр '${par.nam}' для события '${eve}'`)
-                    }
-                    else errs.push(`Отсутствие левой части свойства c val='${par.val}'`)
-                }
-
-                for (const nam of add.refs) {
-                    const itag = nam.attributes ? nam : document.getElementById(nam)
-                    if (itag) {
-                        if (!itag.aO5pop)
-                            fillPop.FillRef(itag)
-                        if (itag.aO5pop)
-                            for (const ipop in itag.aO5pop.pops)
-                                fillPop.AddMissing(pop.moes, ipop.moes)
-                        else
-                            errs.push(`Не найдены popup'ы по ссылке ${nam}`)
-                    }
-                    else
-                        if (!nam.match(/head|group|text|nocss/i))
-                            errs.push(`для '${eve}' не найден ссылочный ref='${nam}'`)
-                }
-
-                for (const nam in dflts)
-                    fillPop.AddMissing(pop[nam], dflts[nam])
-
-                if (C.DeCodeUrl) {
-                    const o5attrs = tag ? C.GetAttrs(tag.attributes) : '',
-                        ori = (pop.url || '').replace(repQuotes, ''),
-                        url = (ori.trim() && !ori.match(/[\/.\\#]/)) ? (document.URL + '?o5nomnu#' + ori) : ori,
-                        wref = C.DeCodeUrl(W.urlrfs, url, o5attrs)
-
-                    if (wref.err)
-                        errs.push(`Ошибка перекодирования url='${pop.url}':  ${wref.err}`)
-                    pop.url = wref.url
-                }
-                if (errs.length > 0)
-                    SetTagError(tag, `декодирование опций`, errs)
-
-                let s = ''
-                for (const win in pop.wins) {
-                    const pw = pop.wins[win]
-                    if (pw !== '') s += win + '=' + pw + ','
-                }
-                pop.pars = s
-                return pop
-            },
-        },
-        CalcSizes = pop => {
+        CalcSizes = (sizs, errs, tagname) => {
+            'use strict'
             const screen = window.screen,
                 she = screen.height,
                 swi = screen.width,
+                GetVal = nam => {
+                    const u = sizs[nam]    // м.б. как строка так и число
+                    if (u) {
+                        const isw = nam == 'width' || nam == 'left' || nam == 'innerwidth' || nam == 'screenx',
+
+                            v = parseFloat(u),
+                            // va = Math.abs(v),   mperc = /\s*[\d.,]*%\s*/
+                            val = (u.match && u.match(/\s*[\d.,]+%\s*/)) ? (0.01 * v * (isw ? swi : she)) : v  // размер в пикселах]
+                        // val= (u.match && u.match(mperc))?( 0.01 * val * (isw ? swi : she) - 0.5 * (isw ? wi : he)):va
+                        return { isw: isw, val: val, }
+                    }
+                }
+            let ss = [],
+                wi = 0,
+                he = 0,
+                dtps = { w: false, h: false, l: false, t: false },
+                CheckDubl = (nam, m1, m2, x, txt) => {
+                    if (nam.match(m1) || nam.match(m2)) {
+                        if (dtps[x]) errs.push(`для  '${tagname}' дублирование ` + txt)
+                        dtps[x] = true
+                    }
+                }
+
+            for (const nam of ['width', 'height', 'innerwidth', 'innerheight']) {
+                const z = GetVal(nam)
+                if (z) {
+                    const val = Math.abs(z.val)
+
+                    if (z.isw) wi = val
+                    else he = val
+                    ss.push(nam + '=' + parseInt(val))
+                    if (errs) {
+                        CheckDubl = (nam, /width/, /innerwidth/, 'w', 'ширины окна')
+                        CheckDubl = (nam, /height/, /innerheight/, 'h', 'высоты окна')
+                        if (val < 100) errs.push(`для  '${tagname}' значение '${nam}' меньше 100`)
+                    }
+                }
+            }
+
+            const aW = screen.availWidth,
+                aH = screen.availHeight,
                 RePos = (val, actW, maxW, minL) => {
                     let x = val
                     if (x > maxW) x = maxW - actW
                     if (x > -1) x = minL + x
                     else x = minL           // + x + maxW - actW - 4
                     return x
-                },
-                GetVal = nam => {
-                    const isw = nam === 'width' || nam === 'left',
-                        u = pop.sizs[nam],    // м.б. как строка так и число
-                        v = parseFloat(u)
-                    let val = Math.abs(v)
-                    if (u.match && u.match(/\d\s*%\s*$/))
-                        val = 0.01 * val * (isw ? swi : she) - 0.5 * (isw ? wi : he)
-                    return { isw: isw, v: v, val: val, }
                 }
-            let s = '',
-                wi = 0,
-                he = 0
-
-            for (const nam of ['width', 'height']) {
+            for (const nam of ['left', 'top', 'screenx', 'screeny']) {
                 const z = GetVal(nam)
+                if (z) {
+                    const isw = z.isw,
+                        v = z.val < 0 ? (isw ? aW + z.val - wi : aH - z.val - he) : z.val,
+                        val = RePos(v, isw ? wi : he, isw ? aW : aH, isw ? screen.availLeft : screen.availTop)
 
-                if (z.isw) wi = z.val
-                else he = z.val
-                s += nam + '=' + parseInt(z.val) + ','
-            }
-
-            for (const nam of ['left', 'top']) {
-                const z = GetVal(nam),
-                    aW = screen.availWidth,
-                    aH = screen.availHeight
-
-                if (z.v < 0)
-                    z.val = z.isw ? aW + z.val - wi : aH - z.val - he
-
-                z.val = RePos(z.val, z.isw ? wi : he, z.isw ? aW : aH, z.isw ? screen.availLeft : screen.availTop)
-
-                s += nam + '=' + parseInt(z.val) + ','
-            }
-            return s
-        },
-        ShowTestRez = () => {
-            const tags = C.GetTagsByQueryes("*[id]", W.modul)
-            tags.forEach(tag => {
-                const xO5 = tag.aO5pop
-                if (xO5 && xO5.newtst) {
-                    xO5.newtst = false
-
-                    for (const eve in xO5.pops) {
-                        console.log(''.padEnd(6) + ' tag=' + xO5.name + ' eve=' + eve)
-                        const pop = xO5.pops[eve]
-                        for (const nam in dflts) {
-                            const pps = pop[nam]
-                            let s = ''
-                            for (const pp in pps)
-                                s += pp.padEnd(6) + ': ' + ((typeof pps[pp] === 'undefined' ? '' : pps[pp]) + ', ').padEnd(4)
-                            if (s)
-                                console.log(''.padEnd(11) + nam + '=>  ' + s)
-                        }
+                    ss.push(nam + '=' + parseInt(val))
+                    if (errs) {
+                        CheckDubl = (nam, /left/, /screenx/, 'l', 'левой позиции')
+                        CheckDubl = (nam, /top/, /screeny/, 't', 'верхней позиции')
                     }
                 }
-            })
-        }
-
-    function ShowWin(tag, eve, add) {
-        if (o5debug > 1) console.log(`${W.modul}: ShowWin`.padEnd(22) +
-            `${C.MakeObjName(tag)}`.padEnd(22) +
-            `${C.MakeObjName(add.act)}, '${eve}') `)
-
-        if (!tag.aO5pop)
-            tag.aO5pop = Object.assign({}, AO5(tag)) // { name: C.MakeObjName(tag), tag: tag, pops: {} }
-
-        const aO5 = tag.aO5pop
-
-        if (aO5.pops[eve]) {
-            const wopen = wopens.find(wopen => wopen.pop.tag == tag && wopen.eve == eve)
-
-            if (wopen) { // повтор события на теге - закрываю всплытое окно!
-                ClosePop(wopen)
-                return
             }
-        }
-        else {
-            fillPop.itags.splice(0, fillPop.itags.length)
-            aO5.pops[eve] = fillPop.Fill(tag, add, eve)
-        }
-        const pop = aO5.pops[eve],
-            s = CalcSizes(pop)
+            return ss.join(',')
+        },
+        Focus = e => {
+            if (wopens.length == 0 || focusTime == e.timeStamp) return
 
-        ClosePops(pop.moes.group)
+            focusTime = e.timeStamp
+            window.setTimeout(() => {
+                for (const wopen of wopens)
+                    wopen.win.focus()
+            }, 1)
+            if (o5debug > 1)
+                console.log(`${W.modul}: Focus для ${wopens.length} тегов (${e.eventPhase}, ${e.isTrusted ? 'T' : 'f'}, ${e.timeStamp.toFixed(1).padEnd(6)}, ${e.type})`)
+        },
+        o5nocss = attrs && attrs.o5nocss && attrs.o5nocss.value,
+        doneattr = W.modul + '-done'
 
-        const win = window.open(pop.url, pop.key, pop.pars + s)
+    function Popups(c) {
+        'use strict'
+        if (c) {
+            C = c
+            o5debug = C.consts.o5debug
+
+            if (o5nocss || GetCSS()) c.ParamsFill(W)    // CSS сохранилось после автономного создания
+            else                                        // иначе - никак, т.к. не известно, кто раньше загрузится
+                c.ParamsFill(W, o5css)                  // CSS пересоздаётся (для Blogger'а)
+        }
+        else
+            console.log(`}===< инициировцан модуль:  ${W.modul}.js`)
+
+        focusTime = 0
+        const tags = C.GetTagsByQueryes('[' + o5popup + ']')
+        if (tags)
+            for (const tag of tags) {
+                if (tag.getAttribute(doneattr)) {
+                    console.error('%c%s', "background: yellow; color: black;", `(========  повтор инициализации для id='${tag.id}'`)
+                    continue
+                }
+                tag.setAttribute(doneattr, 'OK')
+                if (!o5nocss) {
+                    const params = tag.attributes.o5popup.nodeValue
+                    if (!params.match(/\bnocss\b/i) && !tag.classList.contains(W.class))
+                        tag.classList.add(W.class)
+                }
+
+                tag.addEventListener(click, window.olga5.PopUp)
+            }
+
+        for (const eve of ['focus', 'click'])
+            window.addEventListener(eve, Focus, { capture: true, moja: 'fignia' })  // т.е. e.eventPhase ==1
+
+        window.addEventListener(click, ClosePops)
+
+        document.addEventListener('visibilitychange', DClosePops) // для автономной работы
+
+        if (!o5nocss)  // т.е. если явно НЕ запрещено    
+            IncludeCSS()
+
+        const errs = []
+        if (attrs && attrs.o5params) {
+            const pars = {},
+                refs = {}  // тут - refs не нуже
+            SplitPars(attrs.o5params, pars, refs, errs)
+            AddPars(pars, dflts, errs, false, 'конфиг.')
+        }
+        if (errs.length > 0)
+            C.ConsoleError(`Ошибки формирования параметров окна (из url'а):`, errs.length, errs)
+
+        window.dispatchEvent(new CustomEvent('olga5_sinit', { detail: { modul: W.modul } }))
+    }
+
+    function ShowWin(pops) {
+        'use strict'
+        if (o5debug > 1) console.log(`${W.modul}: ShowWin`.padEnd(22) +
+            `${C.MakeObjName(pops.tag)}`.padEnd(22) +
+            `${C.MakeObjName(pops.act)}, '${pops.eve}') `)
+
+        const tag = pops.tag,
+            wopen = wopens.find(wopen => wopen.pops.tag == tag && wopen.pops.eve == pops.eve)
+
+        if (wopen) { // повтор события на теге - закрываю всплытое окно!
+            ClosePop(wopen)
+            return
+        }
+
+        ClosePops(pops.moes.group)
+
+        const sizs = CalcSizes(pops.sizs),
+            s = sizs + ',' + pops.swins,
+            win = window.open(pops.url, pops.key, s)
         if (win) {
             const wopen = {
-                pop: pop,
-                eve: eve,
-                win: win, head: pop.moes.head, text: '', titlD: '', titlB: '', noact: '', name: tag.aO5pop.name,
+                pops: pops,
+                win: win, head: pops.moes.head, text: '', titlD: '', titlB: '', noact: '', name: tag.aO5pop.name,
                 time: (new Date()).getTime()  // отстройка от "дребезжания"
             }
-            const act = pop.act
+            const act = pops.act
 
-            if (pop.moes.text) { // для анонимных - не менять текст
+            if (pops.moes.text) { // для анонимных - не менять текст
                 wopen.text = act.value ? act.value : act.innerHTML
-                act[act.value ? 'value' : 'innerHTML'] = pop.moes.text
+                act[act.value ? 'value' : 'innerHTML'] = pops.moes.text
             }
             RemoveTagErrors(tag)
 
@@ -566,91 +600,73 @@ img.${W.class} {
             }
         }
         else
-            if (!aclicks.includes(eve))
-                SetTagError(tag, `создание окна по событию '${eve}'`, [`вероятно следует снять запрет на всплытие окон в браузере`])
+            if (!aclicks.includes(pops.eve))
+                SetTagError(tag, `создание окна по событию '${pops.ve}'`, [`вероятно следует снять запрет на всплытие окон в браузере`])
 
-        if (o5debug > 1) ShowTestRez()
+        return sizs + ',\n' + pops.swins + ',\n' + pops.smoes
     }
 
-    const o5nocss = attrs && attrs.o5nocss && attrs.o5nocss.value,
-        init = {
-            focusTime: 0,
-            Run: islib => {
-                const txt = islib ? 'из ядра библиотеки' : 'по загрузке страницы',
-                    htxt = W.modul + '(' + txt + ')'
-
-                const tags = C.GetTagsByQueryes('[' + o5popup + ']'),
-                    Focus = e => {
-                        if (wopens.length == 0 || init.focusTime == e.timeStamp) return
-
-                        init.focusTime = e.timeStamp
-                        window.setTimeout(() => {
-                            let i = 0
-                            for (const wopen of wopens)
-                                wopen.win.focus()
-                        }, 1)
-                        if (o5debug > 1)
-                            console.log(`${W.modul}: Focus для ${wopens.length} тегов (${e.eventPhase}, ${e.isTrusted ? 'T' : 'f'}, ${e.timeStamp.toFixed(1).padEnd(6)}, ${e.type})`)
-                    }
-
-                for (const tag of tags) {
-                    const r = CalcAttrs(tag)
-                    if (!o5nocss) {
-                        const params = tag.attributes.o5popup.nodeValue
-                        if (!params.match(/\bnocss\b/i) && !tag.classList.contains(W.class))
-                            tag.classList.add(W.class)
-                    }
-
-                    tag.addEventListener(click, e => {
-                        if (r.url) {
-                            ShowWin(tag, o5popup, { act: r.act, url: r.url, pars: r.pars, refs: r.refs })
-                            e.cancelBubble = true
-                        }
-                    })
-                }
-
-                for (const eve of ['focus', 'click'])
-                    window.addEventListener(eve, Focus, { capture: true })  // т.е. e.eventPhase ==1
-                for (const eve of ['focus', 'blur', 'resize'])
-                    window.addEventListener(eve, Focus, { capture: false })  // т.е. e.eventPhase ==2
-
-                document.addEventListener(click, () => ClosePops(0))
-
-                document.addEventListener('visibilitychange', DClosePops) // для автономной работы
-
-                if (!o5nocss)  // т.е. если явно НЕ запрещено    
-                    IncludeCSS()
-
-                if (attrs && attrs.o5params)
-                    CorrectDefaults(attrs.o5params.value.trim())
-            }
+    window.olga5.PopUp = function () {
+        if (arguments.length < 0 || arguments.length > 3) {
+            C.ConsoleError(`PopUp: ошибочное к-во аргументов='${arguments.length}'`, [` у PopUp() их д.б. от 1 до 3)`])
+            return '?'
         }
 
-    function Popups(c) {
-        if (c) {
-            C = c
-            o5debug = C.consts.o5debug
+        let caller = arguments.callee
+        while (caller.caller)
+            caller = caller.caller
 
-            if (o5nocss || GetCSS()) c.ParamsFill(W)    // CSS сохранилось после автономного создания
-            else                                        // иначе - никак, т.к. не известно, кто раньше загрузится
-                c.ParamsFill(W, o5css)                  // CSS пересоздаётся (для Blogger'а)
+        const e = caller.arguments[0],
+            pops = GetPops(e, arguments)
+        e.cancelBubble = true
+        return ShowWin(pops)
+
+    }
+    window.olga5.PopShow = function () { //  устарешая обёртка  ---- width, height, url
+        // const m = /^(\d){1,6}$/
+        if (arguments.length == 3 && !isNaN(arguments[0]) && !isNaN(arguments[1])) {
+            let caller = arguments.callee
+            while (caller.caller)
+                caller = caller.caller
+
+            const e = caller.arguments[0],
+                pops = GetPops(e, ['', arguments[2], `width=${arguments[0]}, height=${arguments[1]}`])
+            e.cancelBubble = true
+            return ShowWin(pops)
+            // window.olga5.PopUp(['', arguments[2], `width=${arguments[0]}, height=${arguments[1]}`])
         }
-        init.Run(true)
-        window.dispatchEvent(new CustomEvent('olga5_sinit', { detail: { modul: W.modul } }))
+        else {
+            C.ConsoleError(`PopShow: ошибочно к-во или тип аргументов [${arguments.join(', ')}]`)
+            return '?'
+        }
     }
 
-    window.addEventListener("DOMContentLoaded", e => {
-        if (!window.olga5.C) // библиотеки-то - НЕТУ
-            init.Run()
-    })
+    const AutoInit = e => { // автономный запуск
+        if (!Array.from(document.scripts).find(script => script.src.match(/\/o5(com|common)?.js$/))) {
+            document.addEventListener('olga5-incls', W.Init)
+            W.Init()
+        }
+    }
+    document.addEventListener('DOMContentLoaded', AutoInit)
+
+    // let b=0
+    // for (let i=0; i<4; i++){
+    // document.addEventListener('DOMContentLoaded', e => { // автономный запуск
+    //   console.log(`Bb ${b++}`)
+    // })}
+    // const Aa=e => { // автономный запуск
+    //     console.log(`Aa ${a++}`)
+    //   }
+    // for (let i=0; i<4; i++){
+    // document.addEventListener('DOMContentLoaded', Aa)}
 
     if (!window.olga5.find(w => w.modul == W.modul)) {
-        window.olga5.push(W)
-
         if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
             console.log(`}---< ${document.currentScript.src.indexOf(`/${W.modul}.`) > 0 ? 'загружен  ' : 'включён   '}:  ${W.modul}.js`)
+        window.olga5.push(W)
         window.dispatchEvent(new CustomEvent('olga5_sload', { detail: { modul: W.modul } }))
     } else
-        console.error('%c%s', "background: yellow; color: black;border: solid 2px red;", `Повтор загрузки '${W.modul}`)
+        console.error('%c%s', "background: yellow; color: black;border: solid 2px red;", `}---< Повтор загрузки '${W.modul}`)
     // -------------- o5pop
 })();
+// картан

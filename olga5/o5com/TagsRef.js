@@ -13,7 +13,7 @@
 	if (!window.olga5) window.olga5 = []
 	if (!window.olga5.C) window.olga5.C = {}
 	if (!window.olga5[olga5_modul]) window.olga5[olga5_modul] = {}
-	
+
 	const wshp = window.olga5[olga5_modul],
 		C = window.olga5.C,
 		// regExp = /[^\/\s+]+$/
@@ -104,7 +104,7 @@
 				load_snm[td.modul] = td.orig // перезаписываю!
 
 				const w = window.olga5.find(w => w.modul == td.modul),
-					scrpt = { modul: td.modul, orig: td.orig, act: { W: w, need:false }, script: script, }
+					scrpt = { modul: td.modul, orig: td.orig, act: { W: w, need: false }, script: script, }
 				let dochg = ''
 				if (!w || td.code == '_' || (td.trans && td.code != 'data-')) {
 					dochg = !w ? 'новый  ' : 'замена '
@@ -135,7 +135,7 @@
 				if (!C.scrpts.find(scrpt => scrpt.modul == modul))
 					// if (!igns(modul)) {
 					if (!igns.includes(modul)) {
-						C.scrpts.push({ modul: modul, orig: '', act: { W: w, need:false  }, script: C.o5script })
+						C.scrpts.push({ modul: modul, orig: '', act: { W: w, need: false }, script: C.o5script })
 						scrs.push({ modul: modul, orig: '', src: C.o5script.src, txt: `из скомпилированного` })
 					}
 			}
@@ -218,7 +218,7 @@
 				C.ConsoleError(`Ошибки в преобразовании SCRIPT `, errs.length, errs)
 
 			for (const scrpt of C.scrpts) {
-				Object.assign(scrpt.act, { done: 0, strt: 0, timeout: 0, timera: null, incls: null, })
+				Object.assign(scrpt.act, { done: 0, start: 0, timeout: 0, timera: null, incls: null, })
 				Object.seal(scrpt.act)
 				Object.freeze(scrpt)
 			}
@@ -267,5 +267,5 @@
 	}
 
 	if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
-		console.log(`}---> подключен ${olga5_modul}/${modulname}.js`)
+		console.log(`}===< ${document.currentScript.src.indexOf(`/${olga5_modul}.`) > 0 ? 'дозагружен' : 'подключён '}:  ${olga5_modul}/${modulname}.js`)
 })();

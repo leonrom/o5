@@ -3,7 +3,8 @@
 /*jshint esversion: 6*/
 (function () {
 	'use strict'
-	const olga5_modul = 'o5dbg'
+	const olga5_modul = 'o5dbg',
+		modulname = 'logs'
 
 	if (!window.olga5) window.olga5 = []
 	if (!window.olga5[olga5_modul]) window.olga5[olga5_modul] = {}
@@ -69,5 +70,5 @@
 
 	window.olga5[olga5_modul].DbgLogs = DbgLogs
 	if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
-	console.log(`}---< ${document.currentScript.src.indexOf(`/${olga5_modul}.`) > 0 ? 'дозагружен' : 'подключён '}:  ${olga5_modul}/logs.js`)
+		console.log(`}===< ${document.currentScript.src.indexOf(`/${olga5_modul}.`) > 0 ? 'дозагружен' : 'подключён '}:  ${olga5_modul}/${modulname}.js`)
 })();

@@ -12,25 +12,18 @@
     <script data-src='+ o5shp.js'></script>
     <script data-src='+ o5pop.js' o5noclick='0'></script>
     <script data-src='+ o5mnu.js' o5consts='scrollY=-32'></script>
-    <script data-src='+ o5ref.js' 
-		o5tag_attrs="img=image_play;a,img,audio=href,data-href,src,_src;"
-		o5urlrfs="  
+    <script data-src='+ o5ref.js' o5tag_attrs="img=image_play;a,img,audio=href,data-href,src,_src;" o5urlrfs="  
 			myTunes-icon='images + /myMusikIT.png' # --- только для o5snd ---;
-		"
-	></script>
-    <script data-src='+ o5snd.js' 
-		btn_stop='images + /icons8-youtube-music-48.png' 
-		btn_play='images + /icons8-youtube-music-50.png'
-		o5consts="
+		"></script>
+    <script data-src='+ o5snd.js' btn_stop='images + /icons8-youtube-music-48.png'
+        btn_play='images + /icons8-youtube-music-50.png' o5consts="
 			o5shift_speed =0.5 
-		"
-		o5urlrfs="
+		" o5urlrfs="
 			Ceza1-25=sounds+/Ceza1-25.mp3;
 			Ceza2-25=sounds+/Ceza2-25.mp3;
 			imageplay=images + /play.png;
 			solfedjio=images+ /solfedjio.png;
-		"
-	></script>
+		"></script>
     <script data-src='+ add/pusto.js' moe-attr='мой атрибут'></script>
 
     <link data-href='+../blog/csss/olga5.tableCode.css' media='screen' rel='stylesheet' />
@@ -40,10 +33,7 @@
     <link data-href='+../blog/csss/olga5.tableKuplet.css' media='screen' rel='stylesheet' />
     <link data-href='+../blog/csss/tests.css' media='screen' rel='stylesheet' />
 
-    <script src='https://rombase.h1n.ru/o5/olga5/o5.js'
-		o5debug='0' 
-        o5incls='o5pop,o5mnu,o5snd,o5shp,o5ref' 
-        o5urlrfs="
+    <script src='https://rombase.h1n.ru/o5/olga5/o5.js' o5debug='0' o5incls='o5pop,o5mnu,o5snd,o5shp,o5ref' o5urlrfs="
             _блог_o5 = '_url_html+../2020/02';
 			media = + ../blog/media;
             sounds= media + /audio;
@@ -52,22 +42,23 @@
             # _url_html=`# адрес текущей страницы (этот и 2 следующих - закомментированы)`;   
             # _url_root=`# адрес сайта (с текущей страницей)`;    
             # _url_olga5=`# адрес загрузки файла o5common.js`;   
-        " 
-	></script>
+        "></script>
 </head>
 
 <body style="font-size: small;">
     <style>
-        h4{
+        h4 {
             margin-block-start: 0.33em;
-    margin-block-end: 0.33em;
+            margin-block-end: 0.33em;
         }
+
         body {
             font-style: normal;
             font-family: monospace;
             font-size: small;
             background-color: oldlace;
         }
+
         pre {
             background-color: white;
             border: 1px solid gray;
@@ -79,16 +70,16 @@
         }
     </style>
     <script>
-        document.addEventListener("DOMContentLoaded", e => {
+        const BloggerAuto =e => {
             const url = document.URL,
                 xhr = new XMLHttpRequest(),
                 OnLoad = function () {
-                    console.log(`}========  o5inc.OnLoad(${xhr.status})  ------ ${xhr._url}`)
+                    console.log(`========  o5inc.OnLoad(${xhr.status})  ------ ${xhr._url}`)
                     if (xhr.status == 200) {
                         // const ss = xhr.responseText.match(/<\/title>(.|\n)*<\/head>/uimg)
                         // Опережающая и Ретроспективная проверки
                         const ss = xhr.responseText.match(/(?<=<\/title>)(.|\n)*(?=<\/head>)/uimg)
-                            
+
                         document.getElementById('h1').innerHTML += (ss ? ss[0] : 'нету заголовка ?').
                             // replace(/<\/title>/g, '').
                             // replace(/<\/head>/g, '').
@@ -105,7 +96,8 @@
             Object.assign(xhr, { _url: url, onload: OnLoad, onerror: OnError, timeout: 10000, responseType: 'text', withCredentials: true, })
             xhr.open("get", url, true)
             xhr.send()
-        })
+        }
+        document.addEventListener('DOMContentLoaded', BloggerAuto)
     </script>
     <h4 class="olga5_Start">Пример тегов заголовка, подключаемых в HTML файл Blogger'а</h4>
     <pre id="h1">

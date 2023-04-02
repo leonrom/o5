@@ -4,8 +4,9 @@
 /*jshint esversion: 6*/
 /**
  *  сборщик модулей ядра библиотеки
+ * 
 **/
-//
+// 
 (function () {              // ---------------------------------------------- o5com ---
 	'use strict'
 	const olga5_modul = "o5com"
@@ -17,9 +18,12 @@
 	const modnames = ['CConsole', 'CEncode', 'CApi', 'CParams', 'TagsRef', 'IniScripts'],
 		wshp = window.olga5[olga5_modul],
 		C = window.olga5.C,
+		// wls = window.location.search,
+		// mdebug = wls.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=)(\s*\d*)/),
+		// mtiml = wls.match(/(\&|\?|\s)(is|o5)?(-|_)?timload\s*(\s|$|\?|#|&|=)(\s*\d*)/),
 		IncludeScripts = ({ modul = '', names = [], actscript = C.o5script, iniFun = {}, args = [] }) => {
-			const nams = {},
-				o5timload = C.o5script.attributes['o5timload'] || 3,
+			const
+				nams = {},
 				load = { is_set: false, timeout: 0, path: '' },
 				actpath = actscript.src.match(/\S*\//)[0],
 				OnTimer = () => {
@@ -28,7 +32,7 @@
 						if (!nams[nam]) s += (s ? ', ' : '') + nam
 
 					if (s)
-						console.error(`Для ${modul} недозагрузились скрипты: ${s} (таймер o5timload=${o5timload}с.)`)
+						console.error(`Для ${modul} недозагрузились скрипты: ${s} (таймер o5timload=${C.consts.o5timload}с.)`)
 					load.timeout = 0
 				},
 				OnLoad = name => {
@@ -62,7 +66,7 @@
 						is_set: true,
 						// path: C.o5scriptPath + modul + '/',
 						path: actpath + modul + '/',
-						timeout: window.setTimeout(OnTimer, 1000 * o5timload),
+						timeout: window.setTimeout(OnTimer, 1000 * C.consts.o5timload),
 					})
 					nams[name] = false
 
@@ -96,10 +100,10 @@
 			if (!load.timeout) iniFun(args)
 		},
 		RunO5com = () => {
-			const timera = `}----<<< ----- инициировано ядро библиотеки ----- '${olga5_modul}' `,
-				_url_olga5 = C.o5script.src.match(/\S*\//)[0],
-				errs = []
-			console.time(timera)
+			const _url_olga5 = C.o5script.src.match(/\S*\//)[0],
+				errs = [],
+				myclr = "background: blue; color: white;border: none;",
+				strt_time = Number(new Date())
 
 			Object.assign(C, {
 				IncludeScripts: IncludeScripts,
@@ -111,9 +115,13 @@
 					errs.push(modname)
 			}
 
+			const dt = ('' + (Number(new Date()) - strt_time)).padStart(4) + ' ms',
+				name = dt + `        ${olga5_modul}`
+
 			if (errs.length > 0)
-				console.error(`Не найдены [${errs.join(', ')}] в ${olga5_modul}.js ( где-то синтаксическая ошибка ?)`)
-			console.timeEnd(timera)
+				console.error('%c%s', "background: yellow; color: black;border: none;",
+					`Не найдены [${errs.join(', ')}] в ${olga5_modul}.js ( где-то синтаксическая ошибка ?)`)
+			console.log('%c%s', myclr, '---<<<  инициализировано ядро      ' + name)
 		},
 		GetBaseHR = (root) => { // функции определения адреса текущиещей страницы и корня сайна
 			const url = new window.URL(window.location) //"http://rombase.h1n.ru/o5/2020/olga5-all.html")
@@ -210,8 +218,8 @@
 		}
 
 	Object.assign(C, {
-		repQuotes: /^\s*['"`]?\s*|\s*['"`]?\s*$/g,  // необязат. первая и последняя кавычки с окруж. пробелами,
-		olga5ignore:'olga5-ignore',
+		repQuotes: /^\s*((\\')|(\\")|(\\`)|'|"|`)?\s*|\s*((\\')|(\\")|(\\`)|'|"|`)?\s*$/g,
+		olga5ignore: 'olga5-ignore',
 		TryToDigit: TryToDigit,
 		ParamsFillFromScript,
 		GetAttrs: GetAttrs,
@@ -229,12 +237,13 @@
 			_url_olga5: '' // будет задан при инициализации (document.currentScript.src.match(/\S*\//)[0],)
 		},
 		consts: {
-			o5debug: 0, o5nomnu: 0, o5noact: 0, o5timload: 3, o5only: 0,
+			o5timload: 3, 	//mtiml ? (mtiml[5] ? mtiml[5] : 1) : (C.o5script.attributes['o5timload'] || 3),
+			o5debug: 0, 	// mdebug ? (mdebug[5] ? mdebug[5] : 1) : (C.o5script.attributes['o5debug'] || 0),
+			o5nomnu: 0, o5noact: 0, o5only: 0,
 			o5incls: '',
 			o5doscr: 'olga5_sdone',
-			o5iblog: !!document.URL.match(/\/\/.*.blogspot\..*\//i),
 			o5depends: "pusto; o5pop; o5inc; o5ref= o5inc; o5snd:o5ref, o5inc; o5shp=o5snd, o5ref; o5shp:o5inc; o5inc; o5mnu= o5inc",
-			o5init_events: 'DOMContentLoaded',
+			o5init_events: 'readystatechange:d, message',
 			o5done_events: 'beforeunload, olga5_unload',
 		},
 		constsurl: {},
@@ -254,14 +263,15 @@
 
 	IncludeScripts({ modul: olga5_modul, names: modnames, actscript: C.o5script, iniFun: RunO5com, })
 	if (![0, 1, 2, 3].includes(C.consts.o5debug))
-	C.consts.o5debug=1
+		C.consts.o5debug = 1
 
 	const activateEvents = ['click', 'keyup', 'resize'],
+		wd = window, // document
 		SetActivated = e => {
 			C.cstate.activated = true
-			activateEvents.forEach(activateEvent => document.removeEventListener(activateEvent, SetActivated))
+			activateEvents.forEach(activateEvent => wd.removeEventListener(activateEvent, SetActivated))
 		}
-	activateEvents.forEach(activateEvent => document.addEventListener(activateEvent, SetActivated))
-	
-	console.log(`}---< загружено ядро библиотеки`)
+	activateEvents.forEach(activateEvent => wd.addEventListener(activateEvent, SetActivated))
+
+	console.log(`}+++< загружено ядро библиотеки`)
 })();

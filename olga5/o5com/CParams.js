@@ -40,10 +40,12 @@
 
 			for (const spair of spairs)
 				if (spair) {
+// if (spair.match('myMusikIT'))					
+// console.log(121212)
 					const pair = spair.split('=')
 					if (pair.length > 1) {
 						const nam = C.Repname(pair[0].trim()),
-							val = (pair[1] || '').replace(C.repQuotes, '')
+							val = (pair[1] || '').replace(C.repQuotes, '') // .replace(C.repQuote2, '')
 
 						if (nam) params[nam] = C.TryToDigit(val)
 						else
@@ -65,10 +67,12 @@
 
 			for (const nam in urlrfs) {
 				const val = urlrfs[nam]
+// if (val.match('myMusikIT'))					
+	// console.log(121212)				
 				if (val != null && typeof val !== 'undefined') {
 					if (!val.replace)
 						alert('значение URL - не строка')
-					const url = val.replace(C.repQuotes, ''),
+					const url = val.replace(C.repQuotes, ''), //.replace(C.repQuote2, ''),
 						wref = C.DeCodeUrl(urlrfs, url)
 
 					if (wref.err.length > 0)
@@ -219,5 +223,5 @@
 	}
 
 	if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
-		console.log(`}---> подключен ${olga5_modul}/${modulname}.js`)
+		console.log(`}===< ${document.currentScript.src.indexOf(`/${olga5_modul}.`) > 0 ? 'дозагружен' : 'подключён '}:  ${olga5_modul}/${modulname}.js`)
 })();

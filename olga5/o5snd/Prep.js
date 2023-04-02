@@ -5,7 +5,8 @@
 
 (function () {              // ---------------------------------------------- o5snd/Imgs ---
     "use strict"
-    const olga5_modul = 'o5snd'
+    const olga5_modul = 'o5snd',
+        modulname = 'Prep'
 
     if (!window.olga5) window.olga5 = []
     if (!window.olga5[olga5_modul]) window.olga5[olga5_modul] = {}
@@ -36,7 +37,7 @@
         setClass: {
             stop: 'stop', play: 'play', pause: 'pause',
             SetC: (aO5, state) => {
-                if (o5debug > 1) console.log(`--> setClass.SetC (${aO5.name}, '${state}')`)
+                if (o5debug > 1) console.log(`${olga5_modul}/${modulname} SetC (${aO5.name}, '${state}')`)
                 const classList = (aO5.image.play ? aO5.image.play : aO5.snd).classList
                 if (state == wshp.setClass.play) {
                     const image = aO5.image
@@ -73,7 +74,7 @@
             return ori
         },
         StopSound: aO5 => {
-            if (o5debug > 1) console.log(`--> StopSound (${aO5.name})`)
+            if (o5debug > 1) console.log(`${olga5_modul}/${modulname}  StopSound (${aO5.name})`)
             wshp.actaudio = null
 
             const image = aO5.image,
@@ -144,7 +145,6 @@
                     if (ori.url) {
                         const url = TryEncode(ori, snd)
                         if (url != snd[srcAtr]) {
-                            // console.log('setAttribute',srcAtr, url)
                             snd.setAttribute(srcAtr, url)
                             urlattrs.push({ snd: aO5.name, atr: srcAtr, url: url, 'ориг.': ori.url })
                         }
@@ -270,5 +270,5 @@
     })
 
     if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
-        console.log(`}---< ${document.currentScript.src.indexOf(`/${olga5_modul}.`) > 0 ? 'дозагружен' : 'подключён '}:  ${olga5_modul}/Imgs.js`)
+        console.log(`}===< ${document.currentScript.src.indexOf(`/${olga5_modul}.`) > 0 ? 'дозагружен' : 'подключён '}:  ${olga5_modul}/${modulname}.js`)
 })();

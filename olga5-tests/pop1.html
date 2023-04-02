@@ -11,11 +11,6 @@
 	<!-- <script src='../olga5/o5dbg/pos.js'></script> -->
 	<script src='../olga5/o5pop.js' o5timer='0.3' o5opacity='0.2' o5-debug="0" params="" o5timer="1"></script>
 	<!-- <script src='../olga5/o5com.js' o5debug=0></script> -->
-	<!-- <script>
-		document.addEventListener("DOMContentLoaded", function(event) {
-		  console.log("-------------------  DOM fully loaded and parsed");
-		});
-	  </script> -->
 </head>
 
 <body style="margin: 0 0.1em 0 0.3em;">
@@ -135,24 +130,19 @@
 				</span>&nbsp; - <i>мигает</i> данный тег;
 			</li>
 			<li><span id="li5" class="olga5_popup" onclick="window.olga5.PopUp('./popup.html', 'p1')">
-					<span class='inLine'>...PopUp(&nbsp;&nbsp;'&nbsp;./popup.html', 'p1')&nbsp;&nbsp;&nbsp;&nbsp;</span>
-				</span>&nbsp; - &nbsp;&nbsp;&nbsp;как 4;
+					<span class='inLine'>...PopUp(&nbsp;&nbsp;'&nbsp;./popup.html', 'p1')
+						&nbsp;&nbsp;&nbsp;</span>
+				</span>&nbsp; - &nbsp;&nbsp;&nbsp;ошибка задания ссылки (пропущен <i>ссылочный</i> тег);
 			</li>
-			<!-- <li><span id="li6" class="olga5_popup" onclick="window.olga5.PopUp(this, './popup.html')">
-					<span class='inLine'>...PopUp(this, './popup.html')&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-				</span>&nbsp; - положение и размеры - по-умолчанию;
-			</li>
-			<li><span id="li7" class="olga5_popup" onclick="window.olga5.PopUp('./popup.html')">
-					<span class='inLine'>...PopUp(&nbsp;&nbsp;&nbsp;&nbsp;' ./popup.html ')&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-				</span>&nbsp; - &nbsp;&nbsp;аналогично;
-			</li> -->
-			<li><span id="li6" class="olga5_popup" onclick="window.olga5.PopShow('', 444,333, './popup.html')">
-					<span class='inLine'>...PopShow('',444,333,'./popup.html')</span>
-				</span>&nbsp; - &nbsp;&nbsp;&nbsp;как 4, но меньшего размера - через <b>PopShow()</b> ;
+
+			<li><span id="li8" class="olga o5popup" o5popup='тесты+popup.html;'>
+				<span class='inLine'>&nbsp;&nbsp;&nbsp;o5popup='тесты+popup.html, p1'
+					&nbsp;&nbsp;&nbsp;&nbsp;</span>
+			</span>&nbsp; - &nbsp;&nbsp;с использование атрибута <b>o5popup</b>;
 			</li>
 			<li><span id="li7" class="olga5_popup" onclick="window.olga5.PopShow(444,333, './popup.html')">
-					<span class='inLine'>...PopShow(444, 333, './popup.html')&nbsp;</span>
-				</span>&nbsp; - &nbsp;&nbsp;&nbsp;как 6.
+					<span class='inLine'>PopShow(444, 333, './popup.html, p1')</span>
+				</span>&nbsp; - &nbsp;&nbsp;с использование <i>обёртки</i> <b>PopShow</b>.
 			</li>
 		</ol>
 		<p>

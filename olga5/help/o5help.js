@@ -251,7 +251,7 @@ ol.${olga5_class} li>div pre {
             SwitchLis(li, (l) => { if (l.$o5.checked) OpenH(l) })
             MousePosToLi(li)
         },
-        MousePosToLi = (li) =>{
+        MousePosToLi = (li) => {
             // const w = li.$o5.span.getBoundingClientRect(),
             //     left = w.left + 5,
             //     top = w.top + w.height / 2            
@@ -277,12 +277,12 @@ ol.${olga5_class} li>div pre {
         },
         allTitles = {
             isShown: true,
-            Hide: (id) => {   
-                if (!id.includes('_') || !allTitles.isShown)     return
+            Hide: (id) => {
+                if (!id.includes('_') || !allTitles.isShown) return
                 allTitles.isShown = false
-    
+
                 const lis = document.getElementsByTagName('li')
-                for (const li of lis){
+                for (const li of lis) {
                     li.$o5.span.title = ''
                     const inputs = li.getElementsByTagName('input')
                     if (inputs && inputs.length > 0)
@@ -372,7 +372,7 @@ ol.${olga5_class} li>div pre {
                 OnKeyUp = (e) => { console.log(` key=${e.key}`) }
 
             InitCSS(css)
-            
+
             for (const ol of ols) {
                 ol.$o5 = { lis: ol.querySelectorAll(':scope>li'), li: null, checked: false }
                 Object.seal(ol.$o5)
@@ -384,16 +384,37 @@ ol.${olga5_class} li>div pre {
                     span.title += '\nКлик - ' + (li.id.indexOf('_') > 0 ? 'показ раздела справки' : 'содержание раздела справки')
                     li.$o5 = { ol: ol, div: null, span: span, input: null, checked: false }
                     Object.seal(li.$o5)
-                    
+
                 }
             }
 
             window.addEventListener('message', OnMessage)
             window.addEventListener('resize', OnResize)
-            document.addEventListener('keyup', OnKeyUp)
+            window.addEventListener('keyup', OnKeyUp)
         }
 
-    console.log('}---< включено:  `' + olga5_snam + '.js`  (' + olga5_class + ')');
-    document.addEventListener('DOMContentLoaded', WndInit)
+    // console.log('}---< включено:  `' + olga5_snam + '.js`  (' + olga5_class + ')');
+    // document.addEventListener('DOMContentLoaded', WndInit)
     window.$o5 = { InitCSS: InitCSS }
+
+    const
+        W = {
+            modul: 'o5help',
+            Init: WndInit,
+        },
+        AutoInit = e => { // автономный запуск
+            if (!Array.from(document.scripts).find(script => script.src.match(/\/o5(com|common)?.js$/)))
+                W.Init()
+        }
+
+    document.addEventListener('DOMContentLoaded', AutoInit)
+
+    if (!window.olga5) window.olga5 = []
+    if (!window.olga5.find(w => w.modul == W.modul)) {
+        if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
+            console.log(`}---< ${document.currentScript.src.indexOf(`/${W.modul}.`) > 0 ? 'загружен  ' : 'включён   '}:  ${W.modul}.js`)
+        window.olga5.push(W)
+        window.dispatchEvent(new CustomEvent('olga5_sload', { detail: { modul: W.modul } }))
+    } else
+        console.error('%c%s', "background: yellow; color: black;border: solid 2px red;", `}---< Повтор загрузки '${W.modul}`)
 })();

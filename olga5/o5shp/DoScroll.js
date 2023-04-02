@@ -5,7 +5,8 @@
 //!
 (function () {              // ---------------------------------------------- o5shp/DoScroll ---
     "use strict"
-    const olga5_modul = "o5shp"
+    const olga5_modul = "o5shp",
+        modulname = 'DoScroll'
 
     if (!window.olga5) window.olga5 = []
     if (!window.olga5[olga5_modul]) window.olga5[olga5_modul] = {}
@@ -50,9 +51,6 @@
                         const pO5 = bord.pO5,
                             pos = pO5.pos
                         if (pos.top != pos.bottom) {
-                            // if (!a.to || !a.to.pos) {
-                            //     console.log()
-                            // }
                             if (a.to == null || a.to == bO5 || a.to.pos.top < pos.top) a.to = pO5
                             if (a.bo == null || a.bo == bO5 || a.bo.pos.bottom > pos.bottom) a.bo = pO5
                         }
@@ -62,23 +60,11 @@
                         }
                     }
                 }
-            // Located = (bords, a) => {
-            //     for (const bord of bords) {
-            //         const pO5 = bord.pO5,
-            //             pos = pO5.pos
-            //         Object.assign(a, {
-            //             to: ((a.to && a.to.pos.top > pos.top) ? a.to : pO5),
-            //             le: ((a.le && a.le.pos.left > pos.left) ? a.le : pO5),
-            //             ri: ((a.ri && a.ri.pos.right < pos.right) ? a.ri : pO5),
-            //             bo: ((a.bo && a.bo.pos.bottom < pos.bottom) ? a.bo : pO5),
-            //         })
-            //     }
-            // }
             for (const ask of aO5.hovered.asks)
                 Located([ask.bords[0]], a)
             Object.assign(aO5.hovered, a)
 
-            Object.assign(a, { to: bO5, le: bO5, ri: bO5, bo: bO5 })
+            Object.assign(a, { to: bO5, le: bO5, ri: bO5, bo: bO5 }) 
 
             for (const ask of aO5.located.asks)
                 Located(ask.bords, a)
@@ -86,17 +72,12 @@
 
             for (const hoverMarks of ['to', 'le', 'ri', 'bo']) {
                 const pO5 = aO5.hovered[hoverMarks]
-                // if (!pO5 || !pO5.located) {
-                //     console.log()
-                //     for (const ask of aO5.hovered.asks)
-                //         Located([ask.bords[0]], a)
-                // }
-
                 if (pO5.located.timeStamp != timeStamp) { // чтобы не повторяться для одинаковых
                     Located(pO5.prevs, pO5.located)
                     pO5.located.timeStamp = timeStamp
                 }
             }
+
         },
         FixSet = (aO5) => {
             const dirV = aO5.cls.dirV
@@ -286,7 +267,7 @@
                                 s += (aa[a].bb[b][j] || '').padEnd(fmt[j])
 
                             if (s.trim())
-                                console.log(s)
+                                console.log(`${olga5_modul}/${modulname} ` + s)
                         }
                     }
                 },
@@ -327,11 +308,9 @@
         },
         Scroll = (aO5s) => {
             if (wshp.W.consts.o5debug > 2)
-                console.log("Scroll для '" + (() => {
+                console.log(`${olga5_modul}/${modulname} ` + "Scroll для '" + (() => {
                     let s = ''
                     aO5s.forEach(aO5 => { s += (s ? ', ' : '') + aO5.name })
-                    // if (!s)
-                    //     s = s
                     return s
                 })() + "'")
             let k2 = -1,
@@ -354,9 +333,6 @@
                     aO5.Hide()
                     aO5.act.wasKilled = false
                 }
-                // // console.log('opacity for id= ' + aO5.id)
-                // aO5.shdw.style.opacity = 0
-                // aO5.shp.style.opacity = 1
             }
 
             let killevel = -1
@@ -441,9 +417,9 @@
                 console.groupEnd()
             }
         }
-        document.dispatchEvent(o5shp_scroll)
+        window.dispatchEvent(o5shp_scroll)
     }
 
     if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
-        console.log(`}---< ${document.currentScript.src.indexOf(`/${olga5_modul}.`) > 0 ? 'дозагружен' : 'подключён '}:  ${olga5_modul}/DoScroll.js`)
+        console.log(`}===< ${document.currentScript.src.indexOf(`/${olga5_modul}.`) > 0 ? 'дозагружен' : 'подключён '}:  ${olga5_modul}/${modulname}.js`)
 })();

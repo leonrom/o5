@@ -4,7 +4,8 @@
 /*jshint esversion: 6 */
 (function () {              // ---------------------------------------------- o5shp/DoInit ---
     "use strict"
-    const olga5_modul = "o5shp"
+    const olga5_modul = "o5shp",
+        modulname = 'DoInit'
 
     if (!window.olga5) window.olga5 = []
     if (!window.olga5[olga5_modul]) window.olga5[olga5_modul] = {}
@@ -21,8 +22,8 @@
             for (const aO5 of aO5s) s += (s ? ', ' : '') + aO5.name
             return s
         },
-        SwitchOpacity = aO5s =>{
-            for (const aO5 of aO5s){
+        SwitchOpacity = aO5s => {
+            for (const aO5 of aO5s) {
                 aO5.shdw.style.opacity = 0
                 aO5.cart.style.opacity = 1
                 SwitchOpacity(aO5.aO5s)
@@ -77,8 +78,8 @@
             this.id = current.id
             this.name = C.MakeObjName(current)
             this.isBody = current == document.body || current.nodeName == 'BODY'
-            this.isFinal = this.isBody || 
-                ['overview-content', 'viewitem-panel'].find(cls => current.classList.contains(cls)) 
+            this.isFinal = this.isBody ||
+                ['overview-content', 'viewitem-panel'].find(cls => current.classList.contains(cls))
             this.isDIV = current.tagName.match(/\bdiv\b/i)  // == "DIV"
             if (o5debug > 2)
                 console.log("создаётся pO5 для '" + this.name + "'")
@@ -178,7 +179,7 @@
                             for (const qual of quals) {
                                 const tt = qual.replaceAll(/-/g, '=').split('='),
                                     c = tt[0].substr(0, 1).toUpperCase()
-                                    
+
                                 if (c != '' && !isNaN(c)) cls.level = Number(c)
                                 else if (c == 'N') cls.none = true
                                 else if (c == 'K') cls.kill = true
@@ -244,6 +245,13 @@
                     if (o5debug > 1)
                         console.log(" >> SetLevelsAll " + ('' + Date.now()).substr(-6) + ", вложенности объектов: \n\t  " + aO5str)
                     return aO5str
+                },
+                DoScroll = e => {
+                    const pO5 = (e.target == document ? document.body : e.target).pO5
+                    if (pO5) {
+                        const aO5s = (pO5.owns.own ? pO5.owns.own : wshp).aO5s
+                        wshp.DoScroll(aO5s, e.timeStamp)
+                    }
                 }
 
             MakeAO5s()
@@ -252,21 +260,19 @@
 
 
             if (o5debug > 0) {
-                const sels = []
+                let etimeStamp = 0
+                const sels = [],
+                    DbgDoResize = e => { // для отладки  !!!!!!!!!!!!!!!!!!
+                        if (e.timeStamp > etimeStamp + 0.1)
+                            if (!e.target.classList.contains(wshp.W.class))
+                                wshp.DoResize()
+                        etimeStamp = e.timeStamp
+                    }
                 for (const mtag of mtags)
                     sels.push({ name: C.MakeObjName(mtag.tag), origcls: mtag.origcls, class: mtag.tag.className, quals: mtag.quals.join(', '), })
                 if (sels.length > 0) C.ConsoleInfo(`o5shp: найдены селекторы:`, sels.length, sels)
-                else
-                    if (!C.consts.o5iblog)
-                        C.ConsoleInfo(`o5shp: НЕ найдены селекторы с '${wshp.W.class}'`)
 
-                let etimeStamp = 0
-                document.addEventListener('click', (e) => { // для отладки  !!!!!!!!!!!!!!!!!!
-                    if (e.timeStamp > etimeStamp + 0.1)
-                        if (!e.target.classList.contains(wshp.W.class))
-                            wshp.DoResize()
-                    etimeStamp = e.timeStamp
-                })
+                window.addEventListener('click', DbgDoResize)
             }
 
             if (wshp.aO5s.length > 0) {
@@ -275,13 +281,7 @@
                 SwitchOpacity(wshp.aO5s)
 
                 window.addEventListener('resize', wshp.DoResize)
-                document.addEventListener('scroll', e => {
-                    const pO5 = (e.target == document ? document.body : e.target).pO5
-                    if (pO5) {
-                        const aO5s = (pO5.owns.own ? pO5.owns.own : wshp).aO5s
-                        wshp.DoScroll(aO5s, e.timeStamp)
-                    }
-                }, true)
+                document.addEventListener('scroll', DoScroll, true)
             }
 
             Finish()
@@ -292,6 +292,6 @@
     })
 
     if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
-        console.log(`}---< ${document.currentScript.src.indexOf(`/${olga5_modul}.`) > 0 ? 'дозагружен' : 'подключён '}:  ${olga5_modul}/DoInit.js`)
+        console.log(`}===< ${document.currentScript.src.indexOf(`/${olga5_modul}.`) > 0 ? 'дозагружен' : 'подключён '}:  ${olga5_modul}/${modulname}.js`)
 })();
 

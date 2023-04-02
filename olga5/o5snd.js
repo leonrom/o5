@@ -19,8 +19,10 @@
 				actscript: document.currentScript,
 			}
 		},
-		css = { olga5sndError: `olga5-sndError`, olga5sndLoad: `olga5-sndLoad`, olga5sndPause: `olga5-sndPause`,
-			olga5sndPlay: `olga5-sndPlay`, olga5sndNone: `olga5-sndNone`, olga5freeimg: `olga5-freeimg`, },
+		css = {
+			olga5sndError: `olga5-sndError`, olga5sndLoad: `olga5-sndLoad`, olga5sndPause: `olga5-sndPause`,
+			olga5sndPlay: `olga5-sndPlay`, olga5sndNone: `olga5-sndNone`, olga5freeimg: `olga5-freeimg`,
+		},
 		o5css = `
 		.${W.class}:not(.${css.olga5sndNone}) {
 			cursor: pointer;
@@ -82,14 +84,13 @@
 
 	if (!window.olga5) window.olga5 = []
 	if (!window.olga5[W.modul]) window.olga5[W.modul] = {}
-	
+
 	Object.assign(window.olga5[W.modul], { W: W, })
 	if (!window.olga5.find(w => w.modul == W.modul)) {
-		window.olga5.push(W)
 		if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
 			console.log(`}---< ${document.currentScript.src.indexOf(`/${W.modul}.`) > 0 ? 'загружен  ' : 'включён   '}:  ${W.modul}.js`)
+		window.olga5.push(W)
 		window.dispatchEvent(new CustomEvent('olga5_sload', { detail: { modul: W.modul } }))
 	} else
-		// console.error(`Повтор загрузки '${W.modul}`)
-		console.error('%c%s', "background: yellow; color: black;border: solid 2px red;", `Повтор загрузки '${W.modul}`)	
+		console.error('%c%s', "background: yellow; color: black;border: solid 2px red;", `}---< Повтор загрузки '${W.modul}`)
 })();

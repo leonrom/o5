@@ -1,1 +1,37 @@
-http://localhost/o5/olga5-tests/pop1.html?o5debug=2,aaa:4#mmm
+https://sofi.hosting.energy:1500/ispmgr
+https://www.blogger.com/blog/posts/3804831536624877489
+https://www.blogger.com/blog/themes/edit/3804831536624877489?hl=ru
+https://rombase.ru/turk/wp-admin/post.php?post=10&action=edit
+
+http://localhost/o5/blog/olga5-snd.html?o5debug=2
+https://olga-5.blogspot.com/2020/02/olga5-snd.html?o5debug=2
+https://rombase.ru/turk/main/o5snd_js/?o5debug=2
+
+http://evimturkiye.ru/forum/16-4900-1
+https://cromwell-intl.com/turkish/nouns.html
+https://turkish4d.com/course/7
+
+https://www.olx.ua/d/obyavlenie/gorelka-gazovaya-palnik-hs-509c-s-podogrevom-gaza-i-antiperelivochnym-k-IDQ6hUR.html?reason=ip%7Citem_to_vec
+
+
+
+			/* тест моих функций */
+			if (C.consts.o5debug > 2) {
+				let s = ''
+				const modul = '',
+					Prt = mtags => {
+						s = ''
+						mtags.forEach(mtag => {
+							s += (!mtag.quals ? C.MakeObjName(mtag) : CheckNew
+								(C.MakeObjName(mtag.tag) + '(' + mtag.quals.join(',') + ')')) + '; '
+						})
+						console.log(s)
+					}
+				console.groupCollapsed(` тест моих функций функций выборки `)
+				Prt(C.GetTagsByQueryes('[o5popup],[title]', modul))
+				Prt(C.GetTagsByIds("div_strt", modul))
+				Prt(C.GetTagsByClassNames('olga5_page_header, olga5_shp', modul))
+				Prt(C.GetTagsByTagNames('div,p', modul))
+				Prt(C.SelectByClassName('olga5_shp', modul, true))
+				console.groupEnd()
+			}

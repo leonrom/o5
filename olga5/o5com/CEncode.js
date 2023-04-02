@@ -56,6 +56,8 @@
 			if (url.match(/^\s*data:/)) {
 				return { url: url.trim(), err: '', num: 0 }
 			}
+			// if (url.match('myTunes-icon'))					
+			// 	console.log(121212)				
 			const errs = [],
 				parts = [],
 				Replace4320 = u =>
@@ -63,11 +65,9 @@
 				IsCompaund = orig => orig && (orig.includes('+') || IsUrlNam(orig)),
 				SplitRefs = (s, refs = null) => {
 					s.split('+').forEach(sprt => {
-						const prt = sprt.trim(),
-							isnam = IsUrlNam(prt),
+						const prt = sprt.replace(C.repQuotes, ''),	// trim(),
+							isnam = IsUrlNam(prt), 
 							ref = isnam ? C.Repname(prt) : prt
-						// if (prt == 'btnSound' || prt == 'btnsound')
-						// 	console.log()
 
 						if (isnam) parts.num++
 						if (refs && refs.find(r => ref == r))
@@ -146,7 +146,7 @@
 		}
 
 	wshp[modulname] = () => {
-		// if (C.consts.o5debug > 0) console.log(`}===  инициализация ${olga5_modul}/${modulname}.js`)
+		// if (C.consts.o5debug > 0) console.log(`===  инициализация ${olga5_modul}/${modulname}.js`)
 		Object.assign(C, {
 			DelBacks: DelBacks,
 			IsFullUrl: IsFullUrl,
@@ -157,5 +157,5 @@
 	}
 
 	if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
-		console.log(`}---> подключен ${olga5_modul}/${modulname}.js`)
+		console.log(`}===< ${document.currentScript.src.indexOf(`/${olga5_modul}.`) > 0 ? 'дозагружен' : 'подключён '}:  ${olga5_modul}/${modulname}.js`)
 })();

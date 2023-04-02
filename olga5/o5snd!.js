@@ -5,7 +5,8 @@
 
 (function () {              // ---------------------------------------------- o5snd/AO5snd ---
     "use strict"
-    const olga5_modul = 'o5snd'
+    const olga5_modul = 'o5snd',
+        modulname = 'AO5snd'
 
     if (!window.olga5) window.olga5 = []
     if (!window.olga5[olga5_modul]) window.olga5[olga5_modul] = {}
@@ -38,7 +39,7 @@
                         audio.volume = v > setVolume.vmax ? setVolume.vmax : (v < setVolume.vmin ? setVolume.vmin : v)
                         SetTitle(aO5, txt)
                         if (o5debug > 1)
-                            console.log(`Изменено: ${txt} для '${aO5.name}' }`)
+                            console.log(`${olga5_modul}/${modulname} Изменено: ${txt} для '${aO5.name}' }`)
                     }
                 }
             },
@@ -66,7 +67,7 @@
                 RemError: (aO5, mrk) => {
                     if (aO5.sound.errIs[mrk]) {
                         errTypes.SetT(aO5, mrk, false)
-                        console.log(`Устранена ошибка: errTypes.${mrk}`)
+                        console.log(`${olga5_modul}/${modulname} Устранена ошибка: errTypes.${mrk}`)
 
                         const errIs = aO5.sound.errIs
                         for (const erri in errIs)
@@ -83,13 +84,13 @@
                 const sound = aO5.sound,
                     audio = sound.audio,
                     Play = (aO5) => {
-                        if (o5debug > 1) console.log(`  > Play()`)
+                        if (o5debug > 1) console.log(`${olga5_modul}/${modulname}   > Play()`)
 
                         if (aO5.modis.over && !C.cstate.activated)
                             errTypes.AddError(aO5, 'неАктивир.')
 
                         if (sound.ison) { // если курсор не ушел
-                            if (o5debug > 1) console.log(`--> Play OK`)
+                            if (o5debug > 1) console.log(`${olga5_modul}/${modulname} --> Play OK`)
                             try {
                                 const audio = sound.audio
                                 // audio.volume = aO5.sound.volume
@@ -107,7 +108,7 @@
                             wshp.StopSound(aO5)
                     }
 
-                if (o5debug > 1) console.log(`--> StartSound() из '${aO5.sound.state}'`)
+                if (o5debug > 1) console.log(`${olga5_modul}/${modulname} --> StartSound() из '${aO5.sound.state}'`)
 
                 if (wshp.actaudio && wshp.actaudio != audio)
                     wshp.StopSound(wshp.actaudio.aO5snd)
@@ -186,7 +187,7 @@
                             snd = GetTargetObj(e),
                             aO5 = snd.aO5snd
 
-                        if (o5debug > 1) console.log(`--> OnPlayAct.${txt}  ${('' + e.timeStamp).padStart(8)}` +
+                        if (o5debug > 1) console.log(`${olga5_modul}/${modulname}  OnPlayAct.${txt}  ${('' + e.timeStamp).padStart(8)}` +
                             ` для ${aO5.name} '${type}' при isOny= ${aO5.sound.ison}`)
 
                         eacts.find(eact => eact.type == type).Act(snd, e)
@@ -203,7 +204,7 @@
                             aO5 = snd.aO5snd,
                             sound = aO5.sound
 
-                        if (o5debug > 1) console.log(`--> CallStartSound() ${aO5.name} '${aO5.sound.state}'  e.type= '${e.type}'`)
+                        if (o5debug > 1) console.log(`${olga5_modul}/${modulname}  CallStartSound() ${aO5.name} '${aO5.sound.state}'  e.type= '${e.type}'`)
                         Object.assign(aO5.sound, { ison: true, shiftKey: e.shiftKey ? (e.location == 2 ? 1 : -1) : 0 })
 
                         if (e.type == 'mouseenter')
@@ -217,7 +218,7 @@
                         else if (e.type == 'click') {
                             const isA = snd.tagName.toUpperCase() == 'A'
                             switch (sound.state) {
-                                case ss.pause: 
+                                case ss.pause:
                                     if (isA) {
                                         wshp.StopSound(aO5)
                                         return // чтобы избежать StopBubble(e)
@@ -273,7 +274,7 @@
                     },
                     audio = aO5.sound.audio = new Audio() // ocument.createElement('audio'),
 
-                if (o5debug > 1) console.log(`-- Activate ${aO5.name} '${e.type}'`)
+                if (o5debug > 1) console.log(`${olga5_modul}/${modulname}  Activate ${aO5.name} '${e.type}'`)
 
                 setVolume.SetV(aO5, 0)
 
@@ -300,7 +301,7 @@
             WaitActivate = snd => {
                 if (snd.aO5snd.modis.none) return
 
-                if (o5debug > 2) console.log(`-- WaitActivate ${snd.id}`)
+                if (o5debug > 2) console.log(`${olga5_modul}/${modulname}  WaitActivate ${snd.id}`)
                 for (const eWait of eFocus)
                     snd.addEventListener(eWait, Activate, { capture: true })
             }
@@ -343,7 +344,8 @@
     }
 
     window.olga5[olga5_modul].AO5snd = AO5snd
-    console.log(`}---< ${document.currentScript.src.indexOf(`/${olga5_modul}.`) > 0 ? 'дозагружен' : 'подключён '}:  ${olga5_modul}/AO5snd.js`)
+    if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
+        console.log(`}===< ${document.currentScript.src.indexOf(`/${olga5_modul}.`) > 0 ? 'дозагружен' : 'подключён '}:  ${olga5_modul}/${modulname}.js`)
 })();
 /* global window, document, console */
 /*jshint asi:true  */
@@ -352,7 +354,8 @@
 
 (function () {              // ---------------------------------------------- o5snd/Imgs ---
     "use strict"
-    const olga5_modul = 'o5snd'
+    const olga5_modul = 'o5snd',
+        modulname = 'Prep'
 
     if (!window.olga5) window.olga5 = []
     if (!window.olga5[olga5_modul]) window.olga5[olga5_modul] = {}
@@ -383,7 +386,7 @@
         setClass: {
             stop: 'stop', play: 'play', pause: 'pause',
             SetC: (aO5, state) => {
-                if (o5debug > 1) console.log(`--> setClass.SetC (${aO5.name}, '${state}')`)
+                if (o5debug > 1) console.log(`${olga5_modul}/${modulname} SetC (${aO5.name}, '${state}')`)
                 const classList = (aO5.image.play ? aO5.image.play : aO5.snd).classList
                 if (state == wshp.setClass.play) {
                     const image = aO5.image
@@ -420,7 +423,7 @@
             return ori
         },
         StopSound: aO5 => {
-            if (o5debug > 1) console.log(`--> StopSound (${aO5.name})`)
+            if (o5debug > 1) console.log(`${olga5_modul}/${modulname}  StopSound (${aO5.name})`)
             wshp.actaudio = null
 
             const image = aO5.image,
@@ -491,7 +494,6 @@
                     if (ori.url) {
                         const url = TryEncode(ori, snd)
                         if (url != snd[srcAtr]) {
-                            // console.log('setAttribute',srcAtr, url)
                             snd.setAttribute(srcAtr, url)
                             urlattrs.push({ snd: aO5.name, atr: srcAtr, url: url, 'ориг.': ori.url })
                         }
@@ -617,7 +619,7 @@
     })
 
     if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
-        console.log(`}---< ${document.currentScript.src.indexOf(`/${olga5_modul}.`) > 0 ? 'дозагружен' : 'подключён '}:  ${olga5_modul}/Imgs.js`)
+        console.log(`}===< ${document.currentScript.src.indexOf(`/${olga5_modul}.`) > 0 ? 'дозагружен' : 'подключён '}:  ${olga5_modul}/${modulname}.js`)
 })();
 /* global window, document, console */
 /*jshint asi:true  */
@@ -626,7 +628,8 @@
 
 (function () {              // ---------------------------------------------- o5snd/Imgs ---
     "use strict"
-    const olga5_modul = 'o5snd'
+    const olga5_modul = 'o5snd',
+        modulname = 'Imgs'
 
     if (!window.olga5) window.olga5 = []
     if (!window.olga5[olga5_modul]) window.olga5[olga5_modul] = {}
@@ -658,15 +661,15 @@
                     Not only is this the w3c recommendation but it’s the faster method in IE8, the version users are slowly starting to adopt.
                     */
                     if (C.consts.o5debug > 2)
-                        console.log(`olga5_Imgs создание нового для url=${url}`)
+                        console.log(`${olga5_modul}/${modulname} olga5_Imgs создание нового для url=${url}`)
 
                     const nimg = document.createElement('img')
                     Object.assign(nimg, { src: url, importance: 'high', loading: 'eager', crossOrigin: null })
                     maps.set(url, { img: nimg, err: '' })
 
                     nimg.addEventListener('load', () => {
-                        if (C.consts.o5debug >1)
-                            console.log(`GetImgForRef: загружен url= ${url}`)
+                        if (C.consts.o5debug > 1)
+                            console.log(`${olga5_modul}/${modulname} GetImgForRef: загружен url= ${url}`)
                         if (url.trim() == '')
                             alert('url=?')
 
@@ -675,7 +678,7 @@
 
                     nimg.addEventListener('error', e => {
                         // Reject(`GetImgForRef: для url=${url}- ошибка ${e.message ? e.message : 'не определен (?)'}`)
-                        Reject({err:`GetImgForRef ошибка: ${e.message ? e.message : 'не определен'}`, url:url})
+                        Reject({ err: `GetImgForRef ошибка: ${e.message ? e.message : 'не определен'}`, url: url })
                     }, { once: true })
                 }
             }),
@@ -689,7 +692,7 @@
                     if (!isinmap)
                         maps.set(url, { img: img.cloneNode(true), err: '' })
                     if (C.consts.o5debug > 1)
-                        console.log(`olga5_Imgs ${isinmap ? 'повтор  ' : 'добавлен'} url=${url} для img.id='${img.id}' ${s}`)
+                        console.log(`${olga5_modul}/${modulname} olga5_Imgs ${isinmap ? 'повтор  ' : 'добавлен'} url=${url} для img.id='${img.id}' ${s}`)
                 }
                 else
                     console.error(`olga5_Imgs : попытка добавить` + (img ? ` пустой src для img.id='${img.id}'` : ` пустой  <img>`))
@@ -753,7 +756,7 @@
                     img.parentNode.removeChild(img)
                     img = null
                 }).catch(reject => {
-                    C.ConsoleError(reject.err,reject.url.replace(/https?:\/\//, ''))
+                    C.ConsoleError(reject.err, reject.url.replace(/https?:\/\//, ''))
                 })
                 // }).catch(err => {
                 //     C.ConsoleError(`SetImgByRef.${err}`)
@@ -815,9 +818,9 @@
     }
 
     window.olga5[olga5_modul].Imgs = Imgs
-    
-	if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
-    console.log(`}---< ${document.currentScript.src.indexOf(`/${olga5_modul}.`) > 0 ? 'дозагружен' : 'подключён '}:  ${olga5_modul}/Imgs.js`)
+
+    if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
+        console.log(`}===< ${document.currentScript.src.indexOf(`/${olga5_modul}.`) > 0 ? 'дозагружен' : 'подключён '}:  ${olga5_modul}/${modulname}.js`)
 })();
 /* global document, window, console*/
 /*jshint asi:true  */
@@ -840,8 +843,10 @@
 				actscript: document.currentScript,
 			}
 		},
-		css = { olga5sndError: `olga5-sndError`, olga5sndLoad: `olga5-sndLoad`, olga5sndPause: `olga5-sndPause`,
-			olga5sndPlay: `olga5-sndPlay`, olga5sndNone: `olga5-sndNone`, olga5freeimg: `olga5-freeimg`, },
+		css = {
+			olga5sndError: `olga5-sndError`, olga5sndLoad: `olga5-sndLoad`, olga5sndPause: `olga5-sndPause`,
+			olga5sndPlay: `olga5-sndPlay`, olga5sndNone: `olga5-sndNone`, olga5freeimg: `olga5-freeimg`,
+		},
 		o5css = `
 		.${W.class}:not(.${css.olga5sndNone}) {
 			cursor: pointer;
@@ -903,14 +908,13 @@
 
 	if (!window.olga5) window.olga5 = []
 	if (!window.olga5[W.modul]) window.olga5[W.modul] = {}
-	
+
 	Object.assign(window.olga5[W.modul], { W: W, })
 	if (!window.olga5.find(w => w.modul == W.modul)) {
-		window.olga5.push(W)
 		if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
 			console.log(`}---< ${document.currentScript.src.indexOf(`/${W.modul}.`) > 0 ? 'загружен  ' : 'включён   '}:  ${W.modul}.js`)
+		window.olga5.push(W)
 		window.dispatchEvent(new CustomEvent('olga5_sload', { detail: { modul: W.modul } }))
 	} else
-		// console.error(`Повтор загрузки '${W.modul}`)
-		console.error('%c%s', "background: yellow; color: black;border: solid 2px red;", `Повтор загрузки '${W.modul}`)	
+		console.error('%c%s', "background: yellow; color: black;border: solid 2px red;", `}---< Повтор загрузки '${W.modul}`)
 })();

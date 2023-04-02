@@ -5,7 +5,8 @@
 
 (function () {              // ---------------------------------------------- o5snd/Imgs ---
     "use strict"
-    const olga5_modul = 'o5snd'
+    const olga5_modul = 'o5snd',
+        modulname = 'Imgs'
 
     if (!window.olga5) window.olga5 = []
     if (!window.olga5[olga5_modul]) window.olga5[olga5_modul] = {}
@@ -37,15 +38,15 @@
                     Not only is this the w3c recommendation but it’s the faster method in IE8, the version users are slowly starting to adopt.
                     */
                     if (C.consts.o5debug > 2)
-                        console.log(`olga5_Imgs создание нового для url=${url}`)
+                        console.log(`${olga5_modul}/${modulname} olga5_Imgs создание нового для url=${url}`)
 
                     const nimg = document.createElement('img')
                     Object.assign(nimg, { src: url, importance: 'high', loading: 'eager', crossOrigin: null })
                     maps.set(url, { img: nimg, err: '' })
 
                     nimg.addEventListener('load', () => {
-                        if (C.consts.o5debug >1)
-                            console.log(`GetImgForRef: загружен url= ${url}`)
+                        if (C.consts.o5debug > 1)
+                            console.log(`${olga5_modul}/${modulname} GetImgForRef: загружен url= ${url}`)
                         if (url.trim() == '')
                             alert('url=?')
 
@@ -54,7 +55,7 @@
 
                     nimg.addEventListener('error', e => {
                         // Reject(`GetImgForRef: для url=${url}- ошибка ${e.message ? e.message : 'не определен (?)'}`)
-                        Reject({err:`GetImgForRef ошибка: ${e.message ? e.message : 'не определен'}`, url:url})
+                        Reject({ err: `GetImgForRef ошибка: ${e.message ? e.message : 'не определен'}`, url: url })
                     }, { once: true })
                 }
             }),
@@ -68,7 +69,7 @@
                     if (!isinmap)
                         maps.set(url, { img: img.cloneNode(true), err: '' })
                     if (C.consts.o5debug > 1)
-                        console.log(`olga5_Imgs ${isinmap ? 'повтор  ' : 'добавлен'} url=${url} для img.id='${img.id}' ${s}`)
+                        console.log(`${olga5_modul}/${modulname} olga5_Imgs ${isinmap ? 'повтор  ' : 'добавлен'} url=${url} для img.id='${img.id}' ${s}`)
                 }
                 else
                     console.error(`olga5_Imgs : попытка добавить` + (img ? ` пустой src для img.id='${img.id}'` : ` пустой  <img>`))
@@ -132,7 +133,7 @@
                     img.parentNode.removeChild(img)
                     img = null
                 }).catch(reject => {
-                    C.ConsoleError(reject.err,reject.url.replace(/https?:\/\//, ''))
+                    C.ConsoleError(reject.err, reject.url.replace(/https?:\/\//, ''))
                 })
                 // }).catch(err => {
                 //     C.ConsoleError(`SetImgByRef.${err}`)
@@ -194,7 +195,7 @@
     }
 
     window.olga5[olga5_modul].Imgs = Imgs
-    
-	if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
-    console.log(`}---< ${document.currentScript.src.indexOf(`/${olga5_modul}.`) > 0 ? 'дозагружен' : 'подключён '}:  ${olga5_modul}/Imgs.js`)
+
+    if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
+        console.log(`}===< ${document.currentScript.src.indexOf(`/${olga5_modul}.`) > 0 ? 'дозагружен' : 'подключён '}:  ${olga5_modul}/${modulname}.js`)
 })();

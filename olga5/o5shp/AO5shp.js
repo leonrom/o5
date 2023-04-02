@@ -5,7 +5,8 @@
 
 (function () {              // ---------------------------------------------- o5shp/AO5shp ---
     "use strict"
-    const olga5_modul = "o5shp"
+    const olga5_modul = "o5shp",
+    modulname = 'AO5shp'
 
     if (!window.olga5) window.olga5 = []
     if (!window.olga5[olga5_modul]) window.olga5[olga5_modul] = {}
@@ -118,15 +119,15 @@
                 w: GPV('padding-left') + GPV('padding-right') + GPV('border-left-width') + GPV('border-right-width'),
                 h: GPV('padding-top') + GPV('padding-bottom') + GPV('border-top-width') + GPV('border-bottom-width')
             })
-//             const PN=n=>{   
-//                 const nst1 = window.getComputedStyle(shp)
-//                 const nst2 = window.getComputedStyle(shdw)
-//                 console.log('shp  : '+shp.id +"  zoom="+nst.zoom+", trans="+nst.transform+", zoom="+shp.style.zoom+", trans="+shp.style.transform+"   =====  " +n)
-//                 console.log('shdw : '+shdw.id+"  zoom="+nst2.zoom+", trans="+nst2.transform+", zoom="+shdw.style.zoom+", trans="+shdw.style.transform+"")
-//                 console.log('shp1 : '+shp.id +"  zoom="+nst1.zoom+", trans="+nst1.transform )
-//                 // console.log('shdw: '+shp.id+"  outlineWidth='"+nst2.outlineWidth+"' outline='"+nst2.outline+"' zoom="+nst2.zoom+", transform='"+nst2.transform+"'")
-//             }
-// PN(1)
+            //             const PN=n=>{   
+            //                 const nst1 = window.getComputedStyle(shp)
+            //                 const nst2 = window.getComputedStyle(shdw)
+            //                 console.log('shp  : '+shp.id +"  zoom="+nst.zoom+", trans="+nst.transform+", zoom="+shp.style.zoom+", trans="+shp.style.transform+"   =====  " +n)
+            //                 console.log('shdw : '+shdw.id+"  zoom="+nst2.zoom+", trans="+nst2.transform+", zoom="+shdw.style.zoom+", trans="+shdw.style.transform+"")
+            //                 console.log('shp1 : '+shp.id +"  zoom="+nst1.zoom+", trans="+nst1.transform )
+            //                 // console.log('shdw: '+shp.id+"  outlineWidth='"+nst2.outlineWidth+"' outline='"+nst2.outline+"' zoom="+nst2.zoom+", transform='"+nst2.transform+"'")
+            //             }
+            // PN(1)
             for (const prop of [   // перенос нужных "внешних" свойств на cart 
                 'outline-color', 'outline-offset', 'outline-style', 'outline-width'
             ]) {
@@ -164,7 +165,7 @@
             for (const o of [cart, aO5.posW, aO5.posC, aO5.posS]) Object.seal(o)
             Object.freeze(aO5)
 
-// PN(2)
+            // PN(2)
             shp.addEventListener('dblclick', DoShpClick, { capture: true, passive: true })
 
             // wshp.AO5shp(aO5)
@@ -196,8 +197,8 @@
         located = Object.assign({ act: 'located', asks: [], }, Tbelong)
         posW = { top: 0, left: 0, height: 0, width: 0 }
         posC = Object.assign({}, this.posW)
-        posS = {top: 0, left: 0, }
-        sizS = {height: 0, width: 0, }
+        posS = { top: 0, left: 0, }
+        sizS = { height: 0, width: 0, }
 
         cart = null
         shdw = null
@@ -265,5 +266,5 @@
     })
 
     if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
-        console.log(`}---< ${document.currentScript.src.indexOf(`/${olga5_modul}.`) > 0 ? 'дозагружен' : 'подключён '}:  ${olga5_modul}/AO5shp.js`)
+        console.log(`}===< ${document.currentScript.src.indexOf(`/${olga5_modul}.`) > 0 ? 'дозагружен' : 'подключён '}:  ${olga5_modul}/${modulname}.js`)
 })();

@@ -42,7 +42,7 @@
 		}
 
 	wshp[modulname] = () => {
-		// if (C.consts.o5debug > 0) console.log(`}===  инициализация ${olga5_modul}/${modulname}.js`)
+		// if (C.consts.o5debug > 0) console.log(`===  инициализация ${olga5_modul}/${modulname}.js`)
 		Object.assign(C, {
 			owners: [],
 			scrpts: [],
@@ -127,7 +127,7 @@
 						}
 						C.owners.push({ start: tag, modules: quals, origcls: m }) // специально чуть по-иному
 						if (C.consts.o5debug > 2)
-							console.log(`QuerySelectorInit: id='${tag.id}',  '${m}', \n\t${quals}`)
+							console.log(`${olga5_modul}/${modulname} QuerySelectorInit: id='${tag.id}',  '${m}', \n\t${quals}`)
 					}
 				if (errs.length > 0)
 					C.ConsoleError(`Неопределены квалификаторы для '${scls}': `, errs.join(', '))
@@ -136,12 +136,12 @@
 		return true
 	}
 	if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
-		console.log(`}---> подключен ${olga5_modul}/${modulname}.js`)
-		/*
-		тестирование Match()
-		\bolga5_snd(\s*[,:+]\s*((([`'"\(\[])(.*?)\4)|[^\s`'":,+]*))*(\s*|$)
+		console.log(`}===< ${document.currentScript.src.indexOf(`/${olga5_modul}.`) > 0 ? 'дозагружен' : 'подключён '}:  ${olga5_modul}/logs.js`)
+	/*
+	тестирование Match()
+	\bolga5_snd(\s*[,:+]\s*((([`'"\(\[])(.*?)\4)|[^\s`'":,+]*))*(\s*|$)
 
-		olga5_snd
+	olga5_snd
 aaa olga5_snd: q: q  asa
 aaa olga5_snd: q : q : a  asa
 aaa olga5_snd:over : a-11_z : loop  asa
@@ -159,5 +159,5 @@ aaa olga5_snd: Lяя :Aюю:'ёй-sounds_2 + /gitme.mp3 bbb:O'asa
 aaa olga5_snd: Lяя :Aюю :'ёй-sounds_2 + /gitme.mp3 bbb:O' asa
 aaa dlassaaa:A olga5_snd:over : a-11_z: loop :  "  sounds + Ceza1-25.mp3" 
 
-		*/
+	*/
 })();
