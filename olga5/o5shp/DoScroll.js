@@ -72,7 +72,7 @@
 
             for (const hoverMarks of ['to', 'le', 'ri', 'bo']) {
                 const pO5 = aO5.hovered[hoverMarks]
-                if (pO5.located.timeStamp != timeStamp) { // чтобы не повторяться для одинаковых
+                if (pO5 && pO5.located && pO5.located.timeStamp != timeStamp) { // чтобы не повторяться для одинаковых
                     Located(pO5.prevs, pO5.located)
                     pO5.located.timeStamp = timeStamp
                 }
