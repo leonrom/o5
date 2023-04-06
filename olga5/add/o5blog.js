@@ -131,12 +131,12 @@ canvas{
                 h = parseFloat(nst.getPropertyValue('height')) || 0
             canvas.style.height = h + 'px'
         },
-        GetCSS = () => {
-            const chs = document.head.children
-            for (const ch of chs)
-                if (ch.nodeName == "STYLE" && ch.id == namo5css)
-                    return ch
-        },
+        // GetCSS = () => {
+        //     const chs = document.head.children
+        //     for (const ch of chs)
+        //         if (ch.nodeName == "STYLE" && ch.id == namo5css)
+        //             return ch
+        // },
         // FillMenu = function () {
         //     if (C.consts.o5nomnu <= 0) {
         //         const dsbl = W.class + '_dsbl',

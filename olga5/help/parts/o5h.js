@@ -39,6 +39,15 @@ h4{
    margin-block-end: 0.3em;
 }
 `,
+        OnSize = (e) => {
+            console.log(`o5h: data=${e.data} e.timeStamp= ${e.timeStamp}`);
+            const data = JSON.parse(e.data)
+            if (data.code == 'width') {
+                const h = GetSize(`${data.width}px`, 'h').h
+                // div.style.height = `${h}px`
+                window.top.postMessage(`{"name":"${name}", "code":"height", "height":"${h}"}`, '*')
+            }
+        },
         Init = (width) => {
             const div = document.getElementsByTagName('div')[0],
                 style = div.style,
@@ -46,15 +55,6 @@ h4{
                     style.width = wstyle
                     const nst = window.getComputedStyle(div)
                     return { w: parseInt(nst.width), h: parseInt(nst.height) }
-                },
-                OnSize = (e) => {
-                    console.log(`o5h: data=${e.data} e.timeStamp= ${e.timeStamp}`);
-                    const data = JSON.parse(e.data)
-                    if (data.code == 'width'){
-                        const h = GetSize(`${data.width}px`, 'h').h
-                        // div.style.height = `${h}px`
-                        window.top.postMessage(`{"name":"${name}", "code":"height", "height":"${h}"}`, '*')
-                    }
                 },
                 wmin = GetSize('min-content', 'w').w + 10, // это добавил paddingRight (?)
                 wmax = GetSize('max-content', 'w').w + 10

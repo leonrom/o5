@@ -170,7 +170,9 @@
 	display:none;
 }
 `,
-		win = { target: '_self', resize: true, scrollX: 0, scrollY: -18, blockclick: false, timclick: 0 },
+
+			// const phases = ['NONE', 'CAPTURING_PHASE', 'AT_TARGET', 'BUBBLING_PHASE',]
+		win = { target: '_self', resize: true, scrollX: 0, scrollY: -18,  }, // blockclick: false, timclick: 0 },
 		Target = function (e) {
 			let target = e.toElement || e.target
 			while (target && !target.o5menus) target = target.parentElement
@@ -188,6 +190,35 @@
 			} else
 				C.ConsoleError("GoTo: не определён тег в текущем окне: ", o5menus.ref)
 		},
+		DoMnu = e => {
+			console.log('DoMnu: ' + e.type + ' ' + e.eventPhase + ' ' + e.timeStamp.toFixed(1).padEnd(6) )
+			const target = Target(e)
+			if (target && target.o5menus.ready) {
+				const o5menus = target.o5menus
+				o5menus.ready = false
+				if (o5menus.isext) window.open(o5menus.ref, win.target)
+				else GoTo(o5menus)
+
+				if (win.resize) {
+					// window.dispatchEvent(new window.Event('resize'))
+					const wshp = window.olga5.o5shp
+					if (wshp)
+						wshp.DoResize(wshp.aO5s)
+				}
+				win.blockclick = true
+				e.cancelBubble = true
+			}
+		},
+		Clear = e => {
+			console.log('Clear: ' + e.type + ' ' + e.eventPhase + ' ' + e.timeStamp.toFixed(1).padEnd(6) + 
+				' ' + (win.blockclick?'очищаю':''))
+			if (win.blockclick) {
+				win.blockclick = false
+				e.cancelBubble = true
+			}
+			// // win.timclick = e.timeStamp
+			// e.cancelBubble = true
+		},
 		MnuInit = function (items) {
 			if (C.consts.o5nomnu > 0) return
 
@@ -196,27 +227,6 @@
 			if (!items || !items[0]) errs.push(`${proc}: не определеныа структура меню`)
 			if (errs.length == 0) {
 				const uls = [],
-					DoMnu = e => {
-						const target = Target(e)
-						if (target && target.o5menus.ready) {
-							const o5menus = target.o5menus
-							o5menus.ready = false
-							if (o5menus.isext) window.open(o5menus.ref, win.target)
-							else GoTo(o5menus)
-
-							if (win.resize) window.dispatchEvent(new window.Event('resize'))
-							win.blockclick = true
-							e.cancelBubble = true
-						}
-					},
-					Clear = e => {
-						const phases = ['NONE', 'CAPTURING_PHASE', 'AT_TARGET', 'BUBBLING_PHASE',]
-						if (win.blockclick) {
-							win.blockclick = false
-							e.cancelBubble = true
-						}
-						win.timclick = e.timeStamp
-					},
 					item0 = items[0],
 					base = item0.base || ''
 
@@ -266,8 +276,11 @@
 				else
 					C.InsertBefore(owner, ul, owner.firstChild)
 
-				ul.addEventListener('mousedown', DoMnu, { capture: true })
-				window.addEventListener('click', Clear, { capture: false })
+				ul.addEventListener('mousedown', DoMnu, true)
+				ul.addEventListener('click', DoMnu, true)
+				window.addEventListener('click', Clear, true) 
+				// ul.style.zIndex = 99999
+				
 
 				uls[0] = ul
 				const blc = (item0.block || 's')[0].toLowerCase(),
@@ -276,6 +289,9 @@
 				let m = 0
 				for (const item of items) {
 					const li = document.createElement('li')
+
+				// li.addEventListener('click', Clear, true) 
+				li.style.zIndex = 99999
 					li.o5menus = { isext: true, block: block }
 					if (item.ref) {
 						const ref = item.ref || '',

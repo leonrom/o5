@@ -218,7 +218,7 @@
 		if (C.consts.o5debug > 0) (C.save.libName, xs, p, n1)
 
 		// delete C.save
-		Object.freeze(C)
+		// Object.freeze(C)
 		return true
 	}
 

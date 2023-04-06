@@ -489,6 +489,7 @@ img.${W.class} {
             }
             return ss.join(',')
         },
+        optsFocus={ capture: true, moja: 'fignia' },
         Focus = e => {
             if (wopens.length == 0 || focusTime == e.timeStamp) return
 
@@ -535,7 +536,7 @@ img.${W.class} {
             }
 
         for (const eve of ['focus', 'click'])
-            window.addEventListener(eve, Focus, { capture: true, moja: 'fignia' })  // т.е. e.eventPhase ==1
+            window.addEventListener(eve, Focus, optsFocus )  // т.е. e.eventPhase ==1
 
         window.addEventListener(click, ClosePops)
 
@@ -648,17 +649,6 @@ img.${W.class} {
         }
     }
     document.addEventListener('DOMContentLoaded', AutoInit)
-
-    // let b=0
-    // for (let i=0; i<4; i++){
-    // document.addEventListener('DOMContentLoaded', e => { // автономный запуск
-    //   console.log(`Bb ${b++}`)
-    // })}
-    // const Aa=e => { // автономный запуск
-    //     console.log(`Aa ${a++}`)
-    //   }
-    // for (let i=0; i<4; i++){
-    // document.addEventListener('DOMContentLoaded', Aa)}
 
     if (!window.olga5.find(w => w.modul == W.modul)) {
         if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))

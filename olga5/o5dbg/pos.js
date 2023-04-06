@@ -36,6 +36,23 @@
 				mposPos.y = e.pageY
 			} else
 				mposPos.x = mposPos.y = 0
+		},
+		StopMoveAct = (e) => {
+			if (mposAct) {
+				mposAct.div.style.cursor = m_cursor
+				mposAct = null
+			}
+			ShowPos(e)
+		},
+		SetVP = () => {
+			const wp = window.visualViewport,
+				W = wp ? wp.width : window.innerWidth,
+				H = wp ? wp.height : window.innerHeight
+			Object.assign(viewport, { wp, W, H })
+		},
+		MyMouseMove = (e) => {
+			if (mposAct) mposAct.MoveAct(e.pageX, e.pageY)
+			ShowPos(e)
 		}
 
 	class Mdiv {
@@ -117,24 +134,7 @@
 		console.log(`${W.modul}: MousePos()` + (isInitiated ? 'игнорируется' : ''))
 		if (isInitiated) return
 
-		const div = document.createElement('div'),
-			StopMoveAct = (e) => {
-				if (mposAct) {
-					mposAct.div.style.cursor = m_cursor
-					mposAct = null
-				}
-				ShowPos(e)
-			},
-			SetVP = () => {
-				const wp = window.visualViewport,
-					W = wp ? wp.width : window.innerWidth,
-					H = wp ? wp.height : window.innerHeight
-				Object.assign(viewport, { wp, W, H })
-			},
-			MyMouseMove = (e) => {
-				if (mposAct) mposAct.MoveAct(e.pageX, e.pageY)
-				ShowPos(e)
-			}
+		const div = document.createElement('div')
 
 		document.body.appendChild(div)
 

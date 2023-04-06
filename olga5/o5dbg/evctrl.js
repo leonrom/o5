@@ -41,7 +41,7 @@
 
 	eventsControl.Add()
 
-	function listAllEventListeners() {
+	function listAllEventListeners(e) {
 		const allElements = Array.prototype.slice.call(document.querySelectorAll('*'));
 		allElements.push(document);
 		allElements.push(window);
@@ -96,7 +96,7 @@
 
 		}
 		// return elements.sort();
-		console.groupCollapsed('%c%s', `background: green;color:white;`, `перечень слушателей событий`)
+		console.groupCollapsed('%c%s', `background: green;color:white;`, `перечень слушателей событий ` + e.type)
 		console.table(elements)
 		console.groupEnd()
 	};
@@ -134,6 +134,7 @@
 		if (this.eventListenerList[a].length == 0) delete this.eventListenerList[a];
 	};
 
-	window.addEventListener('olga5_ready', listAllEventListeners)
+	listAllEventListeners({type:'инициализация'})
+	window.addEventListener('olga5_ready', listAllEventListeners)	
 	console.timeEnd(timera)
 })();

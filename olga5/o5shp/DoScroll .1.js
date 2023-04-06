@@ -43,55 +43,11 @@
                         else
                             CalcParentLocate(parent.pO5)
         },
-        PrepareBords1 = (aO5) => {
-            const
-                NewBords = (bord, a) => {
-                    const pO5 = bord.pO5,
-                        pos = pO5.pos
-                    if (pos.top != pos.bottom) {
-                        if (a.to == null || a.to.pos.top < pos.top) a.to = pO5
-                        if (a.bo == null || a.bo.pos.bottom > pos.bottom) a.bo = pO5
-                    }
-                    if (pos.left != pos.right) {
-                        if (a.le == null || a.le.pos.left < pos.left) a.le = pO5
-                        if (a.ri == null || a.ri.pos.right > pos.right) a.ri = pO5
-                    }
-                },
-                Hovered = (bords, a) => {
-                    let j = bords.length
-                    while (j-- > 0)
-                        NewBords(bords[j], a)
-                },
-                Located = (bords, a) => {
-                    for (let j = 0; j < bords.length; j++)
-                        NewBords(bords[j], a)
-                }
-
-            Object.assign(aO5.hovered, { to: null, le: null, ri: null, bo: null })
-            for (const ask of aO5.hovered.asks)
-                Hovered([ask.bords[0]], aO5.hovered)
-
-            Object.assign(aO5.located, { to: null, le: null, ri: null, bo: null })
-            for (const ask of aO5.located.asks)
-                Located(ask.bords, aO5.located)
-
-            for (const hoverMarks of ['to', 'le', 'ri', 'bo']) {
-                const pO5 = aO5.hovered[hoverMarks]
-                if (!pO5 || !pO5.located)
-                    alert(`located '${hoverMarks}' (in  DoScroll.PrepareBords)`)
-
-                if (pO5.located.timeStamp != timeStamp) { // чтобы не повторяться для одинаковых
-                    Hovered(pO5.prevs, pO5.located)
-                    pO5.located.timeStamp = timeStamp
-                }
-            }
-
-        },
         PrepareBords = (aO5) => {
-            const bO5 = document.body.pO5,
+            const // bO5 = bords.length>0?bords[bords.length-1].pO5:null, // document.body.pO5,
                 a = { to: bO5, le: bO5, ri: bO5, bo: bO5 },
                 Located = (bords, a) => {
-                    const bO5 = bords.length > 0 ? bords[bords.length - 1].pO5 : null
+                    const bO5 = bords.length>0?bords[bords.length-1].pO5:null
                     for (const bord of bords) {
                         const pO5 = bord.pO5,
                             pos = pO5.pos
@@ -117,14 +73,16 @@
 
             for (const hoverMarks of ['to', 'le', 'ri', 'bo']) {
                 const pO5 = aO5.hovered[hoverMarks]
-                if (!pO5 || !pO5.located)
-                    alert(`located '${hoverMarks}' (in  DoScroll.PrepareBords)`)
-                    
-                if (pO5.located.timeStamp != timeStamp) { // чтобы не повторяться для одинаковых
-                    Located(pO5.prevs, pO5.located)
-                    pO5.located.timeStamp = timeStamp
+                if (pO5 && pO5.located) {
+                    if (pO5.located.timeStamp != timeStamp) { // чтобы не повторяться для одинаковых
+                        Located(pO5.prevs, pO5.located)
+                        pO5.located.timeStamp = timeStamp
+                    }
                 }
+                else
+                    console.error('----------------------------------------------------------------------------------')
             }
+
         },
         FixSet = (aO5) => {
             const dirV = aO5.cls.dirV

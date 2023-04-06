@@ -311,6 +311,45 @@ ol.${olga5_class} li>div pre {
             if (input) InputCheck(li, input)
             // e.cancelBubble = true
         },
+        OnMessage = (e) => {
+            if (!e.isTrusted) return
+
+            console.log('0 e.data=' + e.data);
+
+            const data = JSON.parse(e.data),
+                div = divs[data.name],
+                iframe = div.getElementsByTagName('iframe')[0]
+
+            if (data.code == "height") {
+                iframe.style.height = (data.height) + 'px'
+                div.style.height = (data.height) + 'px'
+            }
+            else if (data.code == "init") {
+                div.classList.add('isshown')
+                div.classList.remove('onstart')
+                oldW.wmax = data.wmax
+                oldW.wmin = data.wmin
+
+                SetWidth()
+            }
+        },
+        OnResize = (e) => {
+            if (oldW.innerWidth == window.innerWidth) return
+
+            // console.log('old=' + oldW.innerWidth, 'new=' + window.innerWidth);
+            Object.assign(oldW, { innerWidth: window.innerWidth })
+
+            if (oldW.afterWidth) {
+                oldW.afterWidth = false
+                return
+            }
+
+            const snst = window.getComputedStyle(strt),
+                wbkg = parseInt(snst.width) - parseInt(snst.paddingRight)
+
+            SetWidth()
+        },
+        OnKeyUp = (e) => { console.log(` key=${e.key}`) },
         WndInit = function () {
             const ols = document.getElementsByTagName('ol'),
                 strt = document.getElementsByTagName('div')[0],
@@ -330,46 +369,7 @@ ol.${olga5_class} li>div pre {
                             cW.postMessage(`{"code":"width",  "width":${width}}`, '*')
                         }
                     }
-                },
-                OnMessage = (e) => {
-                    if (!e.isTrusted) return
-
-                    console.log('0 e.data=' + e.data);
-
-                    const data = JSON.parse(e.data),
-                        div = divs[data.name],
-                        iframe = div.getElementsByTagName('iframe')[0]
-
-                    if (data.code == "height") {
-                        iframe.style.height = (data.height) + 'px'
-                        div.style.height = (data.height) + 'px'
-                    }
-                    else if (data.code == "init") {
-                        div.classList.add('isshown')
-                        div.classList.remove('onstart')
-                        oldW.wmax = data.wmax
-                        oldW.wmin = data.wmin
-
-                        SetWidth()
-                    }
-                },
-                OnResize = (e) => {
-                    if (oldW.innerWidth == window.innerWidth) return
-
-                    // console.log('old=' + oldW.innerWidth, 'new=' + window.innerWidth);
-                    Object.assign(oldW, { innerWidth: window.innerWidth })
-
-                    if (oldW.afterWidth) {
-                        oldW.afterWidth = false
-                        return
-                    }
-
-                    const snst = window.getComputedStyle(strt),
-                        wbkg = parseInt(snst.width) - parseInt(snst.paddingRight)
-
-                    SetWidth()
-                },
-                OnKeyUp = (e) => { console.log(` key=${e.key}`) }
+                }
 
             InitCSS(css)
 
@@ -393,8 +393,6 @@ ol.${olga5_class} li>div pre {
             window.addEventListener('keyup', OnKeyUp)
         }
 
-    // console.log('}---< включено:  `' + olga5_snam + '.js`  (' + olga5_class + ')');
-    // document.addEventListener('DOMContentLoaded', WndInit)
     window.$o5 = { InitCSS: InitCSS }
 
     const

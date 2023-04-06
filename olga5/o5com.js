@@ -221,7 +221,7 @@
 		repQuotes: /^\s*((\\')|(\\")|(\\`)|'|"|`)?\s*|\s*((\\')|(\\")|(\\`)|'|"|`)?\s*$/g,
 		olga5ignore: 'olga5-ignore',
 		TryToDigit: TryToDigit,
-		ParamsFillFromScript,
+		ParamsFillFromScript, 
 		GetAttrs: GetAttrs,
 		GetAttribute: GetAttribute,
 		Repname: Repname,
@@ -243,7 +243,8 @@
 			o5incls: '',
 			o5doscr: 'olga5_sdone',
 			o5depends: "pusto; o5pop; o5inc; o5ref= o5inc; o5snd:o5ref, o5inc; o5shp=o5snd, o5ref; o5shp:o5inc; o5inc; o5mnu= o5inc",
-			o5init_events: 'readystatechange:d, message',
+			o5init_events: 'readystatechange:d, message',	// , transitionrun, transitionend
+			o5hide_events: 'transitionrun',	// , transitionrun, transitionend
 			o5done_events: 'beforeunload, olga5_unload',
 		},
 		constsurl: {},

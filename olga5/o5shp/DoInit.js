@@ -70,6 +70,19 @@
                     C.ConsoleError(`Неопределён hash= '${hash}' в адресной строке`)
             }
             // window.dispatchEvent(new window.Event('resize'))
+        },
+        DbgDoResize = e => { // для отладки  !!!!!!!!!!!!!!!!!!
+            if (e.timeStamp > etimeStamp + 0.1)
+                if (!e.target.classList.contains(wshp.W.class))
+                    wshp.DoResize()
+            etimeStamp = e.timeStamp
+        },
+        DoScroll = e => {
+            const pO5 = (e.target == document ? document.body : e.target).pO5
+            if (pO5) {
+                const aO5s = (pO5.owns.own ? pO5.owns.own : wshp).aO5s
+                wshp.DoScroll(aO5s, e.timeStamp)
+            }
         }
 
     class PO5 {
@@ -245,13 +258,6 @@
                     if (o5debug > 1)
                         console.log(" >> SetLevelsAll " + ('' + Date.now()).substr(-6) + ", вложенности объектов: \n\t  " + aO5str)
                     return aO5str
-                },
-                DoScroll = e => {
-                    const pO5 = (e.target == document ? document.body : e.target).pO5
-                    if (pO5) {
-                        const aO5s = (pO5.owns.own ? pO5.owns.own : wshp).aO5s
-                        wshp.DoScroll(aO5s, e.timeStamp)
-                    }
                 }
 
             MakeAO5s()
@@ -261,18 +267,13 @@
 
             if (o5debug > 0) {
                 let etimeStamp = 0
-                const sels = [],
-                    DbgDoResize = e => { // для отладки  !!!!!!!!!!!!!!!!!!
-                        if (e.timeStamp > etimeStamp + 0.1)
-                            if (!e.target.classList.contains(wshp.W.class))
-                                wshp.DoResize()
-                        etimeStamp = e.timeStamp
-                    }
+                const sels = []
                 for (const mtag of mtags)
                     sels.push({ name: C.MakeObjName(mtag.tag), origcls: mtag.origcls, class: mtag.tag.className, quals: mtag.quals.join(', '), })
                 if (sels.length > 0) C.ConsoleInfo(`o5shp: найдены селекторы:`, sels.length, sels)
 
-                window.addEventListener('click', DbgDoResize)
+                for (const start of C.page.starts)
+                    start.addEventListener('click', DbgDoResize)
             }
 
             if (wshp.aO5s.length > 0) {
