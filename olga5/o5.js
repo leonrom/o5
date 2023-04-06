@@ -2,7 +2,7 @@
 /*jshint asi:true  */
 /*jshint esversion: 6*/
 /*eslint no-useless-escape: 0*/
-(function () {              // 3---------------------------------------------- o5ref ---
+(function () {              // ---------------------------------------------- o5ref ---
 	'use strict';
 	let C = null
 	const
