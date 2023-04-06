@@ -12,6 +12,6 @@ cat o5snd/AO5snd.js o5snd/Prep.js o5snd/Imgs.js \
     o5snd.js \
   > o5snd!.js   2>>o5.log
 
-cat o5ref.js o5snd!.js o5shp!.js o5pop.js \
+cat o5ref.js o5snd!.js o5shp!.js o5pop.js o5mnu.js \
     o5common.js \
   > o5.js       2>>o5.log

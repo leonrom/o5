@@ -2,7 +2,7 @@
 /*jshint asi:true  */
 /*jshint esversion: 6*/
 /*eslint no-useless-escape: 0*/
-(function () {              // ---------------------------------------------- o5ref ---
+(function () {              // 3---------------------------------------------- o5ref ---
 	'use strict';
 	let C = null
 	const
@@ -1389,6 +1389,19 @@
                     C.ConsoleError(`Неопределён hash= '${hash}' в адресной строке`)
             }
             // window.dispatchEvent(new window.Event('resize'))
+        },
+        DbgDoResize = e => { // для отладки  !!!!!!!!!!!!!!!!!!
+            if (e.timeStamp > etimeStamp + 0.1)
+                if (!e.target.classList.contains(wshp.W.class))
+                    wshp.DoResize()
+            etimeStamp = e.timeStamp
+        },
+        DoScroll = e => {
+            const pO5 = (e.target == document ? document.body : e.target).pO5
+            if (pO5) {
+                const aO5s = (pO5.owns.own ? pO5.owns.own : wshp).aO5s
+                wshp.DoScroll(aO5s, e.timeStamp)
+            }
         }
 
     class PO5 {
@@ -1564,13 +1577,6 @@
                     if (o5debug > 1)
                         console.log(" >> SetLevelsAll " + ('' + Date.now()).substr(-6) + ", вложенности объектов: \n\t  " + aO5str)
                     return aO5str
-                },
-                DoScroll = e => {
-                    const pO5 = (e.target == document ? document.body : e.target).pO5
-                    if (pO5) {
-                        const aO5s = (pO5.owns.own ? pO5.owns.own : wshp).aO5s
-                        wshp.DoScroll(aO5s, e.timeStamp)
-                    }
                 }
 
             MakeAO5s()
@@ -1580,18 +1586,13 @@
 
             if (o5debug > 0) {
                 let etimeStamp = 0
-                const sels = [],
-                    DbgDoResize = e => { // для отладки  !!!!!!!!!!!!!!!!!!
-                        if (e.timeStamp > etimeStamp + 0.1)
-                            if (!e.target.classList.contains(wshp.W.class))
-                                wshp.DoResize()
-                        etimeStamp = e.timeStamp
-                    }
+                const sels = []
                 for (const mtag of mtags)
                     sels.push({ name: C.MakeObjName(mtag.tag), origcls: mtag.origcls, class: mtag.tag.className, quals: mtag.quals.join(', '), })
                 if (sels.length > 0) C.ConsoleInfo(`o5shp: найдены селекторы:`, sels.length, sels)
 
-                window.addEventListener('click', DbgDoResize)
+                for (const start of C.page.starts)
+                    start.addEventListener('click', DbgDoResize)
             }
 
             if (wshp.aO5s.length > 0) {
@@ -1917,10 +1918,55 @@
                         else
                             CalcParentLocate(parent.pO5)
         },
+        PrepareBords1 = (aO5) => {
+            const
+                NewBords = (bord, a) => {
+                    const pO5 = bord.pO5,
+                        pos = pO5.pos
+                    if (pos.top != pos.bottom) {
+                        if (a.to == null || a.to.pos.top < pos.top) a.to = pO5
+                        if (a.bo == null || a.bo.pos.bottom > pos.bottom) a.bo = pO5
+                    }
+                    if (pos.left != pos.right) {
+                        if (a.le == null || a.le.pos.left < pos.left) a.le = pO5
+                        if (a.ri == null || a.ri.pos.right > pos.right) a.ri = pO5
+                    }
+                },
+                Hovered = (bords, a) => {
+                    let j = bords.length
+                    while (j-- > 0)
+                        NewBords(bords[j], a)
+                },
+                Located = (bords, a) => {
+                    for (let j = 0; j < bords.length; j++)
+                        NewBords(bords[j], a)
+                }
+
+            Object.assign(aO5.hovered, { to: null, le: null, ri: null, bo: null })
+            for (const ask of aO5.hovered.asks)
+                Hovered([ask.bords[0]], aO5.hovered)
+
+            Object.assign(aO5.located, { to: null, le: null, ri: null, bo: null })
+            for (const ask of aO5.located.asks)
+                Located(ask.bords, aO5.located)
+
+            for (const hoverMarks of ['to', 'le', 'ri', 'bo']) {
+                const pO5 = aO5.hovered[hoverMarks]
+                if (!pO5 || !pO5.located)
+                    alert(`located '${hoverMarks}' (in  DoScroll.PrepareBords)`)
+
+                if (pO5.located.timeStamp != timeStamp) { // чтобы не повторяться для одинаковых
+                    Hovered(pO5.prevs, pO5.located)
+                    pO5.located.timeStamp = timeStamp
+                }
+            }
+
+        },
         PrepareBords = (aO5) => {
             const bO5 = document.body.pO5,
                 a = { to: bO5, le: bO5, ri: bO5, bo: bO5 },
                 Located = (bords, a) => {
+                    const bO5 = bords.length > 0 ? bords[bords.length - 1].pO5 : null
                     for (const bord of bords) {
                         const pO5 = bord.pO5,
                             pos = pO5.pos
@@ -1938,7 +1984,7 @@
                 Located([ask.bords[0]], a)
             Object.assign(aO5.hovered, a)
 
-            Object.assign(a, { to: bO5, le: bO5, ri: bO5, bo: bO5 }) 
+            Object.assign(a, { to: bO5, le: bO5, ri: bO5, bo: bO5 })
 
             for (const ask of aO5.located.asks)
                 Located(ask.bords, a)
@@ -1946,12 +1992,14 @@
 
             for (const hoverMarks of ['to', 'le', 'ri', 'bo']) {
                 const pO5 = aO5.hovered[hoverMarks]
-                if (pO5 && pO5.located && pO5.located.timeStamp != timeStamp) { // чтобы не повторяться для одинаковых
+                if (!pO5 || !pO5.located)
+                    alert(`located '${hoverMarks}' (in  DoScroll.PrepareBords)`)
+                    
+                if (pO5.located.timeStamp != timeStamp) { // чтобы не повторяться для одинаковых
                     Located(pO5.prevs, pO5.located)
                     pO5.located.timeStamp = timeStamp
                 }
             }
-
         },
         FixSet = (aO5) => {
             const dirV = aO5.cls.dirV
@@ -2846,6 +2894,7 @@ img.${W.class} {
             }
             return ss.join(',')
         },
+        optsFocus={ capture: true, moja: 'fignia' },
         Focus = e => {
             if (wopens.length == 0 || focusTime == e.timeStamp) return
 
@@ -2892,7 +2941,7 @@ img.${W.class} {
             }
 
         for (const eve of ['focus', 'click'])
-            window.addEventListener(eve, Focus, { capture: true, moja: 'fignia' })  // т.е. e.eventPhase ==1
+            window.addEventListener(eve, Focus, optsFocus )  // т.е. e.eventPhase ==1
 
         window.addEventListener(click, ClosePops)
 
@@ -3006,17 +3055,6 @@ img.${W.class} {
     }
     document.addEventListener('DOMContentLoaded', AutoInit)
 
-    // let b=0
-    // for (let i=0; i<4; i++){
-    // document.addEventListener('DOMContentLoaded', e => { // автономный запуск
-    //   console.log(`Bb ${b++}`)
-    // })}
-    // const Aa=e => { // автономный запуск
-    //     console.log(`Aa ${a++}`)
-    //   }
-    // for (let i=0; i<4; i++){
-    // document.addEventListener('DOMContentLoaded', Aa)}
-
     if (!window.olga5.find(w => w.modul == W.modul)) {
         if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
             console.log(`}---< ${document.currentScript.src.indexOf(`/${W.modul}.`) > 0 ? 'загружен  ' : 'включён   '}:  ${W.modul}.js`)
@@ -3026,7 +3064,414 @@ img.${W.class} {
         console.error('%c%s', "background: yellow; color: black;border: solid 2px red;", `}---< Повтор загрузки '${W.modul}`)
     // -------------- o5pop
 })();
-// картан/* global document, window, console, Map*/
+// картан/* global document, window, console*/
+/* exported olga5_menuPopDn_Click*/
+/*jshint asi:true  */
+/*jshint esversion: 6*/
+(function () {              // ---------------------------------------------- o5mnu ---
+	'use strict'
+	let C = null
+	const W = {
+		modul: 'o5mnu',
+		Init: Init,
+		class: 'olga5_menu',
+		consts: 'o5menudef=, scrollY=-18'
+	},
+		class_empty = W.class + '_empty',
+		class_small = W.class + '_small',
+		o5css = `
+.${W.class} {
+    margin: 0 !important;
+    padding: 0 !important;
+    font-size: small;
+    height: min-content;
+    width: max-content;
+    z-index: 1111111;
+    top: 1px;
+    right: 1px;
+    position: unset; /* будут присвоено ниже */
+    display: initial; 
+}
+.${W.class}.Left {left: 1px; right:''}
+
+/*.${class_small} {
+	width: 144px;
+	text-align: center ! important;
+	text-align: -moz-center;
+	text-align: -webkit-center;
+	font-size: smaller ! important;
+	line-height: 11px ! important;
+}*/
+
+.${W.class} ul {
+    margin: 0;
+    padding: 0;
+    border-radius: 2px;
+    display: grid;    /* иначе переносит строки последующего пункта при открытии подменю */
+}
+
+.${W.class} li {
+    display: block;
+    color: white;
+    background: gray;
+    height: 1.5em;
+    text-align: left;
+	text-align: -webkit-left;
+	text-align: -moz-left;
+    border-bottom: 0.01em solid lightseagreen;
+    padding: 1px 5px 1px 2px;
+    cursor: pointer;
+    font-family: sans-serif;
+    font-size: small;
+    margin-bottom: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+.${W.class} li>ul {
+    position: absolute;
+    top: unset;
+    display: none;
+    padding: 0;
+    margin: 0;
+    border: 1px solid darkgrey;
+    outline: 1px solid white;
+    float: right;
+}
+.${W.class}.Left li>ul {float: left;}
+
+.${W.class}>li {
+    background-color: white;
+    border: none;
+    border-radius: 8px;
+    background-color: transparent;	
+	text-align: right;
+	text-align: -moz-right;
+	text-align: -webkit-right;
+	// text-align: -moz-left;
+}
+
+.${W.class}.Left>li {
+    text-align: left;
+	text-align: -webkit-left;
+	text-align: -moz-left;
+}
+
+.${W.class}>li>ul {
+    outline: 1px solid bisque;
+    top: 0.5em;
+    position: relative;
+    right: 0.1em;
+}
+
+.${W.class}>li>ul {left: 0.1em;}
+.${W.class}>li>ul>li>ul { right: 3.1em; margin-top: -4px;}
+.${W.class}>li>ul>li>ul>li>ul { right: 6.1em; margin-top: -3px;}
+.${W.class}>li>ul>li>ul>li>ul>li>ul { right: 9.1em; margin-top: -3px;}
+.${W.class}>li>ul>li>ul>li>ul>li>ul>li>ul { right: 12.1em; margin-top: -3px;}
+.${W.class}.Left>li>ul {left: 0.1em;}
+.${W.class}.Left>li>ul>li>ul { left: 3.1em; margin-top: -4px;}
+.${W.class}.Left>li>ul>li>ul>li>ul {left: 6.1em; margin-top: -3px;}
+.${W.class}.Left>li>ul>li>ul>li>ul>li>ul {left: 9.1em; margin-top: -3px;}
+.${W.class}.Left>li>ul>li>ul>li>ul>li>ul>li>ul {left: 12.1em; margin-top: -3px;}
+
+.${W.class} li>span {
+    display: flex;
+    padding-left: 6px;
+    height: 100%;
+    align-items: center;
+    width: max-content;
+    justify-content: flex-start;
+    overflow: hidden;
+}
+
+.${W.class}>li>span {
+    border: 1px solid darkgray;
+    border-radius: 8px;
+    color: black;
+    background-color: yellow;
+    padding: 3px 4px 2px 4px;
+    justify-content: center;
+    height: min-content;
+	// width: -moz-min-content;
+	width: fit-content;
+}
+
+.${W.class} li:hover {
+    color: black;
+    background-color: lavender;
+}
+
+.${W.class}>li:hover {
+    background: transparent;
+    height: 3em;
+}
+
+.${W.class}>li:hover>span {
+    color: white;
+    background: gray;
+    border: 0.01em solid lightseagreen;
+    padding-bottom: 4px;
+}
+
+.${W.class} li:hover>ul,
+.${W.class} li>ul:hover {
+    display: block;
+}
+
+.${W.class} li:active>ul {    /* для корректного "гашения" - д.б. ПОСЛЕДНИМ ! */
+    display: none;
+}
+.main-outer {
+    background-color: ghostwhite;
+    border: 1px solid navajowhite;
+}
+
+.${class_empty} {
+    height: 2px ! important;
+    background-color: aqua ! important;
+}
+
+.olga5-menuhidden{
+	display:none;
+}
+`,
+
+		// const phases = ['NONE', 'CAPTURING_PHASE', 'AT_TARGET', 'BUBBLING_PHASE',]
+		win = { target: '_self', resize: true, scrollX: 0, scrollY: -18, }, // blockclick: false, timclick: 0 },
+		Target = function (e) {
+			let target = e.toElement || e.target
+			while (target && !target.o5menus) target = target.parentElement
+			return target
+		},
+		OnMnu = function (e) {
+			const target = Target(e)
+			if (target && !target.o5menus.ready) target.o5menus.ready = true
+		},
+		GoTo = function (o5menus) {
+			const tag = document.getElementById(o5menus.ref)
+			if (tag) {
+				tag.scrollIntoView({ block: o5menus.block, behavior: "smooth" })
+				return true
+				// if (win.scrollY != 0) window.scrollBy(0, win.scrollY)
+			} else
+				C.ConsoleError("GoTo: не определён тег в текущем окне: ", o5menus.ref)
+		},
+		DoMnu = e => {
+			if (C.consts.o5debug)
+				console.log('DoMnu: ' + e.type + ' ' + e.eventPhase + ' ' + e.timeStamp.toFixed(1).padEnd(6))
+			const target = Target(e)
+			if (target && target.o5menus.ready) {
+				const o5menus = target.o5menus
+				o5menus.ready = false
+
+				let ok = true
+				if (o5menus.isext) window.open(o5menus.ref, win.target)
+				else
+					ok = GoTo(o5menus)
+
+				if (ok && win.resize) {
+					// window.dispatchEvent(new window.Event('resize'))
+					const wshp = window.olga5.o5shp
+					if (wshp)
+						wshp.DoResize(wshp.aO5s)
+				}
+				win.blockclick = true
+				e.cancelBubble = true
+			}
+		},
+		Clear = e => {
+			if (C.consts.o5debug)
+				console.log('Clear: ' + e.type + ' ' + e.eventPhase + ' ' + e.timeStamp.toFixed(1).padEnd(6) +
+					' ' + (win.blockclick ? 'очищаю' : ''))
+			if (win.blockclick) {
+				win.blockclick = false
+				e.cancelBubble = true
+			}
+			// // win.timclick = e.timeStamp
+			// e.cancelBubble = true
+		},
+		MnuInit = function (items) {
+			if (C.consts.o5nomnu > 0) return
+
+			const proc = 'MnuInit',
+				errs = []
+			if (!items || !items[0]) errs.push(`${proc}: не определеныа структура меню`)
+			if (errs.length == 0) {
+				const uls = [],
+					item0 = items[0],
+					base = item0.base || ''
+
+				const id = item0.id || ''
+				if (id && document.getElementById(id)) errs.push(`${proc}: повтор создания меню с id='${id}'`)
+
+				if (item0.target) {
+					win.target = item0.target
+					win.resize = false
+				}
+				if (W.consts.scrollY) win.scrollY = parseInt(W.consts.scrollY)
+
+				let ul = document.createElement("ul")
+
+				ul.id = id
+				ul.className = W.class
+				if (item0.right) ul.style.right = item0.right
+				else if (item0.left) {
+					ul.style.left = item0.left
+					ul.classList.add('Left')
+				}
+				if (item0.top) ul.style.top = item0.top
+
+				let owner = document.body
+				if (item0.owner) {
+					if (typeof item0.owner === 'object') owner = item0.owner
+					else {
+						const own = item0.owner.trim(),
+							xwner = (!own || own.match(/\.body\b/)) ? document.body : document.querySelector(own)
+
+						if (xwner) owner = xwner
+						else
+							C.ConsoleError(`${proc}: нет owner'а для '${own}'`)
+					}
+				}
+				if (item0.position) ul.style.position = item0.position
+				else if (!item0.owner) ul.style.position = 'fixed'
+				else ul.style.position = 'absolute'
+
+				if (ul.style.position == 'absolute') {
+					const nst = window.getComputedStyle(owner),
+						position = nst.getPropertyValue('position')
+					if (position != 'absolute')
+						C.ConsoleError(`${proc}: контейнер ${C.MakeObjName(owner)} для меню '${C.MakeObjName(ul)}' имеет position='${position}' (не ''absolute)`)
+				}
+				if (item0.noremov) owner.insertBefore(ul, owner.firstChild)  // НЕ удаляется по закрытии страницы (owner.appendChild(ul))				
+				else
+					C.InsertBefore(owner, ul, owner.firstChild)
+
+				ul.addEventListener('mousedown', DoMnu, true)
+				ul.addEventListener('click', DoMnu, true)
+				window.addEventListener('click', Clear, true)
+				// ul.style.zIndex = 99999
+
+
+				uls[0] = ul
+				const blc = (item0.block || 's')[0].toLowerCase(),
+					block = blc == 's' ? 'start' : (blc == 'e' ? 'end' : (blc == 'n' ? 'nearesr' : 'center'))
+
+				let m = 0
+				for (const item of items) {
+					const li = document.createElement('li')
+
+					// li.addEventListener('click', Clear, true) 
+					li.style.zIndex = 99999
+					li.o5menus = { isext: true, block: block }
+					if (item.ref) {
+						const ref = item.ref || '',
+							wl = window.location
+						if (ref.length == 0) li.o5menus.ref = wl.origin + wl.pathname
+						else if (C.IsFullUrl(ref)) li.o5menus.ref = ref // (ref.match(/^\s*(https?:)\/\//)) li.o5menus.ref = ref
+						else if (ref.match(/\.html?($|\?|&|#)/)) li.o5menus.ref = base + ref
+						else {
+							li.o5menus.ref = ref[0] == '#' ? ref.substr(1) : ref
+							li.o5menus.isext = false
+						}
+					}
+
+					if (item.title) li.title = item.title
+					if (item.class) li.classList.add(item.class)
+					if (item.style) li.style = item.style
+
+					if (m == 0)
+						li.onmouseover = OnMnu
+
+					ul.appendChild(li)
+
+					if (item.span && item.span != '') {
+						const span = document.createElement('span')
+						span.innerText = item.span
+						li.appendChild(span)
+					} else
+						li.classList.add(class_empty)
+
+					if (item.add) {
+						ul = document.createElement("ul")
+						ul.style.width = item.add
+						li.appendChild(ul)
+						uls[++m] = ul
+					} else if (item.ret) {
+						m = m - item.ret
+						if (m < 0) {
+							errs.push('m: item.ret=' + item.ret + ', ')
+							m = 0
+						}
+						ul = uls[m]
+					}
+				}
+			}
+			if (errs.length > 0)
+				C.ConsoleError("${proc}: ошибки создания меню: ", errs.length, errs)
+		}
+
+	function Init(c) {
+		C = c
+		const
+			InitByText = (menu, tag) => {// если есть такой атрибут}
+				const regval = /^["'`;{\s]*|["'`},\s]*$/g,
+					lis = menu.match(/{[^}]*}/g) || [],
+					items = [],
+					errs = []
+
+				for (const li of lis) {
+					const pairs = li.match(/[^,]+(,|})/g),
+						item = {}
+					for (const pair of pairs) {
+						try {
+							const i = pair.indexOf(':'),
+								nam = pair.substr(0, i).replaceAll(regval, ''),
+								val = pair.substr(i + 1).replaceAll(regval, '')
+							item[nam] = val
+						} catch (err) {
+							errs.push({ li: li, pair: pair })
+						}
+					}
+					items.push(item)
+				}
+				if (errs.length > 0)
+					C.ConsoleError("Init: ошибки в строках атрибута 'o5menudef': ", errs.length, errs)
+
+				MnuInit(items)
+			}
+
+		if (C.consts.o5nomnu > 0) C.ConsoleInfo(`Меню отключено по o5nomnu=${C.consts.o5nomnu}`)
+		else {
+			if (!W.isReady) {
+				c.ParamsFill(W, o5css)
+				window.olga5.Menu = MnuInit
+			}
+
+			const menu = (W.consts['o5menudef'] || '').trim()
+			if (menu)	// если есть такой атрибут}
+				InitByText(menu)
+
+			const tags = C.GetTagsByClassNames('olga5-menuhidden', W.modul)
+			if (tags)
+				tags.forEach(tag => {
+					InitByText(tag.innerText.trim(), tag)
+				})
+		}
+		window.dispatchEvent(new CustomEvent('olga5_sinit', { detail: { modul: W.modul } }))
+	}
+
+	if (!window.olga5) window.olga5 = []
+	if (!window.olga5.find(w => w.modul == W.modul)) {
+		if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
+			console.log(`}---< ${document.currentScript.src.indexOf(`/${W.modul}.`) > 0 ? 'загружен  ' : 'включён   '}:  ${W.modul}.js`)
+		window.olga5.push(W)
+		window.dispatchEvent(new CustomEvent('olga5_sload', { detail: { modul: W.modul } }))
+	} else
+		console.error('%c%s', "background: yellow; color: black;border: solid 2px red;", `}---< Повтор загрузки '${W.modul}`)
+})();
+/* global document, window, console, Map*/
 /* exported olga5_menuPopDn_Click*/
 /*jshint asi:true  */
 /*jshint esversion: 6*/
@@ -3696,7 +4141,7 @@ aaa dlassaaa:A olga5_snd:over : a-11_z: loop :  "  sounds + Ceza1-25.mp3"
 		if (C.consts.o5debug > 0) (C.save.libName, xs, p, n1)
 
 		// delete C.save
-		Object.freeze(C)
+		// Object.freeze(C)
 		return true
 	}
 
@@ -3990,9 +4435,6 @@ aaa dlassaaa:A olga5_snd:over : a-11_z: loop :  "  sounds + Ceza1-25.mp3"
 	if (!window.olga5.C) window.olga5.C = {}
 	if (!window.olga5[olga5_modul]) window.olga5[olga5_modul] = {}
 
-	let page = null,
-		cc = null
-
 	const myclr = "background: blue; color: white;border: none;"
 	class MyEvents {
 		doceves = ['DOMContentLoaded', 'readystatechange', 'visibilitychange', 'blur']
@@ -4013,12 +4455,12 @@ aaa dlassaaa:A olga5_snd:over : a-11_z: loop :  "  sounds + Ceza1-25.mp3"
 		}
 		AddEvents = (Fun) => { // addEventListener
 			for (const meve of this.meves)
-				if (meve.isd) document.addEventListener(meve.eve, Fun, { capture: true })
+				if (meve.isd) document.addEventListener(meve.eve, Fun,  true )
 				else window.addEventListener(meve.eve, Fun)
 		}
 		RemEvents = (Fun) => { // addEventListener
 			for (const meve of this.meves)
-				if (meve.isd) document.removeEventListener(meve.eve, Fun, { capture: true })
+				if (meve.isd) document.removeEventListener(meve.eve, Fun,  true )
 				else window.removeEventListener(meve.eve, Fun)
 		}
 	}
@@ -4067,9 +4509,9 @@ aaa dlassaaa:A olga5_snd:over : a-11_z: loop :  "  sounds + Ceza1-25.mp3"
 		 * @param {isok}  необязательный признак готовности документа (наименование события)
 		 */
 		InitScripts = nam => {
-			if (!(page && page.pact && page.pact.ready)) return
+			if (!(C.page && C.page.pact && C.page.pact.ready)) return
 
-			const start = page.pact.start
+			const start = C.page.pact.start
 			for (const scrpt of C.scrpts) {
 				const act = scrpt.act
 				if (!act.timera)
@@ -4078,7 +4520,7 @@ aaa dlassaaa:A olga5_snd:over : a-11_z: loop :  "  sounds + Ceza1-25.mp3"
 					if (act.need && act.W.Init) {
 						const depend = scrpt.depends.find(depend => (depend.act.need && depend.act.done != start))
 						if (!depend) {
-							if (cc.o5debug > 1)
+							if (C.consts.o5debug > 1)
 								console.log(`--->>>     ______ начало нинициализации _____     ${act.W.modul} `)
 							act.start = start
 							act.timera.Start(act.W.modul)
@@ -4090,19 +4532,19 @@ aaa dlassaaa:A olga5_snd:over : a-11_z: loop :  "  sounds + Ceza1-25.mp3"
 		},
 		OnInit = e => {	//  завершение инициализации очередного скрипта
 			if (!e.detail || !e.detail.modul) {
-				page.errs.push({ modul: '?', err: `для события '${e.type}' НЕ указан 'detail' или 'detail.modul'` })
+				C.page.errs.push({ modul: '?', err: `для события '${e.type}' НЕ указан 'detail' или 'detail.modul'` })
 				return
 			}
 
 			const modul = e.detail.modul.trim(),
 				scrpt = C.scrpts.find(scrpt => scrpt.modul == modul),
-				start = page.pact.start,
+				start = C.page.pact.start,
 				lefts = []
 			C.scrpts.forEach(scr => {
 				if (scr.modul != modul && scr.act.done != start && scr.act.need)
 					lefts.push(scr.modul)
 			})
-			if (cc.o5debug > 1) {
+			if (C.consts.o5debug > 1) {
 				console.log(`- - > после инициализации '${modul}': ` +
 					(lefts.length > 0 ? `осталось:  ${lefts.join(', ')}` : `больше не осталось`))
 			}
@@ -4113,24 +4555,24 @@ aaa dlassaaa:A olga5_snd:over : a-11_z: loop :  "  sounds + Ceza1-25.mp3"
 				if (lefts.length > 0)
 					InitScripts(`инициирован '${modul}'`)
 				else
-					page.PageFinish(0)
+					C.page.PageFinish(0)
 			} else
-				page.errs.push({ modul: modul, err: `для события '${e.type}' указан несуществующий модуль` })
+				C.page.errs.push({ modul: modul, err: `для события '${e.type}' указан несуществующий модуль` })
 		},
 		OnLoad = e => {	// завершение загрузки очередного скрипта
-			const start = page.pact.start,
+			const start = C.page.pact.start,
 				newloads = [],
 				Included = modul => {
 					const nam = `загружены включения для '${modul}'`,
 						scrpt = C.scrpts.find(scrpt => scrpt.modul == modul)
-					if (cc.o5debug > 1)
+					if (C.consts.o5debug > 1)
 						console.log(`OnLoad: '${nam}'`)
 
 					scrpt.act.incls = ''
 					InitScripts(nam)
 				}
 
-			if (cc.o5debug > 1)
+			if (C.consts.o5debug > 1)
 				console.log('- - > после загрузки ' + (e ? ` '${e.detail.modul}'` : ` ядра`))
 			for (const scrpt of C.scrpts) {
 				const w = scrpt.act.W || window.olga5.find(x => x.modul == scrpt.modul)
@@ -4151,7 +4593,7 @@ aaa dlassaaa:A olga5_snd:over : a-11_z: loop :  "  sounds + Ceza1-25.mp3"
 					}
 				}
 			}
-			if (cc.o5debug > 2)
+			if (C.consts.o5debug > 2)
 				console.log('    > ' + newloads.length ? ` (готовы к инициации: ${newloads.join(', ')})` : ' (но инициировать нечего)')
 
 			if (newloads.length > 0)
@@ -4159,7 +4601,7 @@ aaa dlassaaa:A olga5_snd:over : a-11_z: loop :  "  sounds + Ceza1-25.mp3"
 		}
 
 	class Page {
-		pact = { url: '', ready: false, start: false, timerp: new MyTimer("}==  КОНЕЦ  обработки  страницы"), timer: 0, mos: null }
+		pact = { url: '', ready: false, start: false, timerp: new MyTimer("}==  КОНЕЦ  обработки  страницы"), timer: 0, mos: [] }
 		errs = []
 		ScriptsFinish = e => { // закрытие всех новых элементов страницы
 
@@ -4169,7 +4611,7 @@ aaa dlassaaa:A olga5_snd:over : a-11_z: loop :  "  sounds + Ceza1-25.mp3"
 			pact.ready = false
 
 			const n0 = this.childs.length
-			if (cc.o5debug > 0) console.log('%c%s', myclr,
+			if (C.consts.o5debug > 0) console.log('%c%s', myclr,
 				`}=====< закрытие по '${e.type}' (n= ${n0}) страницы "${pact.url}"`)
 
 			let n = n0
@@ -4178,7 +4620,9 @@ aaa dlassaaa:A olga5_snd:over : a-11_z: loop :  "  sounds + Ceza1-25.mp3"
 					owner = child.aO5_pageOwner
 				for (const item of owner.children)
 					if (item == child) {
-						item.remove()
+						// item.remove()
+						item.style.display = 'none'
+						owner.removeChild(item)
 						break
 					}
 			}
@@ -4193,9 +4637,9 @@ aaa dlassaaa:A olga5_snd:over : a-11_z: loop :  "  sounds + Ceza1-25.mp3"
 			this.donePage.RemEvents(this.ScriptsFinish)
 			window.dispatchEvent(new window.Event('olga5_done'))
 		}
-		ScriptsStart = (starts) => {  // начало обработки страницы
+		ScriptsStart = () => {  // начало обработки страницы
 
-			C.QuerySelectorInit(starts, this.olga5Start) //  чтобы пересчитало область определения
+			C.QuerySelectorInit(this.starts, this.olga5Start) //  чтобы пересчитало область определения
 
 			for (const scrpt of C.scrpts) { // делаем при каждой инициализации
 				if (C.owners.length == 0) scrpt.act.need = true
@@ -4229,7 +4673,7 @@ aaa dlassaaa:A olga5_snd:over : a-11_z: loop :  "  sounds + Ceza1-25.mp3"
 				}
 			}
 
-			if (cc.o5debug > 0) {
+			if (C.consts.o5debug > 0) {
 				const o5inc = C.scrpts.find(scrpt => scrpt.modul == 'o5inc'),
 					o5include = document.querySelector('[o5include]')
 				if (o5inc && !o5include) C.ConsoleError(`Задан скрипт 'o5inc.js' но отсутствует тег с атрибутом 'o5include'`)
@@ -4276,8 +4720,8 @@ aaa dlassaaa:A olga5_snd:over : a-11_z: loop :  "  sounds + Ceza1-25.mp3"
 			this.initDone.RemEvents(OnInit)
 			window.dispatchEvent(new window.Event('olga5_ready'))
 		}
-		PageStart = (url, starts) => {
-			if (cc.o5debug > 0)
+		PageStart = (url) => {
+			if (C.consts.o5debug > 0)
 				console.log('%c%s', myclr, "----- старт обработки страницы ", url)
 
 			if (!document.body.classList.contains(this.cls))
@@ -4285,9 +4729,9 @@ aaa dlassaaa:A olga5_snd:over : a-11_z: loop :  "  sounds + Ceza1-25.mp3"
 
 			const pact = this.pact
 			pact.timerp.Start(url)
-			if (cc.o5timload) {
+			if (C.consts.o5timload) {
 				if (pact.timer > 0) window.clearTimeout(pact.timer)
-				pact.timer = window.setTimeout(this.PageFinish, 1000 * cc.o5timload, true)
+				pact.timer = window.setTimeout(this.PageFinish, 1000 * C.consts.o5timload, true)
 			}
 
 			this.loadDone.AddEvents(OnLoad)
@@ -4295,73 +4739,69 @@ aaa dlassaaa:A olga5_snd:over : a-11_z: loop :  "  sounds + Ceza1-25.mp3"
 			this.donePage.AddEvents(this.ScriptsFinish)
 
 			this.errs.splice(0, this.errs.length)
-			this.ScriptsStart(starts)
+			this.ScriptsStart()
 			// InitScripts(`загружена страница '${url}'`)
 
 			OnLoad()  // после InitScripts
 		}
-		Check5Start = (mutations) => {
-			for (const mutation of mutations)
-				for (const node of mutation.addedNodes)
-					if (node.getElementsByClassName(this.olga5Start)) {
-						Check(e)
-						return
-					}
-		}
-		Check = e => { // проверка и начало инициализации страницы
+		clr = `background: green;color:white;`
+		CheckInit = e => { // проверка и начало инициализации страницы !!
 			const pact = this.pact,
 				url = DocURL(),
 				starts = document.querySelectorAll("[class *= '" + this.olga5Start + "']"),
 				isolga5 = starts && starts.length,
 				isloaded = document.readyState == 'complete' ||
-					(url.match(/\bolga5-tests\b/i) && document.readyState == 'interactive')
+					(url.match(/\bolga5-tests\b/i) && document.readyState == 'interactive'),
+				isnew = pact.url != url || !pact.ready
 
-			if (cc.o5debug > 1 && e) {
-				console.groupCollapsed('%c%s', `background: green;color:white;`,
-					'____>  ' + e.type.padEnd(22) + (isolga5 ? 'ДА' : '  ') + document.readyState[0] + ':' + url.padEnd(55))
+			if (C.consts.o5debug > 1 && e) {
+				console.groupCollapsed('%c%s', this.clr, '____>  ' + e.type.padEnd(22) +
+					(isolga5 ? 'ДА ' : '  ') + (isnew ? 'новая ' : 'повт. ') +
+					document.readyState[0] + ':' + url.padEnd(55))
 				for (const nam in e)
 					if (nam != 'type' && !(e[nam] instanceof Function)) console.log(nam.padEnd(24), e[nam])
 				console.groupEnd()
 			}
 
-			if (pact.url != url || !pact.ready) {
-				if (cc.o5debug > 0)
-					console.log("----- есть новая страницы ", url)
+			if (isnew && isloaded && isolga5) {
 
-				if (pact.ready) this.ScriptsFinish(e)
+				this.ScriptsFinish(e)
 
-				Object.assign(pact, {
-					url: url,
-					ready: isloaded && isolga5,
-					start: Number(new Date()) + Math.random(),
-					mos: []
-				})
+				Object.assign(pact, { url: url, ready: true, start: Number(new Date()) + Math.random() })
+				pact.mos.splice(0, pact.mos.length)
 
-				if (pact.ready)
-					this.PageStart(url, starts)
+				this.starts.splice(0, this.starts.length)
+				for (let i = 0; i < starts.length; i++)
+					this.starts[i] = starts[i]
 
-				if (pact.mos && pact.mos.length == 0) {
-					const tags = document.querySelectorAll("div[o5include]")
-					if (tags.length > 0) {
-						for (const tag of tags) {
-							const mo = new MutationObserver(this.Check5Start)
-							mo.observe(tag, { 'childList': true, 'subtree': true });
-							pact.mos.push(mo)
-						}
-					}
-					// else pact.mos=null
-				}
+				this.PageStart(url)
 			}
 		}
+		CheckHide = e => { // проверка и начало инициализации страницы
+			const pact = this.pact,
+				url = DocURL()
+
+			if (pact.url != url && pact.ready) {
+				console.log('%c%s', this.clr, '____<  ' + e.type.padEnd(22) + ' закрыл: ' + url.padEnd(55))
+
+				this.ScriptsFinish(e)
+				pact.url = url
+			}
+		}
+
 		constructor() {
 			this.olga5Start = 'olga5_Start'
 			this.cls = 'olga5_isLoading'
 			this.childs = []
+			this.starts = []
 
-			const strtEvents = new MyEvents(cc.o5init_events)
-			strtEvents.AddEvents(this.Check)	//{ capture: true }
+			const initEvents = new MyEvents(C.consts.o5init_events)
+			initEvents.AddEvents(this.CheckInit)	//{ capture: true }
 
-			this.donePage = new MyEvents(cc.o5done_events)
+			const closeEvents = new MyEvents(C.consts.o5hide_events)
+			closeEvents.AddEvents(this.CheckHide)	//{ capture: true }
+
+			this.donePage = new MyEvents(C.consts.o5done_events)
 			this.loadDone = new MyEvents('olga5_sload')
 			this.initDone = new MyEvents('olga5_sinit')
 			Object.seal(this.pact)
@@ -4369,39 +4809,40 @@ aaa dlassaaa:A olga5_snd:over : a-11_z: loop :  "  sounds + Ceza1-25.mp3"
 		}
 	}
 
-	C.AppendChild = function (owner, child) {
-		child.aO5_pageOwner = owner
-		owner.appendChild(child)
-		if (page) page.childs.push(child)
-	}
-	C.InsertBefore = function (owner, child, reference) {
-		child.aO5_pageOwner = owner
-		owner.insertBefore(child, reference)
-		if (page) page.childs.push(child)
-	}
 	let nbody = 0
 	if (!wshp[modulname])
 		wshp[modulname] = () => {
-			cc = C.consts
-			if (cc.o5debug > 0) console.log(` ===  инициализация ${olga5_modul}/${modulname}.js`)
+			if (C.consts.o5debug > 0) console.log(` ===  инициализация ${olga5_modul}/${modulname}.js`)
 
-			if (cc.o5nomnu > 0)
+			if (C.consts.o5nomnu > 0)
 				document.body.classList.add('o5nomnu')
 
-			if (cc.o5noact > 0) {
-				((C && cc.o5debug > 0) ? C.ConsoleError : console.log)
-					("}---> загружено `o5common.js`, но инициализация ОТКЛЮЧЕНА по o5noact= '" + cc.o5noact + "'")
+			if (C.consts.o5noact > 0) {
+				((C && C.consts.o5debug > 0) ? C.ConsoleError : console.log)
+					("}---> загружено `ядро библиотеки`, но инициализация ОТКЛЮЧЕНА по o5noact= '" + C.consts.o5noact + "'")
 				return
 			}
 
 			if (C.scrpts.length > 0) {
-				page = new Page()
-				// page.Check()
+				Object.assign(C, {
+					page: new Page(),
+					AppendChild: (owner, child) => {
+						child.aO5_pageOwner = owner
+						owner.appendChild(child)
+						if (C.page) C.page.childs.push(child)
+					},
+					InsertBefore: (owner, child, reference) => {
+						child.aO5_pageOwner = owner
+						owner.insertBefore(child, reference)
+						if (C.page) C.page.childs.push(child)
+					}
+				})
 			}
 			else {
 				C.ConsoleError(`IniScripts.js: вообще нет скриптов для обработки`)
 				window.dispatchEvent(new window.Event('olga5_ready'))
 			}
+
 			return true
 		}
 
@@ -4630,7 +5071,7 @@ aaa dlassaaa:A olga5_snd:over : a-11_z: loop :  "  sounds + Ceza1-25.mp3"
 		repQuotes: /^\s*((\\')|(\\")|(\\`)|'|"|`)?\s*|\s*((\\')|(\\")|(\\`)|'|"|`)?\s*$/g,
 		olga5ignore: 'olga5-ignore',
 		TryToDigit: TryToDigit,
-		ParamsFillFromScript,
+		ParamsFillFromScript, 
 		GetAttrs: GetAttrs,
 		GetAttribute: GetAttribute,
 		Repname: Repname,
@@ -4652,7 +5093,8 @@ aaa dlassaaa:A olga5_snd:over : a-11_z: loop :  "  sounds + Ceza1-25.mp3"
 			o5incls: '',
 			o5doscr: 'olga5_sdone',
 			o5depends: "pusto; o5pop; o5inc; o5ref= o5inc; o5snd:o5ref, o5inc; o5shp=o5snd, o5ref; o5shp:o5inc; o5inc; o5mnu= o5inc",
-			o5init_events: 'readystatechange:d, message',
+			o5init_events: 'readystatechange:d, message',	// , transitionrun, transitionend
+			o5hide_events: 'transitionrun',	// , transitionrun, transitionend
 			o5done_events: 'beforeunload, olga5_unload',
 		},
 		constsurl: {},

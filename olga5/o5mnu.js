@@ -171,8 +171,8 @@
 }
 `,
 
-			// const phases = ['NONE', 'CAPTURING_PHASE', 'AT_TARGET', 'BUBBLING_PHASE',]
-		win = { target: '_self', resize: true, scrollX: 0, scrollY: -18,  }, // blockclick: false, timclick: 0 },
+		// const phases = ['NONE', 'CAPTURING_PHASE', 'AT_TARGET', 'BUBBLING_PHASE',]
+		win = { target: '_self', resize: true, scrollX: 0, scrollY: -18, }, // blockclick: false, timclick: 0 },
 		Target = function (e) {
 			let target = e.toElement || e.target
 			while (target && !target.o5menus) target = target.parentElement
@@ -186,20 +186,25 @@
 			const tag = document.getElementById(o5menus.ref)
 			if (tag) {
 				tag.scrollIntoView({ block: o5menus.block, behavior: "smooth" })
+				return true
 				// if (win.scrollY != 0) window.scrollBy(0, win.scrollY)
 			} else
 				C.ConsoleError("GoTo: не определён тег в текущем окне: ", o5menus.ref)
 		},
 		DoMnu = e => {
-			console.log('DoMnu: ' + e.type + ' ' + e.eventPhase + ' ' + e.timeStamp.toFixed(1).padEnd(6) )
+			if (C.consts.o5debug)
+				console.log('DoMnu: ' + e.type + ' ' + e.eventPhase + ' ' + e.timeStamp.toFixed(1).padEnd(6))
 			const target = Target(e)
 			if (target && target.o5menus.ready) {
 				const o5menus = target.o5menus
 				o5menus.ready = false
-				if (o5menus.isext) window.open(o5menus.ref, win.target)
-				else GoTo(o5menus)
 
-				if (win.resize) {
+				let ok = true
+				if (o5menus.isext) window.open(o5menus.ref, win.target)
+				else
+					ok = GoTo(o5menus)
+
+				if (ok && win.resize) {
 					// window.dispatchEvent(new window.Event('resize'))
 					const wshp = window.olga5.o5shp
 					if (wshp)
@@ -210,8 +215,9 @@
 			}
 		},
 		Clear = e => {
-			console.log('Clear: ' + e.type + ' ' + e.eventPhase + ' ' + e.timeStamp.toFixed(1).padEnd(6) + 
-				' ' + (win.blockclick?'очищаю':''))
+			if (C.consts.o5debug)
+				console.log('Clear: ' + e.type + ' ' + e.eventPhase + ' ' + e.timeStamp.toFixed(1).padEnd(6) +
+					' ' + (win.blockclick ? 'очищаю' : ''))
 			if (win.blockclick) {
 				win.blockclick = false
 				e.cancelBubble = true
@@ -278,9 +284,9 @@
 
 				ul.addEventListener('mousedown', DoMnu, true)
 				ul.addEventListener('click', DoMnu, true)
-				window.addEventListener('click', Clear, true) 
+				window.addEventListener('click', Clear, true)
 				// ul.style.zIndex = 99999
-				
+
 
 				uls[0] = ul
 				const blc = (item0.block || 's')[0].toLowerCase(),
@@ -290,8 +296,8 @@
 				for (const item of items) {
 					const li = document.createElement('li')
 
-				// li.addEventListener('click', Clear, true) 
-				li.style.zIndex = 99999
+					// li.addEventListener('click', Clear, true) 
+					li.style.zIndex = 99999
 					li.o5menus = { isext: true, block: block }
 					if (item.ref) {
 						const ref = item.ref || '',

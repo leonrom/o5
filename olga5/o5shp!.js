@@ -340,6 +340,19 @@
                     C.ConsoleError(`Неопределён hash= '${hash}' в адресной строке`)
             }
             // window.dispatchEvent(new window.Event('resize'))
+        },
+        DbgDoResize = e => { // для отладки  !!!!!!!!!!!!!!!!!!
+            if (e.timeStamp > etimeStamp + 0.1)
+                if (!e.target.classList.contains(wshp.W.class))
+                    wshp.DoResize()
+            etimeStamp = e.timeStamp
+        },
+        DoScroll = e => {
+            const pO5 = (e.target == document ? document.body : e.target).pO5
+            if (pO5) {
+                const aO5s = (pO5.owns.own ? pO5.owns.own : wshp).aO5s
+                wshp.DoScroll(aO5s, e.timeStamp)
+            }
         }
 
     class PO5 {
@@ -515,13 +528,6 @@
                     if (o5debug > 1)
                         console.log(" >> SetLevelsAll " + ('' + Date.now()).substr(-6) + ", вложенности объектов: \n\t  " + aO5str)
                     return aO5str
-                },
-                DoScroll = e => {
-                    const pO5 = (e.target == document ? document.body : e.target).pO5
-                    if (pO5) {
-                        const aO5s = (pO5.owns.own ? pO5.owns.own : wshp).aO5s
-                        wshp.DoScroll(aO5s, e.timeStamp)
-                    }
                 }
 
             MakeAO5s()
@@ -531,18 +537,13 @@
 
             if (o5debug > 0) {
                 let etimeStamp = 0
-                const sels = [],
-                    DbgDoResize = e => { // для отладки  !!!!!!!!!!!!!!!!!!
-                        if (e.timeStamp > etimeStamp + 0.1)
-                            if (!e.target.classList.contains(wshp.W.class))
-                                wshp.DoResize()
-                        etimeStamp = e.timeStamp
-                    }
+                const sels = []
                 for (const mtag of mtags)
                     sels.push({ name: C.MakeObjName(mtag.tag), origcls: mtag.origcls, class: mtag.tag.className, quals: mtag.quals.join(', '), })
                 if (sels.length > 0) C.ConsoleInfo(`o5shp: найдены селекторы:`, sels.length, sels)
 
-                window.addEventListener('click', DbgDoResize)
+                for (const start of C.page.starts)
+                    start.addEventListener('click', DbgDoResize)
             }
 
             if (wshp.aO5s.length > 0) {
@@ -868,10 +869,55 @@
                         else
                             CalcParentLocate(parent.pO5)
         },
+        PrepareBords1 = (aO5) => {
+            const
+                NewBords = (bord, a) => {
+                    const pO5 = bord.pO5,
+                        pos = pO5.pos
+                    if (pos.top != pos.bottom) {
+                        if (a.to == null || a.to.pos.top < pos.top) a.to = pO5
+                        if (a.bo == null || a.bo.pos.bottom > pos.bottom) a.bo = pO5
+                    }
+                    if (pos.left != pos.right) {
+                        if (a.le == null || a.le.pos.left < pos.left) a.le = pO5
+                        if (a.ri == null || a.ri.pos.right > pos.right) a.ri = pO5
+                    }
+                },
+                Hovered = (bords, a) => {
+                    let j = bords.length
+                    while (j-- > 0)
+                        NewBords(bords[j], a)
+                },
+                Located = (bords, a) => {
+                    for (let j = 0; j < bords.length; j++)
+                        NewBords(bords[j], a)
+                }
+
+            Object.assign(aO5.hovered, { to: null, le: null, ri: null, bo: null })
+            for (const ask of aO5.hovered.asks)
+                Hovered([ask.bords[0]], aO5.hovered)
+
+            Object.assign(aO5.located, { to: null, le: null, ri: null, bo: null })
+            for (const ask of aO5.located.asks)
+                Located(ask.bords, aO5.located)
+
+            for (const hoverMarks of ['to', 'le', 'ri', 'bo']) {
+                const pO5 = aO5.hovered[hoverMarks]
+                if (!pO5 || !pO5.located)
+                    alert(`located '${hoverMarks}' (in  DoScroll.PrepareBords)`)
+
+                if (pO5.located.timeStamp != timeStamp) { // чтобы не повторяться для одинаковых
+                    Hovered(pO5.prevs, pO5.located)
+                    pO5.located.timeStamp = timeStamp
+                }
+            }
+
+        },
         PrepareBords = (aO5) => {
             const bO5 = document.body.pO5,
                 a = { to: bO5, le: bO5, ri: bO5, bo: bO5 },
                 Located = (bords, a) => {
+                    const bO5 = bords.length > 0 ? bords[bords.length - 1].pO5 : null
                     for (const bord of bords) {
                         const pO5 = bord.pO5,
                             pos = pO5.pos
@@ -889,7 +935,7 @@
                 Located([ask.bords[0]], a)
             Object.assign(aO5.hovered, a)
 
-            Object.assign(a, { to: bO5, le: bO5, ri: bO5, bo: bO5 }) 
+            Object.assign(a, { to: bO5, le: bO5, ri: bO5, bo: bO5 })
 
             for (const ask of aO5.located.asks)
                 Located(ask.bords, a)
@@ -897,12 +943,14 @@
 
             for (const hoverMarks of ['to', 'le', 'ri', 'bo']) {
                 const pO5 = aO5.hovered[hoverMarks]
-                if (pO5 && pO5.located && pO5.located.timeStamp != timeStamp) { // чтобы не повторяться для одинаковых
+                if (!pO5 || !pO5.located)
+                    alert(`located '${hoverMarks}' (in  DoScroll.PrepareBords)`)
+                    
+                if (pO5.located.timeStamp != timeStamp) { // чтобы не повторяться для одинаковых
                     Located(pO5.prevs, pO5.located)
                     pO5.located.timeStamp = timeStamp
                 }
             }
-
         },
         FixSet = (aO5) => {
             const dirV = aO5.cls.dirV

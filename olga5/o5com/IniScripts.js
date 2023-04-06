@@ -324,7 +324,7 @@
 			OnLoad()  // после InitScripts
 		}
 		clr = `background: green;color:white;`
-		CheckInit = e => { // проверка и начало инициализации страницы
+		CheckInit = e => { // проверка и начало инициализации страницы !
 			const pact = this.pact,
 				url = DocURL(),
 				starts = document.querySelectorAll("[class *= '" + this.olga5Start + "']"),
