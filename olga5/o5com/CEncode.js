@@ -47,7 +47,11 @@
 			let s = s2s.join('/').replaceAll(/\/\.\//g, '/')
 			return s.replaceAll(/[^:]\/\/+/g, (u) => { return u.substr(0, 2) })
 		},
-		IsUrlNam = u => { return !!(u.trim() && !u.match(/[\/.\\#]/)) },
+		// IsUrlNam = u => { return !!(u.trim() && !u.match(/[\/.\\#]/)) },
+		IsUrlNam = u => { 
+			const isurl=!!(u&& u.trim() && !u.match(/[\/.\\#]/)) 
+			return isurl
+		},
 		IsFullUrl = url => {
 			return url.match(/^https?:/i) ||
 				url.match(/^\s*\/*\s*(((\d{1,3}\.){3}\d{1,3})|localhost)\//i)

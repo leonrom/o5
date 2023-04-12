@@ -68,7 +68,7 @@
 			for (const nam in urlrfs) {
 				const val = urlrfs[nam]
 // if (val.match('myMusikIT'))					
-	// console.log(121212)				
+	// console.log(121212)		isurl		
 				if (val != null && typeof val !== 'undefined') {
 					if (!val.replace)
 						alert('значение URL - не строка')
@@ -203,7 +203,7 @@
 			SplitParams: SplitParams,
 		})
 
-		if (C.consts.o5debug > 0) PrintParams(C.consts, C.save.xs, C.save.p, C.save.n1)
+		if (C.consts.o5debug > 0) PrintParams(C.save.libName, C.save.xs, C.save.p, C.save.n1)
 
 		const p = 'urlrfs',
 			xs = {}, // временное хранилилище для считываемых параметров
@@ -215,7 +215,7 @@
 		DeCodeUrlRfs(defs, C.save.libName)
 
 		for (const nam in defs) { xs[nam].url = defs[nam] }
-		if (C.consts.o5debug > 0) (C.save.libName, xs, p, n1)
+		if (C.consts.o5debug > 0) PrintParams(C.save.libName, xs, p, n1)
 
 		// delete C.save
 		// Object.freeze(C)

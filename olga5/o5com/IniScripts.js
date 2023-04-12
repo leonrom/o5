@@ -34,12 +34,12 @@
 		}
 		AddEvents = (Fun) => { // addEventListener
 			for (const meve of this.meves)
-				if (meve.isd) document.addEventListener(meve.eve, Fun,  true )
+				if (meve.isd) document.addEventListener(meve.eve, Fun, true)
 				else window.addEventListener(meve.eve, Fun)
 		}
 		RemEvents = (Fun) => { // addEventListener
 			for (const meve of this.meves)
-				if (meve.isd) document.removeEventListener(meve.eve, Fun,  true )
+				if (meve.isd) document.removeEventListener(meve.eve, Fun, true)
 				else window.removeEventListener(meve.eve, Fun)
 		}
 	}
@@ -125,7 +125,7 @@
 			})
 			if (C.consts.o5debug > 1) {
 				console.log(`- - > после инициализации '${modul}': ` +
-					(lefts.length > 0 ? `осталось:  ${lefts.join(', ')}` : `больше не осталось`))
+					(lefts.length > 0 ? `осталось:  ${lefts.join(', ')}` : ` не осталось`))
 			}
 			if (scrpt) {
 				const act = scrpt.act
@@ -232,6 +232,16 @@
 					}
 				}
 			}
+			if (C.consts.o5debug > 0) {
+				let asknoneed = []
+				for (const scrpt of C.scrpts)
+					if (!scrpt.act.need)
+						asknoneed.push(scrpt.modul)
+				const l=asknoneed.length
+				if (l > 0)
+					C.ConsoleError(`В скриптах заданы ${l} 'ненужн${l>1?'ых':'ый'}' модул${l>3?'ей':(l>1?'я':'ь')}: `, asknoneed.join(', '))
+			}
+
 			if (C.consts.o5doscr) {  // запуск встроенных cкриптоав
 				const scrs = C.GetTagsByTagNames('script'),
 					scriptDone = C.consts.o5doscr,

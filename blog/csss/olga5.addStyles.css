@@ -1,20 +1,22 @@
-body{
-	background-color: lightyellow;
+body {
+    background-color: lightyellow;
 }
-body.o5nomnu{
-	overflow: scroll;
-	background-color: azure;
+
+body.o5nomnu {
+    overflow: scroll;
+    background-color: azure;
     /* outline: 9px solid lightgray; */
     margin: 0;
     outline: auto;
-  padding-left: 4px;
+    padding-left: 4px;
 }
 
 code {
     color: blue;
     font-weight: bold;
-		/* text-decoration: underline; */
+    /* text-decoration: underline; */
 }
+
 audio {
     height: 1.8em;
 }
@@ -38,29 +40,46 @@ audio {
     background-color: seashell;
     border: solid lightpink 1px;
     vertical-align: baseline;
-	text-align: left;
-	text-align: -moz-left;
-	text-align: -webkit-left;
+    text-align: left;
+    text-align: -moz-left;
+    text-align: -webkit-left;
     padding: 0.3em 0.2em 0.2em 5.2em;
     color: darkblue;
     font-size: large;
-	margin-top: 0.1em;
+    margin-top: 0.1em;
     font-weight: bold;
     border-radius: 3px;
 }
 
+.olga5_page_header > .copyright {
+    font-size: small;
+    display: inline-block;
+    text-align: end;
+    color: blueviolet;
+    position: fixed;
+    top: 24px;
+    right: 16px;
+
+    opacity: 0.3;
+    font-style: italic;
+}
+
+.olga5_diagonal span {
+    font-weight: normal;
+    font-size: small;
+    font-style: italic;
+}
+
 .olga5_diagonal {
     background: yellow;
-    width: 177px;
     right: 0;
     border: 1px solid black;
     position: absolute;
-    top: 55px;
+    top: 77px;
     left: 12px;
     padding: 18px;
-    /* padding-left: 44px; */
     border-radius: 15px;
-    opacity: 0.4;
+    opacity: 0.8;
     -webkit-transform: rotate(-45deg);
     -moz-transform: rotate(-45deg);
     -o-transform: rotate(-45deg);
@@ -72,13 +91,13 @@ audio {
     font-family: sans-serif;
     font-weight: bold;
     text-align: center;
-    width: 211px;
+    width: 255px;
     display: block;
 }
 
 .olga5_divimg {
-	width: max-content;
-	    max-width: 95%;
+    width: max-content;
+    max-width: 95%;
     height: 266px;
     overflow: scroll;
     margin-left: 33px;
@@ -100,8 +119,8 @@ li>b+i{
 /* li::first-letter,
 li::marker::first-letter{ */
 
-.actFirstLetter li::first-letter{    
-  /* font-family: monospace;
+.actFirstLetter li::first-letter {
+    /* font-family: monospace;
     font-size: large;
     padding-right: 2px;
     font-weight: bold; */
@@ -115,11 +134,12 @@ li::marker::first-letter{ */
 	font-family: cursive;
     font-size: small;
 } */
-.actFirstLetter li :first-child{
-	font-family: cursive;
+.actFirstLetter li :first-child {
+    font-family: cursive;
     font-size: smaller;
-	font-weight: normal;
+    font-weight: normal;
 }
+
 /* .actFirstLetter li::target-text:first-child{
 	font-family: cursive;
     font-size: small;
@@ -148,12 +168,14 @@ blockquote {
     width: max-content;
     max-width: 90%;
 }
-.blockquote{
-	margin: 0;
-	    padding: 0;
-	    padding-left: 16px;
-	    margin-left: 16px;
+
+.blockquote {
+    margin: 0;
+    padding: 0;
+    padding-left: 16px;
+    margin-left: 16px;
 }
+
 blockquote::before {
     border: 14px solid transparent;
     border-top: 14px solid #efefef;
@@ -169,6 +191,7 @@ blockquote::before {
     transform-origin: center;
     transform: rotate(90deg) skew(-25deg) translateY(17px);
 }
+
 blockquote cite {
     position: absolute;
     bottom: -24px;
@@ -178,8 +201,9 @@ blockquote cite {
     font-weight: 300;
     color: #000;
 }
+
 blockquote p {
-margin: 0 !important;
+    margin: 0 !important;
 }
 
 .o_comment {
@@ -220,11 +244,18 @@ margin: 0 !important;
     margin: 0 !important;
 }
 
-.moecomment{
-    font-size: smaller;
+.moecomment {
+    font-size: small;
     line-height: 0.85em;
-    font-family: serif;
     font-style: italic;
     margin-block-start: 0em;
     margin-block-end: 0em;
+}
+
+.moeattention {
+    background-color: bisque;
+    border: 1px solid lightgreen;
+    border-radius: 5px;
+    padding-left: 0.3em;
+    padding-right: 0.3em;
 }

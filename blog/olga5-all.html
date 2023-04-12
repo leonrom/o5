@@ -13,12 +13,13 @@
 	<script data-src='+o5pop.js'></script>
 	<script data-src='+o5mnu.js' scrollY='-32'></script>
 
-	<script data-src='+o5ref.js' o5tag_attrs="img=image_play;a,img,audio=href,data-href,src,_src;" o5urlrfs="  
+	<script data-src='+o5ref.js' 
+		o5tag_attrs="img=image_play;a,img,audio=href,data-href,src,_src;" 
+		o5urlrfs="  
 			sounds=https://archive.org/download/clouds_20200310;
 			myTunes-icon=images + /myMusikIT.png               # --- только для o5snd ---;
 			Ceza1-25=sounds+/Ceza1-25.mp3;
-			мой-блог=https://ariturlearn..blogspot.com/2017/02/;   # --- только для o5shp ---;
-			
+			мой-блог=https://ariturlearn..blogspot.com/2017/02/;   # --- только для o5shp ---;			
 		">
 		</script>
 	<script data-src='+o5snd.js' btn_play='images + /play.png' btn_stop='images + /play_Freepik.png'></script>
@@ -36,7 +37,9 @@
 		src='https://rombase.h1n.ru/o5/olga5/o5common.js'       # отладка на моём сервере
 		src='http://localhost/o5/olga5/o5common.js'             # локальная отладка
 	-->
-	<script src='http://localhost/o5/olga5/o5com.js' o5consts="o5debug='1'; o5nomnu='0'; o5noact='0';" o5urlrfs="
+	<script src='../olga5/o5com.js' 
+		o5consts="o5debug='1'; o5nomnu='0'; o5noact='0';" 
+		o5urlrfs="
 			тесты='+ ../olga5-tests';
 			блог_o5='https://olga-5.blogspot.com/2020/02';
 			images=_url_olga5 + ../blog/media/image;       
@@ -44,11 +47,11 @@
 			# _url_root='# адрес сайта с текущей страницей';
 			# _url_olga5='# адрес загрузки файла o5common.js';
 		">
-		</script>
+	</script>
 </head>
 
 <body>
-	<div id='olga5Start' class="olga5_Start:o5shp,o5pop,o5mnu dir=" dir="ltr" trbidi="on">
+	<div id='olga5Start' class="olga5_Start:o5shp,o5pop,o5mnu" dir="ltr" trbidi="on">
 		<img alt="" border="0" width="200" style="display:none" data-original-height="599" data-original-width="662"
 			src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj3368Zm1cDrYNB31cB8ZgTvqX-oFl4e_fDG__JfwU_sLerz6HwVGwHjKFNdpuTwZh5X9tlnBVUvruSz48HoOoegNMEfaP5E6nxtZL8CrHFub6JaHgBRMW-xFTwWrGZby-0AvLvEZQ28Qq4-66Ne7P0UgvSNwmk3MYIKKFECDgIXYpJfKQNIciQrUDA/s200/all.png" />
 
@@ -94,8 +97,8 @@
 			В данной версии представлены функциональные модули (скрипты) :
 		</p>
 		<ul>
-			<li><a href="_url_html+/olga5-snd.html" target="olga5-addPage"><code>o5snd.js</code></a> &mdash;
-				подключение воспроизведения аудио, к тегам (<b>img</b>, <b>p</b>, <b>span</b> и иным) страницы;</li>
+			<li><a href="_url_html+olga5-snd.html" target="olga5-addPage"><code>o5snd.js</code></a> &mdash;
+				1подключение воспроизведения аудио, к тегам (<b>img</b>, <b>p</b>, <b>span</b> и иным) страницы;</li>
 			<li><a href="_url_html+/olga5-ref.html" target="olga5-addPage"><code>o5ref.js</code></a> &mdash;
 				подстановка <i>ссылок</i> в указанные теговые атрибуты странцы;</li>
 			<li><a href="_url_html+/olga5-shp.html" target="olga5-addPage"><code>o5shp.js</code></a> &mdash;
@@ -1367,14 +1370,14 @@
 						(и при этом в нём оператор <i>setAttribute</i> выставит скрипту этот атрибут со значением '1').
 					</li>
 				</ul>
-					<h4>События открытия и закрытия страницы</h4> <br/>
+					<h4>События открытия и закрытия страницы</h4> 
 					<p>
 Списки являются строками, содержащими наименования событий, разделённые символом '<b>,</b>'. 
 Чтобы задать где именно, на <b>window</b>'е или на <b>document</b>'е,- должно генерироаться событие, после его наименования следует указать квалификатор
  соответственно '<b>W</b>' или '<b>D</b>'. Например  "readystatechange:d". Если квалификатор не указан, то 
- события [<i>'DOMContentLoaded', 'readystatechange', 'visibilitychange', 'blur'</i>] будут генерироваться на <b>document</b>'е.
+ события [<i>'DOMContentLoaded', 'readystatechange', 'visibilitychange', 'blur'</i>] будут генерироваться на <b>document</b>'е,
+ а остальные -  на <b>window</b>.
 				</p>
-				<p class="moecomment">События <i>библиотеки</i></p> как правило генерируются на <b>window</b>
 			<ul>
 					<li><b>o5init_events</b> &mdash;
 						<span title="разделённыйх символом '<b>,</b>'">список</span> событий,
@@ -1395,10 +1398,8 @@
 						Если требуется гарантированно избежать инициализации то
 						следует указать несуществующие наименования событий или задать атрибут <b>o5noact</b>.
 						Умалчиваемое значение: "readystatechange:d, message";
+						<br/><span class="moecomment">Событие <b>message</b> возникает в <b>Blogger'е</b> при смене отображаемой страницы.</span>
 					</li>
-					<p class="moecomment">
-						Событие <b>message</b> возникает в <b>Blogger'е</b> при смене отображаемой страницы.
-					</p>
 					<li><b>o5hide_events</b> &mdash;
 						<span title="разделённыйх символом '<b>,</b>'">список</span> событий смены активного <b>url</b>'а,
 						например при бодгрузке новой страницы в <b>Blogger</b>'е'.
@@ -1411,10 +1412,8 @@
 						<span title="разделённыйх символом '<b>,</b>'">список</span> событий на <b>window</b>'е,
 						по наступлении одного из которых происходит закрытие окон и объектов.
 						Умалчиваемое значение: "beforeunload, olga5_unload".
+						<br/><span class="moecomment">Событие <b>olga5_unload</b>  не создаётся в <i>библиотеке</i>, но предусмотрено для использования во внешних программах.</span>
 					</li>
-					<p class="moecomment">						
-						Сообщение '<i>olga5_unload</i>' не создаётся в <i>библиотеке</i>, но предусмотрено для использования во внешних программах.
-					</p>
 				</ul>
 
 				<br />

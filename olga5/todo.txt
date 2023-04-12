@@ -1,3 +1,6 @@
+разобраться с возможностью '.' в назв. каталогов IsUrlNam и IsFullUrl 
+IsUrlNam -> IsUrlRef
+
 http://localhost/o5/olga5-tests/shp1.html
 не заполняет поля
 

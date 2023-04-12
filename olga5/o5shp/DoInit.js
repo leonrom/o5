@@ -11,7 +11,8 @@
     if (!window.olga5[olga5_modul]) window.olga5[olga5_modul] = {}
 
     let C = null,
-        o5debug = 0,
+        o5debug = 0,        
+        etimeStamp = 0,
         debugids = []  // 'shp_text' // 'shp_1÷4' // 'shp-demo' // 'shp_text'        
 
     const wshp = window.olga5[olga5_modul],
@@ -264,9 +265,7 @@
 
             wshp.aO5str = SetLevelsAll(wshp.aO5s)
 
-
             if (o5debug > 0) {
-                let etimeStamp = 0
                 const sels = []
                 for (const mtag of mtags)
                     sels.push({ name: C.MakeObjName(mtag.tag), origcls: mtag.origcls, class: mtag.tag.className, quals: mtag.quals.join(', '), })
