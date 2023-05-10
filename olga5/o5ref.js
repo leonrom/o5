@@ -4,8 +4,8 @@
 /*eslint no-useless-escape: 0*/
 (function () {              // 3---------------------------------------------- o5ref ---
 	'use strict';
-	let C = null
 	const
+		C = window.olga5.C,
 		W = {
 			modul: 'o5ref',
 			Init: RefInit,
@@ -67,19 +67,19 @@
 						const tagattr = tag.attributes[attr]
 						if (tagattr) {
 							const ori = tagattr.nodeValue,
-								wref = C.DeCodeUrl(W.urlrfs, ori, o5attrs)
+								wref = C.DeCodeUrl(W.urlrfs, ori, o5attrs),
+								anew = (attr[0] == '_') ? attr.substring(1) : attr 
 
 							if (wref.err)
 								undefs.push({ 'имя (refs)': nam, 'атрибут': attr, 'адрес': ori, 'непонятно': wref.err })
-							// 1?							else
-							if (wref.url && ori != wref.url) {
-								const a = (attr[0] == '_') ? attr.substring(1) : attr // (attr == '_src') ? 'src' : ((attr == '_href') ? 'href' : attr)
-								if (a != attr)     	// если обработано без ошибок, то удаляю - чтоб другие модули не повторяли
+							
+							if (wref.url && (ori != wref.url||attr != anew)) {
+								if (attr != anew)     	// если обработано без ошибок, то удаляю - чтоб другие модули не повторяли
 									tag.removeAttribute(attr)
 
-								tag.setAttribute(a, wref.url)
+								tag.setAttribute(anew, wref.url)
 
-								rez.push({ nam: nam, attr: (attr + (a != attr ? ` (${a})` : ``)), src: ori, rez: wref.url })
+								rez.push({ nam: nam, attr: (attr + (anew != attr ? ` (${anew})` : ``)), src: ori, rez: wref.url })
 								attrs[attr]++
 							}
 						}
@@ -96,10 +96,9 @@
 		}
 	// --------------------------------------------------------	
 	let no_o5tag_attrs = false
-	function RefInit(c) {
-		C = c
+	function RefInit() {
 
-		c.ParamsFill(W)
+		C.ParamsFill(W)
 
 		const o5tag_attrs = 'o5tag_attrs',
 			s = W.consts[o5tag_attrs]
@@ -118,12 +117,5 @@
 		window.dispatchEvent(new CustomEvent('olga5_sinit', { detail: { modul: W.modul } }))
 	}
 
-	if (!window.olga5) window.olga5 = []
-	if (!window.olga5.find(w => w.modul == W.modul)) {
-		if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
-			console.log(`}---< ${document.currentScript.src.indexOf(`/${W.modul}.`) > 0 ? 'загружен  ' : 'включён   '}:  ${W.modul}.js`)
-		window.olga5.push(W)
-		window.dispatchEvent(new CustomEvent('olga5_sload', { detail: { modul: W.modul } }))
-	} else
-		console.error('%c%s', "background: yellow; color: black;border: solid 2px red;", `}---< Повтор загрузки '${W.modul}`)
+	C.MsgAddModule(W, null)
 })();

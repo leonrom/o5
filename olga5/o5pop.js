@@ -3,12 +3,12 @@
 /* jshint asi:true                   */
 /* jshint esversion: 6               */
 (function () {              // ---------------------------------------------- o5pop ---
-    if (!window.olga5) window.olga5 = []
+    let focusTime = 0
 
-    const pard = window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/)
-    let o5debug = (pard ? (pard[0].match(/=/) ? parseInt(pard[0].match(/\s*\d+/) || 1) : 1) : 2),
-        focusTime = 0,
-        C = {                // заменитель библиотечного
+    const     // phases = ['NONE', 'CAPTURING_PHASE', 'AT_TARGET', 'BUBBLING_PHASE'],                
+        pard = window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/),
+        o5debug = (pard ? (pard[0].match(/=/) ? parseInt(pard[0].match(/\s*\d+/) || 1) : 1) : 2),
+        C = window.olga5 ? window.olga5.C : {                // заменитель библиотечного
             consts: { o5debug: o5debug },
             repQuotes: /^\s*((\\')|(\\")|(\\`)|'|"|`)?\s*|\s*((\\')|(\\")|(\\`)|'|"|`)?\s*$/g,
             ConsoleError: (msg, name, errs) => {
@@ -24,9 +24,8 @@
                     ('[' + obj.tagName ? obj.tagName : (obj.nodeName ? obj.nodeName : '?') + ']') +
                     '.' + (obj.className ? obj.className : '?'))) : 'НЕОПР?'),
             GetTagsByQueryes: query => document.querySelectorAll(query), // второй аргумент - игнорится
-        }
-
-    const     // phases = ['NONE', 'CAPTURING_PHASE', 'AT_TARGET', 'BUBBLING_PHASE'],                
+            avtonom: true,
+        },
         SetTagError = (tag, txt, errs) => {  // добавление и протоколирование НОВЫХ ошибок для тегов
             const
                 isnew = tag.title.indexOf(txt) < 0,
@@ -123,19 +122,20 @@
 
                 const ap = tag.getAttribute(o5popup),
                     pops = tag.aO5pop.apops[eve] = {
-                        tag: tag, eve: eve,                     //для обратного поиска
+                        tag: tag, eve: eve,                                         //для обратного поиска
                         url: '',
                         act: tag,
-                        spar: '',                               // это просто для истории
-                        key: tag.aO5pop.name + '(' + eve + ')', // наименование окна
-                        wins: {}, moes: {}, sizs: {},
-                        swins: null, smoes: null,               // будут доопределены позже
+                        spar: '',                                                   // это просто для истории
+                        key: tag.aO5pop.name + '(' + eve + ')' + e.timeStamp,       // наименование окна
+                        wins: {}, moes: {}, sizs: {}, swins: null, smoes: null,     // будут доопределены позже
                     }
 
                 if (eve == click && ap) {  // при клике 'o5popup' приоритетнее
-                    const ss = ap.split(/\s*;\s*/)
-                    pops.url = ss[0]
-                    pops.spar = ss[1] || ''
+                    const mm = ap.match(/\s*[;,]\s*/),
+                        i = mm ? mm.index : 9999
+                    // ss = ap.split(/\s*;\s*/)
+                    pops.url = ap.substring(0, i).trim()
+                    pops.spar = ap.substring(i + 1)
                 } else {
                     const l = args.length,
                         nam = l > 0 ? args[0] : '' // имя объекта, на котором д.б. мигание,
@@ -332,7 +332,7 @@ img.${W.class} {
 }
 `,
         ClosePop = wopen => {
-            if (C.consts.o5debug > 1) console.log(`${W.modul}: ClosePop`.padEnd(22) +
+            if (o5debug > 1) console.log(`${W.modul}: ClosePop`.padEnd(22) +
                 `${wopen.name}`.padEnd(22))
             if (wopen.time + 444 > (new Date()).getTime()) return
 
@@ -389,7 +389,7 @@ img.${W.class} {
                 if (ch.nodeName == "STYLE" && ch.id == namo5css)
                     return ch
         },
-        IncludeCSS = () => {// подключение CSS'ов, встроенных в скрипт  (копия из o5common.js)                
+        IncludeCSS = () => {// подключение CSS'ов, встроенных в скрипт  (копия из o5com!.js)                
             let css = GetCSS()
             if (!css) {
                 if (o5debug > 0)
@@ -489,7 +489,7 @@ img.${W.class} {
             }
             return ss.join(',')
         },
-        optsFocus={ capture: true, moja: 'fignia' },
+        optsFocus = { capture: true, moja: 'fignia' },
         Focus = e => {
             if (wopens.length == 0 || focusTime == e.timeStamp) return
 
@@ -504,59 +504,6 @@ img.${W.class} {
         o5nocss = attrs && attrs.o5nocss && attrs.o5nocss.value,
         doneattr = W.modul + '-done'
 
-    function Popups(c) {
-        'use strict'
-        if (c) {
-            C = c
-            o5debug = C.consts.o5debug
-
-            if (o5nocss || GetCSS()) c.ParamsFill(W)    // CSS сохранилось после автономного создания
-            else                                        // иначе - никак, т.к. не известно, кто раньше загрузится
-                c.ParamsFill(W, o5css)                  // CSS пересоздаётся (для Blogger'а)
-        }
-        else
-            console.log(`}===< инициировцан модуль:  ${W.modul}.js`)
-
-        focusTime = 0
-        const tags = C.GetTagsByQueryes('[' + o5popup + ']')
-        if (tags)
-            for (const tag of tags) {
-                if (tag.getAttribute(doneattr)) {
-                    console.error('%c%s', "background: yellow; color: black;", `(========  повтор инициализации для id='${tag.id}'`)
-                    continue
-                }
-                tag.setAttribute(doneattr, 'OK')
-                if (!o5nocss) {
-                    const params = tag.attributes.o5popup.nodeValue
-                    if (!params.match(/\bnocss\b/i) && !tag.classList.contains(W.class))
-                        tag.classList.add(W.class)
-                }
-
-                tag.addEventListener(click, window.olga5.PopUp)
-            }
-
-        for (const eve of ['focus', 'click'])
-            window.addEventListener(eve, Focus, optsFocus )  // т.е. e.eventPhase ==1
-
-        window.addEventListener(click, ClosePops)
-
-        document.addEventListener('visibilitychange', DClosePops) // для автономной работы
-
-        if (!o5nocss)  // т.е. если явно НЕ запрещено    
-            IncludeCSS()
-
-        const errs = []
-        if (attrs && attrs.o5params) {
-            const pars = {},
-                refs = {}  // тут - refs не нуже
-            SplitPars(attrs.o5params, pars, refs, errs)
-            AddPars(pars, dflts, errs, false, 'конфиг.')
-        }
-        if (errs.length > 0)
-            C.ConsoleError(`Ошибки формирования параметров окна (из url'а):`, errs.length, errs)
-
-        window.dispatchEvent(new CustomEvent('olga5_sinit', { detail: { modul: W.modul } }))
-    }
 
     function ShowWin(pops) {
         'use strict'
@@ -641,22 +588,69 @@ img.${W.class} {
             return '?'
         }
     }
+    function Popups(e) {
+        'use strict'
+        if (!C.avtonom)
+            if (o5nocss || GetCSS()) C.ParamsFill(W)    // CSS сохранилось после автономного создания
+            else                                        // иначе - никак, т.к. не известно, кто раньше загрузится
+                C.ParamsFill(W, o5css)                  // CSS пересоздаётся (для Blogger'а)
 
-    const AutoInit = e => { // автономный запуск
-        if (!Array.from(document.scripts).find(script => script.src.match(/\/o5(com|common)?.js$/))) {
-            document.addEventListener('olga5-incls', W.Init)
-            W.Init()
+        if (o5debug > 0) console.log(`========  инициализация '${W.modul}'   ------` +
+            `${C.avtonom ? ('автономно по ' + e.type) : 'из библиотеки'}`)
+
+        focusTime = 0
+        const tags = C.GetTagsByQueryes('[' + o5popup + ']')
+        if (tags)
+            for (const tag of tags) {
+                if (tag.getAttribute(doneattr)) {
+                    console.error('%c%s', "background: yellow; color: black;", `(========  повтор инициализации для id='${tag.id}'`)
+                    continue
+                }
+                tag.setAttribute(doneattr, 'OK')
+                if (!o5nocss) {
+                    const params = tag.attributes.o5popup.nodeValue
+                    if (!params.match(/\bnocss\b/i) && !tag.classList.contains(W.class))
+                        tag.classList.add(W.class)
+                }
+
+                tag.addEventListener(click, window.olga5.PopUp)
+            }
+
+        for (const eve of ['focus', 'click'])
+            window.addEventListener(eve, Focus, optsFocus)  // т.е. e.eventPhase ==1
+
+        window.addEventListener(click, ClosePops)
+
+        document.addEventListener('visibilitychange', DClosePops) // для автономной работы
+
+        if (!o5nocss)  // т.е. если явно НЕ запрещено    
+            IncludeCSS()
+
+        const errs = []
+        if (attrs && attrs.o5params) {
+            const pars = {},
+                refs = {}  // тут - refs не нуже
+            SplitPars(attrs.o5params, pars, refs, errs)
+            AddPars(pars, dflts, errs, false, 'конфиг.')
         }
-    }
-    document.addEventListener('DOMContentLoaded', AutoInit)
+        if (errs.length > 0)
+            C.ConsoleError(`Ошибки формирования параметров окна (из url'а):`, errs.length, errs)
 
-    if (!window.olga5.find(w => w.modul == W.modul)) {
-        if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
+        window.dispatchEvent(new CustomEvent('olga5_sinit', { detail: { modul: W.modul } }))
+    }
+    // const AutoInit = e => { // автономный запуск
+    //     if (C.avtonom) {
+    //         document.addEventListener('olga5-incls', W.Init)
+    //         W.Init()
+    //     }
+    // }
+    if (C.avtonom) {
+        document.addEventListener('DOMContentLoaded', W.Init)
+        document.addEventListener('olga5-incls', W.Init)
+    }
+    if (!C.avtonom)
+        C.MsgAddModule(W, null)
+    else
+        if (o5debug)
             console.log(`}---< ${document.currentScript.src.indexOf(`/${W.modul}.`) > 0 ? 'загружен  ' : 'включён   '}:  ${W.modul}.js`)
-        window.olga5.push(W)
-        window.dispatchEvent(new CustomEvent('olga5_sload', { detail: { modul: W.modul } }))
-    } else
-        console.error('%c%s', "background: yellow; color: black;border: solid 2px red;", `}---< Повтор загрузки '${W.modul}`)
-    // -------------- o5pop
 })();
-// картан

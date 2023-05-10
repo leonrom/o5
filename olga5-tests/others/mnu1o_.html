@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>mnu1_</title>
+    <link rel="shortcut icon" href="./favicon.svg" type="image/x-icon">
+
+    <script src=" ../olga5/o5com.js" o5debug="2"></script>
+    <!-- <script src='https://rombase.h1n.ru/o5/olga5/o5dbg/events.js'></script> -->
+    <script src=" ../olga5/o5mnu.js" o5menu="
+            {span: 'меню <script> ',right: '311px',top: '33px',add: '233px',
+                target:'_olga5',
+                base:'https://olga-5.blogspot.com/blog/02'
+            },
+                {span: '3. Подключение аудио-файлов',ref: '/olga5-snd.html',add: '288px',id: 'div1'},
+                    {span: '3.1. Подключение к тегам 31',ref: 'snd_31',},
+                    {span: '3.2. Просто к тегам 32',ref: 'snd_32',ret: 1},
+                {span: '4. CSS-описания REF',ref: '/olga5-ref.html'},
+                {span: 'Заключение SHP',id: 'div5',ref: '/olga5-shp.html'},
+            "></script>
+</head>
+ 
+<body class="olga5_Start">
+    <div style="text-align: left;line-height: 1.3; margin-bottom: 0cm;">
+        <h3>примеры меню</h3>
+    </div>
+    <pre id="menu-pre" class="olga5-menuhidden" style="display:none">
+		{span: 'меню <b>&lt;pre&gt;</b>',right: '11px',top: '33px',add: '233px',
+            owner: '.divC',
+            target:'_olga5',
+            base:'https://olga-5.blogspot.com/blog/02'
+            },
+        {span: '3. Подключение аудио-файлов',ref: '/olga5-snd.html',add: '288px',id: 'div1'},
+            {span: '3.1. Подключение к тегам 31',ref: 'snd_31',},
+            {span: '3.2. Просто к тегам 32',ref: 'snd_32',ret: 1},
+        {span: '4. CSS-описания REF',ref: '/olga5-ref.html'},
+        {span: 'Заключение SHP',id: 'div5',ref: '/olga5-shp.html'},
+    </pre>
+    <div id="menu-div" class="olga5-menuhidden" style="display:none">
+        {span: 'меню <b>&lt;div&gt;</b>',right: '11px',top: '133px',add: '233px',
+        owner: '#divI',
+        target:'_olga5',
+        base:'https://olga-5.blogspot.com/blog/02'
+        },
+        {span: '3. Подключение аудио-файлов',ref: '/olga5-snd.html',add: '288px',id: 'div1'},
+        {span: '3.1. Подключение к тегам 31',ref: 'snd_31',},
+        {span: '3.2. Просто к тегам 32',ref: 'snd_32',ret: 1},
+        {span: '4. CSS-описания REF',ref: '/olga5-ref.html'},
+        {span: 'Заключение SHP',id: 'div5',ref: '/olga5-shp.html'},
+    </div>
+    <script id="menu-script1">
+        window.addEventListener('olga5_ready', function () {
+            if (window.olga5 && window.olga5.Menu)
+                window.olga5.Menu([{ span: 'меню <script> 1', right: '166px', top: '33px', add: '233px', owner: 'body', },
+                { span: '3. Подключение аудио-файлов', ref: 'snd_3', add: '288px', id: 'div1' },
+                { span: '3.1. Подключение к тегам &lt;audio&gt;', ref: 'snd_31', },
+                { span: '3.2. Просто к тегам &lt;img&gt;', ref: 'snd_32', ret: 1 },
+                { span: '4. CSS-описания скрипта блабла', ref: 'snd_4' },
+                { span: 'Заключение ', ref: 'snd_5' },
+                ])
+        })
+    </script>
+    <script id="menu-script1">
+        window.addEventListener('olga5_ready', function () {
+            if (window.olga5 && window.olga5.Menu)
+                window.olga5.Menu([{ span: 'меню <script> 2', right: '166px', top: '133px', add: '233px',  },
+                { span: '3. Подключение аудио-файлов', ref: 'snd_3', add: '288px', id: 'div1' },
+                { span: '3.1. Подключение к тегам &lt;audio&gt;', ref: 'snd_31', },
+                { span: '3.2. Просто к тегам &lt;img&gt;', ref: 'snd_32', ret: 1 },
+                { span: '4. CSS-описания скрипта блабла', ref: 'snd_4' },
+                { span: 'Заключение ', ref: 'snd_5' },
+                ])
+        })
+    </script>
+    <div class="divC" id="divI">
+        <div id='snd_3'>это snd_3</div>
+        <div></div>
+        <div id='snd_31'>это snd_31</div>
+        <div></div>
+        <div id='snd_32'>это snd_32</div>
+        <div></div>
+        <div id='snd_4'>это snd_4</div>
+        <div></div>
+        <div id='snd_5'>это snd_5</div>
+        <div></div>
+    </div>
+</body>
+
+</html>

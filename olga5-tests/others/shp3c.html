@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="ru">
+ 
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<title>shp3c</title>
+    <link rel="shortcut icon" href="./favicon.svg" type="image/x-icon">
+
+	<link href='../add/alltst.css' media='screen' rel='stylesheet' />
+	<script src='../add/alltst.js'></script>
+
+	<script src='../olga5/o5.js' o5debug=0></script>
+</head>
+
+<body id="body">
+	<script>
+		const eve = document.head.querySelector("script[src*='o5inc.js']") ? 'olga5-incls' : 'olga5_ready' 
+		window.addEventListener(eve, Init3, { once: true })
+	</script>
+
+	<div class='olga5_Start' o5include='./shp3.html?.example'></div>
+</body>
+
+</html>

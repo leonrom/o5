@@ -6,7 +6,7 @@
 	'use strict';
 	let C = null
 	const olga5_modul = 'o5p1',
-		olga5_class = olga5_name + '_o5p1',
+		olga5_class = 'olga5_o5p2', // olga5_name + '_o5p2',
 		olga5_CSS = `
         .olga5_snd {
             cursor: pointer;

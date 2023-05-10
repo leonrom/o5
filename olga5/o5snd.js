@@ -5,6 +5,7 @@
 	'use strict';
 
 	const
+		C = window.olga5.C,
 		W = {
 			modul: 'o5snd',
 			Init: SndInit,
@@ -70,27 +71,17 @@
 			75% {transform: rotateZ(-33deg);}
 		}
 	`
-	function SndInit(c) {
+	function SndInit() {
 		const wshp = window.olga5[W.modul]
 
 		wshp.css = css
 
-		c.ParamsFill(W, o5css)
+		C.ParamsFill(W, o5css)
 
-		const mtags = c.SelectByClassName(W.class, W.modul)
+		const mtags = C.SelectByClassName(W.class, W.modul)
 		wshp.Prepare(mtags)
 		window.dispatchEvent(new CustomEvent('olga5_sinit', { detail: { modul: W.modul } }))
 	}
 
-	if (!window.olga5) window.olga5 = []
-	if (!window.olga5[W.modul]) window.olga5[W.modul] = {}
-
-	Object.assign(window.olga5[W.modul], { W: W, })
-	if (!window.olga5.find(w => w.modul == W.modul)) {
-		if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
-			console.log(`}---< ${document.currentScript.src.indexOf(`/${W.modul}.`) > 0 ? 'загружен  ' : 'включён   '}:  ${W.modul}.js`)
-		window.olga5.push(W)
-		window.dispatchEvent(new CustomEvent('olga5_sload', { detail: { modul: W.modul } }))
-	} else
-		console.error('%c%s', "background: yellow; color: black;border: solid 2px red;", `}---< Повтор загрузки '${W.modul}`)
+	C.MsgAddModule(W, { W: W, })
 })();

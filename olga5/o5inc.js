@@ -3,216 +3,251 @@
 /*jshint esversion: 6*/
 (function () {              // ---------------------------------------------- o5inc ---	
 	'use strict'
-	const mdebug = window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=)(\s*\d*)/)
-	let C = {
-		consts: { o5debug: mdebug ? (mdebug[5] ? mdebug[5] : 1) : 0 },
-		ConsoleInfo: (head, len, rezs) => {
-			console.groupCollapsed(head + ' - OK')
-			console.table(rezs)
-			console.groupEnd()
-		},
-		ConsoleError: (head, ne, rezs) => {
-			console.groupCollapsed(head + ` - есть ${ne} ошибок!`)
-			console.table(rezs)
-			console.groupEnd()
-		},
-	}
+	let
+		incls = null
 	const
+		pard = window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/),
+		C = window.olga5 ? window.olga5.C : {
+			consts: { o5debug: (pard ? (pard[0].match(/=/) ? parseInt(pard[0].match(/\s*\d+/) || 1) : 1) : 2) },
+			ConsoleInfo: (head, txt, rezs) => {
+				console.groupCollapsed(head + ' - ' + txt)
+				console.table(rezs)
+				console.trace()
+				console.groupEnd()
+			},
+			ConsoleError: (head, ne, rezs) => {
+				console.groupCollapsed(head + ` - есть ${ne} ошибок!`)
+				console.table(rezs)
+				console.trace()
+				console.groupEnd()
+			},
+			avtonom: true,
+		},
+		_div = document.createElement('div'),
 		W = {
 			modul: 'o5inc',
-			Init: Includes,
-			// src: document.currentScript.src,
+			Init: InclStart,
+			consts: 'o5getall=true',
 		},
-		incls = {},
-		act = {
-			div: null,
-			cnt: 0,
-			DecFinish: function () {
-				if (--this.cnt <= 0) {
-					const rezs = [],
-						head = `o5inc:  обработка 'CInclude'`
-					let ne = 0
-					for (const ori in incls) {
-						const incl = incls[ori],
-							err = incl.err > 1 ? 'ERROR' : incl.err > 0 ? 'error' : ''
-						if (err) ne++
+		o5include = 'o5include',
+		InclFinish = () => {
+			const rezs = []
+			let ok = true
+			for (const url in incls) {
+				const incl = incls[url]
+				if (incl.err)
+					ok = false
 
-						rezs.push({ url: incl.url, err: err, status: incl.status, load: incl.text, bad_selector: incl.undef })
-					}
-
-					if (ne) C.ConsoleError(head, ne, rezs)
-					else
-						if (C.consts.o5debug > 0) C.ConsoleInfo(head, 'OK', rezs)
-
-					window.dispatchEvent(new CustomEvent('olga5_sinit', { detail: { modul: W.modul } }))
-					window.dispatchEvent(new CustomEvent('olga5-incls', { detail: { modul: W.modul } })) // для тестов
-				}
+				rezs.push({ ori: incl.ori, url: incl.url, err: incl.err || 'OK', })
 			}
+
+			const head = `${W.modul}:  обработка 'CInclude'`
+			if (!ok)
+				C.ConsoleError(head + ' - есть ошибки:', rezs.length, rezs)
+			else
+				if (C.consts.o5debug > 0)
+					C.ConsoleInfo(head, 'OK', rezs)
+
+			window.dispatchEvent(new CustomEvent('olga5_sinit', { detail: { modul: W.modul } }))
+			window.dispatchEvent(new CustomEvent('olga5-incls', { detail: { modul: W.modul } }))
 		},
-		FindIncl = (_url) => {
-			let incl = null
-			for (const ori in incls)
-				if (incls[ori].url == _url)
-					return incls[ori]
-			C.ConsoleError(`Не определён incl-источник загрузки для url='${_url}'`)
-		},
-		OnLoad = function () {
-			const xhr = this,
-				ok = xhr.status == 200,
-				incl = FindIncl(xhr._url)
-
-			if (C.consts.o5debug > 0) console.log(`========  o5inc.OnLoad(${xhr.status})  ------ ${xhr._url}`)
-
-			if (incl) {
-				Object.assign(incl, { status: xhr.status, text: xhr.statusText, err: ok ? 0 : 2 })
-
-				if (ok) {
-					let tagid = null,
-						ok = false
-					const s = xhr.responseText,
-						m1 = s.match(/<body\.*>/),
-						i1 = (m1 && m1.length > 0) ? (m1.index + m1[0].length) : 0,
-						i2 = i1 > 0 ? s.lastIndexOf('</body') : s.length,
-						res = (i1 > 0 ? s.substring(i1, i2) : s).trim(),
-						AddSel = tag => {
-							tagid.tag.innerHTML += (tagid.tag.innerHTML ? '<br/>' : '') + tag.innerHTML
-							ok = true
+		AddIncls = (tags) => {
+			const errs = [],
+				IsDisplay = tag => {
+					let div = tag
+					while (div.tagName.match(/div/i)) {
+						const nst = window.getComputedStyle(div),
+							display = nst.getPropertyValue('display')
+						if (display == 'none') {
+							return false
 						}
-
-					if (C.consts.o5debug > 1) {
-						console.groupCollapsed(`Содержимое прочитанного '${incl.url}'`)
-						console.log(s)
-						console.groupEnd
+						div = div.parentNode
 					}
-					for (tagid of incl.tagids) {
-						let sel = tagid.selector
-						ok = false
-						if (sel) {
-							if (!act.div) {
-								act.div = document.createElement('div')  // первый и единственный раз
-								act.div.innerHTML = res
-							}
-
-							let tags = ''
-							switch (sel[0]) {
-								case '': AddSel(act.div)
-									break
-								case '[': tags = act.div.querySelectorAll(sel)
-									if (tags)
-										for (const t of tags)
-											AddSel(t)
-									break
-								case '#': //tag = AddSel(act.div.querySelector(`[id='${sel.substring(1)}']`))
-									tags = act.div.querySelectorAll(`[id='${sel.substring(1)}']`)
-									if (tags)
-										for (const t of tags)
-											AddSel(t)
-									break
-								case '.':
-									const clss = sel.substring(1).split(/\s*:\s*/),
-										cls = clss[0]
-									tags = act.div.querySelectorAll(`[class *='${cls}']`)
-									if (tags) {
-										let s = ''
-										for (let i = 1; i < clss.length; i++) {
-											const cls = clss[i].trim()
-											if (cls)
-												s += (s?'|':'') + ':' + cls
-										}
-
-										const match = new RegExp(`\\b` + cls + (s ? `(:[^\\s]*)*(${s})+` : ``) + `\\b`)
-										// Match: scls => new RegExp(`\\b` + scls + `([,:][^\\s\\)]*)*\\b`),
-
-										for (const t of tags)
-											if (t.className.match(match))
-												AddSel(t)
-									}
-									break
-								default: tags = act.div.getElementsByTagName(sel)
-									if (tags)
-										for (const t of tags)
-											AddSel(t)
-							}
-
-							if (!ok) {
-								if (C.consts.o5debug > 1)
-									console.error(`inc: не определён селектор '${tagid.selector}' (м.б. ошибка парности тегов <div>)`)
-								incl.undef += (incl.undef ? ',' : '') + tagid.selector
-								incl.err = 1
-							}
-						} else
-							tagid.tag.innerHTML += res
-					}
+					return true
 				}
+			for (const tag of tags) // группировка по url'ам, чтобы не грузить лишнее
+				if (W.consts.o5getall || IsDisplay(tag)) {
+					const ref = tag.getAttribute(o5include)
+
+					tag.removeAttribute(o5include)
+					tag.setAttribute('_' + o5include, ref)  // так... для истории
+
+					const
+						ss = ref.split('?'),
+						ori = ss[0].trim(),
+						wref = (C.DeCodeUrl) ? C.DeCodeUrl(C.urlrfs, ori, '') : { url: ori, err: '' }
+					if (wref.err) {
+						if (!errs.contains(ori)) errs.push(ori)
+						continue
+					}
+
+					const url = wref.url
+					let incl = incls[url]
+					if (!incl) {
+						incl = {
+							ori: ori,
+							url: url,
+							mtags: [], err: '', text: '', done: false, isent: false,
+							xhr: new XMLHttpRequest(),
+						}
+						Object.seal(incl)
+						incls[url] = incl
+
+						Object.assign(incl.xhr, {
+							incl: incl, onload: OnLoad, onerror: OnError,
+							timeout: 10000, responseType: 'text', withCredentials: true,
+						})
+						incl.xhr.open("get", url, true)
+					}
+					incl.mtags.push({ tag: tag, sel: (ss[1] || '').trim() })
+				}
+
+			let n = 0
+			for (const url in incls) {
+				const incl = incls[url]
+				if (!incl.isent) {
+					incl.isent = true
+					incl.xhr.send()
+					n++
+				}
+				else
+					if (incl.done)	//	но если файл уже был загружен, то не надо ждать					
+						DoLoad(incl)
 			}
-			if (C.consts.o5debug > 2) console.log("}========  OnLoad() 2 -----------------------------------------------")
-			act.DecFinish()
+			return n
 		},
-		OnError = function (e) {
-			const xhr = this,
-				incl = FindIncl(xhr._url)
-			if (incl)
-				Object.assign(incl, { status: xhr.status, text: 'ошибка OnError... ', undef: 'блокировано by CORS ?', err: 3 })
-			act.DecFinish()
+		AskFinish = (incl, ok) => {
+
+			if (!ok) console.log(`========  o5inc.OnLoad(${incl.xhr.status})   ${incl.xhr.responseURL}`)
+			else
+				if (C.consts.o5debug > 0) console.log(`========  o5inc.OnLoad(${incl.xhr.status})  ------ ${incl.xhr.responseURL}`)
+
+			for (const url in incls)
+				if (!incls[url].done)
+					return
+
+			InclFinish()
 		},
-		AutoInit = e => { // автономный запуск
-			if (!Array.from(document.scripts).find(script => script.src.match(/\/o5(com|common)?.js$/)))
-				W.Init()
+		DoLoad = incl => {
+			const errs = [],
+				mm = incl.xhr.responseText.match(/<body[^>]*>/),
+				i = mm.index
+
+			// _DIV.innerHTML = mm[0].replace(/<\bbody\b/, '<div') +
+			// 	incl.xhr.responseText.substring(i) +
+			// 	'\n</div>'
+			// const _div = _DIV.children[0]
+			_div.innerHTML = incl.xhr.responseText.substring(i)
+
+			if (C.consts.o5debug > 1) {
+				console.groupCollapsed(`${W.modul} : Обрабатывается`)
+				console.log(_div.innerHTML)
+				console.groupEnd()
+			}
+			const tags = []
+			for (const mtag of incl.mtags)
+				if (!mtag.done) {
+					mtag.done - true
+					const
+						sel = mtag.sel,
+						tag = mtag.tag
+
+					let src = _div
+					if (sel) {
+						switch (sel[0]) {
+							case '[': src = (_div.querySelectorAll(sel) || [])[0]
+								break
+							case '#': src = (_div.querySelectorAll(`[id='${sel.substring(1)}']`) || [])[0]
+								break
+							case '.': src = (_div.getElementsByClassName(sel.substring(1)) || [])[0]
+								break
+							default: src = (_div.getElementsByTagName(sel) || [])[0]
+						}
+					}
+
+					if (src) {
+						const s = tag.innerHTML.trim()
+						tag.innerHTML += (s ? '<br/>' : '') + src.innerHTML
+
+						for (const cls of src.classList)
+							if (!tag.classList.contains(cls))
+								tag.classList.add(cls)
+
+						tags.concat(tag.querySelectorAll("div[" + o5include + "]") || [])
+
+
+						// const scrpts = tag.getElementsByTagName('script')
+						// // for (const scrpt of scrpts){
+						// if (scrpts.length > 0) {
+						// 	const scrpt = scrpts[0],
+						// 		script = document.createElement('script')
+						// 	script.innerHTML = "console.log('-234-')"
+						// 	// tag.appendChild(script)
+						// 	scrpt.parentNode.insertBefore(script, scrpt)
+						// }
+					}
+					else
+						errs.push(sel)
+				}
+			if (errs.length > 0)
+				incl.err = `не опр. '${errs.join(', ')}'`
+
+			if (tags && tags.length > 0)
+				AddIncls(tags)
+		},
+		OnLoad = function (e) {
+			const
+				xhr = this,
+				incl = xhr.incl
+
+			if (C.consts.o5debug > 0) {
+				console.groupCollapsed(`${W.modul} : прочитан (${xhr.status}) url='${xhr.responseURL}'`)
+				console.log(xhr.responseText)
+				console.groupEnd()
+			}
+			incl.done = true
+
+
+			if (xhr.status == 200)
+				DoLoad(incl)
+			else
+				incl.err = `статус загрузки = ${xhr.status}`
+
+			// delete incl.xhr  надо бы удалять, ео не получается
+
+			AskFinish(incl, true)
+		},
+		OnError = function () {
+			const incl = this.incl
+			incl.err = 'ошибка загрузки (блокировано by CORS ?)'
+			incl.done = true
+			AskFinish(incl, false)
 		}
 
-	function Includes(c) {
-		if (c && !typeof c == 'event') C = c
-		if (C.consts.o5debug > 0) console.log(`========  инициализация '${W.modul}'   ------ ${c ? 'из библиотеки' : 'автономно'}`)
-
-		const tags = document.querySelectorAll("div[o5include]"),
-			doneattr = W.modul + '-done'
-		if (tags)
-			for (const tag of tags) { // группировка по url'ам, чтобы не грузить лишнее
-				const done = tag.getAttribute(doneattr)
-				if (done) {
-					console.error('%c%s', "background: yellow; color: black;", `(========  повтор инициализации для id='${tag.id}'`)
-					continue
-				}
-				tag.setAttribute(doneattr, 'OK')
-
-				const ref = tag.getAttribute('o5include'),
-					ss = ref.split('?'),
-					ori = ss[0].trim()
-
-				if (!incls[ori]) {
-					const wref = (C.DeCodeUrl) ? C.DeCodeUrl(C.urlrfs, ori, '') : { url: ori, err: '' },
-						text = wref.err ? `Перекодирование` : ``
-
-					incls[ori] = { tagids: [], status: 0, text: text, err: wref.err, undef: '', url: wref.url }
-					Object.seal(incls[ori])
-				}
-				incls[ori].tagids.push({ tag: tag, selector: ss[1] }) // (ss[1] ? ss[1] : '') })
-				// tag.attributes.removeNamedItem(o5include)// 'это на потом: чтобы могло искать и обрабатывать вложенные
-			}
-
-		act.cnt = 0
-		for (const ori in incls) {
-			const url = incls[ori].url,
-				xhr = new XMLHttpRequest()
-			Object.assign(xhr, { _url: url, onload: OnLoad, onerror: OnError, timeout: 10000, responseType: 'text', withCredentials: true, })
-
-			act.cnt++
-			xhr.open("get", url, true)
-			xhr.send()
+	function InclStart(e) {
+		if (C.consts.o5debug > 0) {
+			console.log(`========  инициализация '${W.modul}'   ------` +
+				` ${C.avtonom ? ('автономно по ' + e.type) : 'из библиотеки'} `)
+			_div.style.display = 'none'
+			_div.id = 'moe'
+			document.body.appendChild(_div)
 		}
-		if (act.cnt == 0)
-			act.DecFinish()
+		if (C.ParamsFill)
+			C.ParamsFill(W)
+		const tags = document.querySelectorAll("div[" + o5include + "]")
+		let n = 0
+		if (tags && tags.length > 0) {
+			incls = {}
+			n = AddIncls(tags)
+		}
+
+		if (n == 0)
+			InclFinish()
 	}
 
-	document.addEventListener('DOMContentLoaded', AutoInit)
-
-	if (!window.olga5) window.olga5 = []
-	if (!window.olga5.find(w => w.modul == W.modul)) {
-		if (C.consts.o5debug > 0)
-			console.log(`}---< ${document.currentScript.src.indexOf(`/${W.modul}.`) > 0 ? 'загружен  ' : 'включён   '}:  ${W.modul}.js`)
-		window.olga5.push(W)
-		window.dispatchEvent(new CustomEvent('olga5_sload', { detail: { modul: W.modul } }))
-	} else
-		console.error('%c%s', "background: yellow; color: black;border: solid 2px red;", `}---< Повтор загрузки '${W.modul}`)
-
+	window.addEventListener(o5include, InclStart)
+	if (C.avtonom)
+		document.addEventListener('DOMContentLoaded', InclStart)
+	else
+		C.MsgAddModule(W, null)
 })();

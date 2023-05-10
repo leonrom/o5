@@ -9,15 +9,9 @@
 (function () {              // ---------------------------------------------- o5com/TagRefs ---
 	'use strict'
 	const olga5_modul = 'o5com',
-		modulname = 'TagsRef'
-	if (!window.olga5) window.olga5 = []
-	if (!window.olga5.C) window.olga5.C = {}
-	if (!window.olga5[olga5_modul]) window.olga5[olga5_modul] = {}
-
-	const wshp = window.olga5[olga5_modul],
+		modulname = 'TagsRef',
+		wshp = window.olga5[olga5_modul],
 		C = window.olga5.C,
-		// regExp = /[^\/\s+]+$/
-		// olga5_script = document.currentScript,
 		ReplaceTag = (tagName, change, adrName, url, errs) => {
 			const addnew = document.createElement(tagName),
 				regExp = new RegExp(/[\\+<>'"`=#\\/\\\\]/)
@@ -35,16 +29,7 @@
 					}
 			}
 			addnew.setAttribute(adrName, url)
-			// change.dataset.o5_old = 1 // это нужно, если не удалять оригинал
-			// if (err || C.consts.o5debug > 1)
-			// 	console.log(`добавляю тег <${tagName}> с атрибутом ${adrName}=${url} ${err ? ' с ошибками' : ''}`)
 
-			// if (trn>=7)
-			// 	console.log()
-			// if (addnew.tagName== "SCRIPT")	
-			// console.log(trn++, addnew.src, change.src)
-			// if (addnew.tagName== "LINK")	
-			// console.log(trn++, addnew.href, change.href)
 			change.parentNode.insertBefore(addnew, change)
 			change.parentNode.removeChild(change) //  ??  а вот удалять  -м.б. и не надо: для контроля
 
@@ -81,8 +66,10 @@
 			for (const script of document.scripts) {
 				// if (C.consts.o5debug > 1) console.log(`тег <script>: id= '${script.id}', src= "${script.src}"`)
 
-				if (script === C.o5script) // это ядро, т.е. конец скриптов (не зависимо от наличия 'o5_scripts')
-					break
+				// if (script === C.o5script) // это ядро, т.е. конец скриптов (не зависимо от наличия 'o5_scripts')
+				// 	break
+				if (script === C.o5script) // пропускаю ядро и модуль o5inc
+					continue
 
 				if (script.dataset.o5add) continue 		// это добавленный мною скрипт		
 				if (script.innerText.trim()) continue	// это встроенный скрипт
@@ -118,6 +105,8 @@
 							errs.push({ tag: td.modul, ref: td.from, txt: wref.err })
 						url = wref.url
 					}
+					if (!script.getAttribute('async') && !script.getAttribute('defer'))
+						script.setAttribute('async', '')
 					scrpt.script = ReplaceTag('script', script, 'src', url, errs)
 				}
 
@@ -140,7 +129,7 @@
 					}
 			}
 
-			/* строю зависимости криптов (сначала идут скомпилированные) - сначала по 'o5depends'*/
+			/* строю зависимости cкриптов (сначала идут скомпилированные) - сначала по 'o5depends'*/
 			const ss = C.consts['o5depends'].split(/\s*[;]+\s*/)
 			for (const s of ss) {
 				const uu = s.trim().split(/\s*[:=]+\s*/), // split(/[:=]/), // 
@@ -266,6 +255,5 @@
 		ConvertLinks()
 	}
 
-	if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
-		console.log(`}===< ${document.currentScript.src.indexOf(`/${olga5_modul}.`) > 0 ? 'дозагружен' : 'подключён '}:  ${olga5_modul}/${modulname}.js`)
+	C.MsgAddSub(olga5_modul, modulname)
 })();

@@ -5,17 +5,14 @@
 //!
 (function () {              // ---------------------------------------------- o5shp/DoScroll ---
     "use strict"
-    const olga5_modul = "o5shp",
-        modulname = 'DoScroll'
-
-    if (!window.olga5) window.olga5 = []
-    if (!window.olga5[olga5_modul]) window.olga5[olga5_modul] = {}
-
-    let C = null,
-        timeStamp = 0,
+    let timeStamp = 0,
         debugids = ['shp1'] // , 'shp_text' shp1 shp_1÷4 shp_5÷8 'shp_text' // 'shp_1÷4' // 'shp-demo' // 'shp_text'
 
-    const wshp = window.olga5[olga5_modul],
+    const
+        olga5_modul = "o5shp",
+        modulname = 'DoScroll',
+        C = window.olga5.C,
+        wshp = window.olga5[olga5_modul],
         datestart = Date.now(),
         CalcParentLocate = pO5 => {
             if (pO5.isBody) {
@@ -119,9 +116,8 @@
                 const pO5 = aO5.hovered[hoverMarks]
                 if (!pO5 || !pO5.located)
                     alert(`located '${hoverMarks}' (in  DoScroll.PrepareBords)`)
-                    
-                if (pO5.located.timeStamp != timeStamp) { // чтобы не повторяться для одинаковых
-                    Located(pO5.prevs, pO5.located)
+                    if (pO5.located.timeStamp != timeStamp) { // чтобы не повторяться для одинаковых
+                   Located(pO5.prevs, pO5.located)
                     pO5.located.timeStamp = timeStamp
                 }
             }
@@ -445,7 +441,6 @@
         o5shp_scroll = new window.Event('o5shp_scroll')
 
     wshp.DoScroll = (aO5s, etimeStamp) => {
-        C = window.olga5.C
         timeStamp = etimeStamp ? etimeStamp : (Date.now() + Math.random())
 
         if (aO5s.length > 0) {
@@ -467,6 +462,5 @@
         window.dispatchEvent(o5shp_scroll)
     }
 
-    if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
-        console.log(`}===< ${document.currentScript.src.indexOf(`/${olga5_modul}.`) > 0 ? 'дозагружен' : 'подключён '}:  ${olga5_modul}/${modulname}.js`)
+    C.MsgAddSub(olga5_modul, modulname)
 })();

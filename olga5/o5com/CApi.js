@@ -5,17 +5,10 @@
 (function () {              // ---------------------------------------------- o5com/CApi --- 111
 	'use strict'
 	const olga5_modul = 'o5com',
-		modulname = 'CApi'
-	if (!window.olga5) window.olga5 = []
-	if (!window.olga5.C) window.olga5.C = {}
-	if (!window.olga5[olga5_modul]) window.olga5[olga5_modul] = {}
-
-	const wshp = window.olga5[olga5_modul],
+		modulname = 'CApi',
+		wshp = window.olga5[olga5_modul],
 		C = window.olga5.C,
 		Match = scls => new RegExp(`\\b` + scls + `(\\s*[,:+]\\s*((([\`'"\\(\[])(.*?)\\4)|[^\\s\`'":,+]*))*(\\s*|$)`),
-		// Match = scls => new RegExp(`\\b` + scls + `(\\s*[,:+]\\s*((([\`'"\\(\\[])(.*?)\\4)|[\\w\\-\\.]*))*(\\s|$)`),
-		// Match = scls => new RegExp(`\\b` + scls + `(\\s*[,:+]\\s*((([\`'"])(.*?)\\4)|[+\\s*\\-\\w]*))*`),
-		// Match = scls => new RegExp(`\\b` + scls + `[,:]*[^\\s\\)]*`),
 		mquals = /\s*[:,]\s*/,
 		GetTagsBy = (modul, fun, ask) => {
 			const list = [],
@@ -42,7 +35,6 @@
 		}
 
 	wshp[modulname] = () => {
-		// if (C.consts.o5debug > 0) console.log(`===  инициализация ${olga5_modul}/${modulname}.js`)
 		Object.assign(C, {
 			owners: [],
 			scrpts: [],
@@ -135,29 +127,6 @@
 		})
 		return true
 	}
-	if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
-		console.log(`}===< ${document.currentScript.src.indexOf(`/${olga5_modul}.`) > 0 ? 'дозагружен' : 'подключён '}:  ${olga5_modul}/logs.js`)
-	/*
-	тестирование Match()
-	\bolga5_snd(\s*[,:+]\s*((([`'"\(\[])(.*?)\4)|[^\s`'":,+]*))*(\s*|$)
-
-	olga5_snd
-aaa olga5_snd: q: q  asa
-aaa olga5_snd: q : q : a  asa
-aaa olga5_snd:over : a-11_z : loop  asa
-aaa olga5_snd:over : 'a-11_z : loop'  asa
-olga5_snd:аудио_файл  asa
-olga5_snd:+аудио_файл  asa
-olga5_snd:+ аудио_файл  asa
-olga5_snd: + аудио_файл  asa
-olga5_snd: + аудио_файл +bb asa
-olga5_snd:аудио_файл  : " sd  ffg sa" asa
-aaa olga5_snd:аудио_файл  : " sd  ffg sa" asa
-aaa olga5_snd : аудио_файл  : ' sd  ' ffg sa" asa
-aaa olga5_snd: xZa:'ёй-sounds_2 + /gitme.mp3 bbb:O'asa
-aaa olga5_snd: Lяя :Aюю:'ёй-sounds_2 + /gitme.mp3 bbb:O'asa
-aaa olga5_snd: Lяя :Aюю :'ёй-sounds_2 + /gitme.mp3 bbb:O' asa
-aaa dlassaaa:A olga5_snd:over : a-11_z: loop :  "  sounds + Ceza1-25.mp3" 
-
-	*/
+	
+	C.MsgAddSub(olga5_modul, modulname)	
 })();

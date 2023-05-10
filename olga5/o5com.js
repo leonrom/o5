@@ -10,17 +10,14 @@
 (function () {              // ---------------------------------------------- o5com ---
 	'use strict'
 	const olga5_modul = "o5com"
-
 	if (!window.olga5) window.olga5 = []
 	if (!window.olga5.C) window.olga5.C = {}
 	if (!window.olga5[olga5_modul]) window.olga5[olga5_modul] = {}
 
-	const modnames = ['CConsole', 'CEncode', 'CApi', 'CParams', 'TagsRef', 'IniScripts'],
+	const modnames = ['CConsole', 'CEncode', 'CApi', 'CParams', 'TagsRef', 'IniScripts'], // 'IniScripts' д.б. ПОСЛЕДНИМ
 		wshp = window.olga5[olga5_modul],
 		C = window.olga5.C,
-		// wls = window.location.search,
-		// mdebug = wls.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=)(\s*\d*)/),
-		// mtiml = wls.match(/(\&|\?|\s)(is|o5)?(-|_)?timload\s*(\s|$|\?|#|&|=)(\s*\d*)/),
+		strt_time = Number(new Date()),
 		IncludeScripts = ({ modul = '', names = [], actscript = C.o5script, iniFun = {}, args = [] }) => {
 			const
 				nams = {},
@@ -56,19 +53,21 @@
 					// OnLoad(name)
 				}
 
+			for (const name of names)
+				nams[name] = false
 			for (const name of names) { // в очерёдности размещения	
 				if (!window.olga5[modul]) {
 					C.ConsoleError(`В скрипте, выполняющем дозагрузку скриптов, не создан объект 'window.olga5.${modul}'`)
 					continue
 				}
-				if (!window.olga5[modul][name]) {
-					if (!load.is_set) Object.assign(load, {
-						is_set: true,
-						// path: C.o5scriptPath + modul + '/',
-						path: actpath + modul + '/',
-						timeout: window.setTimeout(OnTimer, 1000 * C.consts.o5timload),
-					})
-					nams[name] = false
+				if (window.olga5[modul][name]) OnLoad(name)
+				else {
+					if (!load.is_set)
+						Object.assign(load, {
+							is_set: true,
+							path: actpath + modul + '/',
+							timeout: window.setTimeout(OnTimer, 1000 * C.consts.o5timload),
+						})
 
 					const script = document.createElement('script')
 
@@ -78,6 +77,8 @@
 
 					script.src = load.path + name + '.js'
 					script.dataset.o5add = modul
+					script.setAttribute('async', '')
+
 					if (C.consts.o5debug > 0) {
 						const MakeObjName = obj => obj ? (
 							(obj.id && obj.id.length > 0) ? ('#' + obj.id) : (
@@ -91,37 +92,40 @@
 					else // это ватще-то заплатка. по-хорошему надо бы убрать 'actscript' оставив 'module'	
 						for (const scr of document.scripts)
 							if (scr.src.lastIndexOf('/' + modul + '.js') > 0) {
-								scr.parentNode.insertBefore(script, scr)
+								scr.parentNode.insertBefore(script, scr.nextSibling)   // т.е. тут insertAfter
 								break
 							}
 				}
 			}
 			// console.log('--------------------- load.timeout='+load.timeout)
-			if (!load.timeout) iniFun(args)
+			// if (!load.timeout) iniFun(args)
 		},
 		RunO5com = () => {
-			const _url_olga5 = C.o5script.src.match(/\S*\//)[0],
-				errs = [],
-				myclr = "background: blue; color: white;border: none;",
-				strt_time = Number(new Date())
+			const
+				DoneO5com = (e) => {
+					if (e)
+						document.removeEventListener('readystatechange', DoneO5com)
 
-			Object.assign(C, {
-				IncludeScripts: IncludeScripts,
-			})
+					const _url_olga5 = C.o5script.src.match(/\S*\//)[0],
+						errs = []
 
-			for (const modname of modnames) {
-				if (wshp[modname]) wshp[modname](_url_olga5)
-				else
-					errs.push(modname)
-			}
+					for (const modname of modnames)
+						if (wshp[modname]) wshp[modname](_url_olga5)
+						else
+							errs.push(modname)
 
-			const dt = ('' + (Number(new Date()) - strt_time)).padStart(4) + ' ms',
-				name = dt + `        ${olga5_modul}`
+					const dt = ('' + (Number(new Date()) - strt_time)).padStart(4) + ' ms',
+						name = dt + `        ${olga5_modul}`
 
-			if (errs.length > 0)
-				console.error('%c%s', "background: yellow; color: black;border: none;",
-					`Не найдены [${errs.join(', ')}] в ${olga5_modul}.js ( где-то синтаксическая ошибка ?)`)
-			console.log('%c%s', myclr, '---<<<  инициализировано ядро      ' + name)
+					if (errs.length > 0)
+						console.error('%c%s', "background: yellow; color: black;border: none;",
+							`Не найдены [${errs.join(', ')}] в ${olga5_modul}.js ( где-то синтаксическая ошибка ?)`)
+					console.log('%c%s', "background: blue; color: white;border: none;", '---<<<  инициализировано ядро      ' + name)
+				}
+
+			if (document.body) DoneO5com()
+			else
+				document.addEventListener('readystatechange', DoneO5com)
 		},
 		GetBaseHR = (root) => { // функции определения адреса текущиещей страницы и корня сайна
 			const url = new window.URL(window.location) //"http://rombase.h1n.ru/o5/2020/olga5-all.html")
@@ -132,6 +136,9 @@
 			if (typeof x === 'undefined') return true
 			if (x === !!x) return x
 			const val = ('' + x).replace(C.repQuotes, '')
+
+			if (val == 'true') return true
+			if (val == 'false') return false
 
 			const i = parseInt(val)
 			if (i == val) return i
@@ -221,14 +228,15 @@
 		repQuotes: /^\s*((\\')|(\\")|(\\`)|'|"|`)?\s*|\s*((\\')|(\\")|(\\`)|'|"|`)?\s*$/g,
 		olga5ignore: 'olga5-ignore',
 		TryToDigit: TryToDigit,
-		ParamsFillFromScript, 
+		ParamsFillFromScript,
 		GetAttrs: GetAttrs,
 		GetAttribute: GetAttribute,
 		Repname: Repname,
+		IncludeScripts: IncludeScripts,
+
 		o5script: document.currentScript,
 		o5attrs: GetAttrs(document.currentScript.attributes),
 		cstate: {	 			// общее состояние 
-			activated: false, 	// признак, что было одно из activateEvents = ['click', 'keyup', 'resize']
 			depends: null,  	// только для подключенных скриптов, но с учетом как o5depends, так и очередности в задании и атрибута async
 		},
 		urlrfs: {
@@ -249,6 +257,25 @@
 		},
 		constsurl: {},
 		save: { hash: null, xs: null, p: '', n1: -1, urlName: 'url', libName: 'ядро', }, // сохранение для "красивой" печати - потом удалю
+
+		MsgAddSub: (modul, sub) => {
+			// if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
+			if (C.consts.o5debug)
+				console.log(`}===< ${document.currentScript.src.indexOf(`/${modul}.`) > 0 ? 'дозагружен' : 'подключён '}:  ${modul}/${sub}.js`)
+		},
+		MsgAddModule: (W, pars) => {
+			if (window.olga5.find(w => w.modul == W.modul))
+				console.error('%c%s', "background: yellow; color: black;border: solid 2px red;", `}---< Повтор загрузки '${W.modul}`)
+			else {
+				if (C.consts.o5debug)
+					console.log(`}---< ${document.currentScript.src.indexOf(`/${W.modul}.`) > 0 ? 'загружен  ' : 'включён   '}:  ${W.modul}.js`)
+
+				if (pars)
+					window.olga5[W.modul] = Object.assign({}, pars)
+				window.olga5.push(W)
+				window.dispatchEvent(new CustomEvent('olga5_sload', { detail: { modul: W.modul } }))
+			}
+		},
 	})
 
 	const xs = {}, // временное хранилилище для считываемых параметров
@@ -262,17 +289,14 @@
 
 	for (const nam in xs) defs[nam] = xs[nam].val
 
-	IncludeScripts({ modul: olga5_modul, names: modnames, actscript: C.o5script, iniFun: RunO5com, })
-	if (![0, 1, 2, 3].includes(C.consts.o5debug))
-		C.consts.o5debug = 1
+	const
+		mm = document.currentScript.src.match(/(!\.js)|(\bo5.js)\s*$/),
+		AscInclude = () =>
+			IncludeScripts({ modul: olga5_modul, names: modnames, actscript: C.o5script, iniFun: RunO5com, })
 
-	const activateEvents = ['click', 'keyup', 'resize'],
-		wd = window, // document
-		SetActivated = e => {
-			C.cstate.activated = true
-			activateEvents.forEach(activateEvent => wd.removeEventListener(activateEvent, SetActivated))
-		}
-	activateEvents.forEach(activateEvent => wd.addEventListener(activateEvent, SetActivated))
+	if (mm) wshp.AscInclude = AscInclude
+	else
+		AscInclude()
 
 	console.log(`}+++< загружено ядро библиотеки`)
 })();

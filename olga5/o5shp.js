@@ -4,9 +4,9 @@
 /*jshint esversion: 6 */
 (function () {              // ---------------------------------------------- o5shp ---
 	"use strict";
-	let C = null
 
 	const
+		C = window.olga5.C,
 		W = {
 			modul: 'o5shp',
 			Init: ShpInit,
@@ -33,26 +33,25 @@
 }
 .${olga5cart}.${olga5ifix} {
 	cursor: pointer;
-}`
+}`,
+		LastDoResize = () => {
+			// if (window.olga5.o5shp && window.olga5.o5shp.DoResize)
+				window.olga5.o5shp.DoResize('по olga5_ready')
+		}
 
-	function ShpInit(c) {
+	function ShpInit() {
 		const wshp = window.olga5[W.modul]
 
-		c.ParamsFill(W, o5css)
+		window.addEventListener('olga5_ready', e => {
+			window.setTimeout(LastDoResize, 1)
+		})
+
+		C.ParamsFill(W, o5css)
 		wshp.DoInit()
 
 		window.dispatchEvent(new CustomEvent('olga5_sinit', { detail: { modul: W.modul } }))
 	}
 
-	if (!window.olga5) window.olga5 = []
-	if (!window.olga5[W.modul]) window.olga5[W.modul] = {}
 
-	Object.assign(window.olga5[W.modul], { W: W, olga5cart: olga5cart, olga5ifix: olga5ifix, })
-	if (!window.olga5.find(w => w.modul == W.modul)) {
-		if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
-			console.log(`}---< ${document.currentScript.src.indexOf(`/${W.modul}.`) > 0 ? 'загружен  ' : 'включён   '}:  ${W.modul}.js`)
-		window.olga5.push(W)
-		window.dispatchEvent(new CustomEvent('olga5_sload', { detail: { modul: W.modul } }))
-	} else
-		console.error('%c%s', "background: yellow; color: black;border: solid 2px red;", `}---< Повтор загрузки '${W.modul}`)
+	C.MsgAddModule(W, { W: W, olga5cart: olga5cart, olga5ifix: olga5ifix, })
 })();

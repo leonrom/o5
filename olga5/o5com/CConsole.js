@@ -8,12 +8,8 @@
 (function () {              // ---------------------------------------------- o5com/CConsole ---
 	'use strict'
 	const olga5_modul = 'o5com',
-		modulname = 'CConsole'
-	if (!window.olga5) window.olga5 = []
-	if (!window.olga5.C) window.olga5.C = {}
-	if (!window.olga5[olga5_modul]) window.olga5[olga5_modul] = {}
-
-	const wshp = window.olga5[olga5_modul],
+		modulname = 'CConsole',
+		wshp = window.olga5[olga5_modul],
 		C = window.olga5.C,
 		padd = "padding-left:0.5rem;",
 		clrtypes = {
@@ -121,6 +117,5 @@
 		return true
 	}
 
-	if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
-		console.log(`}===< ${document.currentScript.src.indexOf(`/${olga5_modul}.`) > 0 ? 'дозагружен' : 'подключён '}:  ${olga5_modul}/${modulname}.js`)
+	C.MsgAddSub(olga5_modul, modulname)
 })();

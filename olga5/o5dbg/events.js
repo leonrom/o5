@@ -71,8 +71,14 @@
 				if (ok) {
 					act.eves[o] = 1
 					act.src.addEventListener(o, e => { Act(e, act.key) }, { capture: true })
+					// document.head.addEventListener(o, e => { Act(e, act.key) }, { capture: true })
 				}
 			}
+
+			// for (const eve of ['readystatechange', 'onload', 'onloadeddata', 'onloadedmetadata', 'onloadstart'])
+			// document.addEventListener('eve', e => {
+			// 	console.log('+++++++++++++++++++++++++++++++++++++++++++++++++++++= document:', e.type)
+			// }, { capture: true })
 
 	addocevs.split(',').forEach(addocev => {
 		const act = acts[0],

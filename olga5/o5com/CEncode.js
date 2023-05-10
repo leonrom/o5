@@ -5,12 +5,8 @@
 (function () {              // ---------------------------------------------- o5com/CEncode ---
 	'use strict'
 	const olga5_modul = 'o5com',
-		modulname = 'CEncode'
-	if (!window.olga5) window.olga5 = []
-	if (!window.olga5.C) window.olga5.C = {}
-	if (!window.olga5[olga5_modul]) window.olga5[olga5_modul] = {}
-
-	const wshp = window.olga5[olga5_modul],
+		modulname = 'CEncode',
+		wshp = window.olga5[olga5_modul],
 		C = window.olga5.C,
 		DelBacks = (s0) => {
 			// const s00 = s0
@@ -48,8 +44,8 @@
 			return s.replaceAll(/[^:]\/\/+/g, (u) => { return u.substr(0, 2) })
 		},
 		// IsUrlNam = u => { return !!(u.trim() && !u.match(/[\/.\\#]/)) },
-		IsUrlNam = u => { 
-			const isurl=!!(u&& u.trim() && !u.match(/[\/.\\#]/)) 
+		IsUrlNam = u => {
+			const isurl = !!(u && u.trim() && !u.match(/[\/.\\#]/))
 			return isurl
 		},
 		IsFullUrl = url => {
@@ -70,7 +66,7 @@
 				SplitRefs = (s, refs = null) => {
 					s.split('+').forEach(sprt => {
 						const prt = sprt.replace(C.repQuotes, ''),	// trim(),
-							isnam = IsUrlNam(prt), 
+							isnam = IsUrlNam(prt),
 							ref = isnam ? C.Repname(prt) : prt
 
 						if (isnam) parts.num++
@@ -128,13 +124,14 @@
 			return ret
 		},
 		TagDes = (tag, ref, errs = null) => {
+			const
+				regExp1 = /(.*(\/|\+)\s*)|(!*\.js\s*$)/g,
+				regExp2 = /(\s*\+\s*)+/g
 			for (const code of ['data-', '_', '']) {
 				const from = code + ref,
 					attr = tag.attributes[from]
 				if (attr) {
-					const orig = attr.nodeValue,
-						regExp1 = new RegExp('((.*\\/|\\+)\\s*)|(!*\\.js\\s*$)', 'g'),
-						regExp2 = new RegExp('(\\s*\\+\\s*)+', 'g')
+					const orig = attr.nodeValue
 
 					return {
 						code: code,
@@ -159,7 +156,5 @@
 		})
 		return true
 	}
-
-	if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
-		console.log(`}===< ${document.currentScript.src.indexOf(`/${olga5_modul}.`) > 0 ? 'дозагружен' : 'подключён '}:  ${olga5_modul}/${modulname}.js`)
+	C.MsgAddSub(olga5_modul, modulname)
 })();

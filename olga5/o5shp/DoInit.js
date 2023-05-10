@@ -4,18 +4,15 @@
 /*jshint esversion: 6 */
 (function () {              // ---------------------------------------------- o5shp/DoInit ---
     "use strict"
-    const olga5_modul = "o5shp",
-        modulname = 'DoInit'
-
-    if (!window.olga5) window.olga5 = []
-    if (!window.olga5[olga5_modul]) window.olga5[olga5_modul] = {}
-
-    let C = null,
-        o5debug = 0,        
+    let o5debug = 0,
         etimeStamp = 0,
         debugids = []  // 'shp_text' // 'shp_1÷4' // 'shp-demo' // 'shp_text'        
 
-    const wshp = window.olga5[olga5_modul],
+    const
+        olga5_modul = "o5shp",
+        modulname = 'DoInit',
+        C = window.olga5.C,
+        wshp = window.olga5[olga5_modul],
         IsFloat001 = (s) => { return Math.abs(parseFloat(s) > 0.01) },
         prevsPO5 = {},
         MyJoinO5s = (aO5s) => {
@@ -75,7 +72,7 @@
         DbgDoResize = e => { // для отладки  !!!!!!!!!!!!!!!!!!
             if (e.timeStamp > etimeStamp + 0.1)
                 if (!e.target.classList.contains(wshp.W.class))
-                    wshp.DoResize()
+                    wshp.DoResize('из DbgDoResize ')
             etimeStamp = e.timeStamp
         },
         DoScroll = e => {
@@ -180,7 +177,6 @@
             FillBords(pO5, 'pO5=' + C.MakeObjName(pO5.current))
         },
         DoInit: () => {
-            C = window.olga5.C
             o5debug = wshp.W.consts.o5debug
             const timeInit = Date.now() + Math.random(),
                 mtags = C.SelectByClassName(wshp.W.class, olga5_modul),
@@ -277,7 +273,7 @@
 
             if (wshp.aO5s.length > 0) {
                 wshp.AO5shp()
-                wshp.DoResize()
+                wshp.DoResize('из DoInit')
                 SwitchOpacity(wshp.aO5s)
 
                 window.addEventListener('resize', wshp.DoResize)
@@ -291,7 +287,6 @@
         }
     })
 
-    if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
-        console.log(`}===< ${document.currentScript.src.indexOf(`/${olga5_modul}.`) > 0 ? 'дозагружен' : 'подключён '}:  ${olga5_modul}/${modulname}.js`)
+    C.MsgAddSub(olga5_modul, modulname)
 })();
 

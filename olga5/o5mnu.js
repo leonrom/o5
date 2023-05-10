@@ -4,13 +4,14 @@
 /*jshint esversion: 6*/
 (function () {              // ---------------------------------------------- o5mnu ---
 	'use strict'
-	let C = null
-	const W = {
-		modul: 'o5mnu',
-		Init: Init,
-		class: 'olga5_menu',
-		consts: 'o5menudef=, scrollY=-18'
-	},
+	const
+		C = window.olga5.C,
+		W = {
+			modul: 'o5mnu',
+			Init: Init,
+			class: 'olga5_menu',
+			consts: 'o5menudef=, scrollY=-18'
+		},
 		class_empty = W.class + '_empty',
 		class_small = W.class + '_small',
 		o5css = `
@@ -208,7 +209,8 @@
 					// window.dispatchEvent(new window.Event('resize'))
 					const wshp = window.olga5.o5shp
 					if (wshp)
-						wshp.DoResize(wshp.aO5s)
+						wshp.DoResize('из o5mnu')
+						// wshp.DoResize(wshp.aO5s)
 				}
 				win.blockclick = true
 				e.cancelBubble = true
@@ -280,7 +282,7 @@
 				}
 				if (item0.noremov) owner.insertBefore(ul, owner.firstChild)  // НЕ удаляется по закрытии страницы (owner.appendChild(ul))				
 				else
-					C.InsertBefore(owner, ul, owner.firstChild)
+					C.page.InsertBefore(owner, ul, owner.firstChild)
 
 				ul.addEventListener('mousedown', DoMnu, true)
 				ul.addEventListener('click', DoMnu, true)
@@ -346,8 +348,7 @@
 				C.ConsoleError("${proc}: ошибки создания меню: ", errs.length, errs)
 		}
 
-	function Init(c) {
-		C = c
+	function Init() {
 		const
 			InitByText = (menu, tag) => {// если есть такой атрибут}
 				const regval = /^["'`;{\s]*|["'`},\s]*$/g,
@@ -379,7 +380,7 @@
 		if (C.consts.o5nomnu > 0) C.ConsoleInfo(`Меню отключено по o5nomnu=${C.consts.o5nomnu}`)
 		else {
 			if (!W.isReady) {
-				c.ParamsFill(W, o5css)
+				C.ParamsFill(W, o5css)
 				window.olga5.Menu = MnuInit
 			}
 
@@ -396,12 +397,5 @@
 		window.dispatchEvent(new CustomEvent('olga5_sinit', { detail: { modul: W.modul } }))
 	}
 
-	if (!window.olga5) window.olga5 = []
-	if (!window.olga5.find(w => w.modul == W.modul)) {
-		if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
-			console.log(`}---< ${document.currentScript.src.indexOf(`/${W.modul}.`) > 0 ? 'загружен  ' : 'включён   '}:  ${W.modul}.js`)
-		window.olga5.push(W)
-		window.dispatchEvent(new CustomEvent('olga5_sload', { detail: { modul: W.modul } }))
-	} else
-		console.error('%c%s', "background: yellow; color: black;border: solid 2px red;", `}---< Повтор загрузки '${W.modul}`)
+	C.MsgAddModule(W, null)
 })();

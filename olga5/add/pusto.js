@@ -4,8 +4,8 @@
 /*jshint esversion: 6*/
 (function () {              // ---------------------------------------------- pusto ---
 	'use strict';
-	let C = null	// если нужна ссылка на ядро библиотеки для использования её API
 	const
+		C = window.olga5.C,	// если нужна ссылка на ядро библиотеки для использования её API
 		W = {
 			modul: 'pusto', 		// уникальное имя модуля 'W' для регистрации
 			Init: WndInit,      	// функция, вызываемая при инициализации 'W'
@@ -23,10 +23,9 @@
      	`,
 		_srcEmpty = 'about:blank'  // пример некоей константы
 
-	function WndInit(c) { 		// определение парамеров модуля и заморозка 'W'
-		if (c) {				// т.к. 'c' не определено при автономном вызове 
-			c.ParamsFill(W, o5css) 	// при отсутствии 'o5css' - c.ParamsFill(W)
-			C = c
+	function WndInit() { 		// определение парамеров модуля и заморозка 'W'
+		if (C) {				// 'C' м.б. не определено при автономном вызове 
+			C.ParamsFill(W, o5css) 	// при отсутствии 'o5css' - C.ParamsFill(W)
 		}
 		// ... иные функции/операторы инициализации заданные внутри  "WndInit(c)"
 
@@ -35,16 +34,6 @@
 		window.dispatchEvent(new CustomEvent('olga5_sinit', { detail: { modul: W.modul } }))
 	}
 
-	if (!window.olga5) window.olga5 = []
-	/* Для автономного вызова инициализации через 'window.olga5.pusto.W.Init()' */
-	window.olga5[W.modul] = { W: W }
-
 	/* Информирование ядра библиотеки об окончании загрузки модуля */
-	if (!window.olga5.find(w => w.modul == W.modul)) {
-		if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
-			console.log(`}---< ${document.currentScript.src.indexOf(`/${W.modul}.`) > 0 ? 'загружен  ' : 'включён   '}:  ${W.modul}.js`)
-		window.olga5.push(W)
-		window.dispatchEvent(new CustomEvent('olga5_sload', { detail: { modul: W.modul } }))
-	} else
-		console.error('%c%s', "background: yellow; color: black;border: solid 2px red;", `}---< Повтор загрузки '${W.modul}`)
+	C.MsgAddModule(W, { W: W })
 })();

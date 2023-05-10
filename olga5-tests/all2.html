@@ -8,6 +8,12 @@
 
 <link href='+o5ini.css' media='screen' rel='stylesheet'/>
 
+<script src='../olga5/o5com!.js' 
+    o5consts="        o5debug=0;    "
+    o5urlrfs=" 
+        _url_olga5 = '../olga5/';
+    "
+></script>
 <script data-src='+o5snd.js'
     o5urlrfs="
         btn_stop = '_url_olga5 + ../blog/media/image/myMusikIT.png';
@@ -16,22 +22,13 @@
     " 
 ></script>
 <script _src='+o5shp.js'></script>
-<script src='../olga5/o5common.js' 
-    o5consts="
-        o5debug=0;
-    "
-    o5urlrfs=" 
-        _url_olga5 = '../olga5/';
-        _фвкуыы = '../olga5/';
-    "
-></script>
 </head>
 
 <body style="font-size: medium;">
 <p>
-	Подгружаются ядро 'o5common.js' и все модули, и их компоненты
+	Подгружаются ядро 'o5com!.js' и все модули, и их компоненты
 </p>
-	<div class='example, olga5_Start'>
+	<div class='example olga5_Start'>
 	<h4>Пример функционирования нескольких файлов скриптов</h4> 
 
 	<p>
@@ -42,7 +39,7 @@
 	<img id='img3' title="просто контрольное изображение с абс. адресом 'btnSound'" class="olga5_shp:None olga5_snd:N" src="../blog/media/image/play.png">
 	<p>
 		При правильной работе подключаемых модулей (находящихся там же, где и
-		'<b><i>o5common.js</i></b>'):
+		'<b><i>o5com!.js</i></b>'):
 	</p>
 	<ul style="margin-left: 12px;">
 		<li>при клике по левой и средней иконкам звучит мелодия 'Gitme' (работа <b><i>o5snd.js</i></b>);</li>

@@ -5,16 +5,14 @@
 //!
 (function () {              // ---------------------------------------------- o5shp/DoResize ---
     "use strict"
-    const olga5_modul = "o5shp",
-        modulname = 'DoResize'
-
-    if (!window.olga5) window.olga5 = []
-    if (!window.olga5[olga5_modul]) window.olga5[olga5_modul] = {}
-
-    let C = null,
-        o5debug = 0,
+    let o5debug = 0,
         debugids = ['head_32']  //  shp_5÷8 'shp_text' // 'shp_1÷4' // 'shp-demo' // 'shp_text'
-    const wshp = window.olga5[olga5_modul],
+
+    const
+        olga5_modul = "o5shp",
+        modulname = 'DoResize',
+        C = window.olga5.C,
+        wshp = window.olga5[olga5_modul],
         errs = [],
         MyRound = (s) => { return Math.round(parseFloat(s)) },
         IsInClass = (classList, clss) => {
@@ -51,7 +49,7 @@
                     while (--i >= 0) {
                         const s = ss[i].trim()
                         if (s.length > 0) {
-                            const C = window.olga5.C,
+                            const
                                 cc = s.split(':'),
                                 u = cc[0].trim(),
                                 t = u.length > 0 ? u[0].toUpperCase() : '?'
@@ -224,7 +222,7 @@
         }
 
     let showerr = true
-    wshp.DoResize = function () {
+    wshp.DoResize = function (txt) {
         /* 
         фактически - д.б. 1 раз. - при первом скроллинге,
         но для отладки - может вызываться повторно
@@ -232,11 +230,10 @@
         const timeStamp = Date.now() + Math.random()
         let aO5s = wshp.aO5s
 
-        C = window.olga5.C
         o5debug = C.consts.o5debug
 
         if (o5debug > 1) {
-            console.groupCollapsed(`  старт Resize для '` + (() => {
+            console.groupCollapsed(`  старт Resize(${txt}) для '` + (() => {
                 let s = ''
                 aO5s.forEach(aO5 => { s += (s ? ', ' : '') + aO5.name })
                 return s
@@ -253,6 +250,5 @@
         showerr = false
     }
 
-    if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
-        console.log(`}===< ${document.currentScript.src.indexOf(`/${olga5_modul}.`) > 0 ? 'дозагружен' : 'подключён '}:  ${olga5_modul}/${modulname}.js`)
+    C.MsgAddSub(olga5_modul, modulname)
 })();

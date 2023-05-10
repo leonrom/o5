@@ -1,3 +1,10 @@
+http://localhost/o5/olga5-tests/ext4.html
+почему 
+  догружаеьт модули o5com
+  не загрузился http://localhost/o5/olga5/o5ref.js
+  где ссно сама картинка?
+
+
 разобраться с возможностью '.' в назв. каталогов IsUrlNam и IsFullUrl 
 IsUrlNam -> IsUrlRef
 
@@ -150,7 +157,7 @@ o5snd: {audios: HTMLCollection(1), o5shift_speed: 0.5}
 в нём примереы с передычей аргуменов
 перечислить включенные: o5ref.js o5shp.js \
     o5shp/AO5shp.js o5shp/DoInit.js o5shp/DoResize.js o5shp/DoScroll.js \
-    o5snd.js o5pop.js o5common.js 
+    o5snd.js o5pop.js o5com!.js 
 пояснение о частичной компиляции,- o5blog и o5dbg - не включены в скомпилированный файл
 
 дописать (пояснением), что при клонировании создаются 3 объекта с id=...._gask shdw cart - т.к. в документе не должно быть с таким...

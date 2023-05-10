@@ -23,7 +23,7 @@
   <script data-src='+o5snd.js' btn_play='images + /play.png' btn_stop='images + /play_Freepik.png'>
   </script>
   <script data-src='+add/pusto.js' moe-attr='мой атрибут'></script>
-  <!-- <script o5debug=2 src='https://rombase.neocities.org/olga5/o5common.js' -->
+  <!-- <script o5debug=2 src='https://rombase.neocities.org/olga5/o5com!.js' -->
 
   <link rel="shortcut icon" href="+../blog/favicon.svg" type="image/x-icon" />
 
@@ -36,9 +36,9 @@
   <link data-href='+../blog/csss/tests.css' media='screen' rel='stylesheet' />
 
   <!-- 
-    _src='https://rombase.neocities.org/olga5/o5common.js'
-    _src='https://rombase.h1n.ru/o5/olga5/o5common.js'  
-    _src='http://localhost/o5/olga5/o5common.js'
+    _src='https://rombase.neocities.org/olga5/o5com!.js'
+    _src='https://rombase.h1n.ru/o5/olga5/o5com!.js'  
+    _src='http://localhost/o5/olga5/o5com!.js'
 -->
   <script src='http://localhost/o5/olga5/o5.js' 
       o5consts="o5debug='1'; o5nomnu='0'; o5noact='0'; o5timload=4;" 
@@ -48,7 +48,7 @@
       images=_url_olga5 + ../blog/media/image;       
       # _url_html='# адрес текущей страницы (этот и 2 следующих - закомментированы)';
       # _url_root='# адрес сайта с текущей страницей';
-      # _url_olga5='# адрес загрузки файла o5common.js';
+      # _url_olga5='# адрес загрузки файла o5com!.js';
     ">
     </script>
 </head>
@@ -522,7 +522,7 @@
       </p>
       <p>
         Сжимание подвисшего блока при дальнейшем скроллинге документа достигается заданием блоку
-        атрибута <i>olga5_owners="id:kst"</i> (см. ниже п. 4.2),
+        атрибута <i>olga5_owners="id:kst"</i> (см. ниже п.&nbsp;4.2),
         где '<i><b>kst</b></i>' - значение атрибута <b>id</b>  блока под заголовком <i>2. Иллюстрация работы</i>.
       </p>
     </div>
@@ -539,11 +539,11 @@
         <br />
          ...
         <br />
-        <i>&lt;script src='olga5/o5common.js' o5debug=2 o5init_events&gt;&lt;/script&gt;</i>
+        <i>&lt;script src='olga5/o5com!.js' o5debug=2 o5init_events&gt;&lt;/script&gt;</i>
       </p>
       <p>
         Здесь дополнительное (выделенное курсивом) подключение
-        <a href="блог_o5 + /olga5-all.html" target="olga5-addPage">o5common.js</a> -
+        <a href="блог_o5 + /olga5-all.html" target="olga5-addPage">o5com!.js</a> -
         обязательно.
       </p>
       <p>
@@ -561,8 +561,8 @@
       </p>
       <p>
         где в перечне классов атрибута <b>class</b> указан обязательный класс <b>olga5_shp</b>,
-        после которого определены два (необязательных,- см. п. 4.1) <i>квалификатора</i> : <b>Up</b> и <b>1</b>.
-        Также, для тега задан <i>атрибут</i> (необязательный, дополнительный,- см. п. 4.2) <b>olga5_frames</b>.
+        после которого определены два (необязательных,- см. п.&nbsp;4.1) <i>квалификатора</i> : <b>Up</b> и <b>1</b>.
+        Также, для тега задан <i>атрибут</i> (необязательный, дополнительный,- см. п.&nbsp;4.2) <b>olga5_frames</b>.
       </p>
 
       <h4 id='head_41'>4.1. Квалификаторы класса <code>olga5_shp</code></h4>
@@ -618,6 +618,12 @@
         сдвигает предыдущий (у которого <i>уровень</i>= '<b>1</b>'), а <i>прилипает</i> к нему.
         И оба они (как и остальные куплеты) подвисают под блоком с YouTube-роликом, у которого <i>уровень</i>=
         '<b>0</b>'.
+      </p>
+      <p>
+        Вместо использования квалификатора <i><b>K</b>ill</i> предпочтительнее указывать 
+        для подвисабельного тега наименование        владельца,- например        
+        <span class='olga5_codeText'>olga5_owners="id:kst</span> (см. п.&nbsp;4.2),
+        как это сделано в первом примере в п.2, где подвисший текст <u>плавно</u> удаляется с экрана.
       </p>
     
       <h4 id='head_42'>4.2. Дополнительные атрибуты тега</h4>

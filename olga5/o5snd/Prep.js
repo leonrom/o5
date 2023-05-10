@@ -5,16 +5,12 @@
 
 (function () {              // ---------------------------------------------- o5snd/Imgs ---
     "use strict"
+    let o5debug = 0
+
     const olga5_modul = 'o5snd',
-        modulname = 'Prep'
-
-    if (!window.olga5) window.olga5 = []
-    if (!window.olga5[olga5_modul]) window.olga5[olga5_modul] = {}
-
-    let C = null,
-        o5debug = 0
-
-    const wshp = window.olga5[olga5_modul],
+        modulname = 'Prep',
+        C = window.olga5.C,
+        wshp = window.olga5[olga5_modul],
         StopSoundOnPage = () => {
             if (wshp.actaudio)
                 wshp.StopSound(wshp.actaudio.aO5snd)
@@ -93,7 +89,6 @@
                 wshp.setClass.SetC(aO5, wshp.setClass.stop)
         },
         Prepare: mtags => {
-            C = window.olga5.C
             o5debug = wshp.W.consts.o5debug
             /*
                         PrepareSnds
@@ -173,7 +168,7 @@
 
                 if (tagName.match(/audio/i)) continue
 
-                const aO5 = wshp.AO5snd(snd, C)
+                const aO5 = wshp.AO5snd(snd)
 
                 if (mtag.quals && mtag.quals.length > 0) {
                     DecodeAttrs(mtag)
@@ -190,7 +185,7 @@
 
                 if (aO5.image.stop) {
                     if (!wshp.imgs) {
-                        wshp.imgs = wshp.Imgs(C)
+                        wshp.imgs = wshp.Imgs()
                         btns.stop = GetBtnUrl('btn_stop') || ''
                         btns.play = GetBtnUrl('btn_play') || ''
                     }
@@ -269,6 +264,5 @@
         },
     })
 
-    if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
-        console.log(`}===< ${document.currentScript.src.indexOf(`/${olga5_modul}.`) > 0 ? 'дозагружен' : 'подключён '}:  ${olga5_modul}/${modulname}.js`)
+    C.MsgAddSub(olga5_modul, modulname)
 })();

@@ -4,10 +4,11 @@
 /*jshint esversion: 6*/
 (function () {
     'use strict';
-    let C = null,
+    let 
         canvas = null,
         navbar = null
     const
+		C = window.olga5.C,
         W = {
             modul: 'o5blog',
             Init: BlogInit, // вызывается при инициализации
@@ -168,12 +169,12 @@ canvas{
             canvas = document.createElement('canvas')
 
             CanvasSize()
-            C.AppendChild(document.body, canvas)
+            C.page.AppendChild(document.body, canvas)
 
             const hr = document.createElement('hr')
             hr.pO5ext = true
             hr.id = hr_id
-            C.AppendChild(document.body, hr)
+            C.page.AppendChild(document.body, hr)
 
             const div = document.createElement('div'),
                 libheader = document.getElementsByClassName('header-inner'),
@@ -188,7 +189,7 @@ canvas{
             div.id = 'd11_header'
             div.innerHTML = spanH + header + '</div>' + spanT + title + '</div>'
 
-            C.AppendChild(navbar, div)
+            C.page.AppendChild(navbar, div)
 
             // document.
             window.addEventListener('resize', CanvasSize)
@@ -231,27 +232,27 @@ canvas{
             // mo = new MutationObserver(CheckNavLbls)
             // mo.observe(navbar, { 'childList': true, 'subtree': true });
         },
-        MakeNavBar = function (c) {
-            navbar = document.getElementById(navbarName)
-            if (navbar) SetNavBar(navbar)
-            else
-                ObserveNavbar(document, navbarName)
-            // {
-            //     let mo = null
-            //     const CheckNavLbls = (mutations) => {
-            //         for (const mutation of mutations)
-            //             for (const node of mutation.addedNodes)
-            //                 if (node.id == navbarName) {
-            //                     SetNavBar(node)
-            //                     mo.disconnect()
-            //                     mo = null
-            //                     return
-            //                 }
-            //     }
-            //     mo = new MutationObserver(CheckNavLbls)
-            //     mo.observe(document, { 'childList': true, 'subtree': true });
-            // }
-        },
+        // MakeNavBar = function (c) {
+        //     navbar = document.getElementById(navbarName)
+        //     if (navbar) SetNavBar(navbar)
+        //     else
+        //         ObserveNavbar(document, navbarName)
+        //     // {
+        //     //     let mo = null
+        //     //     const CheckNavLbls = (mutations) => {
+        //     //         for (const mutation of mutations)
+        //     //             for (const node of mutation.addedNodes)
+        //     //                 if (node.id == navbarName) {
+        //     //                     SetNavBar(node)
+        //     //                     mo.disconnect()
+        //     //                     mo = null
+        //     //                     return
+        //     //                 }
+        //     //     }
+        //     //     mo = new MutationObserver(CheckNavLbls)
+        //     //     mo.observe(document, { 'childList': true, 'subtree': true });
+        //     // }
+        // },
         AddRefToO5 = function () {
             const pagers = document.getElementsByClassName('post-outer-container')
 
@@ -297,11 +298,10 @@ canvas{
 
         NoAttr = name => !attrs || !attrs[name] || !attrs[name].value
 
-    function BlogInit(c) { // Модуль инициализации скрипта
-        C = c
+    function BlogInit() { // Модуль инициализации скрипта
         if (!W.isReady) {
             if (NoAttr('o5nocss')) C.ParamsFill(W, o5css)
-            else c.ParamsFill(W)
+            else C.ParamsFill(W)
 
             // if (NoAttr('o5noact')) ActScripts()
 

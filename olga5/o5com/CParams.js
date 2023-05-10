@@ -11,12 +11,8 @@
 (function () {              // ---------------------------------------------- o5com/CParams ---
 	'use strict'
 	const olga5_modul = 'o5com',
-		modulname = 'CParams'
-	if (!window.olga5) window.olga5 = []
-	if (!window.olga5.C) window.olga5.C = {}
-	if (!window.olga5[olga5_modul]) window.olga5[olga5_modul] = {}
-
-	const wshp = window.olga5[olga5_modul],
+		modulname = 'CParams',
+		wshp = window.olga5[olga5_modul],
 		C = window.olga5.C,
 		csslist = {}, // перечень наименований создаваемых классо
 		// repQuotes = /^['"`\s]+|['"`\s]+$/g,
@@ -40,8 +36,6 @@
 
 			for (const spair of spairs)
 				if (spair) {
-// if (spair.match('myMusikIT'))					
-// console.log(121212)
 					const pair = spair.split('=')
 					if (pair.length > 1) {
 						const nam = C.Repname(pair[0].trim()),
@@ -67,8 +61,8 @@
 
 			for (const nam in urlrfs) {
 				const val = urlrfs[nam]
-// if (val.match('myMusikIT'))					
-	// console.log(121212)		isurl		
+				// if (val.match('myMusikIT'))					
+				// console.log(121212)		isurl		
 				if (val != null && typeof val !== 'undefined') {
 					if (!val.replace)
 						alert('значение URL - не строка')
@@ -140,7 +134,7 @@
 			const scrpt = C.scrpts.find(scrpt => scrpt.modul == W.modul)
 
 			if (!scrpt) {
-				C.ConsoleError(`? В 'C.scrpts' не наден модуль `, W.modul)
+				C.ConsoleError(`В 'C.scrpts' не наден модуль `, W.modul)
 				return
 			}
 
@@ -217,11 +211,8 @@
 		for (const nam in defs) { xs[nam].url = defs[nam] }
 		if (C.consts.o5debug > 0) PrintParams(C.save.libName, xs, p, n1)
 
-		// delete C.save
-		// Object.freeze(C)
 		return true
 	}
 
-	if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
-		console.log(`}===< ${document.currentScript.src.indexOf(`/${olga5_modul}.`) > 0 ? 'дозагружен' : 'подключён '}:  ${olga5_modul}/${modulname}.js`)
+	C.MsgAddSub(olga5_modul, modulname)
 })();
