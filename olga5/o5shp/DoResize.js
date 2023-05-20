@@ -5,14 +5,14 @@
 //!
 (function () {              // ---------------------------------------------- o5shp/DoResize ---
     "use strict"
-    let o5debug = 0,
+    let wshp = {},
+        o5debug = 0,
         debugids = ['head_32']  //  shp_5÷8 'shp_text' // 'shp_1÷4' // 'shp-demo' // 'shp_text'
 
     const
         olga5_modul = "o5shp",
         modulname = 'DoResize',
         C = window.olga5.C,
-        wshp = window.olga5[olga5_modul],
         errs = [],
         MyRound = (s) => { return Math.round(parseFloat(s)) },
         IsInClass = (classList, clss) => {
@@ -222,7 +222,8 @@
         }
 
     let showerr = true
-    wshp.DoResize = function (txt) {
+
+    wshp = C.ModulAddSub(olga5_modul, modulname, txt => {
         /* 
         фактически - д.б. 1 раз. - при первом скроллинге,
         но для отладки - может вызываться повторно
@@ -249,6 +250,6 @@
         wshp.DoScroll(wshp.aO5s)
         showerr = false
     }
+    )
 
-    C.MsgAddSub(olga5_modul, modulname)
 })();

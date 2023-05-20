@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>ref1</title>
+
+    <script async src='../olga5/o5com!.js' o5debug=0 o5urlrfs="
+            мой-сервер= https://rombase.neocities.org/ ;
+            lib = o5/olga5/;
+        "></script>
+    <script src='+./o5ref.js' o5tag_attrs='a= href, src; img=src; i,b=owm'></script>
+</head>
+
+<body style="margin: 0 0.1em 0 0.3em;">
+    <div id="1.1"  class='example'>
+        Открыть содержимое <b>o5ref.js</b> по именованным ссылкам &lt;<b>a</b>&gt;, где первая - находитмся в классе
+        <i>olga5_Start</i> (а вторая - нет):
+        <i><b>href</b>="мой-сервер + lib + o5ref.js"</i>:
+        <br />
+        <div id="1.2"  class='olga5_Start:o5ref:o5ref'>
+            <a id='a1' href="мой-сервер + lib + o5ref.js" target="olga5-addPage">Обработанная ссылка</a>
+            <img alt="Пример" _src="images+/pict.png" />
+        </div>
+        <a id='a2' href="мой-сервер + lib + o5ref.js" target="olga5-addPage">Не обработанная (ошибочная) ссылка</a>
+    </div>
+</body>
+
+</html>

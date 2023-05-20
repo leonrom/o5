@@ -6,14 +6,14 @@
 (function () {              // ---------------------------------------------- o5snd/Imgs ---
     "use strict"
     const
+        C = window.olga5.C,
         olga5_modul = 'o5snd',
         modulname = 'Imgs',
-        C = window.olga5.C,
-        Imgs = () => {
+        wshp = C.ModulAddSub(olga5_modul, modulname, () => {
             let imgs = null
             const
-                wshp = window.olga5[olga5_modul],
                 a = document.createElement('a'),
+                lognam = `${olga5_modul}/${modulname} `,
                 FullUrl = (url) => {
                     if (C.IsFullUrl(url)) return url
                     else {
@@ -36,7 +36,7 @@
                         Not only is this the w3c recommendation but it’s the faster method in IE8, the version users are slowly starting to adopt.
                         */
                         if (C.consts.o5debug > 2)
-                            console.log(`${olga5_modul}/${modulname} olga5_Imgs создание нового для url=${url}`)
+                            console.log(`${lognam} olga5_Imgs создание нового для url=${url}`)
 
                         const nimg = document.createElement('img')
                         Object.assign(nimg, { src: url, importance: 'high', loading: 'eager', crossOrigin: null })
@@ -44,7 +44,7 @@
 
                         nimg.addEventListener('load', () => {
                             if (C.consts.o5debug > 1)
-                                console.log(`${olga5_modul}/${modulname} GetImgForRef: загружен url= ${url}`)
+                                console.log(`${lognam} GetImgForRef: загружен url= ${url}`)
                             if (url.trim() == '')
                                 alert('url=?')
                             Resolve({ img: nimg, new: true })
@@ -66,7 +66,7 @@
                         if (!isinmap)
                             maps.set(url, { img: img.cloneNode(true), err: '' })
                         if (C.consts.o5debug > 1)
-                            console.log(`${olga5_modul}/${modulname} olga5_Imgs ${isinmap ? 'повтор  ' : 'добавлен'} url=${url} для img.id='${img.id}' ${s}`)
+                            console.log(`${lognam} olga5_Imgs ${isinmap ? 'повтор  ' : 'добавлен'} url=${url} для img.id='${img.id}' ${s}`)
                     }
                     else
                         console.error(`olga5_Imgs : попытка добавить` + (img ? ` пустой src для img.id='${img.id}'` : ` пустой  <img>`))
@@ -190,7 +190,5 @@
             imgs = new Imgs()
             return imgs
         }
-
-    window.olga5[olga5_modul].Imgs = Imgs
-    C.MsgAddSub(olga5_modul, modulname)
+        )
 })();

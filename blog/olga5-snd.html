@@ -10,6 +10,24 @@
 	<!-- <script src="https://rombase.h1n.ru/o5/olga5/o5dbg/events.js"></script> -->
 
     <link href='+../blog/favicon.svg' rel='shortcut icon' type='image/x-icon' />
+
+	<!-- 
+		src="../o5/olga5/o5.js"
+		src='https://rombase.h1n.ru/o5/olga5/o5.js'
+		src='http://localhost/o5/olga5/o5.js'  	
+	-->
+    <script src="http://localhost/o5/olga5/o5.js"
+		o5debug="0"
+        o5incls="o5pop,o5mnu,o5snd,o5shp,o5ref"
+        o5urlrfs="
+            _блог_o5 = \'_url_html+../2020/02\';
+			media = + ../blog/media;
+            sounds= media + /audio;
+            images= media + /image;
+            тесты = + ../olga5-tests;     
+        " 
+	></script>
+
 	<link data-href="+o5ini.css" media="screen" rel="stylesheet" />
     
     <script data-src="+ o5inc.js"></script>
@@ -44,22 +62,6 @@
     <link data-href="+../blog/csss/olga5.tableKuplet.css" media="screen" rel="stylesheet" />
     <link data-href="+../blog/csss/tests.css" media="screen" rel="stylesheet" />
 
-	<!-- 
-		src="../o5/olga5/o5.js"
-		src='https://rombase.h1n.ru/o5/olga5/o5.js'
-		src='http://localhost/o5/olga5/o5.js'  	
-	-->
-    <script src="http://localhost/o5/olga5/o5com.js"
-		o5debug="0"
-        o5incls="o5pop,o5mnu,o5snd,o5shp,o5ref"
-        o5urlrfs="
-            _блог_o5 = \'_url_html+../2020/02\';
-			media = + ../blog/media;
-            sounds= media + /audio;
-            images= media + /image;
-            тесты = + ../olga5-tests;     
-        " 
-	></script>
 </head>
 
 <body>
@@ -262,7 +264,7 @@
 									<a id='6' class='olga5_snd:href' target="olga5-addPage" href="sounds+/Ceza1-25.mp3"
 										title="кликни чтобы прослушать">&lt;<b>a</b>&gt;</a>
 									<br />
-									<a id='6a' class='olga5_snd:over:href' target="olga5-addPage" href=Ceza1-25.mp3
+									<a id='6a' class='olga5_snd:over:href' target="olga5-addPage" href=sounds+/Ceza1-25.mp3
 										title="задержи курсор чтобы прослушать">&lt;<b>a</b>&gt;</a>
 									<br />
 									<b id='6b' class="olga5_snd:alive:'sounds+ /Ceza2-25.mp3'"
@@ -368,9 +370,9 @@
 					</li>
 					<li><b>6</b> &mdash; примеры внедрения аудио-ссылок непосредственно в теги оформления
 						текста.
-						В примерах '<b>a</b>' у тегов ссылка на аудио задана через теговый атрибут <b>href</b>.
-						Здесь даны два примера для иллюстрации отработки перехода по ссылке '<b>a</b>':
-						в обоих случаях перехоб будет выполнен кликом по тегу <u>после</u> постановки звучания на паузу.
+						В обоих примерах с &lt;<b>a</b>&gt; ссылка на аудио задана через теговый атрибут <b>href</b>.
+						Здесь даны два варианта для иллюстрации отработки перехода по ссылке '<b>a</b>':
+						в обоих случаях переход будет выполнен кликом по тегу <u>после</u> постановки звучания на паузу.
 					</li>
 				</ul>
 
@@ -384,7 +386,7 @@
 						<b>src</b> или <b>href</b> от <u>текущего</u> тега (даже если сами эти атрибуты
 						были определены через префиксы '<b>_</b>' или '<b>data-</b>').
 						Использование таких ссылок можно посмотреть
-						<span class="olga5_popup" onclick="window.olga5.PopShow(  700, 466, 'тесты+/snd46c.html')">
+						<span class="olga5_popup" onclick="window.olga5.PopShow(  700, 466, 'тесты+/snd5.html')">
 							тут</span>;
 					</li>
 					<li>если после открытияя страницы сразу навести курсор на тег с квалификатором <b>:over</b>,
@@ -678,17 +680,22 @@ img.olga5_shp:not(.<b>olga5-freeimg</b>) {
 						:<b>'https://archive.org/download/clouds_20200310/Ceza1-25.mp3'</b>:O:L:A</i>..</li>
 			</ul>
 			</p>
-			<p class='moecomment'>
-				<em>Пояснение</em>: квалификаторы действуют только при инициализации тегов после чего удаляются из
-				<i>className</i> тега.
+			<p class="moeattention">
+				В <b>audio_play</b> могут использоваться именованные ссылки, определённые <u>в&nbsp;ядре</u> <i>библиотеки</i>
+				<br/>
+				<span class='moecomment'>
+				(не допустимо их определение в модуле <code>o5ref</code> т.к. он не может обработать атрибут <b>class</b>)</span>. 
 			</p>
 			<p>
-				Если не указано значение <b>:Alive</b>, то, при уводе курсора в режиме НЕ <b>:Over</b>, звучание
-				продолжается, а в режиме <b>:Over</b> - прекращается.
-				Однако, увод курсора во время паузы (после клика) приведёт к прекращению звучания - независимо от
+				Если не указано значение <b>:Alive</b>, то, при уводе курсора в режиме без <b>:Over</b>, звучание
+				продолжается, а в режиме с <b>:Over</b> - прекращается.
+				Однако, увод курсора во время паузы (после клика) всегда приведёт к прекращению звучания - независимо от
 				наличия <b>:Alive</b>.
 			</p>
-
+			<p class='moecomment'>
+				<em>Пояснение</em>: квалификаторы действуют только при инициализации тегов после чего удаляются из
+				<b>className</b> тега.
+			</p>
 			<p>
 				При отсутствии атрибута
 				<span

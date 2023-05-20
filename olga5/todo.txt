@@ -1,3 +1,10 @@
+
+
+читать
+https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Permissions-Policy#syntax
+
+https://cloud.google.com/blog/products/data-analytics/iframe-sandbox-tutorial
+
 http://localhost/o5/olga5-tests/ext4.html
 почему 
   догружаеьт модули o5com

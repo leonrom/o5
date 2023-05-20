@@ -1,14 +1,18 @@
 /* global document, window */
 /*jshint asi:true  */
 /*jshint esversion: 6*/
-(function () {
+(function () {              // ---------------------------------------------- o5dbg/pos ---
 	'use strict'
-	const W = { modul: 'pos' }
 
-	let mposPos = null, // объект, в котором позиция мыши
+	let wshp = {},
+		mposPos = null, // объект, в котором позиция мыши
 		mposAct = null // текущий двигаемый объект (тот же самый)
 
-	const id = "olga5_mousePos",
+	const
+		olga5_modul = "o5dbg",
+		modulname = 'Pos',
+		C = window.olga5.C,
+		id = "olga5_mousePos",
 		m_borderColorOff = 'lightgray',
 		m_borderColorOn = 'red',
 		m_borderRadius = '3px',
@@ -129,9 +133,9 @@
 		}
 	}
 
-	function MousePos() {
+	wshp = C.ModulAddSub(olga5_modul, modulname, () => {
 		const isInitiated = document.getElementById(id)
-		console.log(`${W.modul}: MousePos()` + (isInitiated ? 'игнорируется' : ''))
+		console.log(`${olga5_modul}.${modulname} : ` + (isInitiated ? 'игнорируется' : ''))
 		if (isInitiated) return
 
 		const div = document.createElement('div')
@@ -145,11 +149,8 @@
 		document.addEventListener('mouselive', StopMoveAct)
 		document.addEventListener('mouseup', StopMoveAct)
 		document.addEventListener('mousemove', MyMouseMove)
+		
 		SetVP()
 		ShowPos()
-	}
-
-	document.addEventListener('DOMContentLoaded', MousePos)
-
-	window.dispatchEvent(new CustomEvent('olga5_sload', { detail: { modul: W.modul } }))
+	})
 })();

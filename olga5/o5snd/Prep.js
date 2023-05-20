@@ -3,14 +3,15 @@
 /*jshint strict:true  */
 /*jshint esversion: 6 */
 
-(function () {              // ---------------------------------------------- o5snd/Imgs ---
+(function () {              // ---------------------------------------------- o5snd/Prep ---
     "use strict"
-    let o5debug = 0
 
-    const olga5_modul = 'o5snd',
+    const
+        olga5_modul = 'o5snd',
         modulname = 'Prep',
         C = window.olga5.C,
-        wshp = window.olga5[olga5_modul],
+        o5debug = C.consts.o5debug,
+        lognam = `${olga5_modul}/${modulname} `,
         StopSoundOnPage = () => {
             if (wshp.actaudio)
                 wshp.StopSound(wshp.actaudio.aO5snd)
@@ -22,77 +23,8 @@
             return wref.url
         },
         urlattrs = [],
-        errs = []
-
-
-    errs.Add = function (name, url, txt, atr, err) {
-        this.push({ snd: name, 'источник': url, 'пояснение': txt, val: atr, 'ошибка': err })
-    }
-
-    Object.assign(wshp, {
-        setClass: {
-            stop: 'stop', play: 'play', pause: 'pause',
-            SetC: (aO5, state) => {
-                if (o5debug > 1) console.log(`${olga5_modul}/${modulname} SetC (${aO5.name}, '${state}')`)
-                const classList = (aO5.image.play ? aO5.image.play : aO5.snd).classList
-                if (state == wshp.setClass.play) {
-                    const image = aO5.image
-                    if (image.play) {
-                        image.stop.style.display = 'none'
-                        image.play.style.display = aO5.modis.dspl
-                    }
-                    classList.add(wshp.css.olga5sndPlay)
-                    classList.remove(wshp.css.olga5sndPause)
-                }
-                else if (state == wshp.setClass.pause) {
-                    classList.remove(wshp.css.olga5sndPlay)
-                    classList.add(wshp.css.olga5sndPause)
-                }
-                else if (state == wshp.setClass.stop) {
-                    classList.remove(wshp.css.olga5sndPlay)
-                    classList.remove(wshp.css.olga5sndPause)
-                }
-                else alert(`setClass.SetC: state='${state}'`)
-                aO5.sound.state = state
-            }
-        },
-        OriForTag: (tag, ref, atnam) => {
-            const ori = { url: '', atr: '' },
-                attr = atnam ? C.GetAttribute(tag.aO5snd.o5attrs, atnam) : ''
-            if (attr)
-                Object.assign(ori, { url: attr.value, atr: atnam })
-            else
-                if (ref) {
-                    const td = C.TagDes(tag, ref)
-                    if (td)
-                        Object.assign(ori, { url: td.orig, atr: td.from })
-                }
-            return ori
-        },
-        StopSound: aO5 => {
-            if (o5debug > 1) console.log(`${olga5_modul}/${modulname}  StopSound (${aO5.name})`)
-            wshp.actaudio = null
-
-            const image = aO5.image,
-                audio = aO5.audio ? aO5.audio : aO5.sound.audio
-
-            audio.pause()
-            audio.currentTime = 0
-            aO5.sound.state = wshp.setClass.stop
-
-            if (image && image.play) {
-                image.play.style.display = 'none'
-                image.stop.style.display = aO5.modis.dspl
-            }
-
-            if (audio !== aO5.audio)
-                wshp.setClass.SetC(aO5, wshp.setClass.stop)
-        },
-        Prepare: mtags => {
-            o5debug = wshp.W.consts.o5debug
-            /*
-                        PrepareSnds
-            */
+        errs = [],
+        wshp = C.ModulAddSub(olga5_modul, modulname, mtags => {
             const btns = { stop: '', play: '' },
                 DecodeAttrs = (mtag) => {
                     const snd = mtag.tag,
@@ -205,7 +137,8 @@
                 Object.freeze(aO5.parms)
             }
 
-            window.addEventListener('olga5_done', StopSoundOnPage)
+            // window.addEventListener('olga5_done', StopSoundOnPage)
+            C.E.AddEventListener('olga5_done', StopSoundOnPage)
             for (const eve of ['blur', 'pagehide', 'dblclick'])
                 document.addEventListener(eve, StopSoundOnPage)
 
@@ -217,7 +150,7 @@
                 OnPlay = (audio) => {
                     const a = wshp.actaudio
                     if (a && a != audio)
-                        StopSound(a.aO5snd)
+                        wshp.StopSound(a.aO5snd)
 
                     wshp.actaudio = audio
                 },
@@ -261,8 +194,74 @@
 
             if (errs.length > 0)
                 C.ConsoleError(`${wshp.W.modul}: ошибки перекодировки тегов с ${wshp.W.class}`, errs.length, errs)
+        })
+
+
+    errs.Add = function (name, url, txt, atr, err) {
+        this.push({ snd: name, 'источник': url, 'пояснение': txt, val: atr, 'ошибка': err })
+    }
+
+    Object.assign(wshp, {
+        setClass: {
+            stop: 'stop', play: 'play', pause: 'pause',
+            SetC: (aO5, state) => {
+                if (o5debug > 1) console.log(`${lognam} SetC (${aO5.name}, '${state}')`)
+                const classList = (aO5.image.play ? aO5.image.play : aO5.snd).classList
+                if (state == wshp.setClass.play) {
+                    const image = aO5.image
+                    if (image.play) {
+                        image.stop.style.display = 'none'
+                        image.play.style.display = aO5.modis.dspl
+                    }
+                    classList.add(wshp.css.olga5sndPlay)
+                    classList.remove(wshp.css.olga5sndPause)
+                }
+                else if (state == wshp.setClass.pause) {
+                    classList.remove(wshp.css.olga5sndPlay)
+                    classList.add(wshp.css.olga5sndPause)
+                }
+                else if (state == wshp.setClass.stop) {
+                    classList.remove(wshp.css.olga5sndPlay)
+                    classList.remove(wshp.css.olga5sndPause)
+                }
+                else alert(`setClass.SetC: state='${state}'`)
+                aO5.sound.state = state
+            }
+        },
+        OriForTag: (tag, ref, atnam) => {
+            const ori = { url: '', atr: '' },
+                attr = atnam ? C.GetAttribute(tag.aO5snd.o5attrs, atnam) : ''
+            if (attr)
+                Object.assign(ori, { url: attr.value, atr: atnam })
+            else
+                if (ref) {
+                    const td = C.TagDes(tag, ref)
+                    if (td)
+                        Object.assign(ori, { url: td.orig, atr: td.from })
+                }
+            return ori
+        },
+        StopSound: aO5 => {
+            if (o5debug > 1) console.log(`${lognam}  StopSound (${aO5.name})`)
+            wshp.actaudio = null
+
+            const image = aO5.image,
+                audio = aO5.audio ? aO5.audio : aO5.sound.audio
+
+            audio.pause()
+            audio.currentTime = 0
+            aO5.sound.state = wshp.setClass.stop
+
+            if (image && image.play) {
+                image.play.style.display = 'none'
+                image.stop.style.display = aO5.modis.dspl
+            }
+
+            if (audio !== aO5.audio)
+                wshp.setClass.SetC(aO5, wshp.setClass.stop)
         },
     })
 
-    C.MsgAddSub(olga5_modul, modulname)
+
+
 })();

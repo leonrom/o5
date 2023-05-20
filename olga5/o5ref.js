@@ -114,8 +114,9 @@
 			C.ConsoleError(`${W.modul}.js: неопределено значение атрибута '${o5tag_attrs}'`)
 		}
 
-		window.dispatchEvent(new CustomEvent('olga5_sinit', { detail: { modul: W.modul } }))
+		// window.dispatchEvent(new CustomEvent('olga5_sinit', { detail: { modul: W.modul } }))
+		C.E.DispatchEvent('olga5_sinit', W.modul)
 	}
 
-	C.MsgAddModule(W, null)
+	C.ModulAdd(W)
 })();

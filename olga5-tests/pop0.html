@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<title>pop0</title>
+	<script src='./events.js'></script>
+	<script src='../olga5/o5pop.js' o5timer='0.3' o5opacity='0.2'></script>
+	<script src='../olga5/o5com.js' o5debug=2></script>
+</head>
+
+<body style="margin: 0 0.1em 0 0.3em;">
+	<div class='example, olga5_Start'>
+		<p>
+			Проверка задания параметров для CalcAllOpts.
+		</p>
+		<p>
+			Теги с атрибутом <b>o5popup</b>
+		</p>
+		<ul>
+			<li>- клик по кнопке 'p1' (события - по умолчанию: 'onclick', 'keyup')
+				<input id="p1" type="button" value="'открыть'" o5popup='./popup.html; width:wp1, height:hp1, left:lp1'>;
+			</li>
+			<li>- клик по кнопке 'p2' (события - аналогично; немигающей заголовок окна)
+				<input id="p2" type="button" value="'открыть'" o5popup='./popup.html; width:wp2, left:lp2, defid=p1, head:""'>;
+			</li>
+			<li>- нажать Enter на кнопке 'p3' c одним событием 'keyup'
+				<input id="p3" type="button" value="'открыть'" o5popup='./popup.html; width:wp2, defid=p1; keyup'>;
+			</li>
+			<li>- клик по кнопке 'p4' с тремя событиями 'evex, click, pnax'
+				<input id="p4" type="button" value="'открыть'" o5popup='./popup.html; p2; evex, click, pnax'>;
+			</li>
+		</ul>
+
+		<p>
+			Теги с обработчиком события
+		</p>
+		<ul>
+			<li>- клик по тегу 'o1' с событием 
+				<span class="olga5_popup" id='o1'
+					onclick="window.olga5.PopUp(this, './popup.html', 'width:wo1, height:ho1, left:lo1')">'onClick'</span>
+			</li>
+			<li>- наведение курсора на тег 'o2' с текстом
+				<i class="olga5_popup" id="o2"
+					onmouseenter="window.olga5.PopUp(this, './popup.html', 'width:wo2, height:ho2,defid=p3')">'onmouseenter'</i>
+			</li>
+			<li>- тег 'o3' с тремя событиями 'onClick, onEevex, onKeyUp' и еще раз onClick
+				<span class="olga5_popup" id='o3'
+					onClick="window.olga5.PopUp(this, './popup.html', 'width:wo3С, height:ho3C')"
+					onEevex="window.olga5.PopUp(this, './popup.html', 'width:wo3С, height:ho3E, defid=o1')"
+					onKeyUp="window.olga5.PopUp(this, './popup.html', 'width:wo3С, height:ho3K, left:lo3')"					
+					onClick="window.olga5.PopUp(this, './popup.html', 'height:ho3C2')"
+				>'3 разных'</span>
+			</li>
+		</ul>
+	</div>
+</body>
+
+</html>

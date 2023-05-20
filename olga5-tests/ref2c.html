@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>ref2c </title>
+	<link rel="shortcut icon" href="./favicon.svg" type="image/x-icon">
+
+	<script id='o5inc' data-src='+ o5inc.js'></script>  
+    <script id='o5ref' data-src='../olga5/o5ref.js' 
+        o5tag_attrs='
+            a = href,data-href, xxx # Содержит ошибку;
+            b, vv = xxx             # -"-            ;
+            img, audio = src,_src                    ;
+        '
+        o5urlrfs = "		
+        ma   = /media                           # это промежуточная часть адресной строки;
+        tt   = _url_html + ma + /tt             # здесь `/tt` название папки, а не ссылка;
+        belo = _url_root + mma + /o5/blog       # спец. содержит ошибочную ссылку  'mma' ;
+        audio= _url_root + /o5/blog + ma+/audio # спец. демо формирования составного пути;
+        btnSound = _url_root + o5/blog/media/image/play.png   # ссылка на конкретный файл;
+        "
+    >        
+    </script>
+    <script async src='../olga5/o5.js' o5debug=0></script>
+</head>
+<body style="margin: 0 0.1em 0 0.3em;">
+	<div o5include='./ref2.html?.example'></div>
+</body>
+</html>

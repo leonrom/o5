@@ -4,8 +4,9 @@
 /*jshint esversion: 6*/
 (function () {
 	'use strict';
-	let C = null
-	const olga5_modul = 'o5p2',
+	const
+		C = window.olga5.C,
+		olga5_modul = 'o5p2',
 		olga5_class = 'olga5_o5p2', // olga5_name + '_o5p2',
 		olga5_CSS = `
             cursor: pointer; 
@@ -16,12 +17,11 @@
      `,
 		_srcEmpty = 'about:blank',
 		// ...  другие константы, функции, обработчики событий
-		WndInit = function (c) { // Модуль инициализации скрипта
-			C = c
-			C.ParamsFill(W)
-			C.InitCSS(olga5_CSS, olga5_class, olga5_modul)
+		WndInit = function () { // Модуль инициализации скрипта
+			C.ParamsFill(W, olga5_CSS)
 			// ...  другие функции инициализации
-			window.dispatchEvent(new CustomEvent('olga5_sinit', { detail: { modul: W.modul } }))
+			// window.dispatchEvent(new CustomEvent('olga5_sinit', { detail: { modul: W.modul } }))
+			C.E.DispatchEvent('olga5_sinit', W.modul)
 		}
 
 	const W = {
@@ -33,5 +33,6 @@
 	console.log(`}---< загружен:  ${olga5_modul}.js`)
 	if (!window.olga5) window.olga5 = []
 	window.olga5.push(W)
-	window.dispatchEvent(new CustomEvent('olga5_sload', { detail: { modul: W.modul } }))
+	// window.dispatchEvent(new CustomEvent('olga5_sload', { detail: { modul: W.modul } }))
+	C.E.DispatchEvent('olga5_sload', W.modul)
 })();

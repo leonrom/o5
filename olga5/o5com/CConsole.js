@@ -9,7 +9,6 @@
 	'use strict'
 	const olga5_modul = 'o5com',
 		modulname = 'CConsole',
-		wshp = window.olga5[olga5_modul],
 		C = window.olga5.C,
 		padd = "padding-left:0.5rem;",
 		clrtypes = {
@@ -106,7 +105,7 @@
 			console.groupEnd()
 		}
 
-	wshp[modulname] = () => {
+	C.ModulAddSub(olga5_modul, modulname, () => {
 		Object.assign(C, {
 			ConsoleMsg: ConsoleMsg,
 			ConsoleAlert: (txt, add, tab) => ConsoleMsg('alert', txt, add, tab),
@@ -116,6 +115,5 @@
 		})
 		return true
 	}
-
-	C.MsgAddSub(olga5_modul, modulname)
+	)
 })();

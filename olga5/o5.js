@@ -8,13 +8,94 @@
 **/
 // 
 (function () {              // ---------------------------------------------- o5com ---
+	const
+		E = { // тут везде tag===window.  Д.б. перед 'use strict'
+			Err: err => {
+				console.error("%c%s", "background: yellow; color: black;border: solid 1px gold;", 'E: ' + err)
+			},
+			Msg: (txt, eve, nFun) => {
+				if (C.consts.o5debug > 0) {
+					console.groupCollapsed("%c%s", "background: lightblue; color: black;border: solid 1px gold;",
+						`${txt} для eve='${eve}'\n ф-ии "${nFun}"`)
+					console.trace()
+					console.groupEnd()
+				}
+			},
+			NFun: (Fun) => Fun.name || Fun,
+			events: [],
+			donets: [],
+			AddEventListener: (eve, Fun, opts) => {
+				const nFun = E.NFun(Fun)
+				E.Msg('AddEventListener', eve, nFun)
+				if (E.events.find(event => event.eve == eve && event.nFun == nFun && event.opts == opts))
+					E.Err(`повторная регистрация  '${eve}' для ф-ии "${nFun}"`)
+				else {
+					const
+						caller = arguments.callee
+					for (const donet of E.donets)
+						if (donet.eve == eve)
+							if (donet.callers.includes(caller))
+								E.Err(`Повторное выполнение '${eve}' для ф-ии "${nFun}"`)
+							else {
+								donet.callers.push(caller)
+								Fun(donet.e)
+							}
+
+					E.events.push({ eve: eve, nFun: nFun, opts: opts })
+					window.addEventListener(eve, Fun, opts)
+				}
+			},
+			RemoveEventListener: (eve, Fun) => {
+				const nFun = E.NFun(Fun)
+				E.Msg('RemoveEventListener', eve, nFun)
+				let i = E.events.length,
+					k = -1
+				while (i-- > 0 && k < 0)
+					if (E.events[i].eve == eve && E.events[i].nFun == nFun)
+						k = i
+
+				if (k < 0)
+					E.Err(`удаление неприсвоенного события '${eve}' функции "${nFun}" `)
+				else {
+					E.events.splice(k, 1)
+					window.removeEventListener(eve, Fun)
+				}
+			},
+			DispatchEvent: (eve, modulx, canrep) => {
+				const modul = modulx ? modulx : ''
+				if (C.consts.o5debug > 1 && !canrep) {
+					console.groupCollapsed(`DispatchEvent: '${eve}' для modul= '${modul}'`)
+					console.trace()
+					console.groupEnd()
+				}
+				const donet = E.donets.find(donet => donet.eve == eve && donet.modul == modul)
+				let e = null
+				if (donet) {
+					e = donet.e
+					if (!canrep)
+						E.Err(`повторная генерация события '${eve}' modul="${modul}"`)
+				}
+				else {
+					const e2 = new CustomEvent(eve, modul ? { detail: { modul: modul } } : {})
+					E.donets.push({ eve: eve, modul: modul, callers: [], e: e2, })
+					e = e2
+				}
+				window.dispatchEvent(e)
+			},
+			Init: () => {
+				E.events.splice(0, E.events.length)
+				E.donets.splice(0, E.donets.length)
+			},
+		}
+
 	'use strict'
 	const olga5_modul = "o5com"
 	if (!window.olga5) window.olga5 = []
 	if (!window.olga5.C) window.olga5.C = {}
 	if (!window.olga5[olga5_modul]) window.olga5[olga5_modul] = {}
 
-	const modnames = ['CConsole', 'CEncode', 'CApi', 'CParams', 'TagsRef', 'IniScripts'], // 'IniScripts' д.б. ПОСЛЕДНИМ
+	const
+		modnames = ['CConsole', 'CEncode', 'CApi', 'CParams', 'TagsRef', 'IniScripts'], // 'IniScripts' д.б. ПОСЛЕДНИМ
 		wshp = window.olga5[olga5_modul],
 		C = window.olga5.C,
 		strt_time = Number(new Date()),
@@ -133,7 +214,7 @@
 			else return url.origin + url.pathname.substring(0, url.pathname.lastIndexOf('/') + 1)
 		},
 		TryToDigit = x => {
-			if (typeof x === 'undefined') return true
+			if (typeof x === 'undefined') return 1		// true
 			if (x === !!x) return x
 			const val = ('' + x).replace(C.repQuotes, '')
 
@@ -173,8 +254,12 @@
 					for (const param of params) {
 						const u = param.trim()
 						if (u.length > 0) {
-							const prms = u.split(/[=:]/),
-								nam = Repname(prms[0])
+							const prms = u.split(/[=:]/)
+							let nam = Repname(prms[0])
+							if (nam == 'o5nomenu' || nam == 'nomenu') nam = 'o5nomnu'
+							if (nam == 'debug') nam = 'o5debug'
+							// if (nam == 'o5debug') 
+							// 	nam = 'o5debug'
 							if (C.consts.hasOwnProperty(nam)) {
 								const val = TryToDigit(prms[1])
 								xs[nam] = { val: val, source: C.save.urlName }
@@ -233,7 +318,7 @@
 		GetAttribute: GetAttribute,
 		Repname: Repname,
 		IncludeScripts: IncludeScripts,
-
+		E: E,
 		o5script: document.currentScript,
 		o5attrs: GetAttrs(document.currentScript.attributes),
 		cstate: {	 			// общее состояние 
@@ -247,7 +332,9 @@
 		consts: {
 			o5timload: 3, 	//mtiml ? (mtiml[5] ? mtiml[5] : 1) : (C.o5script.attributes['o5timload'] || 3),
 			o5debug: 0, 	// mdebug ? (mdebug[5] ? mdebug[5] : 1) : (C.o5script.attributes['o5debug'] || 0),
-			o5nomnu: 0, o5noact: 0, o5only: 0,
+			o5nomnu: 0,
+			o5noact: 0,
+			o5only: 0,
 			o5incls: '',
 			o5doscr: 'olga5_sdone',
 			o5depends: "pusto; o5pop; o5inc; o5ref= o5inc; o5snd:o5ref, o5inc; o5shp=o5snd, o5ref; o5shp:o5inc; o5inc; o5mnu= o5inc",
@@ -258,22 +345,49 @@
 		constsurl: {},
 		save: { hash: null, xs: null, p: '', n1: -1, urlName: 'url', libName: 'ядро', }, // сохранение для "красивой" печати - потом удалю
 
-		MsgAddSub: (modul, sub) => {
-			// if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
-			if (C.consts.o5debug)
+		ModulAddSub: (modul, sub, Fun) => {
+			if (C.consts.o5debug) {
+				// const nam = `${modul}/${sub}.js`
+				// if ('o5shp/DoInit.js' == nam)
+				// 	console.log()
 				console.log(`}===< ${document.currentScript.src.indexOf(`/${modul}.`) > 0 ? 'дозагружен' : 'подключён '}:  ${modul}/${sub}.js`)
+			}
+
+			if (window.olga5[modul] && window.olga5[modul][sub]) {
+				console.groupCollapsed('%c%s', "background: yellow; color: black;border: solid 2px red;",
+					`}---< Повтор загрузки '${modul}/${sub}'`)
+				console.log(`Fun_old=${window.olga5[modul][sub]})`)
+				console.log(`Fun_new=${Fun})`)
+				console.groupEnd()
+			}
+
+			if (!window.olga5[modul])
+				window.olga5[modul] = {}
+			if (Fun)
+				window.olga5[modul][sub] = Fun
+			return window.olga5[modul]
 		},
-		MsgAddModule: (W, pars) => {
-			if (window.olga5.find(w => w.modul == W.modul))
-				console.error('%c%s', "background: yellow; color: black;border: solid 2px red;", `}---< Повтор загрузки '${W.modul}`)
+		ModulAdd: (W, pars) => {
+			const modul = W.modul
+			if (window.olga5.find(w => w.modul == modul))
+				console.error('%c%s', "background: yellow; color: black;border: solid 2px red;",
+					`}---< Повтор загрузки '${modul}`)
 			else {
 				if (C.consts.o5debug)
-					console.log(`}---< ${document.currentScript.src.indexOf(`/${W.modul}.`) > 0 ? 'загружен  ' : 'включён   '}:  ${W.modul}.js`)
+					console.log(`}---< ${document.currentScript.src.indexOf(`/${modul}.`) > 0 ? 'загружен  ' : 'включён   '}:  ${modul}.js`)
+
+				if (!window.olga5[modul])
+					window.olga5[modul] = {}
 
 				if (pars)
-					window.olga5[W.modul] = Object.assign({}, pars)
+					Object.assign(window.olga5[modul], pars)
+
+				window.olga5[modul].W = W
 				window.olga5.push(W)
-				window.dispatchEvent(new CustomEvent('olga5_sload', { detail: { modul: W.modul } }))
+				// window.dispatchEvent(new CustomEvent('olga5_sload', { detail: { modul: modul } }))
+				C.E.DispatchEvent('olga5_sload', W.modul)
+
+				return window.olga5[modul]
 			}
 		},
 	})
@@ -294,7 +408,7 @@
 		AscInclude = () =>
 			IncludeScripts({ modul: olga5_modul, names: modnames, actscript: C.o5script, iniFun: RunO5com, })
 
-	if (mm) wshp.AscInclude = AscInclude
+	if (mm) wshp.AscInclude = AscInclude  // формальный вызов чтобы всё поотмечать и вызвать iniFun()
 	else
 		AscInclude()
 
@@ -311,7 +425,6 @@
 	'use strict'
 	const olga5_modul = 'o5com',
 		modulname = 'CConsole',
-		wshp = window.olga5[olga5_modul],
 		C = window.olga5.C,
 		padd = "padding-left:0.5rem;",
 		clrtypes = {
@@ -408,7 +521,7 @@
 			console.groupEnd()
 		}
 
-	wshp[modulname] = () => {
+	C.ModulAddSub(olga5_modul, modulname, () => {
 		Object.assign(C, {
 			ConsoleMsg: ConsoleMsg,
 			ConsoleAlert: (txt, add, tab) => ConsoleMsg('alert', txt, add, tab),
@@ -418,8 +531,7 @@
 		})
 		return true
 	}
-
-	C.MsgAddSub(olga5_modul, modulname)
+	)
 })();
 /* global document, window, console, Map*/
 /* exported olga5_menuPopDn_Click*/
@@ -429,7 +541,6 @@
 	'use strict'
 	const olga5_modul = 'o5com',
 		modulname = 'CEncode',
-		wshp = window.olga5[olga5_modul],
 		C = window.olga5.C,
 		DelBacks = (s0) => {
 			// const s00 = s0
@@ -569,8 +680,7 @@
 				errs.push({ tag: C.MakeObjName(tag), ref: ref, txt: 'не определены атрибуты' })
 		}
 
-	wshp[modulname] = () => {
-		// if (C.consts.o5debug > 0) console.log(`===  инициализация ${olga5_modul}/${modulname}.js`)
+	C.ModulAddSub(olga5_modul, modulname, () => {
 		Object.assign(C, {
 			DelBacks: DelBacks,
 			IsFullUrl: IsFullUrl,
@@ -579,7 +689,7 @@
 		})
 		return true
 	}
-	C.MsgAddSub(olga5_modul, modulname)
+	)
 })();
 /* global document, window, console, Map*/
 /* exported olga5_menuPopDn_Click*/
@@ -587,10 +697,10 @@
 /*jshint esversion: 6*/
 (function () {              // ---------------------------------------------- o5com/CApi --- 111
 	'use strict'
-	const olga5_modul = 'o5com',
-		modulname = 'CApi',
-		wshp = window.olga5[olga5_modul],
+	const
 		C = window.olga5.C,
+		olga5_modul = 'o5com',
+		modulname = 'CApi',
 		Match = scls => new RegExp(`\\b` + scls + `(\\s*[,:+]\\s*((([\`'"\\(\[])(.*?)\\4)|[^\\s\`'":,+]*))*(\\s*|$)`),
 		mquals = /\s*[:,]\s*/,
 		GetTagsBy = (modul, fun, ask) => {
@@ -617,7 +727,7 @@
 			return list
 		}
 
-	wshp[modulname] = () => {
+	C.ModulAddSub(olga5_modul, modulname, () => {
 		Object.assign(C, {
 			owners: [],
 			scrpts: [],
@@ -687,22 +797,24 @@
 				else
 					for (const tag of starts) {
 						const quals = [],
-							ms = tag.className.match(match),
-							m = ms[0].trim()
+							ms = tag.className.match(match)
 						if (ms) {
+							const
+								m = ms[0].trim(),
+								ss = m.split(mquals)
+
 							tag.className = tag.className.replace(m, scls)// ВСЕГДА убираю квалификаторы (остальные в ms - не трогать!)
 
-							const ss = m.split(mquals)
 							for (let j = 1; j < ss.length; j++) {
 								const modul = ss[j]
 
 								if (C.scrpts.find(scrpt => scrpt.modul == modul)) quals.push(modul)
 								else errs.push(modul)
 							}
+							C.owners.push({ start: tag, modules: quals, origcls: m }) // специально чуть по-иному
+							if (C.consts.o5debug > 2)
+								console.log(`${olga5_modul}/${modulname} QuerySelectorInit: id='${tag.id}',  '${m}', \n\t${quals}`)
 						}
-						C.owners.push({ start: tag, modules: quals, origcls: m }) // специально чуть по-иному
-						if (C.consts.o5debug > 2)
-							console.log(`${olga5_modul}/${modulname} QuerySelectorInit: id='${tag.id}',  '${m}', \n\t${quals}`)
 					}
 				if (errs.length > 0)
 					C.ConsoleError(`Неопределены квалификаторы для '${scls}': `, errs.join(', '))
@@ -710,8 +822,7 @@
 		})
 		return true
 	}
-	
-	C.MsgAddSub(olga5_modul, modulname)	
+	)
 })();
 /* global document, window, console, Map*/
 /* exported olga5_menuPopDn_Click*/
@@ -727,7 +838,6 @@
 	'use strict'
 	const olga5_modul = 'o5com',
 		modulname = 'CParams',
-		wshp = window.olga5[olga5_modul],
 		C = window.olga5.C,
 		csslist = {}, // перечень наименований создаваемых классо
 		// repQuotes = /^['"`\s]+|['"`\s]+$/g,
@@ -818,7 +928,7 @@
 						break
 					}
 			} else
-				if (csso != W.modul) err = `Класс '${W.class}' повторяется в модулях '${csso}' и '${modul}. '`
+				if (csso != W.modul) err = `Класс '${W.class}' повторяется в модулях '${csso}' и '${W.modul}. '`
 
 			if (err) C.ConsoleError('>>  создание CSS  ' + err, 'InitCSS')
 			else {
@@ -904,7 +1014,7 @@
 			}
 		}
 
-	wshp[modulname] = url_olga5 => {
+	C.ModulAddSub(olga5_modul, modulname, url_olga5 => {
 		C.urlrfs._url_olga5 = url_olga5
 
 		Object.assign(C, {
@@ -928,8 +1038,7 @@
 
 		return true
 	}
-
-	C.MsgAddSub(olga5_modul, modulname)
+	)
 })();
 /* global document, window, console, Map*/
 /* exported olga5_menuPopDn_Click*/
@@ -941,9 +1050,11 @@
 //
 (function () {              // ---------------------------------------------- o5com/TagRefs ---
 	'use strict'
-	const olga5_modul = 'o5com',
+	let wshp = {}
+
+	const
+		olga5_modul = 'o5com',
 		modulname = 'TagsRef',
-		wshp = window.olga5[olga5_modul],
 		C = window.olga5.C,
 		ReplaceTag = (tagName, change, adrName, url, errs) => {
 			const addnew = document.createElement(tagName),
@@ -995,7 +1106,7 @@
 				igns = [],
 				needs = {}
 
-			incls.forEach(incl => needs[incl] = 1)
+			incls.forEach(incl => { if (incl) needs[incl] = 1 })
 			for (const script of document.scripts) {
 				// if (C.consts.o5debug > 1) console.log(`тег <script>: id= '${script.id}', src= "${script.src}"`)
 
@@ -1183,12 +1294,10 @@
 
 		}
 
-	wshp[modulname] = () => {
+	wshp = C.ModulAddSub(olga5_modul, modulname, () => {
 		ConvertScripts()
 		ConvertLinks()
-	}
-
-	C.MsgAddSub(olga5_modul, modulname)
+	})
 })();
 /* global document, window, console, Map*/
 /* exported olga5_menuPopDn_Click*/
@@ -1224,12 +1333,17 @@
 		AddEvents = (Fun) => { // addEventListener
 			for (const meve of this.meves)
 				if (meve.isd) document.addEventListener(meve.eve, Fun, true)
-				else window.addEventListener(meve.eve, Fun)
+				else
+					window.addEventListener(meve.eve, Fun)
+			// C.E.AddEventListener(meve.eve, Fun)
 		}
 		RemEvents = (Fun) => { // addEventListener
 			for (const meve of this.meves)
 				if (meve.isd) document.removeEventListener(meve.eve, Fun, true)
-				else window.removeEventListener(meve.eve, Fun)
+				else {
+					window.removeEventListener(meve.eve, Fun)
+					// C.E.RemoveEventListener(meve.eve, Fun)
+				}
 		}
 	}
 	class MyTimer {
@@ -1264,7 +1378,7 @@
 			// console.log('...+', this.act.time,  this.act.name)
 		}
 	}
-	const wshp = window.olga5[olga5_modul],
+	const
 		DocURL = () => document.URL.match(/[^?&#]*/)[0].trim(),
 		/**
 		 * InitScripts(nam) - выполнение очередного требуемого скрипта
@@ -1283,6 +1397,8 @@
 			const start = C.page.pact.start
 			for (const scrpt of C.scrpts) {
 				const act = scrpt.act
+				// if (act.W.modul=='o5inc')				
+				// act.timera =0
 				if (!act.timera)
 					act.timera = new MyTimer(`---<<<             инициирован `)
 				if (start != act.start && act.W && !act.incls)
@@ -1334,10 +1450,11 @@
 				Included = modul => {
 					const nam = `загружены включения для '${modul}'`,
 						scrpt = C.scrpts.find(scrpt => scrpt.modul == modul)
-					if (C.consts.o5debug > 1)
+					if (C.consts.o5debug > 0)
 						console.log(`OnLoad: '${nam}'`)
 
 					scrpt.act.incls = ''
+					// const debug = window.open("", "", "width=200,height=100");
 					InitScripts(nam)
 				}
 
@@ -1404,7 +1521,8 @@
 			})
 
 			this.donePage.RemEvents(this.ScriptsFinish)
-			window.dispatchEvent(new window.Event('olga5_done'))
+			// window.dispatchEvent(new window.Event('olga5_done'))
+			C.E.DispatchEvent('olga5_done')
 		}
 		ScriptsStart = () => {  // начало обработки страницы
 
@@ -1490,7 +1608,8 @@
 			}
 			this.loadDone.RemEvents(OnLoad)
 			this.initDone.RemEvents(OnInit)
-			window.dispatchEvent(new window.Event('olga5_ready'))
+			// window.dispatchEvent(new window.Event('olga5_ready'))
+			C.E.DispatchEvent('olga5_ready')
 		}
 		PageStart = (url) => {
 			if (C.consts.o5debug > 0)
@@ -1540,7 +1659,7 @@
 			// }
 			if (isnew && isloaded) {
 
-				pact.start= Number(new Date()) + Math.random()
+				pact.start = Number(new Date()) + Math.random()
 
 				let w = null,
 					o5include = null
@@ -1550,36 +1669,42 @@
 
 					if (!w && o5include) C.ConsoleError(`Имеется тег с атрибутом 'o5include' но отсутствует модуль '${o5inc}'`)
 					else
-						if (o5inc && !o5include && C.consts.o5debug > 0)
+						if (w && !o5include && C.consts.o5debug > 0)
 							C.ConsoleInfo(`¿ Задан модуль '${o5inc}' но отсутствует тег с атрибутом 'o5include' ?`)
 				}
 
-				if (w && o5include) {
-					const
-						scrpt = C.scrpts.find(scrpt => scrpt.modul == o5inc)
-					if (scrpt)
-						Object.assign(scrpt.act, { W: w, start: pact.start, done: pact.start })
-					else
-						C.ConsoleError(`Не найден scrpt для modul='${o5inc}'`)
 
-					window.addEventListener('olga5-incls', e => this.CheckInit(e, true))	//1
-					w.Init()
+				// забрать в общую обработку
+				// проверить, чтобы в очерёдности обработки o5inc  всегда было первым!				
+				// 				if (w && o5include) {
+				// 					const
+				// 						scrpt = C.scrpts.find(scrpt => scrpt.modul == o5inc)
+				// 					if (scrpt)
+				// 						Object.assign(scrpt.act, { W: w, start: pact.start, done: pact.start, need:false })
+				// 					else
+				// 						C.ConsoleError(`Не найден scrpt для modul='${o5inc}'`)
+
+				// 					// window.addEventListener('olga5-incls', e => this.CheckInit(e, true))	//1
+				// 					C.E.AddEventListener('olga5-incls', e => this.CheckInit(e, true))	//1
+				// 					w.Init()
+				// 				}
+				// 				else
+
+
+				if (isolga5) {
+					this.ScriptsFinish(e)
+					Object.assign(pact, { url: url, ready: true })
+
+					pact.mos.splice(0, pact.mos.length)
+
+					this.starts.splice(0, this.starts.length)
+					for (let i = 0; i < starts.length; i++)
+						this.starts[i] = starts[i]
+
+					this.PageStart(url)
 				}
 				else
-					if (isolga5) {
-						this.ScriptsFinish(e)
-						Object.assign(pact, { url: url, ready: true})
-
-						pact.mos.splice(0, pact.mos.length)
-
-						this.starts.splice(0, this.starts.length)
-						for (let i = 0; i < starts.length; i++)
-							this.starts[i] = starts[i]
-
-						this.PageStart(url)
-					}
-					else
-						C.ConsoleError(`Отсутствуют теги с классом '${this.olga5Start}' или атрибутом 'o5include'`)
+					C.ConsoleError(`Отсутствуют теги с классом '${this.olga5Start}' или атрибутом 'o5include'`)
 			}
 		}
 		CheckHide = e => { // проверка и начало инициализации страницы
@@ -1624,7 +1749,7 @@
 		}
 	}
 
-	wshp[modulname] = () => {
+	let wshp = C.ModulAddSub(olga5_modul, modulname, () => {
 		if (C.consts.o5debug > 0) console.log(` ===  инициализация ${olga5_modul}/${modulname}.js`)
 
 		if (C.consts.o5nomnu > 0)
@@ -1640,20 +1765,21 @@
 			Object.assign(C, {
 				page: new Page(),
 			})
+			C.E.Init()  // сброс событий
 		}
 		else {
 			C.ConsoleError(`IniScripts.js: вообще нет скриптов для обработки`)
-			window.dispatchEvent(new window.Event('olga5_ready'))
+			// window.dispatchEvent(new window.Event('olga5_ready'))
+			C.E.DispatchEvent('olga5_ready')
 		}
-		
+
 		return true
 	}
+	)
 
-	C.MsgAddSub(olga5_modul, modulname)
-	
 	if (wshp.AscInclude)
-	wshp.AscInclude()
-})('=');/* global document, window, console, Object, Map*/
+		wshp.AscInclude()
+})();/* global document, window, console, Object, Map*/
 /*jshint asi:true  */
 /*jshint esversion: 6*/
 /*eslint no-useless-escape: 0*/
@@ -1769,10 +1895,11 @@
 			C.ConsoleError(`${W.modul}.js: неопределено значение атрибута '${o5tag_attrs}'`)
 		}
 
-		window.dispatchEvent(new CustomEvent('olga5_sinit', { detail: { modul: W.modul } }))
+		// window.dispatchEvent(new CustomEvent('olga5_sinit', { detail: { modul: W.modul } }))
+		C.E.DispatchEvent('olga5_sinit', W.modul)
 	}
 
-	C.MsgAddModule(W, null)
+	C.ModulAdd(W)
 })();
 /* global window, document, console */
 /*jshint asi:true  */
@@ -1785,12 +1912,13 @@
         olga5_modul = 'o5snd',
         modulname = 'AO5snd',
         C = window.olga5.C,
-        AO5snd = snd => {
-            const wshp = window.olga5[olga5_modul],
+        wshp = C.ModulAddSub(olga5_modul, modulname, snd => {
+            const
                 ss = wshp.setClass,
                 olga5sndError = wshp.css.olga5sndError,
                 W = window.olga5.find(w => w.modul == olga5_modul), // так делать во всех подмодулях 
-                o5debug = W.consts.o5debug,
+                o5debug = C.consts.o5debug,
+                lognam = `${olga5_modul}/${modulname} `,
                 o5shift_speed = W.consts.o5shift_speed < 0.2 ? 0.2 : W.consts.o5shift_speed,
 
                 SetTitle = (aO5, txt) => {
@@ -1812,7 +1940,7 @@
                             audio.volume = v > setVolume.vmax ? setVolume.vmax : (v < setVolume.vmin ? setVolume.vmin : v)
                             SetTitle(aO5, txt)
                             if (o5debug > 1)
-                                console.log(`${olga5_modul}/${modulname} Изменено: ${txt} для '${aO5.name}' }`)
+                                console.log(`${lognam} Изменено: ${txt} для '${aO5.name}' }`)
                         }
                     }
                 },
@@ -1840,7 +1968,7 @@
                     RemError: (aO5, mrk) => {
                         if (aO5.sound.errIs[mrk]) {
                             errTypes.SetT(aO5, mrk, false)
-                            console.log(`${olga5_modul}/${modulname} Устранена ошибка: errTypes.${mrk}`)
+                            console.log(`${lognam} Устранена ошибка: errTypes.${mrk}`)
 
                             const errIs = aO5.sound.errIs
                             for (const erri in errIs)
@@ -1857,13 +1985,13 @@
                     const sound = aO5.sound,
                         audio = sound.audio,
                         Play = (aO5) => {
-                            if (o5debug > 1) console.log(`${olga5_modul}/${modulname}   > Play()`)
+                            if (o5debug > 1) console.log(`${lognam}   > Play()`)
 
                             if (aO5.modis.over && !wshp.activated)
                                 errTypes.AddError(aO5, 'неАктивир.')
 
                             if (sound.ison) { // если курсор не ушел
-                                if (o5debug > 1) console.log(`${olga5_modul}/${modulname} --> Play OK`)
+                                if (o5debug > 1) console.log(`${lognam} --> Play OK`)
                                 try {
                                     const audio = sound.audio
                                     // audio.volume = aO5.sound.volume
@@ -1881,7 +2009,7 @@
                                 wshp.StopSound(aO5)
                         }
 
-                    if (o5debug > 1) console.log(`${olga5_modul}/${modulname} --> StartSound() из '${aO5.sound.state}'`)
+                    if (o5debug > 1) console.log(`${lognam} --> StartSound() из '${aO5.sound.state}'`)
 
                     if (wshp.actaudio && wshp.actaudio != audio)
                         wshp.StopSound(wshp.actaudio.aO5snd)
@@ -1960,7 +2088,7 @@
                                 snd = GetTargetObj(e),
                                 aO5 = snd.aO5snd
 
-                            if (o5debug > 1) console.log(`${olga5_modul}/${modulname}  OnPlayAct.${txt}  ${('' + e.timeStamp).padStart(8)}` +
+                            if (o5debug > 1) console.log(`${lognam}  OnPlayAct.${txt}  ${('' + e.timeStamp).padStart(8)}` +
                                 ` для ${aO5.name} '${type}' при isOny= ${aO5.sound.ison}`)
 
                             eacts.find(eact => eact.type == type).Act(snd, e)
@@ -1977,7 +2105,7 @@
                                 aO5 = snd.aO5snd,
                                 sound = aO5.sound
 
-                            if (o5debug > 1) console.log(`${olga5_modul}/${modulname}  CallStartSound() ${aO5.name} '${aO5.sound.state}'  e.type= '${e.type}'`)
+                            if (o5debug > 1) console.log(`${lognam}  CallStartSound() ${aO5.name} '${aO5.sound.state}'  e.type= '${e.type}'`)
                             Object.assign(aO5.sound, { ison: true, shiftKey: e.shiftKey ? (e.location == 2 ? 1 : -1) : 0 })
 
                             if (e.type == 'mouseenter')
@@ -2047,7 +2175,7 @@
                         },
                         audio = aO5.sound.audio = new Audio() // ocument.createElement('audio'),
 
-                    if (o5debug > 1) console.log(`${olga5_modul}/${modulname}  Activate ${aO5.name} '${e.type}'`)
+                    if (o5debug > 1) console.log(`${lognam}  Activate ${aO5.name} '${e.type}'`)
 
                     setVolume.SetV(aO5, 0)
 
@@ -2074,7 +2202,7 @@
                 WaitActivate = snd => {
                     if (snd.aO5snd.modis.none) return
 
-                    if (o5debug > 2) console.log(`${olga5_modul}/${modulname}  WaitActivate ${snd.id}`)
+                    if (o5debug > 2) console.log(`${lognam}  WaitActivate ${snd.id}`)
                     for (const eWait of eFocus)
                         snd.addEventListener(eWait, Activate, { capture: true })
                 }
@@ -2114,33 +2242,26 @@
                 waitActivate = snd => WaitActivate(snd)
             }
             return new AO5snd(snd)
+
         }
 
-        window.olga5[olga5_modul].activated= false 	// признак, что было одно из activateEvents = ['click', 'keyup', 'resize']
-        const activateEvents = ['click', 'keyup', 'resize'],
-		wd = window, // document
-		SetActivated = e => {
-			window.olga5[olga5_modul].activated = true
-			activateEvents.forEach(activateEvent => wd.removeEventListener(activateEvent, SetActivated))
-		}
-	activateEvents.forEach(activateEvent => wd.addEventListener(activateEvent, SetActivated))
+        )
 
-    window.olga5[olga5_modul].AO5snd = AO5snd
-    C.MsgAddSub(olga5_modul, modulname)
 })();
 /* global window, document, console */
 /*jshint asi:true  */
 /*jshint strict:true  */
 /*jshint esversion: 6 */
 
-(function () {              // ---------------------------------------------- o5snd/Imgs ---
+(function () {              // ---------------------------------------------- o5snd/Prep ---
     "use strict"
-    let o5debug = 0
 
-    const olga5_modul = 'o5snd',
+    const
+        olga5_modul = 'o5snd',
         modulname = 'Prep',
         C = window.olga5.C,
-        wshp = window.olga5[olga5_modul],
+        o5debug = C.consts.o5debug,
+        lognam = `${olga5_modul}/${modulname} `,
         StopSoundOnPage = () => {
             if (wshp.actaudio)
                 wshp.StopSound(wshp.actaudio.aO5snd)
@@ -2152,77 +2273,8 @@
             return wref.url
         },
         urlattrs = [],
-        errs = []
-
-
-    errs.Add = function (name, url, txt, atr, err) {
-        this.push({ snd: name, 'источник': url, 'пояснение': txt, val: atr, 'ошибка': err })
-    }
-
-    Object.assign(wshp, {
-        setClass: {
-            stop: 'stop', play: 'play', pause: 'pause',
-            SetC: (aO5, state) => {
-                if (o5debug > 1) console.log(`${olga5_modul}/${modulname} SetC (${aO5.name}, '${state}')`)
-                const classList = (aO5.image.play ? aO5.image.play : aO5.snd).classList
-                if (state == wshp.setClass.play) {
-                    const image = aO5.image
-                    if (image.play) {
-                        image.stop.style.display = 'none'
-                        image.play.style.display = aO5.modis.dspl
-                    }
-                    classList.add(wshp.css.olga5sndPlay)
-                    classList.remove(wshp.css.olga5sndPause)
-                }
-                else if (state == wshp.setClass.pause) {
-                    classList.remove(wshp.css.olga5sndPlay)
-                    classList.add(wshp.css.olga5sndPause)
-                }
-                else if (state == wshp.setClass.stop) {
-                    classList.remove(wshp.css.olga5sndPlay)
-                    classList.remove(wshp.css.olga5sndPause)
-                }
-                else alert(`setClass.SetC: state='${state}'`)
-                aO5.sound.state = state
-            }
-        },
-        OriForTag: (tag, ref, atnam) => {
-            const ori = { url: '', atr: '' },
-                attr = atnam ? C.GetAttribute(tag.aO5snd.o5attrs, atnam) : ''
-            if (attr)
-                Object.assign(ori, { url: attr.value, atr: atnam })
-            else
-                if (ref) {
-                    const td = C.TagDes(tag, ref)
-                    if (td)
-                        Object.assign(ori, { url: td.orig, atr: td.from })
-                }
-            return ori
-        },
-        StopSound: aO5 => {
-            if (o5debug > 1) console.log(`${olga5_modul}/${modulname}  StopSound (${aO5.name})`)
-            wshp.actaudio = null
-
-            const image = aO5.image,
-                audio = aO5.audio ? aO5.audio : aO5.sound.audio
-
-            audio.pause()
-            audio.currentTime = 0
-            aO5.sound.state = wshp.setClass.stop
-
-            if (image && image.play) {
-                image.play.style.display = 'none'
-                image.stop.style.display = aO5.modis.dspl
-            }
-
-            if (audio !== aO5.audio)
-                wshp.setClass.SetC(aO5, wshp.setClass.stop)
-        },
-        Prepare: mtags => {
-            o5debug = wshp.W.consts.o5debug
-            /*
-                        PrepareSnds
-            */
+        errs = [],
+        wshp = C.ModulAddSub(olga5_modul, modulname, mtags => {
             const btns = { stop: '', play: '' },
                 DecodeAttrs = (mtag) => {
                     const snd = mtag.tag,
@@ -2335,7 +2387,8 @@
                 Object.freeze(aO5.parms)
             }
 
-            window.addEventListener('olga5_done', StopSoundOnPage)
+            // window.addEventListener('olga5_done', StopSoundOnPage)
+            C.E.AddEventListener('olga5_done', StopSoundOnPage)
             for (const eve of ['blur', 'pagehide', 'dblclick'])
                 document.addEventListener(eve, StopSoundOnPage)
 
@@ -2347,7 +2400,7 @@
                 OnPlay = (audio) => {
                     const a = wshp.actaudio
                     if (a && a != audio)
-                        StopSound(a.aO5snd)
+                        wshp.StopSound(a.aO5snd)
 
                     wshp.actaudio = audio
                 },
@@ -2391,10 +2444,76 @@
 
             if (errs.length > 0)
                 C.ConsoleError(`${wshp.W.modul}: ошибки перекодировки тегов с ${wshp.W.class}`, errs.length, errs)
+        })
+
+
+    errs.Add = function (name, url, txt, atr, err) {
+        this.push({ snd: name, 'источник': url, 'пояснение': txt, val: atr, 'ошибка': err })
+    }
+
+    Object.assign(wshp, {
+        setClass: {
+            stop: 'stop', play: 'play', pause: 'pause',
+            SetC: (aO5, state) => {
+                if (o5debug > 1) console.log(`${lognam} SetC (${aO5.name}, '${state}')`)
+                const classList = (aO5.image.play ? aO5.image.play : aO5.snd).classList
+                if (state == wshp.setClass.play) {
+                    const image = aO5.image
+                    if (image.play) {
+                        image.stop.style.display = 'none'
+                        image.play.style.display = aO5.modis.dspl
+                    }
+                    classList.add(wshp.css.olga5sndPlay)
+                    classList.remove(wshp.css.olga5sndPause)
+                }
+                else if (state == wshp.setClass.pause) {
+                    classList.remove(wshp.css.olga5sndPlay)
+                    classList.add(wshp.css.olga5sndPause)
+                }
+                else if (state == wshp.setClass.stop) {
+                    classList.remove(wshp.css.olga5sndPlay)
+                    classList.remove(wshp.css.olga5sndPause)
+                }
+                else alert(`setClass.SetC: state='${state}'`)
+                aO5.sound.state = state
+            }
+        },
+        OriForTag: (tag, ref, atnam) => {
+            const ori = { url: '', atr: '' },
+                attr = atnam ? C.GetAttribute(tag.aO5snd.o5attrs, atnam) : ''
+            if (attr)
+                Object.assign(ori, { url: attr.value, atr: atnam })
+            else
+                if (ref) {
+                    const td = C.TagDes(tag, ref)
+                    if (td)
+                        Object.assign(ori, { url: td.orig, atr: td.from })
+                }
+            return ori
+        },
+        StopSound: aO5 => {
+            if (o5debug > 1) console.log(`${lognam}  StopSound (${aO5.name})`)
+            wshp.actaudio = null
+
+            const image = aO5.image,
+                audio = aO5.audio ? aO5.audio : aO5.sound.audio
+
+            audio.pause()
+            audio.currentTime = 0
+            aO5.sound.state = wshp.setClass.stop
+
+            if (image && image.play) {
+                image.play.style.display = 'none'
+                image.stop.style.display = aO5.modis.dspl
+            }
+
+            if (audio !== aO5.audio)
+                wshp.setClass.SetC(aO5, wshp.setClass.stop)
         },
     })
 
-    C.MsgAddSub(olga5_modul, modulname)
+
+
 })();
 /* global window, document, console */
 /*jshint asi:true  */
@@ -2404,14 +2523,14 @@
 (function () {              // ---------------------------------------------- o5snd/Imgs ---
     "use strict"
     const
+        C = window.olga5.C,
         olga5_modul = 'o5snd',
         modulname = 'Imgs',
-        C = window.olga5.C,
-        Imgs = () => {
+        wshp = C.ModulAddSub(olga5_modul, modulname, () => {
             let imgs = null
             const
-                wshp = window.olga5[olga5_modul],
                 a = document.createElement('a'),
+                lognam = `${olga5_modul}/${modulname} `,
                 FullUrl = (url) => {
                     if (C.IsFullUrl(url)) return url
                     else {
@@ -2434,7 +2553,7 @@
                         Not only is this the w3c recommendation but it’s the faster method in IE8, the version users are slowly starting to adopt.
                         */
                         if (C.consts.o5debug > 2)
-                            console.log(`${olga5_modul}/${modulname} olga5_Imgs создание нового для url=${url}`)
+                            console.log(`${lognam} olga5_Imgs создание нового для url=${url}`)
 
                         const nimg = document.createElement('img')
                         Object.assign(nimg, { src: url, importance: 'high', loading: 'eager', crossOrigin: null })
@@ -2442,7 +2561,7 @@
 
                         nimg.addEventListener('load', () => {
                             if (C.consts.o5debug > 1)
-                                console.log(`${olga5_modul}/${modulname} GetImgForRef: загружен url= ${url}`)
+                                console.log(`${lognam} GetImgForRef: загружен url= ${url}`)
                             if (url.trim() == '')
                                 alert('url=?')
                             Resolve({ img: nimg, new: true })
@@ -2464,7 +2583,7 @@
                         if (!isinmap)
                             maps.set(url, { img: img.cloneNode(true), err: '' })
                         if (C.consts.o5debug > 1)
-                            console.log(`${olga5_modul}/${modulname} olga5_Imgs ${isinmap ? 'повтор  ' : 'добавлен'} url=${url} для img.id='${img.id}' ${s}`)
+                            console.log(`${lognam} olga5_Imgs ${isinmap ? 'повтор  ' : 'добавлен'} url=${url} для img.id='${img.id}' ${s}`)
                     }
                     else
                         console.error(`olga5_Imgs : попытка добавить` + (img ? ` пустой src для img.id='${img.id}'` : ` пустой  <img>`))
@@ -2588,9 +2707,7 @@
             imgs = new Imgs()
             return imgs
         }
-
-    window.olga5[olga5_modul].Imgs = Imgs
-    C.MsgAddSub(olga5_modul, modulname)
+        )
 })();
 /* global document, window, console*/
 /*jshint asi:true  */
@@ -2613,7 +2730,8 @@
 				names: ['AO5snd', 'Imgs', 'Prep'],
 				actscript: document.currentScript,
 			}
-		},
+		},	
+		wshp = C.ModulAdd(W),
 		css = {
 			olga5sndError: `olga5-sndError`, olga5sndLoad: `olga5-sndLoad`, olga5sndPause: `olga5-sndPause`,
 			olga5sndPlay: `olga5-sndPlay`, olga5sndNone: `olga5-sndNone`, olga5freeimg: `olga5-freeimg`,
@@ -2665,34 +2783,34 @@
 			75% {transform: rotateZ(-33deg);}
 		}
 	`
+
 	function SndInit() {
-		const wshp = window.olga5[W.modul]
 
 		wshp.css = css
 
 		C.ParamsFill(W, o5css)
 
 		const mtags = C.SelectByClassName(W.class, W.modul)
-		wshp.Prepare(mtags)
-		window.dispatchEvent(new CustomEvent('olga5_sinit', { detail: { modul: W.modul } }))
+		wshp.Prep(mtags)
+		// window.dispatchEvent(new CustomEvent('olga5_sinit', { detail: { modul: W.modul } }))
+			C.E.DispatchEvent('olga5_sinit', W.modul)
 	}
 
-	C.MsgAddModule(W, { W: W, })
 })();
 /* global window, document, console */
 /*jshint asi:true  */
 /*jshint strict:true  */
 /*jshint esversion: 6 */
 
-(function () {              // ---------------------------------------------- o5shp/AO5shp ---
+(function () {              // ---------------------------------------------- o5shp/MakeAO5 ---
     "use strict"
-    let debugids = ['shp_text', 'shp_1÷4']
+    let wshp = {},
+        debugids = ['shp_text', 'shp_1÷4']
 
     const
         olga5_modul = "o5shp",
-        modulname = 'AO5shp',
+        modulname = 'MakeAO5',
         C = window.olga5.C,
-        wshp = window.olga5[olga5_modul],
         MyRound = (s) => { return Math.round(parseFloat(s)) },
         SetClick = (aO5, clk, next) => {
             if (next) aO5.act.underClick = clk
@@ -2783,8 +2901,10 @@
                 if (id.hasAttribute('id'))
                     id.setAttribute('id', id.id + add)
             })
-            if (shp.id) shdw.id = shp.id + add
-
+            if (shp.id) {
+                shdw.id = shp.id + add
+                cart.id = shp.id + '_cart'
+            }
             wshp.W.origs.consts.split(/;|,/).forEach(c => {
                 shdw.removeAttribute(c.split(/=|:/)[0])
             })
@@ -2843,10 +2963,8 @@
             for (const o of [cart, aO5.posW, aO5.posC, aO5.posS]) Object.seal(o)
             Object.freeze(aO5)
 
-            // PN(2)
             shp.addEventListener('dblclick', DoShpClick, { capture: true, passive: true })
 
-            // wshp.AO5shp(aO5)
             for (const iO5 of aO5.aO5s)
                 Clone(iO5)
         },
@@ -2888,53 +3006,50 @@
     }
 
     // --------------------------------------------------------------------- //    
-
-    Object.assign(wshp, {
-        MakeAO5: (shp, cls, PO5) => {
-            shp.aO5shp = new AO5(shp, cls)
-            const aO5 = shp.aO5shp
-            let pO5 = aO5.prev.pO5
-            if (!pO5) {
-                // console.log('--++ ' + C.MakeObjName(aO5.prev))
-                try {
-                    aO5.prev.pO5 = new PO5(aO5.prev, aO5)
-                } catch (err) {
-                    console.error('--?? ' + C.MakeObjName(aO5.prev))
-                }
-                pO5 = aO5.prev.pO5
+    wshp = C.ModulAddSub(olga5_modul, modulname, (shp, cls, PO5) => {
+        shp.aO5shp = new AO5(shp, cls)
+        const aO5 = shp.aO5shp
+        let pO5 = aO5.prev.pO5
+        if (!pO5) {
+            // console.log('--++ ' + C.MakeObjName(aO5.prev))
+            try {
+                aO5.prev.pO5 = new PO5(aO5.prev, aO5)
+            } catch (err) {
+                console.error('--?? ' + C.MakeObjName(aO5.prev))
             }
-            else if (wshp.W.consts.o5debug > 0)
-                pO5.PutBords(pO5, "FillBords: взял для '" + aO5.name + "' => ")
-
-            pO5.aO5s.push(aO5)
-
-            const prevs = pO5.prevs,
-                parent = prevs.find(parent => parent.aO5shp),
-                own = parent ? parent.aO5shp : null
-            if (own)
-                for (const prev of prevs) {
-                    const hasown = prev.pO5.owns.own
-                    prev.pO5.owns.own = own
-                    if (prev.aO5shp || hasown) break
-                }
-
-            const aO5s = (own || wshp).aO5s
-            aO5s.push(aO5)
-
-            if (shp.tagName.match(/\b(img|iframe|svg)\b/i) && !shp.complete) {
-                if (C.consts.o5debug > 0) C.ConsoleInfo(`ожидается завершение загрузки '${aO5.name}'`)
-                shp.addEventListener('load', e => {
-                    wshp.DoResize('из AO5shp')
-                })
-            }
-        },
-        AO5shp: () => {
-            for (const aO5 of wshp.aO5s)
-                Clone(aO5)
+            pO5 = aO5.prev.pO5
         }
-    })
+        else if (wshp.W.consts.o5debug > 0)
+            pO5.PutBords(pO5, "FillBords: взял для '" + aO5.name + "' => ")
 
-    C.MsgAddSub(olga5_modul, modulname)
+        pO5.aO5s.push(aO5)
+
+        const prevs = pO5.prevs,
+            parent = prevs.find(parent => parent.aO5shp),
+            own = parent ? parent.aO5shp : null
+        if (own)
+            for (const prev of prevs) {
+                const hasown = prev.pO5.owns.own
+                prev.pO5.owns.own = own
+                if (prev.aO5shp || hasown) break
+            }
+
+        const aO5s = (own || wshp).aO5s
+        aO5s.push(aO5)
+
+        if (shp.tagName.match(/\b(img|iframe|svg)\b/i) && !shp.complete) {
+            if (C.consts.o5debug > 0) C.ConsoleInfo(`ожидается завершение загрузки '${aO5.name}'`)
+            shp.addEventListener('load', e => {
+                wshp.DoResize(`из '${modulname}'`)
+            })
+        }
+        // AO5shp: () => {
+        //     for (const aO5 of wshp.aO5s)
+        //         Clone(aO5)
+        // }
+    })
+    wshp.Clone = Clone
+
 })();
 /* global window, document, console */
 /*jshint asi:true  */
@@ -2942,15 +3057,13 @@
 /*jshint esversion: 6 */
 (function () {              // ---------------------------------------------- o5shp/DoInit ---
     "use strict"
-    let o5debug = 0,
-        etimeStamp = 0,
-        debugids = []  // 'shp_text' // 'shp_1÷4' // 'shp-demo' // 'shp_text'        
+    // let debugids = []  // 'shp_text' // 'shp_1÷4' // 'shp-demo' // 'shp_text'        
 
     const
         olga5_modul = "o5shp",
         modulname = 'DoInit',
         C = window.olga5.C,
-        wshp = window.olga5[olga5_modul],
+        o5debug = C.consts.o5debug,
         IsFloat001 = (s) => { return Math.abs(parseFloat(s) > 0.01) },
         prevsPO5 = {},
         MyJoinO5s = (aO5s) => {
@@ -3005,13 +3118,12 @@
                 else
                     C.ConsoleError(`Неопределён hash= '${hash}' в адресной строке`)
             }
-            // window.dispatchEvent(new window.Event('resize'))
         },
         DbgDoResize = e => { // для отладки  !!!!!!!!!!!!!!!!!!
-            if (e.timeStamp > etimeStamp + 0.1)
+            if (e.timeStamp > wshp.etimeStamp + 0.1)
                 if (!e.target.classList.contains(wshp.W.class))
                     wshp.DoResize('из DbgDoResize ')
-            etimeStamp = e.timeStamp
+            wshp.etimeStamp = e.timeStamp
         },
         DoScroll = e => {
             const pO5 = (e.target == document ? document.body : e.target).pO5
@@ -3104,18 +3216,17 @@
         }
     }
 
-    Object.assign(wshp, {
-        name: 'страница',
-        aO5s: [],
-        nests: [],
-        wasResize: false,
-        aO5str: '', // строка рез. вложенности (для демок  и отладки)
-        TestCC3a: function (pO5) { // для теста CC3a в alltst.js
-            pO5.PO5Colors(0)
-            FillBords(pO5, 'pO5=' + C.MakeObjName(pO5.current))
-        },
-        DoInit: () => {
-            o5debug = wshp.W.consts.o5debug
+    const
+        // name = 'страница',
+        // aO5s = [],
+        // nests = [],
+        // wasResize = false,
+        // aO5str = '', // строка рез. вложенности (для демок  и отладки)
+        // TestCC3a = pO5 => { // для теста CC3a в alltst.js
+        //     pO5.PO5Colors(0)
+        //     FillBords(pO5, 'pO5=' + C.MakeObjName(pO5.current))
+        // },
+        wshp = C.ModulAddSub(olga5_modul, modulname, () => {
             const timeInit = Date.now() + Math.random(),
                 mtags = C.SelectByClassName(wshp.W.class, olga5_modul),
                 errs = [],
@@ -3210,11 +3321,15 @@
             }
 
             if (wshp.aO5s.length > 0) {
-                wshp.AO5shp()
+
+                for (const aO5 of wshp.aO5s)
+                    wshp.Clone(aO5)
+
                 wshp.DoResize('из DoInit')
                 SwitchOpacity(wshp.aO5s)
 
-                window.addEventListener('resize', wshp.DoResize)
+                // window.addEventListener('resize', wshp.DoResize)
+                C.E.AddEventListener('resize', wshp.DoResize)
                 document.addEventListener('scroll', DoScroll, true)
             }
 
@@ -3222,10 +3337,16 @@
 
             errs.splice(0, errs.length)
             mtags.splice(0, mtags.length)
-        }
-    })
+        })
 
-    C.MsgAddSub(olga5_modul, modulname)
+    Object.assign(wshp, {
+        name: 'страница',
+        aO5s: [],
+        nests: [],
+        wasResize: false,
+        aO5str: '', // строка рез. вложенности (для демок  и отладки)
+        etimeStamp:0,
+    })
 })();
 
 /* global window, console */
@@ -3235,14 +3356,14 @@
 //!
 (function () {              // ---------------------------------------------- o5shp/DoResize ---
     "use strict"
-    let o5debug = 0,
+    let wshp = {},
+        o5debug = 0,
         debugids = ['head_32']  //  shp_5÷8 'shp_text' // 'shp_1÷4' // 'shp-demo' // 'shp_text'
 
     const
         olga5_modul = "o5shp",
         modulname = 'DoResize',
         C = window.olga5.C,
-        wshp = window.olga5[olga5_modul],
         errs = [],
         MyRound = (s) => { return Math.round(parseFloat(s)) },
         IsInClass = (classList, clss) => {
@@ -3452,7 +3573,8 @@
         }
 
     let showerr = true
-    wshp.DoResize = function (txt) {
+
+    wshp = C.ModulAddSub(olga5_modul, modulname, txt => {
         /* 
         фактически - д.б. 1 раз. - при первом скроллинге,
         но для отладки - может вызываться повторно
@@ -3479,8 +3601,8 @@
         wshp.DoScroll(wshp.aO5s)
         showerr = false
     }
+    )
 
-    C.MsgAddSub(olga5_modul, modulname)
 })();
 /*jshint asi:true  */
 /* global window, console */
@@ -3489,14 +3611,15 @@
 //!
 (function () {              // ---------------------------------------------- o5shp/DoScroll ---
     "use strict"
-    let timeStamp = 0,
+    let wshp = {},
+        timeStamp = 0,
         debugids = ['shp1'] // , 'shp_text' shp1 shp_1÷4 shp_5÷8 'shp_text' // 'shp_1÷4' // 'shp-demo' // 'shp_text'
 
     const
         olga5_modul = "o5shp",
         modulname = 'DoScroll',
+        lognam = `${olga5_modul}/${modulname} `,
         C = window.olga5.C,
-        wshp = window.olga5[olga5_modul],
         datestart = Date.now(),
         CalcParentLocate = pO5 => {
             if (pO5.isBody) {
@@ -3600,8 +3723,8 @@
                 const pO5 = aO5.hovered[hoverMarks]
                 if (!pO5 || !pO5.located)
                     alert(`located '${hoverMarks}' (in  DoScroll.PrepareBords)`)
-                    if (pO5.located.timeStamp != timeStamp) { // чтобы не повторяться для одинаковых
-                   Located(pO5.prevs, pO5.located)
+                if (pO5.located.timeStamp != timeStamp) { // чтобы не повторяться для одинаковых
+                    Located(pO5.prevs, pO5.located)
                     pO5.located.timeStamp = timeStamp
                 }
             }
@@ -3794,7 +3917,7 @@
                                 s += (aa[a].bb[b][j] || '').padEnd(fmt[j])
 
                             if (s.trim())
-                                console.log(`${olga5_modul}/${modulname} ` + s)
+                                console.log(lognam + s)
                         }
                     }
                 },
@@ -3835,7 +3958,7 @@
         },
         Scroll = (aO5s) => {
             if (wshp.W.consts.o5debug > 2)
-                console.log(`${olga5_modul}/${modulname} ` + "Scroll для '" + (() => {
+                console.log(lognam + "Scroll для '" + (() => {
                     let s = ''
                     aO5s.forEach(aO5 => { s += (s ? ', ' : '') + aO5.name })
                     return s
@@ -3921,10 +4044,9 @@
             for (const aO5 of aO5s)   //  не скроллировать внутренности!
                 if (aO5.aO5s.length > 0)
                     Scroll(aO5.aO5s)
-        },
-        o5shp_scroll = new window.Event('o5shp_scroll')
+        }
 
-    wshp.DoScroll = (aO5s, etimeStamp) => {
+    wshp = C.ModulAddSub(olga5_modul, modulname, (aO5s, etimeStamp) => {
         timeStamp = etimeStamp ? etimeStamp : (Date.now() + Math.random())
 
         if (aO5s.length > 0) {
@@ -3943,10 +4065,10 @@
                 console.groupEnd()
             }
         }
-        window.dispatchEvent(o5shp_scroll)
-    }
+        // window.dispatchEvent(new window.Event('o5shp_scroll'))
+        C.E.DispatchEvent('o5shp_scroll', 'DoScroll', true)
+    })
 
-    C.MsgAddSub(olga5_modul, modulname)
 })();
 ﻿/* global document, window, console */
 /*jshint asi:true  */
@@ -3967,7 +4089,7 @@
                 olga5_owners='b';
 			`,
 			incls: {
-				names: ['DoScroll', 'DoResize', 'AO5shp', 'DoInit'],
+				names: ['DoScroll', 'DoResize', 'MakeAO5', 'DoInit'],
 				actscript: document.currentScript,
 			},
 		},
@@ -3986,24 +4108,33 @@
 }`,
 		LastDoResize = () => {
 			// if (window.olga5.o5shp && window.olga5.o5shp.DoResize)
-				window.olga5.o5shp.DoResize('по olga5_ready')
+			window.olga5.o5shp.DoResize('по olga5_ready')
 		}
 
 	function ShpInit() {
-		const wshp = window.olga5[W.modul]
 
-		window.addEventListener('olga5_ready', e => {
+		// window.addEventListener('olga5_ready', e => {
+		C.E.AddEventListener('olga5_ready', e => {		
 			window.setTimeout(LastDoResize, 1)
 		})
 
 		C.ParamsFill(W, o5css)
-		wshp.DoInit()
+		window.olga5[W.modul].DoInit()
 
-		window.dispatchEvent(new CustomEvent('olga5_sinit', { detail: { modul: W.modul } }))
+		// window.dispatchEvent(new CustomEvent('olga5_sinit', { detail: { modul: W.modul } }))
+		C.E.DispatchEvent('olga5_sinit', W.modul)
+
+		window.olga5[W.modul].activated = false 	// признак, что было одно из activateEvents = ['click', 'keyup', 'resize']
+		const activateEvents = ['click', 'keyup', 'resize'],
+			wd = window, // document
+			SetActivated = e => {
+				window.olga5[W.modul].activated = true
+				activateEvents.forEach(activateEvent => wd.removeEventListener(activateEvent, SetActivated))
+			}
+		activateEvents.forEach(activateEvent => wd.addEventListener(activateEvent, SetActivated))
 	}
 
-
-	C.MsgAddModule(W, { W: W, olga5cart: olga5cart, olga5ifix: olga5ifix, })
+	C.ModulAdd(W, { olga5cart: olga5cart, olga5ifix: olga5ifix, })
 })();
 /* global document, window, console  */
 /* exported olga5_menuPopDn_Click    */
@@ -4015,12 +4146,15 @@
     const     // phases = ['NONE', 'CAPTURING_PHASE', 'AT_TARGET', 'BUBBLING_PHASE'],                
         pard = window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/),
         o5debug = (pard ? (pard[0].match(/=/) ? parseInt(pard[0].match(/\s*\d+/) || 1) : 1) : 2),
+		clrs = {	//	копия из CConsole
+			'E': "background: yellow; color: black;border: solid 1px gold;",
+		},
         C = window.olga5 ? window.olga5.C : {                // заменитель библиотечного
             consts: { o5debug: o5debug },
             repQuotes: /^\s*((\\')|(\\")|(\\`)|'|"|`)?\s*|\s*((\\')|(\\")|(\\`)|'|"|`)?\s*$/g,
             ConsoleError: (msg, name, errs) => {
                 const txt = msg + (name ? ' ' + name + ' ' : '')
-                console.groupCollapsed('%c%s', "background: yellow; color: black;", txt)
+                console.groupCollapsed('%c%s', clrs['E'], txt)
                 if (errs && errs.length > 0) console.table(errs)
                 else console.error(txt)
                 console.trace("трассировка вызовов :")
@@ -4270,7 +4404,7 @@
         return pops
     }
 
-    const wopens = [], // window.olga5.PopUpwopens // массив открытых окон
+    const wopens = [],
         click = 'click',
         o5popup = 'o5popup',
         aclicks = ['click', 'keyup', 'keydown', 'keypress'],
@@ -4561,7 +4695,7 @@ img.${W.class} {
         return sizs + ',\n' + pops.swins + ',\n' + pops.smoes
     }
 
-    window.olga5.PopUp = function () {
+    function PopUp() {
         if (arguments.length < 0 || arguments.length > 3) {
             C.ConsoleError(`PopUp: ошибочное к-во аргументов='${arguments.length}'`, [` у PopUp() их д.б. от 1 до 3)`])
             return '?'
@@ -4577,8 +4711,7 @@ img.${W.class} {
         return ShowWin(pops)
 
     }
-    window.olga5.PopShow = function () { //  устарешая обёртка  ---- width, height, url
-        // const m = /^(\d){1,6}$/
+    function PopShow() { //  устарешая обёртка  ---- width, height, url
         if (arguments.length == 3 && !isNaN(arguments[0]) && !isNaN(arguments[1])) {
             let caller = arguments.callee
             while (caller.caller)
@@ -4588,7 +4721,6 @@ img.${W.class} {
                 pops = GetPops(e, ['', arguments[2], `width=${arguments[0]}, height=${arguments[1]}`])
             e.cancelBubble = true
             return ShowWin(pops)
-            // window.olga5.PopUp(['', arguments[2], `width=${arguments[0]}, height=${arguments[1]}`])
         }
         else {
             C.ConsoleError(`PopShow: ошибочно к-во или тип аргументов [${arguments.join(', ')}]`)
@@ -4620,7 +4752,7 @@ img.${W.class} {
                         tag.classList.add(W.class)
                 }
 
-                tag.addEventListener(click, window.olga5.PopUp)
+                tag.addEventListener(click, PopUp)
             }
 
         for (const eve of ['focus', 'click'])
@@ -4644,22 +4776,22 @@ img.${W.class} {
             C.ConsoleError(`Ошибки формирования параметров окна (из url'а):`, errs.length, errs)
 
         window.dispatchEvent(new CustomEvent('olga5_sinit', { detail: { modul: W.modul } }))
+        // C.E.DispatchEvent('olga5_sinit')
     }
-    // const AutoInit = e => { // автономный запуск
-    //     if (C.avtonom) {
-    //         document.addEventListener('olga5-incls', W.Init)
-    //         W.Init()
-    //     }
-    // }
+
     if (C.avtonom) {
         document.addEventListener('DOMContentLoaded', W.Init)
         document.addEventListener('olga5-incls', W.Init)
-    }
-    if (!C.avtonom)
-        C.MsgAddModule(W, null)
-    else
+        if (!window.olga5)
+            window.olga5={}
+
         if (o5debug)
             console.log(`}---< ${document.currentScript.src.indexOf(`/${W.modul}.`) > 0 ? 'загружен  ' : 'включён   '}:  ${W.modul}.js`)
+    }
+    else {
+        C.ModulAdd(W)
+    }
+    Object.assign(window.olga5, { PopUp: PopUp, PopShow: PopShow })
 })();/* global document, window, console*/
 /* exported olga5_menuPopDn_Click*/
 /*jshint asi:true  */
@@ -4868,11 +5000,8 @@ img.${W.class} {
 					ok = GoTo(o5menus)
 
 				if (ok && win.resize) {
-					// window.dispatchEvent(new window.Event('resize'))
-					const wshp = window.olga5.o5shp
-					if (wshp)
-						wshp.DoResize('из o5mnu')
-						// wshp.DoResize(wshp.aO5s)
+					if (window.olga5.o5shp)
+						window.olga5.o5shp.DoResize('из o5mnu')
 				}
 				win.blockclick = true
 				e.cancelBubble = true
@@ -4948,9 +5077,8 @@ img.${W.class} {
 
 				ul.addEventListener('mousedown', DoMnu, true)
 				ul.addEventListener('click', DoMnu, true)
-				window.addEventListener('click', Clear, true)
-				// ul.style.zIndex = 99999
-
+				// window.addEventListener('click', Clear, true)
+				C.E.AddEventListener('click', Clear, true)
 
 				uls[0] = ul
 				const blc = (item0.block || 's')[0].toLowerCase(),
@@ -5056,8 +5184,9 @@ img.${W.class} {
 					InitByText(tag.innerText.trim(), tag)
 				})
 		}
-		window.dispatchEvent(new CustomEvent('olga5_sinit', { detail: { modul: W.modul } }))
+		// window.dispatchEvent(new CustomEvent('olga5_sinit', { detail: { modul: W.modul } }))
+		C.E.DispatchEvent('olga5_sinit', W.modul)
 	}
 
-	C.MsgAddModule(W, null)
+	C.ModulAdd(W)
 })();

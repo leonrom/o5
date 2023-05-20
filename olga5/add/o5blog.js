@@ -192,7 +192,8 @@ canvas{
             C.page.AppendChild(navbar, div)
 
             // document.
-            window.addEventListener('resize', CanvasSize)
+            // window.addEventListener('resize', CanvasSize)
+            C.E.AddEventListener('resize', CanvasSize)	
         },
         ObserveNavbar = (tag, id) => {
             let mo = null
@@ -311,16 +312,17 @@ canvas{
 
         RemoveUnused()
 
-        window.dispatchEvent(new CustomEvent('olga5_sinit', { detail: { modul: W.modul } }))
+        // window.dispatchEvent(new CustomEvent('olga5_sinit', { detail: { modul: W.modul } }))
+		C.E.DispatchEvent('olga5_sinit', W.modul)
     }
-
 
     if (!window.olga5) window.olga5 = []
     if (!window.olga5.find(w => w.modul == W.modul)) {
         if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
             console.log(`}---< ${document.currentScript.src.indexOf(`/${W.modul}.`) > 0 ? 'загружен  ' : 'включён   '}:  ${W.modul}.js`)
         window.olga5.push(W)
-        window.dispatchEvent(new CustomEvent('olga5_sload', { detail: { modul: W.modul } }))
+        // window.dispatchEvent(new CustomEvent('olga5_sload', { detail: { modul: W.modul } }))
+        C.E.DispatchEvent('olga5_sload', W.modul)
     } else
         console.error('%c%s', "background: yellow; color: black;border: solid 2px red;", `}---< Повтор загрузки '${W.modul}`)
 })();

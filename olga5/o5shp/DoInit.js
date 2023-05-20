@@ -4,15 +4,13 @@
 /*jshint esversion: 6 */
 (function () {              // ---------------------------------------------- o5shp/DoInit ---
     "use strict"
-    let o5debug = 0,
-        etimeStamp = 0,
-        debugids = []  // 'shp_text' // 'shp_1÷4' // 'shp-demo' // 'shp_text'        
+    // let debugids = []  // 'shp_text' // 'shp_1÷4' // 'shp-demo' // 'shp_text'        
 
     const
         olga5_modul = "o5shp",
         modulname = 'DoInit',
         C = window.olga5.C,
-        wshp = window.olga5[olga5_modul],
+        o5debug = C.consts.o5debug,
         IsFloat001 = (s) => { return Math.abs(parseFloat(s) > 0.01) },
         prevsPO5 = {},
         MyJoinO5s = (aO5s) => {
@@ -67,13 +65,12 @@
                 else
                     C.ConsoleError(`Неопределён hash= '${hash}' в адресной строке`)
             }
-            // window.dispatchEvent(new window.Event('resize'))
         },
         DbgDoResize = e => { // для отладки  !!!!!!!!!!!!!!!!!!
-            if (e.timeStamp > etimeStamp + 0.1)
+            if (e.timeStamp > wshp.etimeStamp + 0.1)
                 if (!e.target.classList.contains(wshp.W.class))
                     wshp.DoResize('из DbgDoResize ')
-            etimeStamp = e.timeStamp
+            wshp.etimeStamp = e.timeStamp
         },
         DoScroll = e => {
             const pO5 = (e.target == document ? document.body : e.target).pO5
@@ -166,18 +163,17 @@
         }
     }
 
-    Object.assign(wshp, {
-        name: 'страница',
-        aO5s: [],
-        nests: [],
-        wasResize: false,
-        aO5str: '', // строка рез. вложенности (для демок  и отладки)
-        TestCC3a: function (pO5) { // для теста CC3a в alltst.js
-            pO5.PO5Colors(0)
-            FillBords(pO5, 'pO5=' + C.MakeObjName(pO5.current))
-        },
-        DoInit: () => {
-            o5debug = wshp.W.consts.o5debug
+    const
+        // name = 'страница',
+        // aO5s = [],
+        // nests = [],
+        // wasResize = false,
+        // aO5str = '', // строка рез. вложенности (для демок  и отладки)
+        // TestCC3a = pO5 => { // для теста CC3a в alltst.js
+        //     pO5.PO5Colors(0)
+        //     FillBords(pO5, 'pO5=' + C.MakeObjName(pO5.current))
+        // },
+        wshp = C.ModulAddSub(olga5_modul, modulname, () => {
             const timeInit = Date.now() + Math.random(),
                 mtags = C.SelectByClassName(wshp.W.class, olga5_modul),
                 errs = [],
@@ -272,11 +268,15 @@
             }
 
             if (wshp.aO5s.length > 0) {
-                wshp.AO5shp()
+
+                for (const aO5 of wshp.aO5s)
+                    wshp.Clone(aO5)
+
                 wshp.DoResize('из DoInit')
                 SwitchOpacity(wshp.aO5s)
 
-                window.addEventListener('resize', wshp.DoResize)
+                // window.addEventListener('resize', wshp.DoResize)
+                C.E.AddEventListener('resize', wshp.DoResize)
                 document.addEventListener('scroll', DoScroll, true)
             }
 
@@ -284,9 +284,15 @@
 
             errs.splice(0, errs.length)
             mtags.splice(0, mtags.length)
-        }
-    })
+        })
 
-    C.MsgAddSub(olga5_modul, modulname)
+    Object.assign(wshp, {
+        name: 'страница',
+        aO5s: [],
+        nests: [],
+        wasResize: false,
+        aO5str: '', // строка рез. вложенности (для демок  и отладки)
+        etimeStamp:0,
+    })
 })();
 

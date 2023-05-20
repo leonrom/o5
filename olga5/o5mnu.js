@@ -206,11 +206,8 @@
 					ok = GoTo(o5menus)
 
 				if (ok && win.resize) {
-					// window.dispatchEvent(new window.Event('resize'))
-					const wshp = window.olga5.o5shp
-					if (wshp)
-						wshp.DoResize('из o5mnu')
-						// wshp.DoResize(wshp.aO5s)
+					if (window.olga5.o5shp)
+						window.olga5.o5shp.DoResize('из o5mnu')
 				}
 				win.blockclick = true
 				e.cancelBubble = true
@@ -286,9 +283,8 @@
 
 				ul.addEventListener('mousedown', DoMnu, true)
 				ul.addEventListener('click', DoMnu, true)
-				window.addEventListener('click', Clear, true)
-				// ul.style.zIndex = 99999
-
+				// window.addEventListener('click', Clear, true)
+				C.E.AddEventListener('click', Clear, true)
 
 				uls[0] = ul
 				const blc = (item0.block || 's')[0].toLowerCase(),
@@ -394,8 +390,9 @@
 					InitByText(tag.innerText.trim(), tag)
 				})
 		}
-		window.dispatchEvent(new CustomEvent('olga5_sinit', { detail: { modul: W.modul } }))
+		// window.dispatchEvent(new CustomEvent('olga5_sinit', { detail: { modul: W.modul } }))
+		C.E.DispatchEvent('olga5_sinit', W.modul)
 	}
 
-	C.MsgAddModule(W, null)
+	C.ModulAdd(W)
 })();

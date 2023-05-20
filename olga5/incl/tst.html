@@ -5,7 +5,7 @@
 	<title>tst</title>
 	<link rel="shortcut icon" href="./favicon.svg" type="image/x-icon">
 
-	<script src='../olga5/o5inc.js'></script>
+	<script src='../o5inc.js'></script>
 	<style>
 		div {
 			height: 66px;
@@ -39,6 +39,7 @@
 	<div o5include='https://rombase.h1n.ru/o5/tests/incl/inc1.html' title=".../inc1.html иной ресурс"></div>
 
 	<script>
+		if (window.olga5)
 		window.olga5[0].Init()
 		// window.olga5.o5com.CInclude()
 		// window.olga5.C.Includes()

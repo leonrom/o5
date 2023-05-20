@@ -17,7 +17,7 @@
                 olga5_owners='b';
 			`,
 			incls: {
-				names: ['DoScroll', 'DoResize', 'AO5shp', 'DoInit'],
+				names: ['DoScroll', 'DoResize', 'MakeAO5', 'DoInit'],
 				actscript: document.currentScript,
 			},
 		},
@@ -36,22 +36,31 @@
 }`,
 		LastDoResize = () => {
 			// if (window.olga5.o5shp && window.olga5.o5shp.DoResize)
-				window.olga5.o5shp.DoResize('по olga5_ready')
+			window.olga5.o5shp.DoResize('по olga5_ready')
 		}
 
 	function ShpInit() {
-		const wshp = window.olga5[W.modul]
 
-		window.addEventListener('olga5_ready', e => {
+		// window.addEventListener('olga5_ready', e => {
+		C.E.AddEventListener('olga5_ready', e => {		
 			window.setTimeout(LastDoResize, 1)
 		})
 
 		C.ParamsFill(W, o5css)
-		wshp.DoInit()
+		window.olga5[W.modul].DoInit()
 
-		window.dispatchEvent(new CustomEvent('olga5_sinit', { detail: { modul: W.modul } }))
+		// window.dispatchEvent(new CustomEvent('olga5_sinit', { detail: { modul: W.modul } }))
+		C.E.DispatchEvent('olga5_sinit', W.modul)
+
+		window.olga5[W.modul].activated = false 	// признак, что было одно из activateEvents = ['click', 'keyup', 'resize']
+		const activateEvents = ['click', 'keyup', 'resize'],
+			wd = window, // document
+			SetActivated = e => {
+				window.olga5[W.modul].activated = true
+				activateEvents.forEach(activateEvent => wd.removeEventListener(activateEvent, SetActivated))
+			}
+		activateEvents.forEach(activateEvent => wd.addEventListener(activateEvent, SetActivated))
 	}
 
-
-	C.MsgAddModule(W, { W: W, olga5cart: olga5cart, olga5ifix: olga5ifix, })
+	C.ModulAdd(W, { olga5cart: olga5cart, olga5ifix: olga5ifix, })
 })();

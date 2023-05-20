@@ -12,7 +12,6 @@
 	'use strict'
 	const olga5_modul = 'o5com',
 		modulname = 'CParams',
-		wshp = window.olga5[olga5_modul],
 		C = window.olga5.C,
 		csslist = {}, // перечень наименований создаваемых классо
 		// repQuotes = /^['"`\s]+|['"`\s]+$/g,
@@ -103,7 +102,7 @@
 						break
 					}
 			} else
-				if (csso != W.modul) err = `Класс '${W.class}' повторяется в модулях '${csso}' и '${modul}. '`
+				if (csso != W.modul) err = `Класс '${W.class}' повторяется в модулях '${csso}' и '${W.modul}. '`
 
 			if (err) C.ConsoleError('>>  создание CSS  ' + err, 'InitCSS')
 			else {
@@ -189,7 +188,7 @@
 			}
 		}
 
-	wshp[modulname] = url_olga5 => {
+	C.ModulAddSub(olga5_modul, modulname, url_olga5 => {
 		C.urlrfs._url_olga5 = url_olga5
 
 		Object.assign(C, {
@@ -213,6 +212,5 @@
 
 		return true
 	}
-
-	C.MsgAddSub(olga5_modul, modulname)
+	)
 })();

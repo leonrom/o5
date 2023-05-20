@@ -4,10 +4,10 @@
 /*jshint esversion: 6*/
 (function () {              // ---------------------------------------------- o5com/CApi --- 111
 	'use strict'
-	const olga5_modul = 'o5com',
-		modulname = 'CApi',
-		wshp = window.olga5[olga5_modul],
+	const
 		C = window.olga5.C,
+		olga5_modul = 'o5com',
+		modulname = 'CApi',
 		Match = scls => new RegExp(`\\b` + scls + `(\\s*[,:+]\\s*((([\`'"\\(\[])(.*?)\\4)|[^\\s\`'":,+]*))*(\\s*|$)`),
 		mquals = /\s*[:,]\s*/,
 		GetTagsBy = (modul, fun, ask) => {
@@ -34,7 +34,7 @@
 			return list
 		}
 
-	wshp[modulname] = () => {
+	C.ModulAddSub(olga5_modul, modulname, () => {
 		Object.assign(C, {
 			owners: [],
 			scrpts: [],
@@ -104,22 +104,24 @@
 				else
 					for (const tag of starts) {
 						const quals = [],
-							ms = tag.className.match(match),
-							m = ms[0].trim()
+							ms = tag.className.match(match)
 						if (ms) {
+							const
+								m = ms[0].trim(),
+								ss = m.split(mquals)
+
 							tag.className = tag.className.replace(m, scls)// ВСЕГДА убираю квалификаторы (остальные в ms - не трогать!)
 
-							const ss = m.split(mquals)
 							for (let j = 1; j < ss.length; j++) {
 								const modul = ss[j]
 
 								if (C.scrpts.find(scrpt => scrpt.modul == modul)) quals.push(modul)
 								else errs.push(modul)
 							}
+							C.owners.push({ start: tag, modules: quals, origcls: m }) // специально чуть по-иному
+							if (C.consts.o5debug > 2)
+								console.log(`${olga5_modul}/${modulname} QuerySelectorInit: id='${tag.id}',  '${m}', \n\t${quals}`)
 						}
-						C.owners.push({ start: tag, modules: quals, origcls: m }) // специально чуть по-иному
-						if (C.consts.o5debug > 2)
-							console.log(`${olga5_modul}/${modulname} QuerySelectorInit: id='${tag.id}',  '${m}', \n\t${quals}`)
 					}
 				if (errs.length > 0)
 					C.ConsoleError(`Неопределены квалификаторы для '${scls}': `, errs.join(', '))
@@ -127,6 +129,5 @@
 		})
 		return true
 	}
-	
-	C.MsgAddSub(olga5_modul, modulname)	
+	)
 })();

@@ -6,7 +6,6 @@
 	'use strict'
 	const olga5_modul = 'o5com',
 		modulname = 'CEncode',
-		wshp = window.olga5[olga5_modul],
 		C = window.olga5.C,
 		DelBacks = (s0) => {
 			// const s00 = s0
@@ -146,8 +145,7 @@
 				errs.push({ tag: C.MakeObjName(tag), ref: ref, txt: 'не определены атрибуты' })
 		}
 
-	wshp[modulname] = () => {
-		// if (C.consts.o5debug > 0) console.log(`===  инициализация ${olga5_modul}/${modulname}.js`)
+	C.ModulAddSub(olga5_modul, modulname, () => {
 		Object.assign(C, {
 			DelBacks: DelBacks,
 			IsFullUrl: IsFullUrl,
@@ -156,5 +154,5 @@
 		})
 		return true
 	}
-	C.MsgAddSub(olga5_modul, modulname)
+	)
 })();

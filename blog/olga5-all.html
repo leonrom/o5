@@ -14,7 +14,7 @@
 		src='https://rombase.h1n.ru/o5/olga5/o5com!.js'       # отладка на моём сервере
 		src='http://localhost/o5/olga5/o5com!.js'             # локальная отладка
 	-->
-	<script src='../olga5/o5com.js' o5consts="o5debug='1'; o5nomnu='0'; o5noact='0';" o5urlrfs="
+	<script src='../olga5/o5.js' o5consts="o5debug='0'; o5nomnu='0'; o5noact='0';" o5urlrfs="
 			тесты='+ ../olga5-tests';
 			блог_o5='https://olga-5.blogspot.com/2020/02';
 			images=_url_olga5 + ../blog/media/image;       
@@ -24,7 +24,7 @@
 		">
 		</script>
 
-	<script data-src='+o5shp.js'></script>
+	<script data-src='+o5shp!.js'></script>
 	<script data-src='+o5pop.js'></script>
 	<script data-src='+o5mnu.js' scrollY='-32'></script>
 
@@ -35,7 +35,7 @@
 			мой-блог=https://ariturlearn..blogspot.com/2017/02/;   # --- только для o5shp ---;			
 		">
 		</script>
-	<script data-src='+o5snd.js' btn_play='images + /play.png' btn_stop='images + /play_Freepik.png'></script>
+	<script data-src='+o5snd!.js' btn_play='images + /play.png' btn_stop='images + /play_Freepik.png'></script>
 	<script data-src='+add/pusto.js' moe-attr='мой атрибут'></script>
 
 	<link data-href='+../blog/csss/olga5.tableCode.css' media='screen' rel='stylesheet' />
@@ -43,8 +43,6 @@
 	<link data-href='+../blog/csss/olga5.addStyles.css' media='screen' rel='stylesheet' />
 	<link data-href='+../blog/csss/olga5.menuPopDn.css' media='screen' rel='stylesheet' />
 	<link data-href='+../blog/csss/olga5.tableKuplet.css' media='screen' rel='stylesheet' />
-	<link data-href='+../blog/csss/tests.css' media='screen' rel='stylesheet' />
-
 </head>
 
 <body>
@@ -171,7 +169,6 @@
 			оказываются размещенными <u>после</u> остальных стилей в заголовке документа. Тем самым дают возможность
 			переопределить иные стили,- например динамически создаваемые <b>Blogger</b>'ом.
 		</p>
-
 
 		<h4 id='head_13'>1.3. Использование <i>именованных</i> <i>ссылок</i>
 		</h4>
@@ -362,17 +359,15 @@
 					от '<b>+</b>' - см.п.&nbsp;6.2)
 					;</li>
 				<li><b>&nbsp;&nbsp;12</b> &mdash; показана загрузка скрипта атрибутом <b>data-src</b>.
-					В <u>данном</u> примере (с не-скомпилированной библиотекой) эффект использования
+					В <u title="т.е. с не-скомпилированной библиотекой">данном</u> примере эффект использования
 					префиксов '<b><i>_</i></b>' (в стр. 15) и '<b><i>data-</i></b>' одинаков:
 					<code>ядро</code> формирует
 					соответствующий атрибут <b>src</b> (или <b>href</b> у тегов &lt;<b>link</b>&gt;) и перезагружает
 					тег.
-					Ниже, в п.п 2.2 и 3.2 изложены причины целесообразности такого
-					<i title="Ссылка на описание 'маскирования'" class="olga5_popup"
-						onclick="window.olga5.PopUp(this, './help/urlrfs.html?o5nomnu?o5nomnu#head_2', 'width:720, height:800')">маскирования</i>
+					Ниже, в п.п 2.2 и 3.2 изложены причины целесообразности такого <i>маскирования</i>
 					при использовании именованных
 					<span class="olga5_popup"
-						onmouseup="window.olga5.PopShow( 666, 555, '_url_html+./olga5-urlrfs.html?o5nomnu#head_1')">ссылок</span>;
+						onmouseup="window.olga5.PopShow( 666, 555, '+./help/urlrfs.html?o5nomnu#head_1')">ссылок</span>;
 				</li>
 				<li><b>&nbsp;&nbsp;19</b> &mdash; скрипт имеет атрибут <b>_src</b> чтобы
 					отладчик не 'ругался' на неопределённый (изначально) адрес "+o5shp.js;</li>
@@ -385,7 +380,6 @@
 				модулей, описаны ниже в п.6.
 			</p>
 		</div>
-
 		<h4 id='head_22'>2.2. Компиляция скриптов</h4>
 		<p>
 			Для оптимизации загрузки <i>библиотеки</i> её
@@ -393,7 +387,7 @@
 			Компиляция выполняется простым сложением содержимого
 			<span title="т.е. только тех модулей библиотеки, которые нужны для данной страницы/блога">требуемых</span>
 			файлов в очерёдности их ожидаемого выпонения.
-			Скрипт я <code>ядром</code> должен быть первым среди компилируемых
+			Скрипт с <code>ядром</code> должен быть первым среди компилируемых
 			<!-- Содержимое скрипта <code>o5com!.js</code> (или <code>o5com.js</code>,- т.е. ядра библиотеки) должно быть первым.
 			Итоговый файл далее называется '<code>o5.js</code>'. -->
 		</p>
@@ -404,19 +398,8 @@
 			Это показалось удобным при отладке, но при эксплуатации требует повышенного траффика.
 			Названия скриптов скомпилированных модулей должны заканчиваться обязательным символом '<b>!</b>', например
 			<b>o5com!.js</b>, однако название скрипта всей скомпилированной библиотеки м.б. без него, если он
-			называется <b>o5.js</b>. При разбивке модулей на подмодули и их последующей компиляции следует учитывать:
+			называется <b>o5.js</b>. 
 		</p>
-		<!-- <ul>
-			<li>названия скриптов скомпилированных модулей должны заканчиваться обязательным символом '<b>!</b>'</li>
-			<li>для базовой (вызывающй) части модуля модуля:</li>
-			<ul>
-				<li>д.б. создана запись <span class='olga5_codeText'>window.olga5[olga5_modul] = {}</span>,</li>
-				<li></li>
-				<li></li>
-			</ul>
-			<li></li>
-			<li></li>
-		</ul> -->
 		<p>
 			Предлагается всегда <i>компилировать</i> скрипты основных модулей в единый
 			<span title="название произвольно">файл</span> <code>o5.js</code>,
@@ -439,9 +422,9 @@
 			например, таким командным
 			<code class="olga5_popup" onmouseup="window.olga5.PopShow( 555, 422, '+/o5_L.cmd')">файлом</code>.
 			Расширение <i>cmd</i> у него не обязательно,
-			однако первой строкой д.б. '<i>#!/bin/bash</i>', после символов продолжения строки '<b>\</b>'
-			не должно ничего быть и файл
-			должен быть сделан исполняемым,- командой "<i>chmod +x ...</i>" или редактированием его свойств.
+			однако: первой строкой д.б. '<i>#!/bin/bash</i>'; после символов продолжения строки '<b>\</b>'
+			не должно ничего быть;  файл
+			должен быть сделан исполняемым (командой "<i>chmod +x ...</i>" или редактированием его свойств).
 			Очерёдность включаемых скриптов лучше не менять.
 		</p>
 		<p>В <b>Windows</b> файл <code>o5.js</code> можно создать,
@@ -470,9 +453,13 @@
 			<span class="olga5_popup"
 				onmouseup="window.olga5.PopShow( 600, 355, '?o5nomnu#head_21')">п.&nbsp;2.1</span>,
 
-			где лишь вместо ссылки на <code>o5com!.js</code> (в стр. 8) д.б. записана ссылка на <code>o5.js</code>.
+			где лишь вместо ссылки на <code>o5com!.js</code> (в стр. 8) была записана ссылка на <code>o5.js</code>.
 			При этом фактически загружаться будет только файл <code>o5.js</code>
 			т.к. адреса остальных скриптов заданы атрибутом <b>data-src</b> (но не <b>src</b> либо <b>_src</b>).
+		</p>
+		<p class="moecomment">
+			Посмотреть реальные подключения можно открыв (для вызванного примера) системный журнал и в закладке <i>Elements</i> 
+			прочитать содержимое тега &lt;<b>html</b>&gt;. А в закладке <i>Network</i> можно увидеть перечень загружаемых скриптов.
 		</p>
 		<p>
 			<code title="без тегов <title>, <meta> и т.п." class="olga5_popup"
@@ -531,7 +518,7 @@
 			<b>Рекомендуется</b> для всех <u title="за исключением скрипта 'o5com!.js'">функциональных</u>
 			<i>библиотечных</i> скриптов (и <b>css</b>-линков) с именованными ссылками
 			<u>всегда</u> задавать адрес именно через '<b>_src</b>' либо '<b>data-src</b>'. Во-первых,
-			при использовании относительнных ссылок не будет попыток загрузки '<i>ошибочного</i>'
+			при использовании именованных ссылок не будет попыток загрузки '<i>ошибочного</i>'
 			значения атрибута <b>src</b>.
 			А во-вторых,- подключение скриптов к документу остаётся неизменным
 			независимо от того, указан ли последним (содержащим ядро <i>библиотtки</i>) скриптом файл
@@ -539,11 +526,11 @@
 			или скомпилированный модуль <code>o5.js</code>.
 		</p>
 		<p class='moecomment'><b>
-				Вообще, для всех тегов документа, <i>содержащих относительные ссылки</i> следует задавать адрес именно
+				Вообще, для всех тегов документа, содержащих <i>именованные</i> ссылки следует задавать адрес именно
 				через '<b>_src</b>' (либо '<b>data-src</b>'), что сократит время обработки страницы за счет исключения
 				попыток загрузки "неправильных" адресов.</b>
 		</p>
-		<h4><b title="разумными представляются либо полная компиляция, либо вообще баз компиляции">Извращения</b>
+		<h4><b title="разумными представляются либо полная компиляция, либо вообще без компиляции">Извращения</b>
 			компиляции...</h4>
 		<p>
 			Кроме полной компиляции <i>библиотеки</i> можно компилировать только часть скриптов,-
@@ -580,14 +567,17 @@
 			<span o5popup='+ ../blog/olga5-all.html?o5nomnu#head_62; width: 666, height: 444'>п.&nbsp;6.2</span>).
 			Сообщения же об ошибках выдаются всегда, независимо от значения <b>o5debug</b>.
 		</p>
+		<p class="moecomment">
+			В адресной строке вместо <b>o5debug</b> можно писать просто <b>debug</b> (также там вместо <b>o5nomnu</b> можно <b>nomenu</b>)
+		</p>
 		<p>
 			Тексты сообщений об ошибках выводятся на жёлтом фоне, а критические ошибки еще и обрамляются рамкой.
-			После клика на сообщение может пояаиться дополнительная информация.
+			После клика на сообщение может появиться дополнительная информация.
 		</p>
 		<p>
 			Общее <b>правило</b>: при неожидаемой работе библиотеки следует прочитать <i>console.log</i>
 			и, раскрыв (кликом) все сообщения на желтом фоне, найти и устранить выявленные ошибки.
-			При этом желательно открыть страницу с
+			Желательно при этом открывать страницу с
 			<span title="в адресной строке или атрибутом/параметром скрипта">заданием</span>
 			<b>o5debug</b>=1 (или 2).
 		</p>
@@ -652,7 +642,7 @@
 	}
 
 	/* Информирование ядра библиотеки об окончании загрузки модуля */
-	C.MsgAddModule(W, { W: W })
+	C.ModulAdd(W, {})
 })();
 </pre>
 						</td>
@@ -666,16 +656,16 @@
 			</p>
 			<ul>
 				<li>&nbsp;<b>5&divide;13</b> &mdash; структура описания модуля, сохраняемая в
-					<i>общебиблиотечном</i> объекте <b>window.olga5</b>,- см. стр. 37 (и 36).
+					<i>общебиблиотечном</i> объекте <b>window.olga5</b>,- см. стр. 35.
 					Имя модуля должно совпадать с именем файла скрипта (если этот файл подгружается отдельно);
 				</li>
-				<li><b>15&divide;21</b> &mdash; примеры задания скриптовых констант, функций и т.д.,
+				<li><b>15&divide;20</b> &mdash; примеры задания скриптовых констант, функций и т.д.,
 					где <b>16&divide;19</b> - пример вставки <b>CSS</b>-описания непосредственно в скрипт;</li>
 
 				<li><b>22&divide;32</b> &mdash; обязательная функция (передаваемая выше в строке 7) инициализации
 					скрипта, вызываемая при
 					инициализации страницы.</li>
-				<li><b>35&divide;44</b> &mdash; информирование <code>o5com!.js</code> о загрузке модуля данного
+				<li><b>35</b> &mdash; информирование <code>o5com!.js</code> о загрузке модуля данного
 					скрипта с передачей его описания.</li>
 			</ul>
 		</div>
@@ -696,10 +686,10 @@
 			&lt;<b>link</b>&gt;.
 		</p>
 		<p>
-			Функция <b>WndInit</b> будет вызываться автоматически скриптом <code>o5com!.js</code>
+			Функция <b>WndInit</b> будет вызываться автоматически <code>ядром</code>
 			после каждого события обновления страницы.
 			В простейшем случае таким событием
-			будет завершение загрузки страницы, однако при подключению к <b>Blogger</b>'у ситуация усложнится...
+			будет завершение загрузки страницы, однако при подключению к <b title="нпример в Dynamic pusto.js">Blogger</b>'у ситуация может усложниться...
 		</p>
 
 
@@ -708,27 +698,27 @@
 			Для иллюстрации подключения нового скрипта в подпапке <b>./add</b> создан файл <b>pusto.js</b>
 			c содержимым последнего примера.
 			Для ознакомления с его подключением и загрузкой следует кликнуть по ссылке:
-			<code class="olga5_popup" onmouseup="window.olga5.PopShow( 333, 111, 'тесты+/pusto.html')">пример №3</code>.
+			<code class="olga5_popup" onmouseup="window.olga5.PopShow( 333, 111, '+/add/pusto.html')">пример №3</code>.
 		</p>
 		<p>
 			Подключение нового скрипта <code>pusto.js</code> может быть выполнено так:
 		</p>
 		<p class="olga5_codeTextSeparate">
-			&lt;script async src='+ <b>/add/pusto.js</b>' <b>moe-attr</b>='какой-то мой параметр'&gt;&lt;/script&gt;
+			&lt;script data-src='+ /add/<b>pusto</b>.js' <b>moe-attr</b>='мой атрибут'&gt;&lt;/script&gt;
 		</p>
 		<p>
-			с адресацией относительно (заданного далее) <code>o5com!.js</code>.
-			Параметр <b>moe-attr</b> здесь добавлен исключительно для иллюстации.
+			Символ '<b title="с адресацией относительно ядра, заданного где-то выше">+</b>' тут <u>необходим</u>, чтобы ядро 'заметило' сей скрипт,
+			а параметр <b>moe-attr</b> добавлен просто для иллюстации. Посмотреть подробности можно в <i>console.log</i> открытого <i>окошка</i>.
 		</p>
 		<p class='moecomment'>
-			Напоминание: чтобы избежать ложных '<b><i>404</i></b>'-х сообщений можно в тегах <b>script</b>
+			<b>Напоминание-1</b>: чтобы избежать ложных '<b><i>404</i></b>'-х сообщений можно в тегах <b>script</b>
 			<span
 				title="если указать с 'пустым' значением, браузер подставит адрес текущей страницы">не&nbsp;указывать</span>
 			атрибут <b>src</b>,
 			а вместо него задавать <b>data-src</b> (или, эквивалентное тут <b>_src</b>), содержащий требуемую ссылку.
 		</p>
-		<p>
-			<code>ядро</code> признаёт "своими" скриптами только те
+		<p class='moecomment'>
+		<b>Напоминание-2</b>: <code>ядро</code> признаёт "своими" скриптами только те
 			из вышерасположенных скриптов, которые либо начинаются
 			'<b>o5</b>' (например могло бы быть <b>o5pusto.js</b>),
 			либо в значении атрибута <b>src</b> как-нибудь присутствует символ '<b>+</b>'. Поэтому здесь везде пишется
@@ -747,7 +737,7 @@
 			Чтобы подключить к некоторому тегу обработку одним или несколькими скриптами <i>библиотеки</i>,
 			в его теговый атрибут '<b>class</b>' добавляются соответствующие классы.
 			Например, для обработки скриптом <code>pusto.js</code> - класс
-			'<b>olga5_pusto</b>' (это название задано в стр.5 примера п.&nbsp;3.1.), для
+			'<b>olga5_pusto</b>' (это название задано в стр.6 примера п.&nbsp;3.1.), для
 			<code>o5snd.js</code> - класс '<b>olga5_snd</b>' и так далее.
 		</p>
 		<p>
@@ -760,8 +750,8 @@
 		<p>
 			Скрипты выполняются в два этапа.
 			На первом этапе после объявления тега &lt;<b>script</b>&gt; выполняется загрузка скрипта.
-			По окончании загрузки должно генерироваться сообщение <i>olga5_sload</i>, показанное в
-			<span o5popup='+../blog/olga5-all.html?o5nomnu#ks1; width: 666, height: 444'> стр. 42 </span>).
+			Об окончании загрузки должно быть сообщено <code>ядру</code>, как показанно в
+			<span o5popup='+../blog/olga5-all.html?o5nomnu#ks1; width: 666, height: 444'> стр. 35 </span>)
 			(тут и ниже ссылки даются на строки примера <i>Код создания скрипта</i> в п.3.1).
 			На втором этапе, который наступает по окончании загрузки документа, выполняются программы инициализаций
 			скриптов (например, указанная в стр. 7).
@@ -838,7 +828,7 @@
 			<span title="исключение сделано для файлов, URL которых содержит слово 'olga5-tests'">только</span>
 			на тех тегах <b><i>document</i></b>'а,
 			которые находятся <u title="исключая сами такие теги">внутри</u> блочных тегов с классом
-			'<b>olga5_Start</b>'.
+			<b>'olga5_Start'</b>.
 			Например, таковым м.б. тег &lt;<b>body</b>&gt;.
 			Обрамляя отдельные фрагменты документа тегами &lt;<b>div&nbsp;class="olga5_Start"</b>&gt; можно ограничить
 			работу скриптов отдельными блоками (с возможностью уточнения каждому,- какими именно скриптами он может
@@ -925,7 +915,7 @@
 			<br>
 			<li>декодирование именованных <i title="содержащих символ '+' либо не содержащих ни '.', ни '/'"
 					class="olga5_popup"
-					onmouseup="window.olga5.PopShow( 666, 555, './help/urlrfs.html?o5nomnu')">ссылок</i>:
+					onmouseup="window.olga5.PopShow( 666, 555, '+./help/urlrfs.html?o5nomnu')">ссылок</i>:
 				<ul>
 					<!-- <li><b>IsUrlNam</b>(u) &mdash; проверка, что адрес (не содержащий символа '<b>+</b>') 
 						является именованной ссылкой,- т.е. не содержит '<b>.</b>', '<b>/</b>' или '<b>#</b>'.
@@ -1011,8 +1001,19 @@
 						<b>ref</b> (который м.б. 'src' или 'href') у тега <b>tag</b>.
 						При передаче массива <b>errs</b> в него будут записаны замеченные ошибки;
 					</li>
-					<li><b>MsgAddModule</b>(W, pars) &mdash; информирование <code>ядра</code> о загрузке модуля.
-						Параметр <b>pars</b> содержит парамтры, общие для базового и подгружаемых скриптов модуля.
+					<li><b>ModulAdd</b>(W, pars) &mdash; информирование <code>ядра</code> о загрузке модуля с описателем <b>W</b>.
+						Необязательный параметр <b>pars</b> содержит параметры, 
+						(сразу) добавляемые в структуру модуля <span class='olga5_codeTextInline '>window.olga5[modul]</span>.
+						<p class="moecomment">
+							Данная структура содержит параметры, доступные извне <i>модуля</i>, 
+							в частности функции инициализации подмодулей (см. ниже <i>ModulAddSub</i>).
+						</p>
+					</li>
+					<li><b>ModulAddSub</b>(modul, sub, Fun) &mdash; информирование <code>модуля</code> 
+						о загрузке его подмодуля <b>sub</b> с обязательной (впрочем, м.б. и заглушкой) функцией инициализации <b>Fun</b>,
+						которая доступна извне <i>модуля</i> как 
+						<span class='olga5_codeTextInline '>window.olga5[modul][sub]</span>. 
+						Подробнее - см. примеры в папках <i>_url_olga5+/o5shp</i>, <i>_url_olga5+/o5dbg</i>, <i>_url_olga5+/o5snd></i>.
 					</li>
 				</ul>
 			</li>
@@ -1217,14 +1218,15 @@
 			Параметры, необходимые для инициализации скриптов, могут, как правило, передаваться
 			через <i>скриптовые атрибуты</i> <b>o5consts</b> и <b>o5urlrfs</b> (а также <b>o5depends</b>),
 			которые могут содержать любое количество (соответственно) модульных <i>констант</i> и именованных
-			<i class="olga5_popup" onmouseup="window.olga5.PopShow( 666, 555, './help/urlrfs.html?o5nomnu')">ссылок</i>,
+			<i class="olga5_popup" onmouseup="window.olga5.PopShow( 666, 555, '+./help/urlrfs.html?o5nomnu')">ссылок</i>,
 			разделённых символом '<b>;</b>'. Примеры такой передачи параметров показаны в строках 9, 10 и 13 примера
 			<span title="" class="olga5_popup"
 				onmouseup="window.olga5.PopShow( 666, 555, '_url_html+./olga5-all.html?o5nomnu#head_21')">п.
 				2.1</span>.
 		</p>
 		<p>
-			Также для некоторых параметров предусмотрена передача их в виде отдельных <i>скриптовых атрибутов</i>.
+			Также для <span title="указанных в параметрах 'params' и 'urlrfs' структуры-ссылки 'W'">некоторых</span> 
+			параметров предусмотрена передача их в виде отдельных <i>скриптовых атрибутов</i>.
 			Например, константы <b>o5debug</b> и <b>_url_olga5</b> (из того же примера) могут быть заданы:
 		</p>
 		<p class="olga5_codeTextSeparate">
@@ -1444,7 +1446,7 @@
 				</ul>
 				<p>
 					Подробнее ознакомиться с переопределением (и заданием) констант можно на этом
-					<span o5popup="'тесты+/all0_.html'; width: 533, height: 211; click" )>примере</span>.
+					<span o5popup="'тесты+/all0_.html'; width: 533, height: 240; click" )>примере</span>.
 					Для чего раскрыть в системном журнале отладчика сообщения, содержащие текст
 					'<i>... <b>все константы</b> ...</i>' и сравнить их
 					со значениями атрибутов файла примера и вызываемых в нём скриптов
@@ -1575,7 +1577,7 @@
 		<!-- =================================================================	 -->
 		<p>
 			Использование <b>_url_olga5</b> (с переопределением его значения) иллюстрируется
-			<code class="olga5_popup" onmouseup="window.olga5.PopShow( 360, 200, 'тесты+/ext2.html')">примером</code>
+			<code class="olga5_popup" onmouseup="window.olga5.PopShow( 360, 200, 'тесты+/ext2.html?o5debug=1')">примером</code>
 			<span title="обрабатываемых в <head> документа)">подключения</span> <b>JS</b> и <b>CSS</b> файлов, из
 			которых:
 		</p>
@@ -1602,42 +1604,40 @@
 						<div>
 							<pre>
 <span class="olga5_tableName">Исходное :</span>
-
-&lt;base href="<span style="background:fuchsia">https://rombase.<b>h1n.ru</b>/o5/olga5/</span>"&gt;
-
-&lt;link href=' + add/o5i1.css' media='screen' rel='stylesheet' /&gt;
-&lt;link href='./add/o5i2.css' media='screen' rel='stylesheet' /&gt;
-
-&lt;script src='./o5com!.js'
-    _url_olga5="<span style="background:yellow">https://rombase.<b>neocities.org</b>/o5/olga5/</span>"
+&lt;script src='../olga5/o5com!.js'
+    _url_olga5="<span style="background:yellow">https://rombase.<b>neocities.org</b>/o5/olga5/add/</span>"
 &gt;&lt;/script&gt;
-&lt;script src=' + add/o5p1.js'&gt;&lt;/script&gt;
-&lt;script src='./add/o5p2.js'&gt;&lt;/script&gt;
 
+&lt;base href="<span style="background:fuchsia"><b>../</b>olga5/add/</span>"&gt;
+
+&lt;link href=' + o5i1.css' media='screen' rel='stylesheet' /&gt;
+&lt;script src=' + o5p1.js'&gt;&lt;/script&gt;
+
+&lt;link href='o5i2.css' media='screen' rel='stylesheet' /&gt;
+&lt;script src='o5p2.js'&gt;&lt;/script&gt;
 </pre>
 						</div>
 					</td>
 					<td>
 						<div>
-							<pre><br/>1<br/>2<br/>3<br/>4<br/>5<br/>6<br/>7<br/>8<br/>9<br/>10<br/>11</pre>
+							<pre>1<br/>2<br/>3<br/>4<br/>5<br/>6<br/>7<br/>8<br/>9<br/>10<br/>11</pre>
 						</div>
 					</td>
 					<td style="width: auto;">
 						<div>
 							<pre>
 <span class="olga5_tableName" style="float: left;padding-left: 12px;">Полученное: </span>
-
-&lt;base href="https://rombase.h1n.ru/o5/"&gt;
-
-&lt;link <span style="background:yellow">href</span>="<span style="background:yellow">https://rombase.neocities.org/o5/olga5/</span>add/o5i1.css" media="screen" rel="stylesheet"&gt;
-&lt;link <span style="background:fuchsia">href</span>="olga5/add/<b>o5i2.css</b>" media="screen" rel="stylesheet"&gt;
-
-&lt;script <span style="background:yellow">src</span>="<span style="background:yellow">https://rombase.neocities.org/o5/olga5/</span>add/o5p1.js"&gt;&lt;/script&gt;
-&lt;script <span style="background:fuchsia">src</span>="olga5/add/<b>o5p2.js</b>"&gt;&lt;/script&gt;
-
-&lt;script src="https://rombase.h1n.ru/o5/olga5/o5com!.js"
-    _url_olga5="https://rombase.neocities.org/olga5/"
+&lt;script src="../olga5/o5com!.js" 
+    _url_olga5="<span style="background:yellow">https://rombase.neocities.org/o5/olga5/add/</span>"
 &gt;&lt;/script&gt;
+	
+&lt;base href="../olga5/add/"&gt;
+
+&lt;link href="<span style="background:yellow">https://rombase.neocities.org/o5/olga5/add/o5i1.css</span>" media="screen" rel="stylesheet"&gt;
+&lt;script src="<span style="background:yellow">https://rombase.neocities.org/o5/olga5/add/o5p1.js</span>" async=""&gt;&lt;/script&gt;
+
+&lt;link href="<span style="background:fuchsia">o5i2.css</span>" media="screen" rel="stylesheet"&gt;
+&lt;script src="<span style="background:fuchsia">o5p2.js</span>"&gt;&lt;/script&gt;
 </pre>
 						</div>
 					</td>
@@ -1649,12 +1649,12 @@
 			В примере использовались два <i>базовых</i> адреса (выделеных цветом) размещения файлов:
 		</p>
 		<ul>
-			<li><b>"https://rombase.h1n.ru/o5/olga5/"</b> &mdash; <span style="background:fuchsia">указанный</span> в
+			<li><b>"../olga5/add/"</b> &mdash; <span style="background:fuchsia">указанный</span> в
 				теге &lt;<b>base</b>&gt;
 				и используемый в адресах, начинающихся '<b>.</b>';</li>
-			<li><b>"https://rombase.neocities.org/o5/olga5/"</b> &mdash; <span
+			<li><b>"https://rombase.neocities.org/o5/olga5/add/"</b> &mdash; <span
 					style="background:yellow">указанный</span> в параметре <b>_url_olga5</b> подключения
-				<code>ядраа</code>
+				<code>ядра</code>
 				и подставляемый в адреса, начинающиеся '<b>+</b>'.
 			</li>
 		</ul>
@@ -1662,34 +1662,13 @@
 			Из примера <i title="отладчик браузера не показывает тут реальный url">(не)</i> видно, что файлы
 			<b>o5i2.css</b> и <b>o5p2.js</b>
 			берутся из первого адреса, подставляемого браузером автоматически. Проанализировать это
-			можно на закладке '<b><i>Sources</i></b>' отладчика браузера,
-			либо просто посмотрев
-			<code id='ext4' class="olga5_popup"
-				onmouseup="window.olga5.PopShow( 711, 577, 'тесты+/ext4.html')">скриншот</code>
-			протокола загрузки, на котором эллипсами выделены упомянутые файлы.
+			можно на закладках '<b><i>Sources</i></b>' и '<b><i>Console</i></b>' отладчика браузера.
 		</p>
-		<p> Из этого протокола видно, что адреса, содержащие символ '<b>+</b>' в тегах '<b>link</b>' и '<b>script</b>',
-			скорректированы значением <b>_url_olga5</b>. В правой части окна показано подключение стилей из
-			<b>o5i1.css</b> и <b>o5i2.css</b>
-			к тегу <b>div</b>.
+		<p class="moecomment"> 
+			Сообщение  об ошибке (последняя строка в <i>Console</i> на желтом фоне) можно игнорировать,
+			т.к. тут обработка страницы не предусматривается.
 		</p>
-		<p>
-			В нижней части окна показан весь протокол загрузки и инициализации подключаемых скриптов.
-			Первые две строки протокола содержат сообщения о (мнимой) 404-й ошибке.
-			Чтобы их избежать,- нужно переписать строки 3 и 6 исходного примера, соответственно:
-		</p>
-		<p class="olga5_codeTextSeparate">
-			&lt;link data-href=' + add/o5i1.css' media='screen' rel='stylesheet' /&gt;
-		</p>
-		<p class="olga5_codeTextSeparate">&lt;script data-src=' + add/o5p1.js'&gt;&lt;/script&gt;
-		</p>
-		<p>
-			Посмотреть эффект от такой подстановки можно открыв окна исходного текста и отладочного результата для
-			<code class="olga5_popup" onmouseup="window.olga5.PopShow( 500, 144, 'тесты+/ext3.html')">этого</code>
-			примера, где будут отсутствовать сообщения о (мнимом) отсутствии файлов <b>o5i1.css</b> и
-			<b>o5p1.js</b>
-		</p>
-
+		
 
 		<h3 id='head_7'>7. Применение <i>библиотеки</i></h3>
 

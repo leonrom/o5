@@ -9,12 +9,13 @@
         olga5_modul = 'o5snd',
         modulname = 'AO5snd',
         C = window.olga5.C,
-        AO5snd = snd => {
-            const wshp = window.olga5[olga5_modul],
+        wshp = C.ModulAddSub(olga5_modul, modulname, snd => {
+            const
                 ss = wshp.setClass,
                 olga5sndError = wshp.css.olga5sndError,
                 W = window.olga5.find(w => w.modul == olga5_modul), // так делать во всех подмодулях 
-                o5debug = W.consts.o5debug,
+                o5debug = C.consts.o5debug,
+                lognam = `${olga5_modul}/${modulname} `,
                 o5shift_speed = W.consts.o5shift_speed < 0.2 ? 0.2 : W.consts.o5shift_speed,
 
                 SetTitle = (aO5, txt) => {
@@ -36,7 +37,7 @@
                             audio.volume = v > setVolume.vmax ? setVolume.vmax : (v < setVolume.vmin ? setVolume.vmin : v)
                             SetTitle(aO5, txt)
                             if (o5debug > 1)
-                                console.log(`${olga5_modul}/${modulname} Изменено: ${txt} для '${aO5.name}' }`)
+                                console.log(`${lognam} Изменено: ${txt} для '${aO5.name}' }`)
                         }
                     }
                 },
@@ -64,7 +65,7 @@
                     RemError: (aO5, mrk) => {
                         if (aO5.sound.errIs[mrk]) {
                             errTypes.SetT(aO5, mrk, false)
-                            console.log(`${olga5_modul}/${modulname} Устранена ошибка: errTypes.${mrk}`)
+                            console.log(`${lognam} Устранена ошибка: errTypes.${mrk}`)
 
                             const errIs = aO5.sound.errIs
                             for (const erri in errIs)
@@ -81,13 +82,13 @@
                     const sound = aO5.sound,
                         audio = sound.audio,
                         Play = (aO5) => {
-                            if (o5debug > 1) console.log(`${olga5_modul}/${modulname}   > Play()`)
+                            if (o5debug > 1) console.log(`${lognam}   > Play()`)
 
                             if (aO5.modis.over && !wshp.activated)
                                 errTypes.AddError(aO5, 'неАктивир.')
 
                             if (sound.ison) { // если курсор не ушел
-                                if (o5debug > 1) console.log(`${olga5_modul}/${modulname} --> Play OK`)
+                                if (o5debug > 1) console.log(`${lognam} --> Play OK`)
                                 try {
                                     const audio = sound.audio
                                     // audio.volume = aO5.sound.volume
@@ -105,7 +106,7 @@
                                 wshp.StopSound(aO5)
                         }
 
-                    if (o5debug > 1) console.log(`${olga5_modul}/${modulname} --> StartSound() из '${aO5.sound.state}'`)
+                    if (o5debug > 1) console.log(`${lognam} --> StartSound() из '${aO5.sound.state}'`)
 
                     if (wshp.actaudio && wshp.actaudio != audio)
                         wshp.StopSound(wshp.actaudio.aO5snd)
@@ -184,7 +185,7 @@
                                 snd = GetTargetObj(e),
                                 aO5 = snd.aO5snd
 
-                            if (o5debug > 1) console.log(`${olga5_modul}/${modulname}  OnPlayAct.${txt}  ${('' + e.timeStamp).padStart(8)}` +
+                            if (o5debug > 1) console.log(`${lognam}  OnPlayAct.${txt}  ${('' + e.timeStamp).padStart(8)}` +
                                 ` для ${aO5.name} '${type}' при isOny= ${aO5.sound.ison}`)
 
                             eacts.find(eact => eact.type == type).Act(snd, e)
@@ -201,7 +202,7 @@
                                 aO5 = snd.aO5snd,
                                 sound = aO5.sound
 
-                            if (o5debug > 1) console.log(`${olga5_modul}/${modulname}  CallStartSound() ${aO5.name} '${aO5.sound.state}'  e.type= '${e.type}'`)
+                            if (o5debug > 1) console.log(`${lognam}  CallStartSound() ${aO5.name} '${aO5.sound.state}'  e.type= '${e.type}'`)
                             Object.assign(aO5.sound, { ison: true, shiftKey: e.shiftKey ? (e.location == 2 ? 1 : -1) : 0 })
 
                             if (e.type == 'mouseenter')
@@ -271,7 +272,7 @@
                         },
                         audio = aO5.sound.audio = new Audio() // ocument.createElement('audio'),
 
-                    if (o5debug > 1) console.log(`${olga5_modul}/${modulname}  Activate ${aO5.name} '${e.type}'`)
+                    if (o5debug > 1) console.log(`${lognam}  Activate ${aO5.name} '${e.type}'`)
 
                     setVolume.SetV(aO5, 0)
 
@@ -298,7 +299,7 @@
                 WaitActivate = snd => {
                     if (snd.aO5snd.modis.none) return
 
-                    if (o5debug > 2) console.log(`${olga5_modul}/${modulname}  WaitActivate ${snd.id}`)
+                    if (o5debug > 2) console.log(`${lognam}  WaitActivate ${snd.id}`)
                     for (const eWait of eFocus)
                         snd.addEventListener(eWait, Activate, { capture: true })
                 }
@@ -338,17 +339,9 @@
                 waitActivate = snd => WaitActivate(snd)
             }
             return new AO5snd(snd)
+
         }
 
-        window.olga5[olga5_modul].activated= false 	// признак, что было одно из activateEvents = ['click', 'keyup', 'resize']
-        const activateEvents = ['click', 'keyup', 'resize'],
-		wd = window, // document
-		SetActivated = e => {
-			window.olga5[olga5_modul].activated = true
-			activateEvents.forEach(activateEvent => wd.removeEventListener(activateEvent, SetActivated))
-		}
-	activateEvents.forEach(activateEvent => wd.addEventListener(activateEvent, SetActivated))
+        )
 
-    window.olga5[olga5_modul].AO5snd = AO5snd
-    C.MsgAddSub(olga5_modul, modulname)
 })();

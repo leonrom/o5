@@ -19,7 +19,8 @@
 				names: ['AO5snd', 'Imgs', 'Prep'],
 				actscript: document.currentScript,
 			}
-		},
+		},	
+		wshp = C.ModulAdd(W),
 		css = {
 			olga5sndError: `olga5-sndError`, olga5sndLoad: `olga5-sndLoad`, olga5sndPause: `olga5-sndPause`,
 			olga5sndPlay: `olga5-sndPlay`, olga5sndNone: `olga5-sndNone`, olga5freeimg: `olga5-freeimg`,
@@ -71,17 +72,17 @@
 			75% {transform: rotateZ(-33deg);}
 		}
 	`
+
 	function SndInit() {
-		const wshp = window.olga5[W.modul]
 
 		wshp.css = css
 
 		C.ParamsFill(W, o5css)
 
 		const mtags = C.SelectByClassName(W.class, W.modul)
-		wshp.Prepare(mtags)
-		window.dispatchEvent(new CustomEvent('olga5_sinit', { detail: { modul: W.modul } }))
+		wshp.Prep(mtags)
+		// window.dispatchEvent(new CustomEvent('olga5_sinit', { detail: { modul: W.modul } }))
+			C.E.DispatchEvent('olga5_sinit', W.modul)
 	}
 
-	C.MsgAddModule(W, { W: W, })
 })();

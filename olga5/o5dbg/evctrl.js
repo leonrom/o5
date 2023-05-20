@@ -35,7 +35,8 @@
 					window.addEventListener(eve, e => eventsControl.Show(e, 'win'))
 			}
 		},
-		timera = `}---< включено:  ${W.modul}.js`
+		lognam = W.modul,
+		timera = `}---< включено:  ${lognam}.js`
 
 	console.time(timera)
 

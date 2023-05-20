@@ -5,14 +5,15 @@
 //!
 (function () {              // ---------------------------------------------- o5shp/DoScroll ---
     "use strict"
-    let timeStamp = 0,
+    let wshp = {},
+        timeStamp = 0,
         debugids = ['shp1'] // , 'shp_text' shp1 shp_1÷4 shp_5÷8 'shp_text' // 'shp_1÷4' // 'shp-demo' // 'shp_text'
 
     const
         olga5_modul = "o5shp",
         modulname = 'DoScroll',
+        lognam = `${olga5_modul}/${modulname} `,
         C = window.olga5.C,
-        wshp = window.olga5[olga5_modul],
         datestart = Date.now(),
         CalcParentLocate = pO5 => {
             if (pO5.isBody) {
@@ -116,8 +117,8 @@
                 const pO5 = aO5.hovered[hoverMarks]
                 if (!pO5 || !pO5.located)
                     alert(`located '${hoverMarks}' (in  DoScroll.PrepareBords)`)
-                    if (pO5.located.timeStamp != timeStamp) { // чтобы не повторяться для одинаковых
-                   Located(pO5.prevs, pO5.located)
+                if (pO5.located.timeStamp != timeStamp) { // чтобы не повторяться для одинаковых
+                    Located(pO5.prevs, pO5.located)
                     pO5.located.timeStamp = timeStamp
                 }
             }
@@ -310,7 +311,7 @@
                                 s += (aa[a].bb[b][j] || '').padEnd(fmt[j])
 
                             if (s.trim())
-                                console.log(`${olga5_modul}/${modulname} ` + s)
+                                console.log(lognam + s)
                         }
                     }
                 },
@@ -351,7 +352,7 @@
         },
         Scroll = (aO5s) => {
             if (wshp.W.consts.o5debug > 2)
-                console.log(`${olga5_modul}/${modulname} ` + "Scroll для '" + (() => {
+                console.log(lognam + "Scroll для '" + (() => {
                     let s = ''
                     aO5s.forEach(aO5 => { s += (s ? ', ' : '') + aO5.name })
                     return s
@@ -437,10 +438,9 @@
             for (const aO5 of aO5s)   //  не скроллировать внутренности!
                 if (aO5.aO5s.length > 0)
                     Scroll(aO5.aO5s)
-        },
-        o5shp_scroll = new window.Event('o5shp_scroll')
+        }
 
-    wshp.DoScroll = (aO5s, etimeStamp) => {
+    wshp = C.ModulAddSub(olga5_modul, modulname, (aO5s, etimeStamp) => {
         timeStamp = etimeStamp ? etimeStamp : (Date.now() + Math.random())
 
         if (aO5s.length > 0) {
@@ -459,8 +459,8 @@
                 console.groupEnd()
             }
         }
-        window.dispatchEvent(o5shp_scroll)
-    }
+        // window.dispatchEvent(new window.Event('o5shp_scroll'))
+        C.E.DispatchEvent('o5shp_scroll', 'DoScroll', true)
+    })
 
-    C.MsgAddSub(olga5_modul, modulname)
 })();

@@ -40,7 +40,7 @@ function shpX_SetWindow(w0, h0) {
     window.moveTo(aw - w - 5, 5)
     console.log(`PopUp: w0=${w0}, aw=${aw}, w=${w}, aw - w=${aw - w}`)
 
-    window.addEventListener('beforeunload', function () {
+    window.olga5.C.E.AddEventListener('beforeunload', function () {
         window.opener.postMessage(window.name, '*');
     })
     document.addEventListener('blur', function () {
@@ -80,17 +80,22 @@ function shpX_BordNames() {
 
     const tshpsp = document.getElementById('tshpsp'),
         pitches = { 'O': 'ver', 'S': 'hift', 'P': 'ush' },
-        dirput = { 'T': 'op', 'B': 'ottom', 'U': 'p', 'D': 'own' },
+        dirput = { 'T': 'op', 'B': 'ottom', 'U': 'p', 'D': 'own', '': '' },
         Sid = (t, pO5) => {
             const nam = pO5 ? (pO5.id ? pO5.id : (pO5.current.nodeName)) : '?'
             return ' <i>' + t + '</i>=' + nam + ', '
         },
         FillDescription = (aO5s) => {
+            if (!aO5s)
+                console.log("aO5s не опр.? в FillDescription")
             for (const aO5 of aO5s) {
                 const ps = aO5.shp.getElementsByTagName('p'),
                     cls = aO5.cls,
                     o = aO5.located, //.botNam,
                     f = aO5.hovered, //.botNam,
+                    s1 = ' к.=' + (cls.alive ? ':<b>A</b>live' : '') + (cls.level > 0 ? ':<b>' + cls.level + '</b>' : ''),
+                    s2 = ':<b>' + cls.dirV + '</b>' + dirput[cls.dirV],
+                    s3 = ':<b>' + cls.putV + '</b>' + dirput[cls.putV],
                     s = '[<b><u>' + aO5.id + '</u></b>]/' + aO5.cls.nest +
                         ' к.=' + (cls.alive ? ':<b>A</b>live' : '') + (cls.level > 0 ? ':<b>' + cls.level + '</b>' : '') +
                         ':<b>' + cls.dirV + '</b>' + dirput[cls.dirV] +
@@ -229,6 +234,8 @@ function CC1(cb) {
     if (cb) shps.push(document.getElementById(cb.id.substr(1)))
     else {
         (function ConcatAll(aO5s) {
+            if (!aO5s)
+                console.log("aO5s не опр.? в CC1")
             for (const aO5 of aO5s) {
                 shps.push(aO5.shp)
                 if (aO5.aO5s.length > 0) ConcatAll(aO5.aO5s)
@@ -267,12 +274,12 @@ function CC1(cb) {
             }
         }
     }
-    window.olga5.o5shp.DoResize()
+    window.olga5.o5shp.DoResize(`CC1(${cb})`)
 }
 
 function CC1a(cb) {
     shpX_ChgDirPos(cb)
-    window.olga5.o5shp.DoResize()
+    window.olga5.o5shp.DoResize(`CC1a(${cb})`)
 }
 
 function CC2(cb, namshp) {
@@ -283,12 +290,12 @@ function CC2(cb, namshp) {
         atr = frams.length > 0 ? frams : (t == 'f' ? 's' : 'b')
 
     shp.setAttribute(t == 'f' ? 'olga5_frames' : 'olga5_owners', atr)
-    window.olga5.o5shp.DoResize()
+    window.olga5.o5shp.DoResize(`CC2(${cb}, ${namshp})`)
 }
 
 function CC2a(cb) {
     shpX_ChgDirPos(cb)
-    window.olga5.o5shp.DoResize()
+    window.olga5.o5shp.DoResize(`CC2a(${cb})`)
 }
 
 function CC3(cb) {
@@ -319,6 +326,8 @@ function CC3(cb) {
             }
         }
         (function SetStartChecks(aO5s) {
+            if (!aO5s)
+                console.log("aO5s не опр. в SetStartChecks?")
             for (const aO5 of aO5s) {
                 const n = parseInt(aO5.id.substr(3))
 
@@ -363,7 +372,7 @@ function CC3a(cb, txt) {
 }
 
 function StartBordNames() {
-    window.addEventListener('o5shp_scroll', shpX_BordNames)
+    window.olga5.C.E.AddEventListener('o5shp_scroll', shpX_BordNames)
 
     const wshp = window.olga5.o5shp
     if (wshp) wshp.DoResize()
@@ -372,7 +381,7 @@ function StartBordNames() {
 function Init0() {
     "use strict";
     if (!IsInitEvents()) return
-    const Init = () => {
+    const Init0i = () => {
         console.log('Init0() --------------')
 
         const shp1 = document.getElementById('shp1')
@@ -386,13 +395,13 @@ function Init0() {
         window.scrollTo(0, 99)
         StartBordNames()
     }
-    window.addEventListener('olga5_ready', Init)
+    window.olga5.C.E.AddEventListener('olga5_ready', Init0i)
 }
 
 function Init1() {
     "use strict";
     if (!IsInitEvents()) return
-    const Init = () => {
+    const Init1i = () => {
         console.log('Init2() --------------')
 
         for (let i = 0; i < 3; i++) {
@@ -408,13 +417,15 @@ function Init1() {
 
         StartBordNames()
     }
-    window.addEventListener('olga5_ready', Init)
+    // window.aaddEventListener('olga5_ready', Init)
+    window.olga5.C.E.AddEventListener('olga5_ready', Init1i)
 }
 
 function Init2() {
     "use strict";
-    if (!IsInitEvents()) return
-    const Init = () => {
+    const isi = IsInitEvents()
+    if (!isi) return
+    const Init2i = () => {
         console.log('Init2() --------------')
 
         const wshp = window.olga5.o5shp,
@@ -438,66 +449,56 @@ function Init2() {
 
         StartBordNames()
     }
-    window.addEventListener('olga5_ready', Init)
-}
-function Init3x() {
-    "use strict"
-    // console.log('Init3() 1b')
-    const wshp = window.olga5.o5shp,
-        div1 = document.getElementById('div1'),
-        div2 = document.getElementById('div2'),
-        shp0 = document.getElementById('shp0'),
-        cb1w = document.getElementById("bord1w"),
-        cb1c = document.getElementById("bord1c"),
-        cb1b = document.getElementById("bord1b"),
-        tab1 = document.getElementById('tab1')
-
-    styleCC3a = tab1.getAttribute('style')
-    cb1w.indeterminate = false
-    cb1c.indeterminate = false
-    cb1b.indeterminate = false
-    cb1w.max = cb1w.checked ? (cb1w.indeterminate ? 1 : 2) : 0
-    cb1c.max = cb1c.checked ? (cb1c.indeterminate ? 1 : 2) : 0
-    cb1b.max = cb1b.checked ? (cb1b.indeterminate ? 1 : 2) : 0
-
-    // wshp.extraInit = true
-    shpX_ChgDirPos()
-    CC()
-    CC1()
-    CC3()
-    // console.log('Init3() 2', 'div1=' + (div1 ? 'OK' : '?'), 'shp0=' + (shp0 ? 'OK' : '?'))
-
-    // shpX_BordNames()
-    const
-        Scroll0 = () => { shp0.scrollTo(0, 195) },
-        Scroll2 = () => { div2.scrollTo(0, 91); if (shp0) window.setTimeout(Scroll0, 10) },
-        Scroll1 = () => { div1.scrollTo(0, 122); if (div2) window.setTimeout(Scroll2, 10) }
-    if (div1) window.setTimeout(Scroll1, 10)
-    // if (div2) div2.scrollTo(0, 91)
-    // if (shp0) shp0.scrollTo(0, 195)
-    // console.log('Init3() 3 ' + shp0.id + ':  scrollTop:=' + shp0.scrollTop)
-
-    shpX_SetWindow(777, 399)
-    window.scrollTo(0, 333)
-
-    StartBordNames()
+    window.olga5.C.E.AddEventListener('olga5_ready', Init2i)
 }
 
 function Init3() {
     "use strict"
-    if (!IsInitEvents()) return
-    const Init = () => {
+    const isi = IsInitEvents()
+    if (!isi) return
+    const Init3i = () => {
         console.log('Init3() --------------')
-        Init3x()
-        // window.setTimeout(Init3x(), 1)}
-        window.addEventListener('olga5_ready', Init)
+
+        const wshp = window.olga5.o5shp,
+            div1 = document.getElementById('div1'),
+            div2 = document.getElementById('div2'),
+            shp0 = document.getElementById('shp0'),
+            cb1w = document.getElementById("bord1w"),
+            cb1c = document.getElementById("bord1c"),
+            cb1b = document.getElementById("bord1b"),
+            tab1 = document.getElementById('tab1')
+
+        styleCC3a = tab1.getAttribute('style')
+        cb1w.indeterminate = false
+        cb1c.indeterminate = false
+        cb1b.indeterminate = false
+        cb1w.max = cb1w.checked ? (cb1w.indeterminate ? 1 : 2) : 0
+        cb1c.max = cb1c.checked ? (cb1c.indeterminate ? 1 : 2) : 0
+        cb1b.max = cb1b.checked ? (cb1b.indeterminate ? 1 : 2) : 0
+
+        shpX_ChgDirPos()
+        CC()
+        CC1()
+        CC3()
+
+        const
+            Scroll0 = () => { shp0.scrollTo(0, 195) },
+            Scroll2 = () => { div2.scrollTo(0, 91); if (shp0) window.setTimeout(Scroll0, 10) },
+            Scroll1 = () => { div1.scrollTo(0, 122); if (div2) window.setTimeout(Scroll2, 10) }
+        if (div1) window.setTimeout(Scroll1, 10)
+
+        shpX_SetWindow(777, 399)
+        window.scrollTo(0, 333)
+
+        StartBordNames()
     }
+    window.olga5.C.E.AddEventListener('olga5_ready', Init3i)
 }
 
 function Init4() {
     "use strict"
     if (!IsInitEvents()) return
-    const Init = () => {
+    const Init4i= () => {
         console.log('Init4() --------------')
 
         const wshp = window.olga5.o5shp,
@@ -519,7 +520,7 @@ function Init4() {
 
         StartBordNames()
     }
-    window.addEventListener('olga5_ready', Init)
+    window.olga5.C.E.AddEventListener('olga5_ready', Init4i)
 }
 
 function Init4_test() {

@@ -6,6 +6,26 @@
 	<title>olga5-ref</title>
 	<link rel="shortcut icon" href="+../blog/favicon.svg" type="image/x-icon">
 
+	<!-- 
+	src='https://rombase.neocities.org/olga5/o5com!.js'
+	src='https://rombase.h1n.ru/o5/olga5/o5com!.js'
+	src='http://localhost/o5/olga5/o5com!.js' 
+	_блог_o5 = 'https://olga-5.blogspot.com/2020/02' 
+    тесты='http://rombase.h1n.ru/o5/olga5-tests'
+    тесты='http://localhost/o5/olga5-tests'  
+-->
+<script src='http://localhost/o5/olga5/o5.js' 
+o5consts="o5debug=0" 
+o5urlrfs="
+	_блог_o5 = '_url_olga5+../2020/02';
+	тесты = '_url_olga5 + ../olga5-tests';
+	images = _url_olga5 + ../blog/media/image;
+	# _url_html='# адрес текущей страницы (этот и 2 следующих - закомментированы)';
+	# _url_root='# адрес сайта (с текущей страницей)';
+	# _url_olga5='# адрес загрузки файла o5com!.js';
+">
+</script>
+
 	<link data-href='+o5ini.css' media='screen' rel='stylesheet' />
 	<script data-src='+o5pop.js'></script>
 	<script data-src='+o5mnu.js' o5consts="scrollY=-32"></script>
@@ -18,8 +38,8 @@
 			iTunes-icon='images + /myMusikIT.png' # --- только для o5snd ---;
 			Ceza1-25=sounds+/Ceza1-25.mp3;
 		"></script>
-	<script data-src='+o5shp.js'></script>
-	<script data-src='+o5snd.js' btn_play='images + /play.png' btn_stop='images + /play_Freepik.png'>
+	<script data-src='+o5shp!.js'></script>
+	<script data-src='+o5snd!.js' btn_play='images + /play.png' btn_stop='images + /play_Freepik.png'>
 	</script>
 	<script data-src='+add/pusto.js' data-o5consts="moe-attr=мой атрибут"></script>
 
@@ -30,25 +50,6 @@
 	<link data-href='+../blog/csss/olga5.tableKuplet.css' media='screen' rel='stylesheet' />
 	<link data-href='+../blog/csss/tests.css' media='screen' rel='stylesheet' />
 
-	<!-- 
-	src='https://rombase.neocities.org/olga5/o5com!.js'
-	src='https://rombase.h1n.ru/o5/olga5/o5com!.js'
-	src='http://localhost/o5/olga5/o5com!.js' 
-	_блог_o5 = 'https://olga-5.blogspot.com/2020/02' 
-    тесты='http://rombase.h1n.ru/o5/olga5-tests'
-    тесты='http://localhost/o5/olga5-tests'  
--->
-	<script src='http://localhost/o5/olga5/o5com.js' 
-		o5consts="o5debug=2" 
-		o5urlrfs="
-			_блог_o5 = '_url_olga5+../2020/02';
-			тесты = '_url_olga5 + ../olga5-tests';
-			images = _url_olga5 + ../blog/media/image;
-			# _url_html='# адрес текущей страницы (этот и 2 следующих - закомментированы)';
-			# _url_root='# адрес сайта (с текущей страницей)';
-			# _url_olga5='# адрес загрузки файла o5com!.js';
-		">
-	</script>
 </head>
 
 <body>
@@ -82,7 +83,7 @@
 				сообщение.
 				Сами же <i>именованные</i> ссылки могут быть определены как в общедоступном атрибуте
 				<span  
-				class="olga5_popup"	onmouseup="window.olga5.PopShow( 666, 555, '_url_olga5+./olga5-all.html?o5nomnu#head_622')"><b>o5urlrfs</b></span>
+				class="olga5_popup"	onmouseup="window.olga5.PopShow( 666, 555, '_url_olga5+../blog/olga5-all.html?o5nomnu#head_622')"><b>o5urlrfs</b></span>
 				<!-- class="olga5_popup"	onmouseup="window.olga5.PopShow( 666, 555, './olga5-all.html?o5nomnu#head_62')"><b>o5urlrfs</b></span> -->
 				тега <code>o5com!.js</code>,
 				так и в одноимённом атрибуте данного скрипта <code>o5ref.js</code>.

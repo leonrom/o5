@@ -5,13 +5,16 @@
 
 (function () {              // ---------------------------------------------- o5shp/AO5shp ---
     "use strict"
-    let debugids = ['shp_text', 'shp_1÷4']
+    const olga5_modul = "o5shp",
+    modulname = 'AO5shp'
 
-    const
-        olga5_modul = "o5shp",
-        modulname = 'AO5shp',
-        C = window.olga5.C,
-        wshp = window.olga5[olga5_modul],
+    if (!window.olga5) window.olga5 = []
+    if (!window.olga5[olga5_modul]) window.olga5[olga5_modul] = {}
+
+    let C = null,
+        debugids = ['shp_text', 'shp_1÷4']
+
+    const wshp = window.olga5[olga5_modul],
         MyRound = (s) => { return Math.round(parseFloat(s)) },
         SetClick = (aO5, clk, next) => {
             if (next) aO5.act.underClick = clk
@@ -209,7 +212,16 @@
     // --------------------------------------------------------------------- //    
 
     Object.assign(wshp, {
+        // o5classes: [],  // какие классы подключены библииекой
+        // FillClasses: () => {
+        //     C = window.olga5.C
+        //     for (const scrpt of C.scrpts)
+        //         if (scrpt.act.W && scrpt.act.W.class) // если скрипт уже подгружен (т.е. он - перед o5shp.js)
+        //             wshp.o5classes.push(scrpt.act.W.class)
+        // },
         MakeAO5: (shp, cls, PO5) => {
+            C = window.olga5.C
+
             shp.aO5shp = new AO5(shp, cls)
             const aO5 = shp.aO5shp
             let pO5 = aO5.prev.pO5
@@ -243,7 +255,7 @@
             if (shp.tagName.match(/\b(img|iframe|svg)\b/i) && !shp.complete) {
                 if (C.consts.o5debug > 0) C.ConsoleInfo(`ожидается завершение загрузки '${aO5.name}'`)
                 shp.addEventListener('load', e => {
-                    wshp.DoResize('из AO5shp')
+                    wshp.DoResize(shp)
                 })
             }
         },
@@ -253,5 +265,6 @@
         }
     })
 
-    C.MsgAddSub(olga5_modul, modulname)
+    if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
+        console.log(`}===< ${document.currentScript.src.indexOf(`/${olga5_modul}.`) > 0 ? 'дозагружен' : 'подключён '}:  ${olga5_modul}/${modulname}.js`)
 })();

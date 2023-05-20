@@ -3,10 +3,23 @@
 
 <head>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta http-equiv="Permissions-Policy" content="interest-cohort=()">
   <title>olga5-shp</title>
   <link data-href='+o5ini.css' media='screen' rel='stylesheet' />
 
 	<!-- <script src='https://rombase.h1n.ru/o5/olga5/o5dbg/events.js'></script> -->
+
+  <script src='http://localhost/o5/olga5/o5.js' 
+      o5consts="o5debug='1'; o5nomnu='0'; o5noact='0'; o5timload=4;" 
+      data-o5urlrfs="
+      тесты='+ ../olga5-tests';
+      блог_o5='https://olga-5.blogspot.com/2020/02';
+      images=_url_olga5 + ../blog/media/image;       
+      # _url_html='# адрес текущей страницы (этот и 2 следующих - закомментированы)';
+      # _url_root='# адрес сайта с текущей страницей';
+      # _url_olga5='# адрес загрузки файла o5com!.js';
+    ">
+  </script>  
   <script data-src='+o5shp.js'></script>
   <script data-src='+o5pop.js'></script>
   <script data-src='+o5mnu.js' scrollY='-32'></script>
@@ -40,17 +53,6 @@
     _src='https://rombase.h1n.ru/o5/olga5/o5com!.js'  
     _src='http://localhost/o5/olga5/o5com!.js'
 -->
-  <script src='http://localhost/o5/olga5/o5.js' 
-      o5consts="o5debug='1'; o5nomnu='0'; o5noact='0'; o5timload=4;" 
-      data-o5urlrfs="
-      тесты='+ ../olga5-tests';
-      блог_o5='https://olga-5.blogspot.com/2020/02';
-      images=_url_olga5 + ../blog/media/image;       
-      # _url_html='# адрес текущей страницы (этот и 2 следующих - закомментированы)';
-      # _url_root='# адрес сайта с текущей страницей';
-      # _url_olga5='# адрес загрузки файла o5com!.js';
-    ">
-    </script>
 </head>
 <!--  структура вложенности (для справки):
 <body id='body'>
@@ -74,7 +76,7 @@
     <h3 id='head_1'>1. Общие сведения</h3>
     <div  id="div_strt2">
       <p>
-        Скрипт <code>o5shp.js</code> входит в <i>библиотеку</i>
+        Скрипт <code>o5shp.js</code> входит в <b><i>библиотеку</i></b>
         <span o5popup='+ ./help/o5help.html; width: 430, height: 390'><code>Olga5</code></span>&nbsp;и 
         предоставляет авторам HTML-страниц возможность создания эффектов зависания блочных элементов,
         расширяя скудные возможности стандартного свойства <b>position: sticky</b>:
@@ -85,9 +87,7 @@
         <li>зависание блоков как вверху, так и внизу контейнера</li>
       </ul>
       <p>
-        Подобно остальным скриптам
-        <span o5popup='+ ./help/o5help.html; width: 430, height: 390'> библиотеки</span>&nbsp;
-        данный <i>скрипт</i> может быть подключен не только к отдельным
+        Подобно остальным скриптам <i> библиотеки<i> данный <i>скрипт</i> может быть подключен не только к отдельным
         HTML-страницам,
         но и функционировать внутри <b>Blogger</b>'а, в частности на шаблоне <i>Dynamic View</i>.
         Скрипт выполняет обработку тегов с заданным классом <b>olga5_shp</b>,
@@ -146,7 +146,7 @@
           </p>
 
           <div id='shp_text' class="olga5_shp:Up:Top olga5_textNshow" olga5_frames="id:shp-demo;"
-            style="margin-left: 55px;height:8em;width:calc(99% - 66px);background-color:darkseagreen;">
+            style="margin-left: 55px;height:127px;width:calc(99% - 66px);background-color:darkseagreen;">
             <table>
               <tbody>
                 <tr>
@@ -619,7 +619,7 @@
         И оба они (как и остальные куплеты) подвисают под блоком с YouTube-роликом, у которого <i>уровень</i>=
         '<b>0</b>'.
       </p>
-      <p>
+      <p class="moeattention">
         Вместо использования квалификатора <i><b>K</b>ill</i> предпочтительнее указывать 
         для подвисабельного тега наименование        владельца,- например        
         <span class='olga5_codeText'>olga5_owners="id:kst</span> (см. п.&nbsp;4.2),
@@ -855,8 +855,8 @@
         <input id='shp1' type="button" value="показать" onclick="window.olga5.PopUp(this, 'тесты + shp2.html','w:666')">
       </h4>
       <p>
-        <!-- <input id='shp2' type="button" value="Пример" onclick="window.olga5.PopUp(this, 'тесты + shp2.html','w:666')"> -->
-        Пример иллюстрирует варианты задания <i>фреймов</i> (задаются теговым атрибутом <b>olga5_frames</b>),
+        <input id='shp2' type="button" value="Пример" onclick="window.olga5.PopUp(this, 'тесты + shp2.html','w:666')">
+        иллюстрирует варианты задания <i>фреймов</i> (задаются теговым атрибутом <b>olga5_frames</b>),
         на границах которых подвисает <i>объект</i> (здесь <i>объект</i> - синоним <b>shp1</b>)
         и <i>овнеров</i> (владельцев <i>объекта</i>, задаваемых теговым атрибутом <b>olga5_owners</b>),
         ограничивающих область видимости <i>объекта</i>. И тех и других может быть произвольное количество.

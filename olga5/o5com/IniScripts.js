@@ -32,12 +32,17 @@
 		AddEvents = (Fun) => { // addEventListener
 			for (const meve of this.meves)
 				if (meve.isd) document.addEventListener(meve.eve, Fun, true)
-				else window.addEventListener(meve.eve, Fun)
+				else
+					window.addEventListener(meve.eve, Fun)
+			// C.E.AddEventListener(meve.eve, Fun)
 		}
 		RemEvents = (Fun) => { // addEventListener
 			for (const meve of this.meves)
 				if (meve.isd) document.removeEventListener(meve.eve, Fun, true)
-				else window.removeEventListener(meve.eve, Fun)
+				else {
+					window.removeEventListener(meve.eve, Fun)
+					// C.E.RemoveEventListener(meve.eve, Fun)
+				}
 		}
 	}
 	class MyTimer {
@@ -72,7 +77,7 @@
 			// console.log('...+', this.act.time,  this.act.name)
 		}
 	}
-	const wshp = window.olga5[olga5_modul],
+	const
 		DocURL = () => document.URL.match(/[^?&#]*/)[0].trim(),
 		/**
 		 * InitScripts(nam) - выполнение очередного требуемого скрипта
@@ -91,6 +96,8 @@
 			const start = C.page.pact.start
 			for (const scrpt of C.scrpts) {
 				const act = scrpt.act
+				// if (act.W.modul=='o5inc')				
+				// act.timera =0
 				if (!act.timera)
 					act.timera = new MyTimer(`---<<<             инициирован `)
 				if (start != act.start && act.W && !act.incls)
@@ -142,10 +149,11 @@
 				Included = modul => {
 					const nam = `загружены включения для '${modul}'`,
 						scrpt = C.scrpts.find(scrpt => scrpt.modul == modul)
-					if (C.consts.o5debug > 1)
+					if (C.consts.o5debug > 0)
 						console.log(`OnLoad: '${nam}'`)
 
 					scrpt.act.incls = ''
+					// const debug = window.open("", "", "width=200,height=100");
 					InitScripts(nam)
 				}
 
@@ -212,7 +220,8 @@
 			})
 
 			this.donePage.RemEvents(this.ScriptsFinish)
-			window.dispatchEvent(new window.Event('olga5_done'))
+			// window.dispatchEvent(new window.Event('olga5_done'))
+			C.E.DispatchEvent('olga5_done')
 		}
 		ScriptsStart = () => {  // начало обработки страницы
 
@@ -298,7 +307,8 @@
 			}
 			this.loadDone.RemEvents(OnLoad)
 			this.initDone.RemEvents(OnInit)
-			window.dispatchEvent(new window.Event('olga5_ready'))
+			// window.dispatchEvent(new window.Event('olga5_ready'))
+			C.E.DispatchEvent('olga5_ready')
 		}
 		PageStart = (url) => {
 			if (C.consts.o5debug > 0)
@@ -348,7 +358,7 @@
 			// }
 			if (isnew && isloaded) {
 
-				pact.start= Number(new Date()) + Math.random()
+				pact.start = Number(new Date()) + Math.random()
 
 				let w = null,
 					o5include = null
@@ -358,36 +368,42 @@
 
 					if (!w && o5include) C.ConsoleError(`Имеется тег с атрибутом 'o5include' но отсутствует модуль '${o5inc}'`)
 					else
-						if (o5inc && !o5include && C.consts.o5debug > 0)
+						if (w && !o5include && C.consts.o5debug > 0)
 							C.ConsoleInfo(`¿ Задан модуль '${o5inc}' но отсутствует тег с атрибутом 'o5include' ?`)
 				}
 
-				if (w && o5include) {
-					const
-						scrpt = C.scrpts.find(scrpt => scrpt.modul == o5inc)
-					if (scrpt)
-						Object.assign(scrpt.act, { W: w, start: pact.start, done: pact.start })
-					else
-						C.ConsoleError(`Не найден scrpt для modul='${o5inc}'`)
 
-					window.addEventListener('olga5-incls', e => this.CheckInit(e, true))	//1
-					w.Init()
+				// забрать в общую обработку
+				// проверить, чтобы в очерёдности обработки o5inc  всегда было первым!				
+				// 				if (w && o5include) {
+				// 					const
+				// 						scrpt = C.scrpts.find(scrpt => scrpt.modul == o5inc)
+				// 					if (scrpt)
+				// 						Object.assign(scrpt.act, { W: w, start: pact.start, done: pact.start, need:false })
+				// 					else
+				// 						C.ConsoleError(`Не найден scrpt для modul='${o5inc}'`)
+
+				// 					// window.addEventListener('olga5-incls', e => this.CheckInit(e, true))	//1
+				// 					C.E.AddEventListener('olga5-incls', e => this.CheckInit(e, true))	//1
+				// 					w.Init()
+				// 				}
+				// 				else
+
+
+				if (isolga5) {
+					this.ScriptsFinish(e)
+					Object.assign(pact, { url: url, ready: true })
+
+					pact.mos.splice(0, pact.mos.length)
+
+					this.starts.splice(0, this.starts.length)
+					for (let i = 0; i < starts.length; i++)
+						this.starts[i] = starts[i]
+
+					this.PageStart(url)
 				}
 				else
-					if (isolga5) {
-						this.ScriptsFinish(e)
-						Object.assign(pact, { url: url, ready: true})
-
-						pact.mos.splice(0, pact.mos.length)
-
-						this.starts.splice(0, this.starts.length)
-						for (let i = 0; i < starts.length; i++)
-							this.starts[i] = starts[i]
-
-						this.PageStart(url)
-					}
-					else
-						C.ConsoleError(`Отсутствуют теги с классом '${this.olga5Start}' или атрибутом 'o5include'`)
+					C.ConsoleError(`Отсутствуют теги с классом '${this.olga5Start}' или атрибутом 'o5include'`)
 			}
 		}
 		CheckHide = e => { // проверка и начало инициализации страницы
@@ -432,7 +448,7 @@
 		}
 	}
 
-	wshp[modulname] = () => {
+	let wshp = C.ModulAddSub(olga5_modul, modulname, () => {
 		if (C.consts.o5debug > 0) console.log(` ===  инициализация ${olga5_modul}/${modulname}.js`)
 
 		if (C.consts.o5nomnu > 0)
@@ -448,17 +464,18 @@
 			Object.assign(C, {
 				page: new Page(),
 			})
+			C.E.Init()  // сброс событий
 		}
 		else {
 			C.ConsoleError(`IniScripts.js: вообще нет скриптов для обработки`)
-			window.dispatchEvent(new window.Event('olga5_ready'))
+			// window.dispatchEvent(new window.Event('olga5_ready'))
+			C.E.DispatchEvent('olga5_ready')
 		}
-		
+
 		return true
 	}
+	)
 
-	C.MsgAddSub(olga5_modul, modulname)
-	
 	if (wshp.AscInclude)
-	wshp.AscInclude()
-})('=');
+		wshp.AscInclude()
+})();

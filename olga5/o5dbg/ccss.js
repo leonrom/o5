@@ -1,16 +1,16 @@
 /* global window, document, console */
 /*jshint asi:true  */
 /*jshint esversion: 6*/
-(function () {
+(function () {              // ---------------------------------------------- o5dbg/Ccss ---
 	'use strict'
-	const W = { modul: 'ccss' },
-		timera = `}---< включено:  ${W.modul}.js и ожидается событие 'olga5_ready' `
-	console.time(timera)
-
 	let isInitiated = false
 	const
-		CheckCSS = () => {
-			console.log(`${W.modul}: CheckCSS()` + isInitiated ? 'игнорируется' : '')
+		olga5_modul = "o5dbg",
+		modulname = 'Ccss',
+		C = window.olga5.C,
+		lognam = olga5_modul + '.' + modulname + ': ',
+		wshp = C.ModulAddSub(olga5_modul, modulname, () => {
+			console.log(`${lognam}: CheckCSS()` + isInitiated ? 'игнорируется' : '')
 			if (isInitiated) return
 
 			isInitiated = true
@@ -58,7 +58,7 @@
 			}
 
 			if (errs.length > 0)
-				console.error(`${W.modul} ошибка проверки cssRules в CSS'ах для i= [ ` + errs + " ]")
+				console.error(`${lognam} ошибка проверки cssRules в CSS'ах для i= [ ` + errs + " ]")
 			cssAlls.sort(CompareVals)
 
 			const clsNs = [], // список классов в HTML-файле
@@ -83,7 +83,7 @@
 					if (clsN.val != 'olga5_isLoading')//может отсутствовать o5ini.css
 						errCSS.push({ css: clsN.val, used: clsN.txt })
 			})
-			const s0 = `  ==${W.modul}== конец  проверки - `
+			const s0 = `  ==${lognam}== конец  проверки - `
 			if (errCSS.length > 0) {
 				const s = s0 + "были неопределёные CSS-селекторы "
 				console.groupCollapsed(s)
@@ -94,10 +94,5 @@
 				console.log(s)
 				return true
 			}
-		}
-
-	window.addEventListener('olga5_ready', CheckCSS, { once: true })
-	console.timeEnd(timera)
-
-	window.dispatchEvent(new CustomEvent('olga5_sload', { detail: { modul: W.modul } }))
+		})
 })();

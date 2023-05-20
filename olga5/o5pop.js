@@ -8,12 +8,15 @@
     const     // phases = ['NONE', 'CAPTURING_PHASE', 'AT_TARGET', 'BUBBLING_PHASE'],                
         pard = window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/),
         o5debug = (pard ? (pard[0].match(/=/) ? parseInt(pard[0].match(/\s*\d+/) || 1) : 1) : 2),
+		clrs = {	//	копия из CConsole
+			'E': "background: yellow; color: black;border: solid 1px gold;",
+		},
         C = window.olga5 ? window.olga5.C : {                // заменитель библиотечного
             consts: { o5debug: o5debug },
             repQuotes: /^\s*((\\')|(\\")|(\\`)|'|"|`)?\s*|\s*((\\')|(\\")|(\\`)|'|"|`)?\s*$/g,
             ConsoleError: (msg, name, errs) => {
                 const txt = msg + (name ? ' ' + name + ' ' : '')
-                console.groupCollapsed('%c%s', "background: yellow; color: black;", txt)
+                console.groupCollapsed('%c%s', clrs['E'], txt)
                 if (errs && errs.length > 0) console.table(errs)
                 else console.error(txt)
                 console.trace("трассировка вызовов :")
@@ -263,7 +266,7 @@
         return pops
     }
 
-    const wopens = [], // window.olga5.PopUpwopens // массив открытых окон
+    const wopens = [],
         click = 'click',
         o5popup = 'o5popup',
         aclicks = ['click', 'keyup', 'keydown', 'keypress'],
@@ -554,7 +557,7 @@ img.${W.class} {
         return sizs + ',\n' + pops.swins + ',\n' + pops.smoes
     }
 
-    window.olga5.PopUp = function () {
+    function PopUp() {
         if (arguments.length < 0 || arguments.length > 3) {
             C.ConsoleError(`PopUp: ошибочное к-во аргументов='${arguments.length}'`, [` у PopUp() их д.б. от 1 до 3)`])
             return '?'
@@ -570,8 +573,7 @@ img.${W.class} {
         return ShowWin(pops)
 
     }
-    window.olga5.PopShow = function () { //  устарешая обёртка  ---- width, height, url
-        // const m = /^(\d){1,6}$/
+    function PopShow() { //  устарешая обёртка  ---- width, height, url
         if (arguments.length == 3 && !isNaN(arguments[0]) && !isNaN(arguments[1])) {
             let caller = arguments.callee
             while (caller.caller)
@@ -581,7 +583,6 @@ img.${W.class} {
                 pops = GetPops(e, ['', arguments[2], `width=${arguments[0]}, height=${arguments[1]}`])
             e.cancelBubble = true
             return ShowWin(pops)
-            // window.olga5.PopUp(['', arguments[2], `width=${arguments[0]}, height=${arguments[1]}`])
         }
         else {
             C.ConsoleError(`PopShow: ошибочно к-во или тип аргументов [${arguments.join(', ')}]`)
@@ -613,7 +614,7 @@ img.${W.class} {
                         tag.classList.add(W.class)
                 }
 
-                tag.addEventListener(click, window.olga5.PopUp)
+                tag.addEventListener(click, PopUp)
             }
 
         for (const eve of ['focus', 'click'])
@@ -637,20 +638,20 @@ img.${W.class} {
             C.ConsoleError(`Ошибки формирования параметров окна (из url'а):`, errs.length, errs)
 
         window.dispatchEvent(new CustomEvent('olga5_sinit', { detail: { modul: W.modul } }))
+        // C.E.DispatchEvent('olga5_sinit')
     }
-    // const AutoInit = e => { // автономный запуск
-    //     if (C.avtonom) {
-    //         document.addEventListener('olga5-incls', W.Init)
-    //         W.Init()
-    //     }
-    // }
+
     if (C.avtonom) {
         document.addEventListener('DOMContentLoaded', W.Init)
         document.addEventListener('olga5-incls', W.Init)
-    }
-    if (!C.avtonom)
-        C.MsgAddModule(W, null)
-    else
+        if (!window.olga5)
+            window.olga5={}
+
         if (o5debug)
             console.log(`}---< ${document.currentScript.src.indexOf(`/${W.modul}.`) > 0 ? 'загружен  ' : 'включён   '}:  ${W.modul}.js`)
+    }
+    else {
+        C.ModulAdd(W)
+    }
+    Object.assign(window.olga5, { PopUp: PopUp, PopShow: PopShow })
 })();

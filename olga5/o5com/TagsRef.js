@@ -8,9 +8,11 @@
 //
 (function () {              // ---------------------------------------------- o5com/TagRefs ---
 	'use strict'
-	const olga5_modul = 'o5com',
+	let wshp = {}
+
+	const
+		olga5_modul = 'o5com',
 		modulname = 'TagsRef',
-		wshp = window.olga5[olga5_modul],
 		C = window.olga5.C,
 		ReplaceTag = (tagName, change, adrName, url, errs) => {
 			const addnew = document.createElement(tagName),
@@ -62,7 +64,7 @@
 				igns = [],
 				needs = {}
 
-			incls.forEach(incl => needs[incl] = 1)
+			incls.forEach(incl => { if (incl) needs[incl] = 1 })
 			for (const script of document.scripts) {
 				// if (C.consts.o5debug > 1) console.log(`тег <script>: id= '${script.id}', src= "${script.src}"`)
 
@@ -250,10 +252,8 @@
 
 		}
 
-	wshp[modulname] = () => {
+	wshp = C.ModulAddSub(olga5_modul, modulname, () => {
 		ConvertScripts()
 		ConvertLinks()
-	}
-
-	C.MsgAddSub(olga5_modul, modulname)
+	})
 })();

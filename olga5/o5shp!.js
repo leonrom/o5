@@ -3,15 +3,15 @@
 /*jshint strict:true  */
 /*jshint esversion: 6 */
 
-(function () {              // ---------------------------------------------- o5shp/AO5shp ---
+(function () {              // ---------------------------------------------- o5shp/MakeAO5 ---
     "use strict"
-    let debugids = ['shp_text', 'shp_1÷4']
+    let wshp = {},
+        debugids = ['shp_text', 'shp_1÷4']
 
     const
         olga5_modul = "o5shp",
-        modulname = 'AO5shp',
+        modulname = 'MakeAO5',
         C = window.olga5.C,
-        wshp = window.olga5[olga5_modul],
         MyRound = (s) => { return Math.round(parseFloat(s)) },
         SetClick = (aO5, clk, next) => {
             if (next) aO5.act.underClick = clk
@@ -102,8 +102,10 @@
                 if (id.hasAttribute('id'))
                     id.setAttribute('id', id.id + add)
             })
-            if (shp.id) shdw.id = shp.id + add
-
+            if (shp.id) {
+                shdw.id = shp.id + add
+                cart.id = shp.id + '_cart'
+            }
             wshp.W.origs.consts.split(/;|,/).forEach(c => {
                 shdw.removeAttribute(c.split(/=|:/)[0])
             })
@@ -162,10 +164,8 @@
             for (const o of [cart, aO5.posW, aO5.posC, aO5.posS]) Object.seal(o)
             Object.freeze(aO5)
 
-            // PN(2)
             shp.addEventListener('dblclick', DoShpClick, { capture: true, passive: true })
 
-            // wshp.AO5shp(aO5)
             for (const iO5 of aO5.aO5s)
                 Clone(iO5)
         },
@@ -207,53 +207,50 @@
     }
 
     // --------------------------------------------------------------------- //    
-
-    Object.assign(wshp, {
-        MakeAO5: (shp, cls, PO5) => {
-            shp.aO5shp = new AO5(shp, cls)
-            const aO5 = shp.aO5shp
-            let pO5 = aO5.prev.pO5
-            if (!pO5) {
-                // console.log('--++ ' + C.MakeObjName(aO5.prev))
-                try {
-                    aO5.prev.pO5 = new PO5(aO5.prev, aO5)
-                } catch (err) {
-                    console.error('--?? ' + C.MakeObjName(aO5.prev))
-                }
-                pO5 = aO5.prev.pO5
+    wshp = C.ModulAddSub(olga5_modul, modulname, (shp, cls, PO5) => {
+        shp.aO5shp = new AO5(shp, cls)
+        const aO5 = shp.aO5shp
+        let pO5 = aO5.prev.pO5
+        if (!pO5) {
+            // console.log('--++ ' + C.MakeObjName(aO5.prev))
+            try {
+                aO5.prev.pO5 = new PO5(aO5.prev, aO5)
+            } catch (err) {
+                console.error('--?? ' + C.MakeObjName(aO5.prev))
             }
-            else if (wshp.W.consts.o5debug > 0)
-                pO5.PutBords(pO5, "FillBords: взял для '" + aO5.name + "' => ")
-
-            pO5.aO5s.push(aO5)
-
-            const prevs = pO5.prevs,
-                parent = prevs.find(parent => parent.aO5shp),
-                own = parent ? parent.aO5shp : null
-            if (own)
-                for (const prev of prevs) {
-                    const hasown = prev.pO5.owns.own
-                    prev.pO5.owns.own = own
-                    if (prev.aO5shp || hasown) break
-                }
-
-            const aO5s = (own || wshp).aO5s
-            aO5s.push(aO5)
-
-            if (shp.tagName.match(/\b(img|iframe|svg)\b/i) && !shp.complete) {
-                if (C.consts.o5debug > 0) C.ConsoleInfo(`ожидается завершение загрузки '${aO5.name}'`)
-                shp.addEventListener('load', e => {
-                    wshp.DoResize('из AO5shp')
-                })
-            }
-        },
-        AO5shp: () => {
-            for (const aO5 of wshp.aO5s)
-                Clone(aO5)
+            pO5 = aO5.prev.pO5
         }
-    })
+        else if (wshp.W.consts.o5debug > 0)
+            pO5.PutBords(pO5, "FillBords: взял для '" + aO5.name + "' => ")
 
-    C.MsgAddSub(olga5_modul, modulname)
+        pO5.aO5s.push(aO5)
+
+        const prevs = pO5.prevs,
+            parent = prevs.find(parent => parent.aO5shp),
+            own = parent ? parent.aO5shp : null
+        if (own)
+            for (const prev of prevs) {
+                const hasown = prev.pO5.owns.own
+                prev.pO5.owns.own = own
+                if (prev.aO5shp || hasown) break
+            }
+
+        const aO5s = (own || wshp).aO5s
+        aO5s.push(aO5)
+
+        if (shp.tagName.match(/\b(img|iframe|svg)\b/i) && !shp.complete) {
+            if (C.consts.o5debug > 0) C.ConsoleInfo(`ожидается завершение загрузки '${aO5.name}'`)
+            shp.addEventListener('load', e => {
+                wshp.DoResize(`из '${modulname}'`)
+            })
+        }
+        // AO5shp: () => {
+        //     for (const aO5 of wshp.aO5s)
+        //         Clone(aO5)
+        // }
+    })
+    wshp.Clone = Clone
+
 })();
 /* global window, document, console */
 /*jshint asi:true  */
@@ -261,15 +258,13 @@
 /*jshint esversion: 6 */
 (function () {              // ---------------------------------------------- o5shp/DoInit ---
     "use strict"
-    let o5debug = 0,
-        etimeStamp = 0,
-        debugids = []  // 'shp_text' // 'shp_1÷4' // 'shp-demo' // 'shp_text'        
+    // let debugids = []  // 'shp_text' // 'shp_1÷4' // 'shp-demo' // 'shp_text'        
 
     const
         olga5_modul = "o5shp",
         modulname = 'DoInit',
         C = window.olga5.C,
-        wshp = window.olga5[olga5_modul],
+        o5debug = C.consts.o5debug,
         IsFloat001 = (s) => { return Math.abs(parseFloat(s) > 0.01) },
         prevsPO5 = {},
         MyJoinO5s = (aO5s) => {
@@ -324,13 +319,12 @@
                 else
                     C.ConsoleError(`Неопределён hash= '${hash}' в адресной строке`)
             }
-            // window.dispatchEvent(new window.Event('resize'))
         },
         DbgDoResize = e => { // для отладки  !!!!!!!!!!!!!!!!!!
-            if (e.timeStamp > etimeStamp + 0.1)
+            if (e.timeStamp > wshp.etimeStamp + 0.1)
                 if (!e.target.classList.contains(wshp.W.class))
                     wshp.DoResize('из DbgDoResize ')
-            etimeStamp = e.timeStamp
+            wshp.etimeStamp = e.timeStamp
         },
         DoScroll = e => {
             const pO5 = (e.target == document ? document.body : e.target).pO5
@@ -423,18 +417,17 @@
         }
     }
 
-    Object.assign(wshp, {
-        name: 'страница',
-        aO5s: [],
-        nests: [],
-        wasResize: false,
-        aO5str: '', // строка рез. вложенности (для демок  и отладки)
-        TestCC3a: function (pO5) { // для теста CC3a в alltst.js
-            pO5.PO5Colors(0)
-            FillBords(pO5, 'pO5=' + C.MakeObjName(pO5.current))
-        },
-        DoInit: () => {
-            o5debug = wshp.W.consts.o5debug
+    const
+        // name = 'страница',
+        // aO5s = [],
+        // nests = [],
+        // wasResize = false,
+        // aO5str = '', // строка рез. вложенности (для демок  и отладки)
+        // TestCC3a = pO5 => { // для теста CC3a в alltst.js
+        //     pO5.PO5Colors(0)
+        //     FillBords(pO5, 'pO5=' + C.MakeObjName(pO5.current))
+        // },
+        wshp = C.ModulAddSub(olga5_modul, modulname, () => {
             const timeInit = Date.now() + Math.random(),
                 mtags = C.SelectByClassName(wshp.W.class, olga5_modul),
                 errs = [],
@@ -529,11 +522,15 @@
             }
 
             if (wshp.aO5s.length > 0) {
-                wshp.AO5shp()
+
+                for (const aO5 of wshp.aO5s)
+                    wshp.Clone(aO5)
+
                 wshp.DoResize('из DoInit')
                 SwitchOpacity(wshp.aO5s)
 
-                window.addEventListener('resize', wshp.DoResize)
+                // window.addEventListener('resize', wshp.DoResize)
+                C.E.AddEventListener('resize', wshp.DoResize)
                 document.addEventListener('scroll', DoScroll, true)
             }
 
@@ -541,10 +538,16 @@
 
             errs.splice(0, errs.length)
             mtags.splice(0, mtags.length)
-        }
-    })
+        })
 
-    C.MsgAddSub(olga5_modul, modulname)
+    Object.assign(wshp, {
+        name: 'страница',
+        aO5s: [],
+        nests: [],
+        wasResize: false,
+        aO5str: '', // строка рез. вложенности (для демок  и отладки)
+        etimeStamp:0,
+    })
 })();
 
 /* global window, console */
@@ -554,14 +557,14 @@
 //!
 (function () {              // ---------------------------------------------- o5shp/DoResize ---
     "use strict"
-    let o5debug = 0,
+    let wshp = {},
+        o5debug = 0,
         debugids = ['head_32']  //  shp_5÷8 'shp_text' // 'shp_1÷4' // 'shp-demo' // 'shp_text'
 
     const
         olga5_modul = "o5shp",
         modulname = 'DoResize',
         C = window.olga5.C,
-        wshp = window.olga5[olga5_modul],
         errs = [],
         MyRound = (s) => { return Math.round(parseFloat(s)) },
         IsInClass = (classList, clss) => {
@@ -771,7 +774,8 @@
         }
 
     let showerr = true
-    wshp.DoResize = function (txt) {
+
+    wshp = C.ModulAddSub(olga5_modul, modulname, txt => {
         /* 
         фактически - д.б. 1 раз. - при первом скроллинге,
         но для отладки - может вызываться повторно
@@ -798,8 +802,8 @@
         wshp.DoScroll(wshp.aO5s)
         showerr = false
     }
+    )
 
-    C.MsgAddSub(olga5_modul, modulname)
 })();
 /*jshint asi:true  */
 /* global window, console */
@@ -808,14 +812,15 @@
 //!
 (function () {              // ---------------------------------------------- o5shp/DoScroll ---
     "use strict"
-    let timeStamp = 0,
+    let wshp = {},
+        timeStamp = 0,
         debugids = ['shp1'] // , 'shp_text' shp1 shp_1÷4 shp_5÷8 'shp_text' // 'shp_1÷4' // 'shp-demo' // 'shp_text'
 
     const
         olga5_modul = "o5shp",
         modulname = 'DoScroll',
+        lognam = `${olga5_modul}/${modulname} `,
         C = window.olga5.C,
-        wshp = window.olga5[olga5_modul],
         datestart = Date.now(),
         CalcParentLocate = pO5 => {
             if (pO5.isBody) {
@@ -919,8 +924,8 @@
                 const pO5 = aO5.hovered[hoverMarks]
                 if (!pO5 || !pO5.located)
                     alert(`located '${hoverMarks}' (in  DoScroll.PrepareBords)`)
-                    if (pO5.located.timeStamp != timeStamp) { // чтобы не повторяться для одинаковых
-                   Located(pO5.prevs, pO5.located)
+                if (pO5.located.timeStamp != timeStamp) { // чтобы не повторяться для одинаковых
+                    Located(pO5.prevs, pO5.located)
                     pO5.located.timeStamp = timeStamp
                 }
             }
@@ -1113,7 +1118,7 @@
                                 s += (aa[a].bb[b][j] || '').padEnd(fmt[j])
 
                             if (s.trim())
-                                console.log(`${olga5_modul}/${modulname} ` + s)
+                                console.log(lognam + s)
                         }
                     }
                 },
@@ -1154,7 +1159,7 @@
         },
         Scroll = (aO5s) => {
             if (wshp.W.consts.o5debug > 2)
-                console.log(`${olga5_modul}/${modulname} ` + "Scroll для '" + (() => {
+                console.log(lognam + "Scroll для '" + (() => {
                     let s = ''
                     aO5s.forEach(aO5 => { s += (s ? ', ' : '') + aO5.name })
                     return s
@@ -1240,10 +1245,9 @@
             for (const aO5 of aO5s)   //  не скроллировать внутренности!
                 if (aO5.aO5s.length > 0)
                     Scroll(aO5.aO5s)
-        },
-        o5shp_scroll = new window.Event('o5shp_scroll')
+        }
 
-    wshp.DoScroll = (aO5s, etimeStamp) => {
+    wshp = C.ModulAddSub(olga5_modul, modulname, (aO5s, etimeStamp) => {
         timeStamp = etimeStamp ? etimeStamp : (Date.now() + Math.random())
 
         if (aO5s.length > 0) {
@@ -1262,10 +1266,10 @@
                 console.groupEnd()
             }
         }
-        window.dispatchEvent(o5shp_scroll)
-    }
+        // window.dispatchEvent(new window.Event('o5shp_scroll'))
+        C.E.DispatchEvent('o5shp_scroll', 'DoScroll', true)
+    })
 
-    C.MsgAddSub(olga5_modul, modulname)
 })();
 ﻿/* global document, window, console */
 /*jshint asi:true  */
@@ -1286,7 +1290,7 @@
                 olga5_owners='b';
 			`,
 			incls: {
-				names: ['DoScroll', 'DoResize', 'AO5shp', 'DoInit'],
+				names: ['DoScroll', 'DoResize', 'MakeAO5', 'DoInit'],
 				actscript: document.currentScript,
 			},
 		},
@@ -1305,22 +1309,31 @@
 }`,
 		LastDoResize = () => {
 			// if (window.olga5.o5shp && window.olga5.o5shp.DoResize)
-				window.olga5.o5shp.DoResize('по olga5_ready')
+			window.olga5.o5shp.DoResize('по olga5_ready')
 		}
 
 	function ShpInit() {
-		const wshp = window.olga5[W.modul]
 
-		window.addEventListener('olga5_ready', e => {
+		// window.addEventListener('olga5_ready', e => {
+		C.E.AddEventListener('olga5_ready', e => {		
 			window.setTimeout(LastDoResize, 1)
 		})
 
 		C.ParamsFill(W, o5css)
-		wshp.DoInit()
+		window.olga5[W.modul].DoInit()
 
-		window.dispatchEvent(new CustomEvent('olga5_sinit', { detail: { modul: W.modul } }))
+		// window.dispatchEvent(new CustomEvent('olga5_sinit', { detail: { modul: W.modul } }))
+		C.E.DispatchEvent('olga5_sinit', W.modul)
+
+		window.olga5[W.modul].activated = false 	// признак, что было одно из activateEvents = ['click', 'keyup', 'resize']
+		const activateEvents = ['click', 'keyup', 'resize'],
+			wd = window, // document
+			SetActivated = e => {
+				window.olga5[W.modul].activated = true
+				activateEvents.forEach(activateEvent => wd.removeEventListener(activateEvent, SetActivated))
+			}
+		activateEvents.forEach(activateEvent => wd.addEventListener(activateEvent, SetActivated))
 	}
 
-
-	C.MsgAddModule(W, { W: W, olga5cart: olga5cart, olga5ifix: olga5ifix, })
+	C.ModulAdd(W, { olga5cart: olga5cart, olga5ifix: olga5ifix, })
 })();

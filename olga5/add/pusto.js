@@ -31,9 +31,10 @@
 
 		/* информирование ядра библиотеки о завершении инициализации */
 		// console.log(` инициирован:  ${W.modul}.js`)
-		window.dispatchEvent(new CustomEvent('olga5_sinit', { detail: { modul: W.modul } }))
+		// window.dispatchEvent(new CustomEvent('olga5_sinit', { detail: { modul: W.modul } }))
+		C.E.DispatchEvent('olga5_sinit', W.modul)
 	}
 
 	/* Информирование ядра библиотеки об окончании загрузки модуля */
-	C.MsgAddModule(W, { W: W })
+	C.ModulAdd(W, {})
 })();
