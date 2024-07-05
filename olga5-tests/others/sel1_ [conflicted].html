@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>sel1_</title>
+    <link rel="shortcut icon" href="./favicon.svg" type="image/x-icon">
+</head>
+
+<body id="body">
+
+    <style>
+        .CDIV {
+            background: antiquewhite;
+            border: 1px solid;
+            font-size: small;
+            min-height: 11px;
+            min-width: 444px;
+            height: fit-content;
+            width: fit-content;
+            overflow-y: auto;
+            margin-bottom: 5px;
+            padding-right: 8px;
+        }
+        td {
+            padding-left: 4px;
+            padding-right: 8px;
+        }
+pre {
+    display: block;
+    font-family: monospace;
+    white-space: pre;
+    margin: 0;
+}
+    </style>
+    <script>
+        window.addEventListener('olga5_ready', e => {
+            const C = window.olga5.C,
+                start = document.getElementById('start'),
+                strt = start.innerHTML,
+                html = document.getElementById('html'),
+                td1 = document.getElementById('td1'),
+                td2 = document.getElementById('td2'),
+                PrtS = mtags => {
+                    for (const mtag of mtags)
+                        mtag.tag.innerHTML += (mtag.tag.innerHTML.trim() ? '<br\>' : '') +
+                            `<b>${C.MakeObjName(mtag.tag)}</b>: className=${mtag.origcls}<br\>` +
+                            `<span style="margin-left: 30px;"> className=${mtag.tag.className}</span>`+
+                            `<span style="margin-left: 30px;"> квалиф.: ${mtag.quals.length > 0 ? mtag.quals.join(', ') : ' -'}</span>`
+                },
+                Prt = (fun, query) => {
+                    const tags = C[fun](query, ''),
+                        ss = [],
+                        add = td1.innerHTML ? '<br/>  ' : '  '
+                    tags.forEach(tag => { ss.push(C.MakeObjName(tag)) })
+                    td1.innerHTML += add + `C.<b>${fun}</b> ( '${query}',  '' )`
+                    td2.innerHTML += add + `${ss.join(', ')}`
+                }
+
+            C.QuerySelectorInit(document.querySelectorAll("[class *= 'olga5_Start']"))
+
+            Prt('GetTagsByQueryes',     '[o5popup],[title]')
+            Prt('GetTagsByIds',         "i_p3, rez")
+            Prt('GetTagsByTagNames',    'u, p')
+            Prt('GetTagsByClassNames',  'p3b, CXXXXX')
+            Prt('SelectByClassName',    'CXXXXX')
+
+            PrtS(C.SelectByClassName('CXXXXX', ''))
+
+            html.innerText = strt
+        })
+    </script>
+    <div id="start">
+        <h4>Содержимое документа</h4>
+        (тут все склассы написаны заглавными буквами)
+        <div class='CXXXXX CDIV' title="тестовый текст" style="height: 222px;overflow-y: scroll;">
+            <pre id="html">
+            </pre>
+        </div>
+
+        <h4>функции выборки</h4>
+        <table class="CDIV CXXXXX">
+            <tbody>
+                <tr>
+                    <td id="td1"></td>
+                    <td id="td2"></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h4>функция SelectByClassName()</h4>
+        
+        <div class="olga5_Start">
+            <!-- <div id="cx0" class="CDIV CXXXXX"  title="простой класс">
+            </div>
+            <div id="cx1" class="CDIV CXXXXX : loop, main ">
+            </div>
+            <div id="cx2" class="CDIV CDLA:a CXXXXX:over : a-11_z: loop :  '  sounds + Ceza1-25.mp3'  ">
+            </div>
+            <div id="cx3" class="CDIV CDLA:a CXXXXX:over,a-11_z,loop,  '  sounds + Ceza1-25.mp3'  ">
+            </div>
+            <div id="cx4" class=`CDIV CDLA:d CXXXXX:over : a-11_z: loop :  "  sounds + Ceza1-25.mp3"   CDIV CXXXXX : loop, main `>
+            </div> -->
+            <div id="cx5" class=' CXXXXX : loop, main CDIV CDLA:a CXXXXX:over , a-11_Z, loop :  "  + Ceza1-25.mp3"   CDIV'>
+            </div>
+            <u id="u1">дальше теги <b>p</b>: </u>
+            <p id="i_p1" class="p1">какой-то текст в <b>p1</b></p>
+            <p id="i_p2" title="тест">какой-то текст в <b>p2</b></p>
+            <p id="i_p3" class="p3a">какой-то текст в <b>p3a</b></p>
+            <p id="i_p3" class="p3b" o5popup="1">какой-то текст в <b>p3b</b></p>
+        </div>
+    </div>
+    <script src='../olga5/o5com.js' o5consts="o5debug=2; "></script>
+</body>
+
+</html>

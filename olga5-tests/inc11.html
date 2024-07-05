@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<title>inc1_</title>
+	<link rel="shortcut icon" href="./favicon.svg" type="image/x-icon">
+
+	<script src='../olga5/o5com.js' o5debug=2></script>
+	<script data-src='+ o5inc.js'></script>
+	<script src='../olga5/o5pop.js'></script>
+	<script>
+	function Init() {
+		const tags = document.querySelectorAll("div[o5include]")
+		for (const tag of tags) {
+			const atrs = tag.attributes
+			for (const atr of atrs)
+				if (atr.name.match(/o5include/i)) {
+					tag.innerHTML = ` &nbsp;&rarr; &nbsp; &nbsp;`
+					tag.innerText += atr.value
+					break
+				}
+		}
+	}
+	window.addEventListener("DOMContentLoaded", Init)
+	</script>
+</head>
+
+<body id="body" class="olga5_Start">
+	<p>
+		Справа от '&rarr;' - варианты вызова вставляемого файла 
+		<span o5popup='тесты+inc1.html;'>inc1.html</span>
+		(или <span o5popup='тесты+inc2.html;'
+			title="отличающегося содержащимся текстом 'inc2' вместо 'inc1'">inc2.html</span>
+		). Под ним - содержимое вставки. примеры разделены тегом &lt;hr&gt;.
+	</p>
+	<hr>
+	<div class='olga5_Start' o5include='./inc1.html?.cls1' 			id="c01"></div>	<hr>
+	<div class='olga5_Start' o5include='./inc1.html?.cls2' 			id="c02"></div>	<hr>
+	<div class='olga5_Start' o5include='./inc1.html?.cls2:aa' 		id="c03"></div>	<hr>
+	<div class='olga5_Start' o5include='./inc1.html?.cls2::xxaa' 	id="c04"></div>	<hr>
+	<div class='olga5_Start' o5include='./inc1.html?.cls2::xx:aa' 	id="c05"></div>	<hr>
+	<div class='olga5_Start' o5include='./inc1.html?.cls3' 			id="c06"></div>	<hr>
+	<div class='olga5_Start' o5include='./inc1.html?#id1' 			id="i01"></div>	<hr>
+	<div class='olga5_Start' o5include='./inc1.html?span' 			id="s01"></div>	<hr>
+	<div class='olga5_Start' o5include='./inc1.html?[moe]' 			id="m01"></div>	<hr>
+	<div class='olga5_Start' o5include='./inc1.html' 				id="_02"></div>	<hr>
+	<div class='olga5_Start' o5include='./inc2.html' 				id="_02"></div>	<hr>
+</body>
+
+</html>

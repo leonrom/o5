@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <title>all2</title>
+  <link rel="shortcut icon" href="./favicon.svg" type="image/x-icon">
+
+<link href='+o5ini.css' media='screen' rel='stylesheet'/>
+
+<script src='../olga5/o5com!.js' 
+    o5consts="        o5debug=0;    "
+    o5urlrfs=" 
+        _url_olga5 = '../olga5/';
+    "
+></script>
+<script data-src='+o5snd.js'
+    o5urlrfs="
+        btn_stop = '_url_olga5 + ../blog/media/image/myMusikIT.png';
+        музоны   = _url_olga5 + ../blog/media; tt = музоны + /tt;
+        btnSound = '_url_olga5 + ../blog/media/image/play.png';
+    " 
+></script>
+<script _src='+o5shp.js'></script>
+</head>
+
+<body style="font-size: medium;">
+<p>
+	Подгружаются ядро 'o5com!.js' и все модули, и их компоненты
+</p>
+	<div class='example olga5_Start'>
+	<h4>Пример функционирования нескольких файлов скриптов</h4> 
+
+	<p>
+		Ниже показано 3 иконки. Изображения левой и средней заданы через именованные ссылки. Средняя - подвисабельная.
+	</p>
+	<img id='img1' title="аудиоссылка - адрес изображания указан как _src='+btnSound'" 
+	class="olga5_snd:alive:'+tt + /gitme.mp3' olga5_shp:None" 
+	_src="+ btnSound" >
+	<img id='img2' title="аудиоссылка - подвисабельная иконка" class="olga5_snd:alive:'+tt + /gitme.mp3' olga5_shp " _src="+ btnSound">
+	<img id='img3' title="просто контрольное изображение с абс. адресом 'btnSound'" class="olga5_shp:None olga5_snd:N" src="../blog/media/image/play.png">
+	<p>
+		При правильной работе подключаемых модулей (находящихся там же, где и
+		'<b><i>o5com!.js</i></b>'):
+	</p>
+	<ul style="margin-left: 12px;">
+		<li>при клике по левой и средней иконкам звучит мелодия 'Gitme' (работа <b><i>o5snd.js</i></b>);</li>
+		<li>при скроллинге средняя кнопка подвисает вверху окна браузера (работа <b><i>o5shp.js</i></b>);</li>
+	</ul>
+	<p>
+		Для наблюдения подвисания следует уменьшить до минимума размер окна браузера.
+		Правая иконка - эталонное изображение.
+	</p>
+	<P style="font-size: small;">
+		Пояснение: файлы <b>js</b> (и <b>css</b>) берутся с рабочего сервера <b><i>rombase.neocities.org</i></b>. 
+		Мультимедийные файлы берутся с сервера <b><i>archive.org</i></b>, поскольку 
+		бесплатная лицензия <i>neocities</i>'а не позволяет сохранять аудио и видео файлы.
+	</P>
+</div>
+</body>
+
+</html>

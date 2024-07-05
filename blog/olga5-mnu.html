@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<title>olga5-mnu</title>
+	<link rel="shortcut icon" href="+../blog/favicon.svg" type="image/x-icon">
+
+	<link data-href='+o5ini.css' media='screen' rel='stylesheet' />
+	<script data-src='+o5pop.js'></script>
+	<!-- <script data-src='+o5shp.js'></script> -->
+	<script data-src='+o5mnu.js' o5menudef="
+	    { span: 'Блог', id: id, left: '5px', top: '5px', add: '233px', base: 'https://olga-5.blogspot.com/2020/02', scroll: '-30' },
+	    { span: 'Подключение библиотеки', ref: '/olga5-all.html' },
+	    { span: 'Обработка аудио ссылок', ref: '/olga5-snd.html' },
+	    { span: 'Именованные ссылки в адресах', ref: '/olga5-ref.html' },
+	    { span: 'Подвисание тегов на странице', ref: '/olga5-shp.html' },
+	    { span: 'Всплывающие окна', ref: '/olga5-pop.html' },
+	    { span: '' },
+	    { span: 'Меню блога и страниц', ref: '/olga5-mnu.html', title: 'страница еще редактируется', class: dsbl },
+	    { span: 'Подключение к Blogger`у', ref: '/olga5-blog.html', title: 'страница еще редактируется', class: dsbl },
+	"></script>
+	<script data-src='+o5ref.js' o5tag_attrs="img=image_play; a,img,audio=href,data-href,src" o5urlrfs="images=_url_olga5 + ../blog/media/image;
+			sounds=https://archive.org/download/clouds_20200310;
+			iTunes-icon='images + /myMusikIT.png' # --- только для o5snd ---;
+			Ceza1-25=sounds+/Ceza1-25.mp3;"></script>
+	<script data-src='+o5snd.js' btn_play='images + /play.png' btn_stop='images + /play_Freepik.png'></script>
+	<script data-src='+add/pusto.js' moe-attr='мой атрибут'></script>
+	<!-- <script o5debug=2 src='https://rombase.neocities.org/olga5/o5com!.js' -->
+	<link data-href='+../blog/csss/olga5.tableCode.css' media='screen' rel='stylesheet' />
+	<link data-href='+../blog/csss/olga5.textNshow.css' media='screen' rel='stylesheet' />
+	<link data-href='+../blog/csss/olga5.addStyles.css' media='screen' rel='stylesheet' />
+	<!-- <link href='+../blog/csss/olga5.menuPopDn.css' media='screen' rel='stylesheet' /> -->
+
+	<link data-href='+../blog/csss/olga5.tableKuplet.css' media='screen' rel='stylesheet' />
+	<link data-href='+../blog/csss/tests.css' media='screen' rel='stylesheet' />
+	<!-- 
+		<script o5debug='2' src='https://rombase.h1n.ru/o5/olga5/o5com!.js'  
+		<script  src='https://rombase.neocities.org/o5.200901/olga5/o5com!.js' 
+	-->
+	<script o5debug='2' src='../olga5/o5com.js' o5urlrfs="
+		_блог_o5='https://olga-5.blogspot.com/2020/02';
+		_moe=https://rombase.h1n.ru/o5;
+		тесты='_url_olga5 + ../olga5-tests' ;
+		images = '_url_olga5 + ../blog/media/image';
+		#_url_html адрес текущей страницы (этот и 2 следующих - закомментированы);
+		#_url_root адрес сайта (с текущей страницей) ;
+		#_url_olga5 адрес загрузки файла o5com!.js;
+		"></script>
+	<style>
+		.div1 {
+			line-height: 1.3;
+			margin-bottom: 0cm;
+			text-align: left;
+			text-align: -moz-left;
+			text-align: -webkit-left;
+		}
+	</style>
+</head>
+
+<body>
+	<div class="olga5_Start:o5pop" dir="ltr" trbidi="on">
+	<img alt="" border="0" width="200" style="display:none"
+		data-original-height="599" data-original-width="662"
+		src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEg6LLFM-Fd_Ge-bT0fkkaE2rZ3OREguTy1Nx21_14g1vRXX4nT4H0_K755dr-Q0GBmelhcThIVGXkI79Zu9KuwJgDYtUWzpM0f0sixBZZE7oy1DDjTo5Y9PX9uDmQeMZqgtoC0OFzQRDlz6l0Kk0ump0K5XyEhqVX7Q-W2EhyKJSDagbzAYp9uY3ZQ2/s200/mnu.png"
+	/>
+		<div class="div1">
+			<!-- <p class="olga5_page_header olga5_popup"
+				onmouseup="window.olga5.PopShow( 666, 555, '_url_html+./olga5-help.html?o5nomnu')">
+				Скрипт генерации одного или нескольких навигационных меню
+				<span o5popup='+ ./help/o5help.html; width: 430, height: 390'> библиотеки</span>&nbsp;
+				&nbsp;<a id="a_1" href="_блог_o5 + /olga5-all.html" target="olga5-addPage"><code>Olga5</code></a>&nbsp;
+			</p> -->
+			<p class="olga5_page_header">
+				Генерация одного или нескольких навигационных меню <i>библиотеки</i>
+			</p>
+			<p>
+				Описывается скрипт генерации одного или нескольких навигационных меню, 
+				созданных на (почти) чистом CSS,
+				где <b>JavaScript</b>-вставки используются только для выполнения действий, указанных в меню.
+			</p>
+			<p>
+				В одном документе может содержаться несколько <i>менюшек</i>. 
+				В комплексном
+				<b class="olga5_popup" onmouseup="window.olga5.PopShow( 555, 333, 'тесты+/mnu1.html')">примере</b>
+				показаны различные способы подключения меню.
+				Предусмотрено 3 способу задания меню:
+			</p>
+			<ul>
+				<li>вызовами функции <i>window.olga5.<b>Menu(items)</b></i>,
+					где <b><i>items</i></b> - массив объектов структуры меню (перечень пунктов меню), например:
+					<table class="olga5_tableCode"> 
+						<tbody>
+							<tr>
+								<td>
+									<pre>&nbsp;<br/>1<br/>2<br/>3<br/>4<br/>5<br/>6<br/>7<br/>8<br/>9<br/>10<br/>11<br/>12<br/>13<br/>14<br/>15<br/>16<br/>17</pre>
+								</td>
+								<td>
+									<pre>
+<span class="olga5_tableName">вызов <b>Menu(items)</b></span>
+&lt;script&gt;
+    window.addEventListener('olga5_ready', function () {
+        if (window.olga5 && window.olga5.<b>Menu</b>)
+            window.olga5.<b>Menu</b>([
+	{ span: 'меню &lt;script&gt; 2', right: '166px', top: '88px', add: '233px', 
+		target:'_olga6',
+		id:'menu-Menu', 
+		base:'https://olga-5.blogspot.com/blog/02'
+	},
+	{ span: '3. Подключение аудио-файлов', ref: 'snd_3', add: '288px', id: 'snd_3' },
+	    { span: '3.1. Подключение к тегам &lt;audio&gt;', ref: 'snd_31', },
+	    { span: '3.2. Просто к тегам &lt;img&gt;', ref: 'snd_32', ret: 1 },
+	{ span: '4. CSS-описания скрипта', ref: 'snd_4' },
+	{ span: 'Заключение ', ref: 'snd_5' },
+			])
+	})
+&lt;/script&gt;
+</pre>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</li>
+				<li>блочными тегами (<b>div</b>, <b>pre</b>) с классом <i>class="<b>olga5-menuhidden</b>"</i>,
+					содержащими текстовой аналог <b><i>items</i></b>, например:
+					<table class="olga5_tableCode">
+						<tbody>
+							<tr>
+								<td>
+									<pre>&nbsp;<br/>1<br/>2<br/>3<br/>4<br/>5<br/>6<br/>7<br/>8<br/>9<br/>10<br/>11<br/>12</pre>
+								</td>
+								<td>
+									<pre>
+<span class="olga5_tableName">вставка в блочный тег</span>
+&lt;<b>pre</b> id="menu_pre" class="<b>olga5-menuhidden</b>" style="display:none"&gt;
+	{span: 'меню <b>&lt;pre&gt;</b>',right: '11px',top: '33px',add: '233px',
+	    target:'_olga6',
+	    id:'menu-pre', 
+	    base:'https://olga-5.blogspot.com/blog/02'
+    },
+	{span: '3. Подключение аудио-файлов',ref: '/olga5-snd.html',add: '288px', id: 'snd_3'},
+		{span: '3.1. Подключение к тегам 31',ref: 'snd_31',},
+		{span: '3.2. Просто к тегам 32',ref: 'snd_32',ret: 1},
+	{span: '4. CSS-описания REF',ref: '/olga5-ref.html'},
+	{span: 'Заключение SHP',id: 'div5',ref: '/olga5-shp.html'},
+&lt;/pre&gt;
+</pre>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</li>
+				<li>атрибутом <b>o5menudef</b> вызова скрипта <code>o5mnu.js</code>, например:
+					<table class="olga5_tableCode">
+						<tbody>
+							<tr>
+								<td>
+									<pre>&nbsp;<br/>1<br/>2<br/>3<br/>4<br/>5<br/>6<br/>7<br/>8<br/>9<br/>10<br/>11<br/>12<br/>13<br/>14</pre>
+								</td>
+								<td>
+									<pre>
+<span class="olga5_tableName">однократно через <b>o5menudef</b></span>
+&lt;script src=" ../olga5/o5mnu.js"
+<b>o5menudef</b> = "
+    {span: 'меню &lt;script&gt; ',right: '311px',top: '33px',add: '233px',
+        owner: document.body,
+        target:'_olga5',
+        base:'https://olga-5.blogspot.com/blog/02'
+    },
+    {span: '3. Подключение аудио-файлов',ref: '/olga5-snd.html',add: '288px',id: 'div1'},
+    	{span: '3.1. Подключение к тегам 31',ref: 'snd_31',},
+        {span: '3.2. Просто к тегам 32',ref: 'snd_32',ret: 1},
+    {span: '4. CSS-описания REF',ref: '/olga5-ref.html'},
+    {span: 'Заключение SHP',id: 'div5',ref: '/olga5-shp.html'},    
+    "
+&gt;&lt;/script&gt;
+</pre>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</li>
+			</ul>
+			<p>
+				Все элементы <i>массива</i> <b><i>items</i></b> (или соответствующие <i>строки</i>) имеют подобную
+				структуру со <i title="т.е. д.б. обязательно заключены в (одиночные) кавычки">строковыми</i> значениями,
+				в которой 1-й элемент описывает общий вид меню, а остальные перечисляют пункты меню.
+			</p>
+			<p>
+				Поля первого элемента описывают общую структуру меню:
+			</p>
+			<ul>
+				<li><b>base </b> &mdash; базовый <i><b>url</b></i>,- строка, добавляемая слева к значению <b>ref</b>,
+					(только тем) у которых оно заканчивается на <i>.html</i>;</li>
+				<li><b>target</b> &mdash; наименование окна (по-умолчению - '<b>_self</b>'), в котором будут открываться 
+					те ссылки, у которых <b>ref</b> заканчивается на <i>.html</i>;</li>
+				<li><b>noremov</b> &mdash; задает (при любом произвольном значении) неизменяемость меню при
+					обновлении страницы в Blogger'е (для которого оно и задумано);</li>
+				<li><b>owner </b> &mdash; наименование тега документа (или ссылка на него) в котором создаётся меню. По
+					умолчению - <b>document.body</b>;</li>
+				<li><b>right </b> &mdash; величина отступа от правого края <b>owner</b>'а</li>
+				<li><b>left </b> &mdash; величина отступа от левого края <b>owner</b>'а (игнорируется, если задано
+					<b>right</b>);
+				</li>
+				<li><b>block </b> &mdash; вертикальное выравнивание в <b>owner</b>'е',-
+					одно из значений: '<b>S</b><i>tart</i>', '<b>C</b><i>enter</i>', '<b>E</b><i>nd</i>' или 
+					'<b>N</b><i>earest</i>' (проверяется только первая литера без учета регистра). 
+					По умолчанию - <span title="в отличие от умалчиваемого для функции 'scrollIntoView()'">center</span>.
+				</li>
+				<li><b>top </b> &mdash; величина отступа от верхнего края <b>owner</b>'а;</li>
+				<li><b>id </b> &mdash; значение '<b>id</b>' создаваемого меню.
+					Рекомендуется задавать его, т.к. в этом случае
+					программа будет проверять уникальность меню и предупреждать об ошибке его повторного создания;</li>
+				<li><b>position</b> &mdash; определяет <b>CSS</b>-атрибут, задающий <i>позиционирование</i> меню;</li>
+			</ul>
+			<p>
+				Если значение <b>ref</b> не заканчивается на <i>.html</i>, то оно считаются ссылой на тег
+				текущей страницы (независимо от наличия символа '<b>#</b>' в его начале).
+			</p>
+			<p>
+				<i title="т.е. значение CSS-атрибута 'position'">Позиционирование</i> меню в <b>owner</b>'е определяется
+				следующим алгоритмом:
+			<ul>
+				<li>если задано поле <b>position</b>, то принимается его значение;</li>
+				<li>иначе, если поле <b>owner</b> не задано - <i
+						title="для принятого по умолчанию 'body'">position</i>='<b>fixed</b>';</li>
+				<li>иначе принимается <i>position</i>='<b>absolute</b>';</li>
+			</ul>
+			Если <i>position</i> меню определено как '<b>absolute</b>', то проверяется такое же значение для
+			контейнера <b>owner</b> (при отличии - сообщается об ошибке).
+			</p>
+			
+			<p>
+				Последующие элементы содержат поля:
+			</p> 
+			<ul>
+				<li><b>span </b> &mdash; текст пункта меню (в первом элементе это текст заголовка) ;</li>
+				<li><b>ref </b> &mdash; если указан (даже с пустым значением),- определяет <i><b>url</b></i> перехода по клику;
+				</li>
+				<li><b>add </b> &mdash; признак создания подменю. Его значение - ширина подменю ;</li>
+				<li><b>ret </b> &mdash; признак завершения подменю. Его значение - количесто уровней вложенности для
+					возврата;</li>
+				<li><b>title</b> &mdash; заголовок <b>title</b> - всплывающая подсказка к этому тегу;</li>
+				<li><b>class</b> &mdash; произвольный (где-то определённый) <b>class</b>, подключаемый к этому тегу;
+				</li>
+				<li><b>style</b> &mdash; строка <b>style</b>, задаваемая этому тегу.</li>
+			</ul>
+			Из перечисленных полей обязательно только <b>span</b>.
+			Если его значение пусто, то
+			<i title="точнее,- тегу &lt;li&gt; добавляется класс 'Empty'">вставляется</i> разделительная полоска.
+<p>
+	<i><b>url</b></i> перехода определяется следующим алгоритмом:
+	<ul>
+		<li>если значение <b>ref</b> начинается с <b title="или с 'http://'">https://</b>, то <i><b>url</b></i> равен этому значению;</li>
+		<li>иначе, если адресная часть значения <b>ref</b> оканчивается подстрокой '<b title="или '.htm'">.html</b>',
+			то к нему добавляется значение поля <b>base</b>; </li> 
+		<li>иначе интерпретируется как ссылка на текущей странице (независимо от наличие символа '#'). 
+			В этом (и только этом) случае ссылка <span title="выполняется попытка сдвига страницы">открывается</span> в текущем окне браузера.</li>
+	</ul>
+</p>
+
+
+			<!-- <p>
+				Если задавать <b>target</b>, то после клика по ссылке выполняется автоматический переход во вновь
+				открытое оно.
+				Поэтому при навигации по блогу следует использовать в качестве значения target= <b>_blank</b>
+				(либо <b>_self</b>, являющееся значением по-умолчанию).
+			</p> -->
+			<p>
+				При нарушении синтаксиса диагностические сообщения не выдаются (т.к.
+				<span o5popup='+ ./help/o5help.html; width: 430, height: 390'> библиотека</span>&nbsp;
+				не контролирует синтаксис <b>HTML</b>-документа)
+				и подключаемое меню может быть просто невидимым.
+			</p>
+			<p>
+				Следует внимательно формировать объекты в соответствии с синтаксисом <b>js</b>:
+			</p>
+			<ul>
+				<li>поля и значения должны разделяться символом '<b>:</b>';</li>
+				<li>наименования полей должны начинаться с буквы и содержать только латинские буквы и арабские цифры;
+				</li>
+				<li>значения полей должны быть записаны в кавычках;</li>
+				<li>пары <i>наименование</i>:<i>значение</i> полей должны разделяться символом '<b>,</b>'.</li>
+			</ul>
+			Ну и не забывать вставлять атрибуты <b>add</b> перед началом и <b>ret</b> в конце каждого подменю.
+
+			<p class="moeattention"
+				<b>Внимание</b>: если созданное меню имеет странный вид (например, видны вложенные пункты), то
+				следет проверить наличие атрибутов <b>add</b> в заголовках подменю и
+				атрибутов <b>ret</b> в последних пунктах подменю.
+			</p>
+			<p>
+				Скрипт подключения модуля может иметь два атрибута:
+				<!-- Если он не указан, или указан с пустым значением, то его значение принимается '-18px'.
+			В данном блоге задано значение '-32'.
+			При этом отрицательное значение означает смешение требуемого пункта ниже верха экрана.
+			В модуле обрабатываются (если не задан режим <i>o5nomnu</i>)
+			такие ссылки в тегах &lt;<b>a</b>&gt; у которых атрибут <b>href</b> НЕ содержит символы '.' или '#'. -->
+			</p>
+
+			<ul>
+				<li><b>scrollY</b> &mdash; смешение требуемого пункта относительно верха экрана.
+					По умолчанию '-18' (пикселов), для блога рекомендуется '-32';</li>
+				<li><b>o5menudef</b> &mdash; вышеупомянутая структура меню, например меню для всего блога.</li>
+			</ul>
+			<p>
+				Для принудительной <span title="после выбора любого пункта меню">перерисовки</span> 
+				модулями библиотеки текущей страницы генерируется событие '<b>resize</b>'.
+			</p>
+		</div>
+	</div>
+</body>
+
+</html>

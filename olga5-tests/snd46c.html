@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>snd46a</title>
+    <link rel="shortcut icon" href="./favicon.svg" type="image/x-icon">
+
+    <link href="../blog/csss/olga5.tableCode.css" media="screen" rel="stylesheet" />
+
+    <!-- <script src='https://rombase.h1n.ru/o5/olga5/o5dbg/events.js'></script> -->
+    <script data-src='+o5ref.js' o5tag_attrs='
+			a, img, audio=href, data-href, src, _src
+		' o5urlrfs="  
+		myTunes-icon='images + /myMusikIT.png' # --- только для o5snd ---;
+
+		мой-блог=https://turkceile.blogspot.com/2017/02/   # --- только для o5shp ---;
+		_мой-блог=https://ariturlearn.blogspot.com/2017/02 # --- только для o5shp ---;
+		"></script>
+    <script data-src='+o5snd.js' o5urlrfs="
+		Ceza1-25=sounds+/Ceza1-25.mp3;
+		Ceza2-25=sounds+/Ceza2-25.mp3;
+		imageplay=images + /play.png;
+		solfedjio=images+ /solfedjio.png;
+	" btn_stop='images + /icons8-youtube-music-48.png' btn_play='images + /icons8-youtube-music-50.png'></script>
+
+    <script src='../olga5/o5com.js' data-xxx=123 o5consts="o5debug=2" o5urlrfs="
+	_блог_o5 = '_url_olga5+../2020/02';
+	sounds=https://archive.org/download/clouds_20200310;
+	images=_url_olga5 + ../blog/media/image;
+	# _url_html=' адрес текущей страницы (этот и 2 следующих - закомментированы)';
+	# _url_root='# адрес сайта (с текущей страницей)';
+	# _url_olga5='# адрес загрузки файла o5common.js';
+"></script>
+</head>
+
+<body style="margin: 0 0.1em 0 0.3em;">
+    <div class='example, olga5_Start'>
+        <style>
+            #div1 {
+                background-color: aliceblue;
+                border: solid 1px lightgray;
+                height: fit-content;
+                display: block;
+                padding: 4px;
+                overflow: auto;
+                max-width: fit-content;
+                margin-left: 11px;
+            }
+
+            #div1 tr {
+                white-space: nowrap;
+            }
+
+            #div1 table {
+                border-spacing: 0.3em;
+                border-bottom-style: double;
+                border-bottom-color: lightgray;
+            }
+
+            #div1 tr:nth-child(odd) td:last-child {
+                background-color: aliceblue;
+            }
+
+            #div1 tr:nth-child(even) td:last-child {
+                background-color: blanchedalmond;
+            }
+        </style>
+
+        <span>Примеры ссылок на атрибуты. Для звучания - навести (после активации страницы) 
+            <br />курсор на текст '<i>курсор сюда</i>' в тегах &lt;<b>a</b>&gt;, &lt;<b>span</b>&gt; или на иконку</span>
+        <div id='div1' class="olga5_shp:Up:Top" olga5_frames="i:olga5-Start_hr,n" olga5_owners="n">
+            <p>
+                проверки с тегом &lt;<b>A</b>&gt; - переход по ссылке на <b>href</b> после клика на паузе
+            </p>
+            &lt;<b>a</b> class='olga5_snd:<b>href</b>' target="add" href="sounds+/Ceza1-25.mp3"
+            &gt;
+            <a id='13' class='olga5_snd:href' target="add" href="sounds+/Ceza1-25.mp3">курсор сюда</a>
+            &lt;/a&gt;
+            <br />
+            &lt;<b>a</b> class='olga5_snd:a:<b>href</b>' target="add" href="sounds+/Ceza1-25.mp3"
+            &gt;
+            <a id='14' class='olga5_snd:a:href' target="add" href="sounds+/Ceza1-25.mp3">курсор сюда</a>
+            &lt;/a&gt;
+            <br />
+            &lt;<b>a</b> class='olga5_snd:o:<b>href</b>' target="add" href="sounds+/Ceza1-25.mp3"
+            &gt;
+            <a id='11' class='olga5_snd:o:href' target="add" href="sounds+/Ceza1-25.mp3">курсор сюда</a>
+            &lt;/a&gt;
+            <br />
+            &lt;<b>a</b> class='olga5_snd:o:a:<b>href</b>' target="add" href="sounds+/Ceza1-25.mp3" &gt;
+            <a id='12' class='olga5_snd:o:a:href' target="add" href="sounds+/Ceza1-25.mp3">курсор сюда</a>
+            &lt;/a&gt;
+
+            <p>
+                проверки с вариантами ссылок <b>_href</b> и <b>data-href</b>
+            </p>
+            &lt;<b>a</b> class='olga5_snd:o:<b>href</b>' target="add" <b>_href</b>="sounds+/Ceza1-25.mp3" &gt;
+            <a id='22' class='olga5_snd:o:href' target="add" _href="sounds+/Ceza1-25.mp3">курсор сюда</a>
+            &lt;/a&gt;
+            <br />
+            &lt;<b>a</b> class='olga5_snd:o:<b>_href</b>' target="add" <b>_href</b>="sounds+/Ceza1-25.mp3" &gt;
+            <a id='21' class='olga5_snd:o:_href' target="add" _href="sounds+/Ceza1-25.mp3">курсор сюда</a>
+            &lt;/a&gt;
+            <br />
+            &lt;<b>a</b> class='olga5_snd:o:<b>href</b>' target="add" <b>data-href</b>="sounds+/Ceza1-25.mp3" &gt;
+            <a id='23' class='olga5_snd:o:href' target="add" data-href="sounds+/Ceza1-25.mp3">курсор сюда</a>
+            &lt;/a&gt;
+            <br />
+            &lt;<b>a</b> class='olga5_snd:o:<b>data-href</b>' target="add" <b>data-href</b>="sounds+/Ceza1-25.mp3"
+            &gt;
+            <a id='23' class='olga5_snd:o:data-href' target="add" data-href="sounds+/Ceza1-25.mp3">курсор сюда</a>
+            &lt;/a&gt;
+            <br />
+
+            <p>
+                проверки с вариантами ссылок <b>src</b> в тегах <b>span</b> и <b>img</b>
+            </p>
+            <span id='32' class="olga5_snd:o:src" src="+Ceza2-25">
+                &lt;<b>span</b> class="olga5_snd:o:<b>src</b>" <b>src</b>=+Ceza2-25/&gt;курсор сюда&lt;<b>span</b>&gt;
+            </span>
+            <br />
+            &lt;<b>img</b> class="olga5_snd:o:Ceza2-25" <b>src</b>="images+/play.png"
+            <b>image_play</b>=<b>src</b>/&gt;
+            &nbsp;
+            <img id='31' class="olga5_snd:o:Ceza2-25" title="img04" id='04' src="images+/play.png" image_play=src />
+
+        </div>
+    </div>
+</body>
+
+</html>

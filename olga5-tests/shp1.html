@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<title>shp1</title>
+	<link rel="shortcut icon" href="./favicon.svg" type="image/x-icon">
+
+	<link href='./add/alltst.css' media='screen' rel='stylesheet' />
+	<script src='./add/alltst.js'></script>
+
+	<script src='../olga5/o5com.js' o5debug=0></script>
+	<script data-src='+./o5shp.js'></script>
+</head>
+
+<body id="body">
+	<script>
+		const eve = document.head.querySelector("script[src*='o5inc.js']") ? 'olga5-incls' : 'olga5_ready'
+		window.addEventListener(eve, Init1)
+	</script>
+	<div class='example olga5_Start' id="example-1">
+		<div class='cboxed'>
+			<span>видимость</span><br />
+			<input type="checkbox" id="shdwcb" onclick="CC()" title="видимость исходников для объектов 'shp'">shdws:
+			тени<br>
+			<input type="checkbox" id="cartcb" onclick="CC()" checked
+				title="видимость подвисабельных объектов 'shp'">carts: видино<br>
+			<input type="checkbox" id="cartol" onclick="OL(this, 'shp1')" checked
+				title="наличие синих рамок 'outline' вокруг всех 'shp'">с <i>outline</i><br>
+			<span>завис.: <b>Где</b>&nbsp;<b>Когда</b></span><br />
+			&nbsp;shp1:
+			&nbsp;<span id="pmark1" class="span-mark" onclick="CC1a(this)"></span>
+			&nbsp;<span id="dmark1" class="span-mark" onclick="CC1a(this)"></span>
+			<br>
+			&nbsp;shp2:
+			&nbsp;<span id="pmark2" class="span-mark" onclick="CC1a(this)"></span>
+			&nbsp;<span id="dmark2" class="span-mark" onclick="CC1a(this)"></span>
+			<br>
+			&nbsp;shp3:
+			&nbsp;<span id="pmark3" class="span-mark" onclick="CC1a(this)"></span>
+			&nbsp;<span id="dmark3" class="span-mark" onclick="CC1a(this)"></span>
+			<br>
+			<!-- <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b><i>level</i></b>&nbsp;&nbsp;<b><i>push</i></b>&nbsp;&nbsp;<b><i>alive</i></b></span><br /> -->
+			<span>&nbsp;&nbsp;&nbsp;&nbsp;<b
+					style="font-family: serif;"><i>level</i></b>&nbsp;<b><i>push</i></b>&nbsp;<b><i>alive</i></b>
+			</span><br />
+			<div>
+				shp1=<input type="number" size="1" id="lshp1" name="shp1" min="0" max="9" placeholder='0'
+					onchange="CC1(this)">
+				<span class="span-mark" id="pshp1" onclick="CC1(this)" style="opacity: 0.3;">S</span>
+				<input type="checkbox" id="ashp1" onclick="CC1(this)">
+			</div>
+			<div>
+				shp2=<input type="number" size="1" id="lshp2" name="shp2" min="0" max="9" placeholder='0'
+					onchange="CC1(this)">
+				<span class="span-mark" id="pshp2" onclick="CC1(this)">S</span>
+				<input type="checkbox" id="ashp2" onclick="CC1(this)">
+			</div>
+			<div>
+				shp3=<input type="number" size="1" id="lshp3" name="shp3" min="0" max="9" placeholder='0'
+					onchange="CC1(this)">
+				<span class="span-mark" id="pshp3" onclick="CC1(this)">S</span>
+				<input type="checkbox" id="ashp3" onclick="CC1(this)">
+			</div>
+		</div>
+
+		<pre class="pre-head"><b>Квалификаторы класса <i>olga5_shp</i> </b>
+	</pre>
+		<div class="thetext" style="height: 211px;">
+			<p>
+				Показаны три <i>подвисабельных</i> объекта, разделённых пустыми промежутками.
+				При измененнии размеров окна объект <b>shp3</b> обрезается своим контейнером <b>tab3</b>,
+				(в отличие от <b>shp2</b>) потому,
+				что не указанный для <b>shp3</b> аттрибут <b>olga5_owners</b> имеет подразумеваемым значением
+				<b>'b'</b>.
+				И, кстати, поэтому же здесь <b>shp3</b> будет просто 'исчезать' в момент залипания,
+				если поменять (<i>ChrckBox</i>'ом '<b>Где</b>') его положение на низ экрана.
+			</p>
+			<p>
+				На странице помещена "линия" &lt;<b>hr</b>&gt; с классом <b>olga5_shp:remo:<i>i</i></b>
+				(у которой по умолчанию  <b>level</b>=0), которая сдвигает вышестоящие объекты .
+			</p>
+			<p>
+				Внизу страницы помещены две "линии" &lt;<b>hr</b>&gt; с классом <b>olga5_shp:kill:<i>i</i></b>
+				у которых последовательно <b><i>i</i></b> = 2, 1,-
+				выполняют сброс <i>подвисания</i> объектов соответствующего <b>level</b>'а.
+			</p>
+			<p>
+				Справа вверху - два <b>CheckBox</b>'а' <i>видимости</i>,
+				позволяющие отображать положение прототипов подвисабельных объектов.
+				Остальные опции позволяют (не редактируя данный HTML-файл) изменять характеристики <i>зависания</i>:
+			</p>
+			<ul>
+				<li><b>Где</b> &mdash; место, где будет <i>зависать</i> объект: <b>&#8869;</b> - внизу или
+					<b>&#8868;</b> -
+					вверху фрейма
+				</li>
+				<li><b>Когда</b> &mdash; место, по достижении которого произойдёт <i>зависание</i>: <b>&#8613;</b> -
+					появление внизу фрейма или <b>&#10514;</b> - вверху
+					<br /><u>(пока НЕ функционирует)</u>
+				</li>
+				<li><b>level</b> &mdash; уровень <b>level</b> подвисания (произвольное целое число)</li>
+				<li><b>push</b> &mdash; способ выталкивания уже висящего в этом месте объекта
+					(если <b>level</b> выталкивающего объекта не превышает <b>level</b> выталкиваемого):
+					сбрасыванием (код '<b>O</b>'), сдвигом (код '<b>S</b>') или (код '<b>P</b>') толчком при
+					соприкосновении
+				</li>
+				<li><b>alive</b> &mdash; активизация повторного подвисания после сдвига вверх: сразу при освобождении
+					места
+					(т.е. при сдвиге вниз вытолкнувшего объекта) или лишь посли полного возврата объекта</li>
+			</ul>
+			<p>
+				Изменение <b>CheckBox</b>'ов <i>опций зависания</i> отображается в строках "<b><i>к.=</i></b>"
+				самих объектов.
+			</p>
+			<p>
+				Выталкивание объектов проискодит только если они именно <i>натыкаются</i> друг на друга,
+				в чём можно убедиться, изменив ширину окна браузера.
+			</p>
+			<p>
+				При сбросе <i>подвисания</i> объект (с неменьшим <b>level</b>'ом) оказывается там,
+				где в этот момент скроллина находится его прототип,
+				(который можно увидеть, включив <b>CheckBox <i>shdws</i></b>).
+			</p>
+			<p>
+				Следует отмеить, что эффект как-бы 'выталкивания' для <b>shp1</b> и <b>shp2</b> может проявиться и
+				при 'выползании' линии с <b>kill</b> внизу экрана
+				(в зависимости от его размера,- перед ней сначала появляется пустышка с соответствующим текстом).
+			</p>
+
+		</div>
+		<div id='main'
+			style="text-align: left;line-height: 1.3; margin-bottom: 0cm;border: 1px dashed;padding: 5px;width: calc(99% - 111px);">
+			<span
+				style="text-align: right;margin-bottom: 5px;display: inline-block;background-color: aqua;	padding-left: 3px;padding-right: 3px;">
+				main (с <b>outline-offset</b>: 2px;)
+			</span>
+			<div id="shp1" class="aaa olga5_shp" style="float: none; outline-offset:2px;">
+				<p>название объекта</p>
+			</div>
+			<div class="divSmall">пустышка</div>
+
+			<table id="tab2" class="container">
+				<tbody id="tbody2">
+					<tr id="tr2">
+						<td style="min-width: 222px;">
+							<span style="color: gray;">tab2</span>
+							<p>
+								По умолчанию будет<br />
+								плавно сдвигать <b>shp1</b><br />
+								если наткнётся на него<br />
+								(зависит от ширины окна)<br />
+								и его <i><b>level</b></i> не превышает <i><b>level</b></i> у <b>shp1</b>
+							</p>
+						</td>
+						<td id="td2" style="width: 100%;">
+							<div id="shp2" class="olga5_shp" olga5_owners="n" style="float: right;">
+								<!-- <div id="shp2" class="olga5_shp" olga5_owners="n" style="float: right;zoom:0.7;"> -->
+								<!-- <div id="shp2" class="olga5_shp" olga5_owners="n" style="float: right;transform: scale(0.7);"> -->
+								<p>название объекта</p>
+							</div>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<div class="divSmall">пустышка</div>
+			<table id="tab3" class="container">
+				<tbody id="tbody3">
+					<tr id="tr3">
+						<td style="min-width: 222px;">
+							<span style="color: gray;">tab3</span>
+							<p>
+								Виден лишь внутри <b>tab3</b>, по умолчанию будет<br />
+								выталкивать <b>shp2</b> (и/или <b>shp1</b>)<br />
+								если наткнётся на них<br />
+								и его <i><b>level</b></i> не будет превышать их <i><b>level</b></i>'ы
+							</p>
+						</td>
+						<td id="td3" style="width: 100%;">
+							<!-- <div id="shp3" class="olga5_shp" olga5_owners="n" style="float: right;"> -->
+							<div id="shp3" class="olga5_shp:s" style="float: right;margin-right: 5px;">
+								<p>название объекта</p>
+							</div>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<div class="divSmall"> пустышка_1 </div>
+			<div class="divSmall" style="color: blue;width: 77%;"> будет &lt;<b>hr</b>&gt; REMO (т.е. 0)</div>
+			<hr class="olga5_shp:Remo" id='remo_0' />
+			<div class="divSmall"> пустышка_2 </div>
+			<div class="divSmall"> пустышка_3 </div>
+			<div class="divSmall"> пустышка_4 </div>
+			<div class="divSmall"> пустышка_5 </div>
+			<div class="divSmall" style="color: blue;width: 55%;"> будет &lt;<b>hr</b>&gt; KILL:2 </div>
+			<hr class="olga5_shp:Kill:2" id='kill_2' />
+			<div class="divSmall"> пустышка_6 </div>
+			<div class="divSmall"> пустышка_7 </div>
+			<div class="divSmall" style="color: blue;width: 66%;"> будет &lt;<b>hr</b>&gt; KILL:1 </div>
+			<hr class="olga5_shp:Kill:1" id='kill_1' />
+			<div class="divSmall"> КОНЕЦ </div>
+		</div>
+	</div>
+
+</body>
+
+</html>

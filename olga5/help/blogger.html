@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>для Blogger</title>
+
+    <link data-href="+../blog/favicon.svg" rel="shortcut icon" type="image/x-icon" />
+    <link data-href="+o5ini.css" media="screen" rel="stylesheet" />
+    
+    <!-- script src="https://leonrom.github.io/o5/olga5/o5dbg/events.js"></script -->
+    <script src="https://leonrom.github.io/o5/olga5/o5.js"
+        o5debug="0"
+        o5incls="o5pop,o5mnu,o5snd,o5shp,o5ref"
+        o5urlrfs="
+            media = + ../blog/media;
+            sounds= media + /audio;
+            images= media + /image;
+            тесты = + ../olga5-tests;     
+        " 
+    ></script>
+    <script data-src="+ o5inc.js"></script>
+    <script data-src="+ o5shp.js"></script>
+    <script data-src="+ o5pop.js" o5noclick="0"></script>
+    <script data-src="+ o5mnu.js" o5consts="scrollY=-32"></script>
+    <script data-src="+ o5ref.js" 
+		o5tag_attrs="img=image_play;a,img,audio=href,data-href,src,_src;"
+		o5urlrfs="myTunes-icon=\'images + /myMusikIT.png\' # --- только для o5snd ---;"
+    ></script>
+    <script data-src="+ o5snd.js" 
+		btn_stop="images + /icons8-youtube-music-48.png" 
+		btn_play="images + /icons8-youtube-music-50.png"
+		o5consts="o5shift_speed =0.5 "
+		o5urlrfs="
+			Ceza1-25=sounds+/Ceza1-25.mp3;
+			Ceza2-25=sounds+/Ceza2-25.mp3;
+			imageplay=images + /play.png;
+			solfedjio=images+ /solfedjio.png;
+		"
+    ></script>
+    <script data-src="+ add/pusto.js" moe-attr="мой атрибут"></script>
+
+    <link data-href="+../blog/csss/olga5.tableCode.css" media="screen" rel="stylesheet" />
+    <link data-href="+../blog/csss/olga5.textNshow.css" media="screen" rel="stylesheet" />
+    <link data-href="+../blog/csss/olga5.addStyles.css" media="screen" rel="stylesheet" />
+    <link data-href="+../blog/csss/olga5.menuPopDn.css" media="screen" rel="stylesheet" />
+    <link data-href="+../blog/csss/olga5.tableKuplet.css" media="screen" rel="stylesheet" />
+
+</head>
+
+<body style="font-size: small;">
+    <style>
+        h4 {
+            margin-block-start: 0.33em;
+            margin-block-end: 0.33em;
+        }
+
+        body {
+            font-style: normal;
+            font-family: monospace;
+            font-size: small;
+            background-color: oldlace;
+        }
+
+        pre {
+            background-color: white;
+            border: 1px solid gray;
+            padding: 0;
+            padding: 0.5em;
+            padding-left: 0;
+            margin: 0.1em;
+            width: fit-content;
+        }
+    </style>
+    <script>
+        const BloggerAuto =e => {
+            const url = document.URL,
+                xhr = new XMLHttpRequest(),
+                OnLoad = function () {
+                    console.log(`========  o5inc.OnLoad(${xhr.status})  ------ ${xhr._url}`)
+                    if (xhr.status == 200) {
+                        // const ss = xhr.responseText.match(/<\/title>(.|\n)*<\/head>/uimg)
+                        // Опережающая и Ретроспективная проверки
+                        const ss = xhr.responseText.match(/(?<=<\/title>)(.|\n)*(?=<\/head>)/uimg)
+
+                        document.getElementById('h1').innerHTML += (ss ? ss[0] : 'нету заголовка ?').
+                            // replace(/<\/title>/g, '').
+                            // replace(/<\/head>/g, '').
+                            replace(/>/g, '&gt;').
+                            replace(/</g, '&lt;').
+                            replace(/\t/g, '   ').
+                            trim()
+                    }
+                },
+                OnError = function (e) {
+                    console.error(`}========  o5inc.OnLoad(${xhr.status})  ------ ${xhr._url}`)
+                }
+
+            Object.assign(xhr, { _url: url, onload: OnLoad, onerror: OnError, timeout: 10000, responseType: 'text', withCredentials: true, })
+            xhr.open("get", url, true)
+            xhr.send()
+        }
+        document.addEventListener('DOMContentLoaded', BloggerAuto)
+    </script>
+    <h4 class="olga5_Start">Пример тегов заголовка, подключаемых в HTML файл Blogger'а</h4>
+    <pre id="h1">
+    </pre>
+</body>
+
+</html>

@@ -1,0 +1,288 @@
+.divBig {
+    width: 300px;
+    height: 300px;
+    overflow-y: auto;
+    background-color: cadetblue;
+    border: 1px gold solid;
+    padding-left: 20px;
+    padding-top: 20px;
+}
+
+.base {
+    height: 200px;
+    width: 250px;
+    overflow-y: scroll;
+    background-color: deepskyblue;
+    border: 1px darkkhaki solid;
+    padding-left: 20px;
+    padding-top: 30px;
+    margin-right: 20px;
+    margin-bottom: 20px;
+}
+
+.prnt2,
+.prnt {
+    text-align: left;
+	text-align: -moz-left;
+	text-align: -webkit-left;
+    background-color: beige;
+    width: 150px;
+    height: 600px;
+    float: left;
+    margin: 10px;
+    margin-left: 40px;
+    overflow: visible;
+}
+
+.prnt2 {
+    background-color: bisque;
+}
+
+.cboxed {
+    position: fixed;
+    top: 3px;
+    background-color: aliceblue;
+    font-family: monospace;    
+    font-size: small;
+    border: 1px solid aqua;
+    border-radius: 3px;
+    right: 1px;
+    z-index: 999999;
+	padding-left: 3px;    
+    overflow-y: auto;
+    width: fit-content;
+    max-height: 96%;
+    height: fit-content;    
+    overflow-x: hidden;
+    padding-bottom: 3px;
+    min-width: 123px;
+}
+
+.cboxed span {
+    color: black;
+    background-color: gainsboro;
+    padding-left: 1px;
+    padding-right: 1px;
+    font-size: smaller;
+    font-family: monospace;
+}
+
+.cboxed span.span-mark {
+    background-color: lavender;
+    border: 1px solid gray;
+    border-color: lightblue;
+    border-radius: 3px;
+    line-height: 14px;
+    font-size: 10px;
+    cursor: pointer;
+    width: 10px;
+    padding-left: 0px;
+    font-family: monospace;
+    padding-right: 1px;
+    text-align: center;
+    padding-left: 4px;
+    padding-right: 4px;
+    font-weight: bold;
+}
+
+.container span:first-child {
+    position: sticky;
+    float: right;
+    margin: 3px;
+    margin-top: 0;
+    top: 0;
+    right: 0;
+    color: darkblue;
+    background-color: aqua;
+    padding-left: 3px;
+    padding-right: 0px;
+    font-size: smaller;
+    font-family: monospace;
+}
+
+div.olga5_shp.olga5-ignore.container,
+.container {
+    /* display: flow-root; */
+    display: block;
+    border: 4px dashed gray;
+    margin: 3px;
+    width: calc(99% - 33px);
+	height: calc(88% - 88px);
+    /* max-width: 733px; */
+    overflow: auto;
+}
+
+.container.main-div {
+	    height: 444px;
+    width: calc(99% - 144px);
+}
+
+.cboxed input[type="button"] {
+    border-radius: 3px;
+    float: right;
+    margin-top: 2px;
+    cursor: pointer;
+}
+
+.cboxed input[type="checkbox"] {
+    cursor: pointer;
+    margin-top: 0;
+    margin-bottom: 0;
+    vertical-align: middle;
+}
+
+.cboxed input[type="number"] {
+    cursor: pointer;
+    width: 2.1em;
+    font-size: smaller;
+    padding: 0;
+    border: 1px solid lightgrey;
+    height: 12px;
+    vertical-align: middle;
+}
+
+.moved {
+    height: 20px;
+    width: 100px;
+    position: relative;
+    background-color: yellow;
+    overflow: visible;
+    border: 14px red dashed;
+    border-radius: 14px;
+}
+
+.moved,
+.divSmall {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+div.olga5_shp_copy,
+div.olga5_shp {
+    background-color: yellow;
+    border: 12px solid red;
+    outline-width: 9px;
+    outline-style: solid;
+    outline-color: blue;
+    /* outline: solid 9px blue; */
+	width: 250px;
+    height: 60px;
+    /* padding: 9px;
+    padding-top: 2px !important;
+    margin-top: 11px;
+    margin-left: 10px; */
+}
+
+.olga5_shp.container {
+    background-color: greenyellow;
+    height: 70%;
+    width: calc(90% - 22px);
+    padding: 0;
+    /* float: left; */
+    float: none;
+}
+
+.olga5_shp_copy>p,
+.olga5_shp>p {
+    /* background-color: transparent;
+    margin-left: 1px;
+    margin-top: 0px;
+    padding-left: 2px;
+    padding-top: 4px;
+    width: 250px;
+    height: 64px;
+    position: sticky;
+    float: right;
+    top: 12px;
+    right: 10px; */
+    color: black;
+    
+    font-family: monospace;
+    font-size: smaller;
+    display: block;
+    line-height: 12px;
+    
+    position: inherit;
+    width: inherit;
+    height: inherit;
+    opacity: 0.9;
+    word-break: break-word;
+
+    margin-block-start: 0em;
+    margin-block-end: 0em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    
+}
+
+.olga5_shp.container>p {
+    top: 2px;
+    right: 1px;
+	z-index: 1;
+  color: black;
+  border: 1px solid lightgreen;
+  border-bottom-width: 2px;
+  overflow: visible;
+  margin-block-end: 0;
+}
+
+.thetext {
+    overflow: auto;
+    width: calc(99% - 155px);
+    border: solid 1px gray;
+    padding-left: 5px;
+    background-color: aliceblue;
+    font-family: serif;
+    font-kerning: normal;
+    font-size: small;
+    border: 1px solid aqua;
+    border-radius: 5px;
+}
+
+.thetext td {
+    vertical-align: baseline;
+}
+
+.thetext pre {
+    border: 1px aqua dotted;
+    float: right;
+    margin-right: 5px;
+    border-radius: 5px;
+    padding-bottom: 4px;
+    padding-top: 6px;
+    background-color: white;
+}
+
+.divSmall {
+    height: 44px;
+    width: 111px;
+    position: relative;
+    color: darkgray;
+    background: aliceblue;
+    margin: 20px;
+    margin-left: 44px;
+}
+
+.thetext ul {
+    margin-block-start: 0.2em;
+    margin-block-end: 0.3em;
+}
+
+.p-opis {
+    width: max-content !important;
+    height: max-content !important;
+    position: sticky !important;
+    float: right !important;
+}
+
+.pre-head {
+  margin: 0px 155px 0px 0px;
+  margin-right: 33%;
+  line-height: 8px;
+  text-align: center;
+  background-color: transparent;
+  /* vertical-align: super; */
+  font-size: large;
+  padding-top: 5px;
+}

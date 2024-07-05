@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>ref2</title>
+    <link rel="shortcut icon" href="./favicon.svg" type="image/x-icon">
+
+    <script async src='../olga5/o5com!.js' o5debug=0></script>
+    <script id='o5ref' _src='+o5ref.js' o5tag_attrs='
+            a = href,data-href, xxx # Содержит ошибку;
+            b, vv = xxx             # -"-            ;
+            img, audio = src,_src                    ;
+        ' o5urlrfs="		
+        ma   = /media                           # это промежуточная часть адресной строки;
+        tt   = _url_html + ma + /tt             # здесь `/tt` название папки, а не ссылка;
+        belo = _url_root + mma + /o5/blog       # спец. содержит ошибочную ссылку  'mma' ;
+        audio= _url_root + /o5/blog + ma+/audio # спец. демо формирования составного пути;
+        btnSound = _url_root + o5/blog/media/image/play.png   # ссылка на конкретный файл;
+        ">
+        </script>
+</head>
+
+<body style="margin: 0 0.1em 0 0.3em;">
+    <div class='example olga5_Start' style="  line-height: 1em;">
+        <style>
+            audio {
+                vertical-align: middle;
+                height: 2em;
+            }
+
+            p {
+                white-space: nowrap;
+            }
+
+            img {
+                vertical-align: middle;
+                height: 1.8em;
+            }
+
+            p span {
+                font-size: small;
+                font-family: monospace;
+                margin-left: 4em;
+            }
+        </style>
+        <p>
+            1 <b id="i1" xxx='_url_html + ma + /mm' onclick="alert(this.getAttribute('xxx'))"
+                style="cursor: pointer;">кликни посмотреть '<b>xxx</b>'</b>
+            <br /><span>xxx='_url_html + ma + /mm'</span>
+        </p>
+        <p>
+            2 <a id="i2" href="+ belo+/olga5-ref.html?o5nomenu" target="z">ссылка на olga5-ref.html</a>
+            <br /><span>href="+ belo+/olga5-ref.html"</span>
+        </p>
+        <p>
+            3 <img id="i3" class=" olga5_snd:n" _src="btnSound"/>
+            просто иконка
+            <br /><span>_src="btnSound"</span>
+        </p>
+        <p style="margin: 16px 0 0 0;">
+            4 <img id="i4" class=" olga5_snd:n" _src="+ belo + ma + /image/solfedjio.png" />
+            тоже иконка ('<i>belo</i>' - недоопределён в адресе)
+            <br /><span>_src="+ belo + ma + /image/solfedjio.png"</span>
+            <p style="font-size: x-small;margin: 0em 0 0 2em;">см. сообщение "<i>o5ref: : недоопределённые ссылки</i>" в системном журнале</p>
+        </p>
+        <p>
+            5 <audio id="i5" _src="audio + Clouds.mp3" controls="controls"
+                style="vertical-align: middle;  height: 2em;"></audio>
+            <br /><span>_src="audio + Clouds.mp3"</span>
+        </p>
+    </div>
+
+</body>
+
+</html>

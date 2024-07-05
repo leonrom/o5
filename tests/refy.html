@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<title>refy</title>
+	<link rel="shortcut icon" href="./favicon.svg" type="image/x-icon">
+
+	<script async src='../olga5/o5com.js' o5debug=0
+	o5urlrfs="	
+	media = + ../blog/media;
+	sounds= media + /audio;
+	images= media+/image;
+	"
+	></script>
+	<script id='o5ref' _src='+o5ref.js' o5tag_table="182,10514,8642" o5tag_attrs='
+            a = href,data-href, xxx # Содержит ошибку;
+            b, vv = xxx             # -"-            ;
+            img, audio = src,_src                    ;
+        ' o5urlrfs="		
+		myTunes-icon='images + /myMusikIT.png' # --- только для o5snd ---;
+        ">
+		</script>
+	<script data-src='+o5snd.js' o5urlrfs="
+		Ceza1-25=sounds+/Ceza1-25.mp3;
+		Ceza2-25=sounds+/Ceza2-25.mp3;
+		imageplay=images + /play.png;
+		solfedjio=images+ /solfedjio.png;
+		" btn_stop='images + /icons8-youtube-music-48.png' btn_play='images + /icons8-youtube-music-50.png'>
+		</script>
+</head>
+
+<body style="margin: 0 0.1em 0 0.3em;">
+	<style>
+		table.o5youtube {
+			border-spacing: 12px 0px;
+		}
+
+		.o5youtube td {
+			height: 155px;
+			position: relative;
+			width: 222px;
+			/* border: 1px solid lightcoral; */
+		}
+	</style>
+	<div class='example olga5_Start'>
+		<table class="o5youtube">
+			<tbody>
+				<tr>
+					<td o5youtube="K2x3YR0EjFc" title="Короткий, первые 2 куплета официоз "></td>
+					<td o5youtube="Y71Ypvmc1ts" title="10 куплетов с турецкими и английски субтитрами"></td>
+				</tr>
+			</tbody>
+		</table>
+
+		<div>
+			<img class="olga5_snd:+Ceza1-25" title="img01" id="01" loop src="+ myTunes-icon" />
+			&nbsp;простейший пример для &lt;<b>img</b>&gt;
+		</div>
+
+		<div>
+			<audio id="a1" controls="controls" class='olga5_snd:H' src="sounds+/Ceza1-25.mp3">
+			</audio>
+		</div>
+		<div>
+			<audio id="a2" controls="controls" class='olga5_snd:H' src="sounds+/Ceza1-25.mp3">
+			</audio>
+		</div>
+	</div>
+</body>
+
+</html>

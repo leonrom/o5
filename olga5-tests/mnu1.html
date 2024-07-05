@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>mnu1</title>
+    <link rel="shortcut icon" href="./favicon.svg" type="image/x-icon">
+
+    <script src=" ../olga5/o5com.js" o5debug="2"></script>
+    <!-- <script src='https://rombase.h1n.ru/o5/olga5/o5dbg/events.js'></script> -->
+    <link data-href='+../blog/csss/olga5.tableCode.css' media='screen' rel='stylesheet' />
+    <script data-src=" ../olga5/o5mnu.js" 
+        o5menudef="
+            {span: '1. меню <script> ',left: '11px',top: '133px',add: '233px',
+                target:'_olga5',
+                noremov:'',
+                id:'mnu1',
+            },
+            {span: 'Меню №1',ref: 'm1'},
+            {span: 'Использование Menu()',ref: 'm23',add: '288px'},
+                {span: 'подМеню №2',ref: '#m2',},
+                {span: 'подМеню №3',ref: 'm3',ret: 1},
+            { span: 'Меню №4', ref: '#m4' },
+            { span: 'Меню №5', ref: 'm5' },
+    "></script>
+</head>
+
+<body class="olga5_Start">
+	<div class='example olga5_Start'>
+    <script>
+        window.addEventListener('olga5_ready', function () {
+            if (window.olga5 && window.olga5.Menu)
+                window.olga5.Menu([
+                    { span: '2. меню <script>', right: '166px', top: '133px', add: '233px', owner: document.body, position: 'relative', id: "mnu2" },
+                    { span: 'Меню №1', ref: 'm1' },
+                    { span: 'Использование Menu()', ref: 'm23', add: '288px' },
+                    { span: 'подМеню №2', ref: '#m2', },
+                    { span: 'подМеню №3', ref: 'm3', ret: 1 },
+                    { span: 'Меню №4', ref: '#m4' },
+                    { span: 'Меню №5', ref: 'm5' },
+                ])
+        })
+    </script>
+    <script>
+        window.addEventListener('olga5_ready', function () {
+            if (window.olga5 && window.olga5.Menu)
+                window.olga5.Menu([{
+                    span: '3. меню <script>', right: '166px', top: '188px', add: '233px',
+                    id: 'mnu3',
+                    target: '_olga5',
+                    title: 'меню с внешними ссылками',
+                    base: 'https://rombase.h1n.ru/o5/blog/'
+                },
+                { span: '3. Cсылки на иной документ', ref: 'olga5-snd.html#snd_3', add: '288px', id: `snd_3` },
+                { span: '3.1. Подключение к тегам <audio>', ref: '/olga5-snd.html#snd_31', },
+                { span: '3.2. Просто к тегам <img>', ref: './olga5-snd.html#snd_32', ret: 1 },
+                { span: 'Меню №1', ref: 'm1' },
+                { span: 'Использование Menu()', ref: 'm23', add: '288px' },
+                { span: 'подМеню №2', ref: '#m2', },
+                { span: 'подМеню №3', ref: 'm3', ret: 1 },
+                { span: 'Меню №4', ref: '#m4' },
+                { span: 'Меню №5', ref: 'm5' },
+                ])
+        })
+    </script>
+    <pre id="prem4" class="olga5-menuhidden" style="display:none">
+		{span: '4. Меню <b>&lt;pre&gt;</b>',right: '11px',top: '133px',add: '233px',
+        target:'_olga6',
+        id:'mnu4', 
+    },
+        { span: 'Меню №1', ref: 'm1' },
+        { span: 'Использование Menu()', ref: 'm23', add: '288px' },
+            { span: 'подМеню №2', ref: '#m2', },
+            { span: 'подМеню №3', ref: 'm3', ret: 1 },
+        { span: 'Меню №4', ref: '#m4' },
+        { span: 'Меню №5', ref: 'm5' },
+    </pre>
+    <div id="divm5" class="olga5-menuhidden" style="display:none">
+        {span: '5. меню <b>&lt;div&gt;</b>',right: '11px',top: '23px',add: '233px',
+        owner: '#div1',
+        target:'_olga5',
+        id:'mnu5',
+        },
+        { span: 'Меню №1', ref: 'm1' },
+        { span: 'Использование Menu()', ref: 'm23', add: '288px' },
+        { span: 'подМеню №2', ref: '#m2', },
+        { span: 'подМеню №3', ref: 'm3', ret: 1 },
+        { span: 'Меню №4', ref: '#m4' },
+        { span: 'Меню №5', ref: 'm5' },
+    </div>
+    <style>
+        pre {
+            max-width: max-content;
+            background-color: Gainsboro;
+            margin-top: 0;
+        }
+
+        div div {
+            background-color: aquamarine
+        }
+        #div1{
+            position: absolute; 
+            width: calc(99% - 16px); 
+            border: 2px green solid;     
+            height: 666px;
+            overflow: scroll;
+        }
+    </style>
+    <!-- <h3 style="margin-top: 0;">Краткое описание</h3> -->
+        <p>
+            Пять примеров подключения меню, в названиях которых указаны типы тегов, на которые они подвешены.
+            Расположение менюшек произвольно и выбрано лишь ради кучности их на экране и наглядности иллюстрации 
+            позиционирования при скроллинге. 
+            </p>
+            <p>
+            Все меню, за исключением №<b>3</b>, выполняют абсолютно одинаковое
+            <span title="для наглядности следует уменшить высоту кадра">позиционирование</span>
+            на заголовках блока '<b>Примеры меню</b>'. Меню же №<b>3</b> частью содержит <i>ссылки на иной документ</i>,
+            открываемый в отдельной закладке браузера.
+
+            '<b>menu-script</b>' - формируется атрибутом тега &lt;<b>script</b>&gt;;
+            "<b>menu_pre</b>" и "<b>menu_div</b>" - задаются как содержимое блочных тегов;
+            "<b>menu-script1</b>" и "<b>menu-script2</b>" - через вызов функции <b>Menu()</b>.
+            Меню "<b>menu_div</b>" помещается в блок '<i title="блок имеет id=div1">Примеры меню</i>' с ссылками,
+            остальные - в тег <b>body</b>.
+        </p>
+
+    <h3>Примеры меню</h3>
+    <div id="div1">
+        
+        <h3 id="m1">Меню №<b>1</b></h3>
+        <p>
+            Пример вызова из тега <b>&lt;script&gt;</b>.  
+            Тут не указан <b>owner</b>, поэтому меню фиксировано <i>приписано</i> к тегу &lt;<b>body</b>&gt; но фиксировано на экране. 
+            Все меню, вызываемые из тега <b>&lt;script&gt;</b>
+            формируются функцией <b>Menu()</b> однократно, при загрузке страницы
+            (что м.б. существенно, например, в Blogger'е).
+
+        </p>
+        <table class="olga5_tableCode">
+            <tbody>
+                <tr>
+                    <td>
+                        <pre>&nbsp;<br/>1<br/>2<br/>3<br/>4<br/>5<br/>6<br/>7<br/>8<br/>9<br/>10<br/>11<br/>12<br/>13<br/>14<br/>15</pre>
+                    </td>
+                    <td>
+                        <pre>
+<span class="olga5_tableName">вызов из тега <b>&lt;script&gt;</b></b></span>
+&lt;script data-src=" ../olga5/o5mnu.js" 
+  o5menudef="
+    {span: '1.меню &lt;script&gt; ',<b>left</b>: '11px',top: '133px',add: '233px',
+        target:'_olga5',
+        noremov:'',
+        id:'mnu1',
+    },
+    {span: 'Меню №1',ref: 'm1'},
+    {span: 'Использование Menu()',ref: 'm23',add: '288px'},
+        {span: 'подМеню №2',ref: '#m2',},
+        {span: 'подМеню №3',ref: 'm3',ret: 1},
+    { span: 'Меню №4', ref: '#m4' },
+    { span: 'Меню №5', ref: 'm5' },
+"
+&lt;/script&gt;
+</pre>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <p style="font-size: small; ">В примере дополнительно иллюстрируется необязательность использования символа
+            '<b>#</b>'. И это единственный из примеров, выровненый по <b>левому</b> краю <b>owner</b>'а.
+        </p>
+
+        <h3 id="m23">Использование <b>Menu()</b></h3>
+        <p>
+            Пара примеров формирования меню из тега <b>&lt;script&gt;</b> (функцией <b>Menu()</b>),
+            встроенного в документ. Различное использование <b>owner</b>'а.
+        </p>
+
+        <h4 id="m2">подМеню №<b>2</b></h4>
+        <p>
+            Тут указан <b>owner</b> как тег &lt;<b>body</b>&gt; однако  также задано <b>position: 'relative'</b>,
+            поэтому меню сдвигается при скроллинге страницы.
+            Строки 6&div;11 полностью повторяют строки 8&div;13 предыдущего примера.
+        </p>
+
+        <table class="olga5_tableCode">
+            <tbody>
+                <tr>
+                    <td>
+                        <pre>&nbsp;<br/>1<br/>2<br/>3<br/>4<br/>5<br/>6<br/>7<br/>8<br/>9<br/>10<br/>11<br/>12<br/>13<br/>14</pre>
+                    </td>
+                    <td>
+                        <pre>
+<span class="olga5_tableName">вызов в теге <b>&lt;script&gt;</b></b></span>
+&lt;script&gt;
+window.addEventListener('olga5_ready', function () {
+    if (window.olga5 && window.olga5.<b>Menu</b>)
+        window.olga5.Menu([                    
+            { span: '2. меню &lt;script&gt;', right: '166px', top: '133px', add: '233px', owner: document.body, position: 'relative', id: "mnu2" },
+            { span: 'Меню №1', ref: 'm1' },
+            { span: 'Использование Menu()', ref: 'm23', add: '288px' },
+            { span: 'подМеню №2', ref: '#m2', },
+            { span: 'подМеню №3', ref: 'm3', ret: 1 },
+            { span: 'Меню №4', ref: '#m4' },
+            { span: 'Меню №5', ref: 'm5' },
+        ])
+})
+&lt;/script&gt;
+</pre>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <h4 id="m3">подМеню №<b>3</b></h4>
+        <p>
+            Меню фиксировано на экране.
+            В отличие от остальных примеров здесь в начало этого меню добавлены три ссылки на иной документ.
+            Остальные строки 14&div;19 полностью повторяют строки 8&div;13 первого примера.
+        </p>
+        <table class="olga5_tableCode">
+            <tbody>
+                <tr>
+                    <td>
+                        <pre>&nbsp;<br/>1<br/>2<br/>3<br/>4<br/>5<br/>6<br/>7<br/>8<br/>9<br/>10<br/>11<br/>12<br/>13<br/>14<br/>15<br/>16<br/>17<br/>18<br/>19<br/>20<br/>21<br/>22</pre>
+                    </td>
+                    <td>
+                        <pre>
+<span class="olga5_tableName">вызов в теге <b>&lt;script&gt;</b></b></span>
+&lt;script&gt;
+window.addEventListener('olga5_ready', function () {
+    if (window.olga5 && window.olga5.<b>Menu</b>)
+    window.olga5.Menu([{
+        span: '3. меню &lt;script&gt;', right: '166px', top: '188px', add: '233px',
+        id: 'mnu3',
+        target: '_olga5',
+        title: 'меню с внешними ссылками',
+        base: 'https://rombase.h1n.ru/o5/blog/'
+    },
+    { span: '3. Cсылки на иной документ', ref: 'olga5-snd.html#snd_3', add: '288px', id: `snd_3` },
+    { span: '3.1. Подключение к тегам &lt;audio&gt;', ref: '/olga5-snd.html#snd_31', },
+    { span: '3.2. Просто к тегам &lt;img&gt;', ref: './olga5-snd.html#snd_32', ret: 1 },
+    { span: 'Меню №1', ref: 'm1' },
+    { span: 'Использование Menu()', ref: 'm23', add: '288px' },
+    { span: 'подМеню №2', ref: '#m2', },
+    { span: 'подМеню №3', ref: 'm3', ret: 1 },
+    { span: 'Меню №4', ref: '#m4' },
+    { span: 'Меню №5', ref: 'm5' },
+    ])
+})
+&lt;/script&gt;
+</pre>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <p>
+            Здесь отсутствие <b>owner</b>' фиксирует меню на экране.
+        </p>
+
+        <h3 id="m4">Меню №<b>4</b></h3>
+        <p>
+            Пример вызова из тега <b>&lt;pre&gt;</b>. Меню фиксировано на экране.
+            Приятный бонус именно этого тега: форматирование <b>html</b> текста не удаляет сдвиги в структуре описания
+            меню.
+        </p>
+        <table class="olga5_tableCode">
+            <tbody>
+                <tr>
+                    <td>
+                        <pre>&nbsp;<br/>1<br/>2<br/>3<br/>4<br/>5<br/>6<br/>7<br/>8<br/>9<br/>10<br/>11<br/>12</pre>
+                    </td>
+                    <td>
+                        <pre>
+<span class="olga5_tableName">вызов из тега <b>&lt;pre&gt;</b></b></span>
+&lt;pre id="m4" class="olga5-menuhidden" style="display:none"&gt;
+{span: '4. Меню <b>&lt;pre&gt;</b>',right: '11px',top: '133px',add: '233px',
+    target:'_olga6',
+    id:'mnu4', 
+},
+{ span: 'Меню №1', ref: 'm1' },
+{ span: 'Использование Menu()', ref: 'm23', add: '288px' },
+    { span: 'подМеню №2', ref: '#m2', },
+    { span: 'подМеню №3', ref: 'm3', ret: 1 },
+{ span: 'Меню №4', ref: '#m4' },
+{ span: 'Меню №5', ref: 'm5' },
+&lt;/pre&gt;
+</pre>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <p>
+            Здесь, как и в примере №<b>3</b>, отсутствие <b>owner</b>' фиксирует меню на экране.
+            Строки 6÷11 полностью повторяют строки 8÷13 первого примера
+        </p>
+
+        <h3 id="m5">Меню №<b>5</b></h3>
+        <p>
+            Пример вызова из тега <b>&lt;div&gt;</b>. Особенностью примера является назначение его <b>owner</b>'ом блока
+            '<b>Примеры меню</b>', в свойстве <b>style</b> которого задано <i>position: absolute;</i>.
+        </p>
+        <table class="olga5_tableCode">
+            <tbody>
+                <tr>
+                    <td>
+                        <pre>&nbsp;<br/>1<br/>2<br/>3<br/>4<br/>5<br/>6<br/>7<br/>8<br/>9<br/>10<br/>11<br/>12<br/>13</pre>
+                    </td>
+                    <td>
+                        <pre>
+<span class="olga5_tableName">вызов из тега <b>&lt;div&gt;</b></b></span>
+&lt;div id="m5" class="olga5-menuhidden" style="display:none"&gt;
+{span: '5. меню <b>&lt;div&gt;</b>',right: '11px',top: '23px',add: '233px',
+owner: '#div1',
+target:'_olga5',
+id:'mnu5',
+},
+{ span: 'Меню №1', ref: 'm1' },
+{ span: 'Использование Menu()', ref: 'm23', add: '288px' },
+{ span: 'подМеню №2', ref: '#m2', },
+{ span: 'подМеню №3', ref: 'm3', ret: 1 },
+{ span: 'Меню №4', ref: '#m4' },
+{ span: 'Меню №5', ref: 'm5' },
+&lt;/div&gt;
+</pre>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <p>            
+            Строки 7÷12 полностью повторяют строки 8÷13 первого примера
+        </p>
+    </div>
+</div>
+</body>
+
+</html>

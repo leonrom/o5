@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<title>snd43</title>
+	<link rel="shortcut icon" href="./favicon.svg" type="image/x-icon">
+
+	<link href="../blog/csss/olga5.tableCode.css" media="screen" rel="stylesheet" />
+	<script data-src='+o5ref.js'
+		o5tag_attrs='
+			img=image_play;
+			a, img, audio=href, data-href, src, _src
+		'	
+	o5urlrfs="  
+		myTunes-icon='images + /myMusikIT.png' # --- только для o5snd ---;
+
+		мой-блог=https://turkceile.blogspot.com/2017/02/   # --- только для o5shp ---;
+		_мой-блог=https://ariturlearn.blogspot.com/2017/02 # --- только для o5shp ---; 
+		"
+></script>
+<script data-src='+o5snd.js'	
+	o5urlrfs="Ceza1-25=sounds+/Ceza1-25.mp3;"
+	btn_play='images + /play.png'
+	btn_stop='images + /play_Freepik.png'
+></script>
+
+<script src='../olga5/o5com.js' 
+data-xxx=123
+o5consts="o5debug=2"
+o5urlrfs="
+	_блог_o5 = '_url_olga5+../2020/02';
+	sounds=https://archive.org/download/clouds_20200310;
+	ёй-sounds_2=https://archive.org/download/clouds_20200310;
+	images=_url_olga5 + ../blog/media/image;
+	# _url_html=' адрес текущей страницы (этот и 2 следующих - закомментированы)';
+	# _url_root='# адрес сайта (с текущей страницей)';
+	# _url_olga5='# адрес загрузки файла o5common.js';
+"
+></script>
+</head>
+
+<body style="margin: 0 0.1em 0 0.3em;">
+	<div class='example, olga5_Start'>
+	<style>
+		#div1{
+			background-color: aliceblue;
+				border: solid 1px lightgray;
+				height: fit-content;
+				display: block;
+				padding: 4px;
+				overflow: auto;
+				max-width: fit-content;
+				margin-left: 11px;
+		}
+		#div1 tr{
+			white-space: nowrap;
+		}
+		#div1 table{			
+    border-spacing: 0.3em;
+    border-bottom-style: double;
+    border-bottom-color: lightgray;
+		}
+		#div1 tr:nth-child(odd) td:last-child{
+			background-color: aliceblue;
+		}
+		#div1 tr:nth-child(even) td:last-child{
+			background-color: blanchedalmon;
+		}
+	</style>
+	Примеры из блога
+	<div id='div1' class="olga5_shp:Up:Top" olga5_frames="i:olga5-Start_hr,n" olga5_owners="n">
+		<table class="tableIllu">
+			<tbody>
+				<tr>
+					<td>3</td>
+					<td><img class="aaa olga5_snd: Lяя :Aюю:'ёй-sounds_2 + /gitme.mp3' bbb:O" title="img03" id='03'
+							src="+myTunes-icon"
+							image_play="https://icons.iconarchive.com/icons/froyoshark/enkel/48/Spotify-icon.png" />
+					</td>
+					<td>&lt;<b>img</b> class="aaa olga5_snd: Lяя :Aюю:'ёй-sounds_2 + /gitme.mp3 bbb:O'"
+						<b>src</b>= "+myTunes-icon" <b>image_play</b>="http://icons....png"/&gt;
+						<br />&nbsp;&nbsp;&nbsp;
+						зацикленное звучание по клику до следующего клика 
+						('L'= 'loop', 'A'= 'alive', 'яя' и 'юю' - не значат, т.к. берётся 1-я буква)
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		<p>
+			кириллические литеры и лишние пробелы добавлены для проверки универсальности работы
+		</p>
+	</div>
+</div>
+</body>
+
+</html>

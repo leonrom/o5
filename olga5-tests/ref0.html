@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<title>ref0</title>
+	<link rel="shortcut icon" href="./favicon.svg" type="image/x-icon">
+
+	<script async src=' ../olga5/o5common.js' o5debug=0></script>
+	<script  src='../olga5/o5ref.js' 
+	o5consts="
+	  		img=src, image_play
+	  " 
+	  o5urlrfs="
+  			мой-блог=https://rombase.h1n.ru/o5/blog;
+
+			url_ma='мой-блог + /media';
+			url_tt='url_ma + /tt';
+			
+			медиа =  blog/media/;
+			images=_url_olga5 + ../blog/media/image;
+			audios = 'мой-блог + /media/audio';
+			iTunes-icon='images + /iTunes-icon.png';
+	  		no_llorare='audios + /no_llorare.oga';
+			  "
+	  >
+	</script>
+
+	<script async src='../olga5/o5snd.js' 
+		btn_play=' + ../blog/media/image/play.png'
+		btn_stop='мой-блог + /media/image/play_Freepik.png'
+	></script>
+
+
+</head>
+
+<body style="margin: 0 0.1em 0 0.3em;">
+	<div class='example, olga5_Start' style="text-align: left;line-height: 1.3; margin-bottom: 0cm;">
+		<p>
+			Описание скрипта <code>o5snd</code> <i>библиотеки</i>
+			<!-- <a href="мой-блог + /olga5-all.html" target="olga5-addPage"><code>olga5</code></a>, -->
+			расширяющего возможности использования стандартного аудиоплейера.
+		</p>
+		<img class="olga5_snd:loop:live:..blog/media/tt/gitme.mp3" 
+			title="относительныйй адрес" id='00' 
+			src='../blog/media/image/play.png'/> 
+		<img class="olga5_snd:loop:live:+..blog/media/tt/gitme.mp3" 
+			title="через '+' (_url_olga5)" id='01' 
+			src=' + ../blog/media/image/play.png' />
+		<img class="olga5_snd:loop:live:'+url_tt + /gitme.mp3'" 
+		title="по имени кнопки" id='02' 
+			src=btn_play/>
+		<img class="olga5_snd:loop:live:'мой-блог + /media/tt + /gitme.mp3'" 
+			title="через '../ + медиа'" id='03' 
+			src=' + ../ + медиа + /image/play.png'/>
+	</div>
+</body>
+
+</html>

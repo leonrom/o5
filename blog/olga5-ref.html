@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<title>olga5-ref</title>
+	<link rel="shortcut icon" href="+../blog/favicon.svg" type="image/x-icon">
+
+	<!-- 
+	src='https://rombase.neocities.org/olga5/o5com!.js'
+	src='https://rombase.h1n.ru/o5/olga5/o5com!.js'
+	src='http://localhost/o5/olga5/o5com!.js' 
+	_блог_o5 = 'https://olga-5.blogspot.com/2020/02' 
+    тесты='http://rombase.h1n.ru/o5/olga5-tests'
+    тесты='http://localhost/o5/olga5-tests'  
+	https://leonrom.github.io/o5/olga5/o5.js
+-->
+	<script src='http://localhost/o5/olga5/o5.js' o5consts="o5debug=0" o5urlrfs="
+	_блог_o5 = '_url_olga5+../2020/02';
+	тесты = '_url_olga5 + ../olga5-tests';
+	images = _url_olga5 + ../blog/media/image;
+	# _url_html='# адрес текущей страницы (этот и 2 следующих - закомментированы)';
+	# _url_root='# адрес сайта (с текущей страницей)';
+	# _url_olga5='# адрес загрузки файла o5com!.js';
+">
+</script>
+
+	<link data-href='+o5ini.css' media='screen' rel='stylesheet' />
+	<script data-src='+o5pop.js'></script>
+	<script data-src='+o5mnu.js' o5consts="scrollY=-32"></script>
+	<script data-src='+o5ref.js' o5tag_attrs="
+			img=image_play;
+			a,img,audio= href,data-href,src;
+			" o5urlrfs="
+			sounds=https://archive.org/download/clouds_20200310;
+
+			iTunes-icon='images + /myMusikIT.png' # --- только для o5snd ---;
+			Ceza1-25=sounds+/Ceza1-25.mp3;
+		"></script>
+	<script data-src='+o5shp!.js'></script>
+	<script data-src='+o5snd!.js' btn_play='images + /play.png' btn_stop='images + /play_Freepik.png'>
+	</script>
+	<script data-src='+add/pusto.js' data-o5consts="moe-attr=мой атрибут"></script>
+
+	<link data-href='+../blog/csss/olga5.tableCode.css' media='screen' rel='stylesheet' />
+	<link data-href='+../blog/csss/olga5.textNshow.css' media='screen' rel='stylesheet' />
+	<link data-href='+../blog/csss/olga5.addStyles.css' media='screen' rel='stylesheet' />
+
+	<link data-href='+../blog/csss/olga5.tableKuplet.css' media='screen' rel='stylesheet' />
+	<link data-href='+../blog/csss/tests.css' media='screen' rel='stylesheet' />
+
+</head>
+
+<body>
+	<div class="olga5_Start:o5pop,o5ref,o5shp,o5mnu" dir="ltr" trbidi="on">
+		<img alt="" border="0" width="200" style="display:none" data-original-height="599" data-original-width="662"
+			src="https://1.bp.blogspot.com/-opJj3td2qGQ/YEsTLcPWdRI/AAAAAAAAEQg/C1qCdQsEf-87IkDtZdPI_6K5VsBlNnFVACPcBGAsYHg/s200/ref.png" />
+
+		<p class="olga5_page_header">
+			Подстановка <i>именованных</i> ссылок в теги <b>HTML</b>-документа.
+		</p>
+
+		<h3 id="head_1">1. Общие сведения</h3>
+		<div>
+			<p>
+				Скрипт <code>o5ref.js</code> входит в <i>библиотеку</i>
+				<span o5popup='+ ./help/o5help.html; width: 555, height: 390'><code>Olga5</code></span>&nbsp;и
+				выполняет обработку внутренней структуры тегов, находящихся в
+				<span class="olga5_popup"
+					o5popup='+../blog/olga5-all.html?o5nomnu#head_43; width: 666, height: 444'>областях</span>
+				действия инициализации данного скрипта:
+			<ul>
+				<li>подстановку <i>именованных</i> ссылок в тегах, заданных обязательным атрибутом <b>o5tag_attrs</b>;
+				</li>
+				<li>организацию
+					<i
+						title="загрузка клипа начинается только после наведения курсора, а загрузка плейера к нему - после клика на на клипе">сверхленивой</i>
+					загрузки <b>YouTube</b>-клипов в теги, с атрибутом <b>o5youtube</b>;
+				</li>
+				<li>преобразование структурированного HTML-тектста в стандартный тег &lt;<b>table</b>&gt;.</li>
+			</ul>
+
+			подстановку <i>именованных</i> ссылок
+			в тегах, заданных обязательным атрибутом <b>o5tag_attrs</b> и находящихся в
+			<span class="olga5_popup"
+				o5popup='+../blog/olga5-all.html?o5nomnu#head_43; width: 666, height: 444'>областях</span>
+			действия инициализации данного скрипта.
+
+
+
+			При его отсутствии модуль не выполняет никаких действий, а в системный журнал выдаётся предупреждающее
+			сообщение.
+			Сами же <i>именованные</i> ссылки могут быть определены как в общедоступном атрибуте
+			<span class="olga5_popup"
+				onmouseup="window.olga5.PopShow( 666, 555, '_url_olga5+../blog/olga5-all.html?o5nomnu#head_622')"><b>o5urlrfs</b></span>
+			<!-- class="olga5_popup"	onmouseup="window.olga5.PopShow( 666, 555, './olga5-all.html?o5nomnu#head_62')"><b>o5urlrfs</b></span> -->
+			тега <code>o5com!.js</code>,
+			так и в одноимённом атрибуте данного скрипта <code>o5ref.js</code>.
+			</p>
+			<p>
+				Общий синтаксис задания атрибутов определён
+				<span id='span2' title="Ссылка на описание ядра библиотеки 'Olga5'" class="olga5_popup"
+					onclick="window.olga5.PopUp(this, '+../blog/olga5-all.html?o5nomnu#head_6', 'width:720, height:800')">здесь</span>,
+				<!-- onclick="window.olga5.PopUp(this, './olga5-all.html?o5nomnu#head_6', 'width:720, height:800')">здесь</span>, -->
+				а подробности использования <i>именованных</i> ссылок -
+				<span id='span2' title="Ссылка на описание ядра библиотеки 'Olga5'" class="olga5_popup"
+					onclick="window.olga5.PopUp(this, '+./help/urlrfs.html?o5nomnu#head_1', 'width:720, height:800')">здесь</span>.
+			</p>
+			<p>
+				Атрибут <b>o5tag_attrs</b> задает массив из <i>пар</i> списков: тегов и теговых атрибутов,
+				в которых будет выполняться поиск и подстановка <i>именованных</i> ссылок.
+				Например:
+			</p>
+			<p class="olga5_codeTextSeparate">
+				o5tag_attrs = 'a= href, data-href # первая пара; img, audio= src, data-src # вторая пара'
+			</p>
+			Здесь:
+			<ul>
+				<li>для тегов &lt;<b>a</b>&gt; <i>именованные</i> ссылки ищутся во всех атрибутах <b>href</b> и
+					<b>data-href</b>
+					находящихся в
+					<span
+						o5popup='+../blog/olga5-all.html?o5nomnu#head_43; width: 666, height: 444'>областях&nbsp;действия</span>
+					инициализации;
+				</li>
+				<li>для тегов &lt;<b>img</b>&gt; и &lt;<b>audio</b>&gt; <i>именованные</i> ссылки
+					аналогично ищутся в атрибутах <b>src</b> и <b>data-src</b>.</li>
+			</ul>
+			<p>
+				Пары списков разделяются символом '<b>;</b>' (а также - разрывом строки), список тегов отделён от списка
+				атрибутов символом '<b>=</b>',
+				а элементы внутри списков разделяются символом '<b>,</b>'.
+				Символ '<b>#</b>' - начало комментария к паре списков, действующего до ближайшего '<b>;</b>' или конца строки.
+				Пробелы вокруг символов `<b>'</b>`, `<b>;</b>`, `<b>=</b>` и `<b>#</b>` игнорируются и отбрасываются.
+			</p>
+		</div>
+
+
+		<h3 id="head_2">2. Подключение скрипта</h3>
+		<div>
+			<p>
+				Как пример подключения <code>o5ref.js</code> рассматривается
+				<code class="olga5_popup"
+					onclick="window.olga5.PopShow( 500, 288, 'тесты+/ref2.html')">HTML-файл</code>:
+			</p>
+
+			<div id="kst">
+				<table class="olga5_tableCode olga5_shp" style="height:222px;" olga5_owners="id:kst">
+					<tbody>
+						<tr>
+							<td>
+								<pre>&nbsp;<br/>1<br/>2<br/>3<br/>4<br/>5<br/>6<br/>7<br/>8<br/>9<br/>10<br/>11<br/>12<br/>13<br/>14<br/>15<br/>16<br/>17<br/>18<br/>19<br/>20<br/>21<br/>22<br/>23<br/>24<br/>25<br/>26<br/>27<br/>28<br/>29<br/>30<br/>31<br/>32<br/>33<br/>34</pre>
+							</td>
+							<td>
+								<pre>
+<span class="olga5_tableName">рабочий пример</span>
+&lt;html&gt;
+&lt;head&gt;
+    &lt;meta http-equiv="content-type" content="text/html; charset=UTF-8"&gt;
+    &lt;title&gt;ref2 примеры&lt;/title&gt;
+    &lt;script src='../olga5/o5ref.js'
+        o5tag_attrs='
+            a = href
+            a = data-href,<b style="background: gold;"> xxx</b> # Содержит ошибку
+            b,<b style="background: gold;"> vv</b> = xxx             # -"-
+            img, audio = src,<b>_src</b>
+        '
+        o5urlrfs = "		
+            ma   = /media                           # это промежуточная часть адресной строки
+            tt   = _url_html + ma + /tt             # здесь `<b>/tt</b>` название папки, а не ссылка
+            belo = _url_root + <b style="background: gold;">mma</b> + /o5/blog       # спец. содержит ошибочную ссылку  "mma"
+            audio= _url_root + /o5/blog + ma+/audio # спец. демо формирования составного пути
+            btnSound = _url_root + o5/blog/media/image/play.png   # ссылка на конкретный файл
+        "
+    &gt;
+    &lt;/script&gt;
+    &lt;script async src='../olga5/o5com!.js' o5debug=2 &gt;&lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;br/&gt;1 &lt;<b>b</b>     id="1" <b>title</b>="xxx= + _url_html + ma + /mm"
+                         <b>xxx</b>='_url_html + <u>ma</u> + <b style="background: gold;">/mm</b>'
+                         onclick="alert(this.getAttribute('xxx'))"&gt;click me !&lt;/b&gt;
+    &lt;br/&gt;2 &lt;<b>img</b>   id="2" <b>title</b>="_src= +/mm + btnSound; olga5-snd:'mm + tt + /gitme.mp3'"
+                         <b>_src</b>="+ <b style="background: gold;"> mm</b> + <u>btnSound</u>"
+                         <b>olga5-snd</b>:"<b style="background: gold;"> mm</b> + <u>tt</u> + /gitme.mp3" /&gt;
+    &lt;br/&gt;3 &lt;<b>a</b>     id="3" <b>title</b>="href=+ belo+/olga5-ref.html" <b>href</b>="+ <u>belo</u>+/olga5-ref.html" target="z"&gt;ссылка на olga5-ref.html&lt;/a&gt;
+    &lt;br/&gt;4 &lt;<b>img</b>   id="4" <b>title</b>="src= + belo+ma+/image/solfedjio.png" <b>src</b>="+ <u>belo</u> + <u>ma</u> + /image/solfedjio.png"/&gt;
+    &lt;br/&gt;5 &lt;<b>audio</b> id="5" <b>title</b>="src=   auduo + Clouds.mp3" <b>src</b>="<u>audio</u> + Clouds.mp3" controls="controls" &gt;&lt;/audio&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</pre>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				<p>
+					<i>Золотистым</i> фоном выделены ошибочные (т.е. отсутствующие) параметры,- теги, атрибуты или
+					ссылки,
+					которые программа игнорирует. В данном примере эти параметры вставлены искусственно таким образом,
+					чтобы все ссылки всё равно получались обнаруживаемыми&nbsp;&#9786;.
+					Об обнаруженных же ошибочных параметрах выдаются сообщения об ошибке (на желтом фоне в
+					<i>console.log</i> - см. ниже).
+					После клика на такое сообщение появляется выпавший список с детальной информацией об ошибке.
+				</p>
+				<p>
+					В строках 7&div;10 показан вариант задания тегов и их атрибутов, в которых будут выполняться
+					подстановки.
+				</p>
+				<p>
+					В строках 13&div;17 показаны некоторые варианты задания <i>именованных</i> ссылок.
+					Каждая из ссылок в своём <span title="т.е. права от знака '='">значении</span> может ссылаться на
+					другие ссылки,
+					который были определены в вышенаписанных строках.
+				</p>
+				<p class='moecomment'>
+					Здесь строки 7&div;10 и 13&div;17 не заканчиваются символом '<b>;</b>' - потому, что
+					достаточно разрыва строки. Но лучше всё-таки всегда писать '<b>;</b>'
+					т.к. <b>Blogger</b>, при сохранении файла, объединяет строки значения атрибута.
+				</p>
+				<p>
+					В строках 24&div;32 жирным шрифтом выделены теги и атрибуты, для которых будет выполняться
+					подстановка.
+					Подчёркнутым шрифтом - <i>именованные</i> ссылки , используемые в подстановках.
+					Тут же могут быть задаваться/переопределяться значения <b>_url_html</b> и <b>_url_root</b>,
+					сформированные в <code>o5com!.js</code>.
+				</p>
+			</div>
+			<p>
+				Правильность работы приведенного выше
+				<span class="olga5_popup"
+					onclick="window.olga5.PopShow( 500, 288, 'тесты+/ref2.html')">HTML-файла</span>:
+				подтверждается (после клика по ссылке) отображением иконок и загрузкой/звучанием аудио-файла (в 5-м
+				теге).
+				Также результаты подстановок можно посмотреть на закладке <i>Elements</i> окна отладчика
+				<i>DevTools</i>, а протокол работы можно видеть на закладке <i>Console</i> отладчика.
+			</p>
+		</div>
+		
+		<h3 id="head_3">3. Подключение клипов YouTube</h3>
+		<div>
+			<p>
+				Подключение видеороликов YouTube  выполнено с помощью
+				<span o5popup="https://developers.google.com/youtube/iframe_api_reference?hl=ru">YouTube Player API</span>. 
+				При этом вместо вызова <i>мистической</i> функции <b>onYouTubeIframeAPIReady()</b> 
+				использовались типовые обработчики событий <b>onLoad</b> и <b>onError</b>, что позволило загружать контент 
+				динамически,- по мере необходимости.
+			</p>
+			<p>
+				Для включения <b>YouTube</b> необходимо предусмотреть тег-<i>контейнер</i> с атрибутом <b>o5youtube</b> 
+				с указанием <b>videoId</b> – строковым идентификатором видео YouTube, 
+				например <b>o5youtube="K2x3YR0EjFc"</b>. 
+			</p>
+			<p>
+				<i>Контейнером</i> может быть любой (блочный) тег. 
+				При инициализации страницы (модулем <code>o5ref</code>) в <i>контейнере</i> создаётся пустой <i>субконтейнере</i> - тег 
+				<b>div</b>. При наведении курсора на один из <i>контейнеров</i> выполняются:
+				<ul>
+					<li>однократная загрузка <i>YouTube Player API</i>, </li>
+					<li>после окончания которой инициируется загрузка <b>Youtube</b>'ского контента,</li>
+					<li>после окончания которой контент доступен для просмотра по клику на нём.</li>
+				</ul>
+			</p>
+			<P>
+				Для минимизации траффика применяется т.с. <i>супер-Lazy</i> технология загрузки, когда при создании 
+				<i>субконтейнера</i> в нём (точнее,- в его <i>контейнере</i>) в качестве фона загружается лишь умалчиваемая картинка 
+				видеоролика (сам же ролик загрузится лишь после наведения курсора). Это приводит к неприятному эффекту изменеия 
+				размеров <i title="но мне пока лень с этим бороться">контейнере</i>.
+			</P>
+			<p>
+				Работа проигрывателей синхронизована как между собой, так и с обработкой аудио (модулем <code>o5snd</code>), 
+				что обеспечивает звучание (проигрывание) в каждый момент времени только лишь одного файла.
+			</p>
+		</div>
+
+		<h3 id="head_4">4. Рекомендации по отладке</h3>
+		<div>
+			<p>
+				Если какие-то подстановки выполняются неправильно (не показывается иконка, не проигрывается музыка и
+				т.д.),
+				то обычно причиной является либо её недоопределённость в <b>o5tag_attrs</b>,
+				либо ошибка (различие) в написании ссылок, либо неправильная разбивка на подстроки <i>именованных</i>
+				ссылок.
+			</p>
+			<p>
+				Конкретнее о причинах ошибок можно прочитать в предыдущих сообщениях (в <i>console.log</i>) написанных
+				красным шрифтом
+				и начинающиеся словом <span style="color:red;">GET</span>. Коды ошибок, указанные в сообщениях можно
+				найти
+				<code class="olga5_popup"
+					onclick="window.olga5.PopShow( 777, 444, 'https://developer.mozilla.org/ru/docs/Web/HTTP/Status')">тут</code>.
+				К сожалению, не смог обработать и отобразить данным скриптом эту информацию в упорядоченном виде
+				средствами
+				<b>JS</b> из-за политики безопасности браузеров.
+			</p>
+			<p>
+				При поиске причины ошибок следует в <i>console.log</i> прочитать (раскрыть) сообщения, показанные на
+				желтом фоне.
+				Нужно убедиться, что неиспользованные параметры, перечисленные в сообщениях, действительно <i>не
+					используются</i>,
+				а не оказались там из-за ошибки в написании.
+			</p>
+			<p>
+				Ошибки '404', связанные с <i>именованными</i> ссылками,
+				если они появились до завершения инициализации <code>o5ref.js</code>,- можно игнорировать.
+			</p>
+			<p>
+				При поиске ошибки в тесте HTML-страницы следует иметь ввиду, что в сообщении символ конкатенации всегда
+				показывается
+				как '<span class="olga5_codeText"><b>+</b></span>', в то время как на странице он м.б. представлен не
+				только как '<span class="olga5_codeText"><b>+</b></span>',
+				но и как код '&amp;#43;' (даже если изначально там был простой <i>плюс</i>).
+			</p>
+			<p>
+				Для анализа обработки <i>именованных</i> ссылок скриптом, при его инициализации с <b>o5debug</b>>0,
+				в системный <i title="закладка Console окна отладчика браузера">журнал</i>
+				выдаются</span> 'раскрываемые' (табличные) сообщения:
+			</p>
+			<ol>
+				<li><i>все константы 'consts'</i> &mdash; константы, обрабатываеме модулем, включая как
+					общебеблиотечне, так и заданные в данном скрипте;</li>
+				<li><i>все константы 'urlrfs'</i> &mdash; именованные ссылкив, обнаруженные как в
+					<code>o5com!.js</code>, так и в <code>o5ref.js</code>;
+				</li>
+				<li><i>обрабатываемые атрибуты тегов</i> &mdash; параметры тегов, определёные в <b>o5tag_attrs</b>;
+				</li>
+				<li><i>выполнено подстановок для тегов</i> &mdash; перечень тегов и их атрибутов, в которых выполнены
+					подстановки <i>именованных</i> ссылок.
+					При отсутствии подстановок это сообщение имеет вид '<i>не выполнено ни одной подстановки</i>';</li>
+				<li><i>неопределённые адреса</i> &mdash; сообщение об ошибке,- появляется при наличии неопределнных
+					<i>именованных</i> ссылок.
+				</li>
+				<p class="moecomment">
+					Последнее сообщение может оказаться ложным, если обработка <i>именованной</i> ссылки предусмотрена
+					в ином модуле (например в <code>o5snd</code>).
+				</p>
+			</ol>
+			<p>
+				При наличии <i>неработающего</i> тега необходимо проверить наличие его наименования в первом столбце
+				таблицы 4-го сообщения,
+				а его <i>неработающего</i> атрибута - в её 2-м столбце.
+				Их отсутствие свидетельствует, что они не(правильно) прописаны
+				в обязательном атрибуте <b>o5tag_attrs</b> скрипта <code>o5ref.js</code> (в табл. 1).
+			</p>
+			<p>
+				Можно раскрыть отладочное сообщение '...<i>обрабатываемые атрибуты тегов</i>' и 
+				проверить сколько раз для каких атрибутов каких тегов выполнялась подстановка.
+			</p>
+			<p>
+				Если после исправления необнаруженных атрибутов тег по-прежнему не работает, но зато в протоколе
+				появились
+				сообщения вида "<b>GET</b> <i>http://rombase.h1n.ru/o5/blog/media/image/shp1.png</i> <b>404 (Not
+					Found)</b>",
+				то следует <i title="подстановкой вручную в браузер">проверить</i> адреса в 3-й таблице.
+			</p>
+			<p>
+				Ошибки могут появляться и вследствие работы плагинов, подключенных к браузеру.
+				Например, в одной из статей в <b>Blogger</b>'е пришлось заменить фирменное название иконки
+				"iTunes-icon.png" на нейтральное "myMusikIT.png",-
+				из-за ошибки "net::ERR_BLOCKED_BY_CLIENT", вызванной работой плагина <b>AdBlock</b> .
+			</p>
+			<p>
+				Сравните протокол отладки (при <b>is-debug</b>=2) своих модулей с протоколами работающих примеров,
+				приведенных в статье. Эти примеры можно также скачать по ссылкам в заголовках окон.
+			</p>
+			<p>
+				Перед самостоятельным поиском ошибок проверьте текст на валидность, например
+				<a href="https://validator.w3.org/#validate_by_input" target="olga5-addPage">здесь</a>.
+			</p>
+			<p>
+				И наконец: если не получается самостоятельно исправить,- отправьте автору блога ссылку на страницу
+				c описанием возникшей проблемы.
+			</p>
+			<br />
+		</div>
+
+		<!-- ===================================================================================== -->
+		<pre id="menu-pre" class="olga5-menuhidden" style="display:none">
+					{ span: 'Статья', id: "moemenu", right: '5px', top: '5px', add: '266px', block:'s' },
+					{ span: '1. Общие сведения', ref: 'head_1' },
+					{ span: '2. Подключение скрипта', ref: 'head_2' },
+					{ span: '3. Подключение клипов YouTube', ref: 'head_3' },
+					{ span: '4. Рекомендации по отладке', ref: 'head_4' },
+		</pre>
+	</div>
+</body>
+
+</html>

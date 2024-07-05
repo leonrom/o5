@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<title>shp1_</title>
+	<link rel="shortcut icon" href="./favicon.svg" type="image/x-icon">
+
+	<link href='./add/alltst.css' media='screen' rel='stylesheet' />
+	<script src='./add/alltst.js'></script>
+
+	<script src='../olga5/o5com.js' o5debug=2></script>
+	<script data-src='+ o5inc.js'></script>
+	<script  data-src='+./o5shp.js'></script>
+</head>
+
+<!-- <body id="body" onload="Init0()" onblur="window.focus()"> -->
+<body>
+	<script>
+		const eve = document.head.querySelector("script[src*='o5inc.js']") ? 'olga5-incls' : 'olga5_ready' 
+			window.addEventListener(eve, Init1)
+	</script>
+	<div class='olga5_Start' o5include='./shp1.html?.example' id="example-_"></div>
+</body>
+
+</html>

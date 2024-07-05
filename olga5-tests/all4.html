@@ -1,0 +1,96 @@
+<html>
+
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<title>snd3 QS</title>
+	<link rel="shortcut icon" href="./favicon.svg" type="image/x-icon">
+
+	<link href="../csss/olga5.tableCode.css" media="screen" rel="stylesheet" />
+	<script async src='../olga5/o5com!.js' 
+		o5debug=0 
+		o5urlrfs="
+			_images=_url_olga5 + ../blog/media/image; 
+			красный='_images + /icons8-youtube-music-48.png';
+			чёрный ='_images + /icons8-youtube-music-50.png';
+		"
+	></script>
+	<script src='../olga5/o5snd.js'
+		o5urlrfs="
+			imgplay=красный;
+			_аудио=https://archive.org/download;
+			_аудио_файл=_аудио + /clouds_20200310/Clouds.mp3;
+		" 
+	></script>
+	<script src='../olga5/o5ref.js' 
+		o5tag_attrs="img=_src;"
+		o5urlrfs="imgstop=чёрный;"
+	></script>
+</head>
+
+<body style="margin: 0 0.1em 0 0.3em;">
+	<div class='example olga5_Start'>
+	<style>
+		img {
+    		position: inherit;
+    		padding: 0 !important;
+    		vertical-align: bottom;
+    		border-radius: 50%;
+    		box-shadow: none !important;
+    		animation: none;
+    		-moz-box-shadow: none !important;
+    		-webkit-box-shadow: none !important;
+    		width: 28px;
+    		max-height: 28px;
+    		max-width: 28px;
+		}
+	</style>
+	<h4>Примеры выборочной обработки тегов через QuerySelectorAll.</h4>
+	<p>
+		Показаны 4 пары иконок. В зависимости от атрибута <b>class='olga5_Start'</b>
+		иконки могут быть последовательно (согласно очерёдности в &lt;<b>head</b>&gt;) обработаны
+		скриптами
+	</p> 
+	<ul class='olga5_Start'>
+		<li><b>o5snd</b> - теги с '<i>class='olga5_snd'</i>' и даёт 'красную' картинку <img src=красный class="olga5_snd:n" title="файл 'icons8-youtube-music-48.png'" /></li>
+		<li><b>o5ref</b> - теги с атрибутом '<i><b>_</b>src</i>' даёт 'чёрную ' картинку <img src=чёрный class="olga5_snd:n" title="файл 'icons8-youtube-music-50.png'" /></li>
+	</ul>
+	<p>
+		Первая в паре иконка имеет <b>class='olga5_snd'</b> и может обрабатываться скриптом <b>o5snd</b>,
+		а вторая - может измениться последующим скриптом <b>o5ref</b>.
+	</p>
+	
+	<br />
+	<div class='olga5_Start'>
+		1. задано <b>class='olga5_Start'</b> - обрабатывается <b>o5snd</b> и (потом) <b>o5ref</b> <br />
+		красная &mdash; <img id='1.1' class='olga5_snd:_аудио_файл' src=imgplay />; 
+		чёрная &mdash; <img id='1.2' _src=imgstop  />;
+	</div>
+	<br />
+	<div class='olga5_Start:o5ref:o5snd'>
+		2. задано <b>class='olga5_Start:o5ref:o5snd'</b> - то же самое, что и 1 <br />
+		красная &mdash; <img id='2.1' class='olga5_snd:_аудио_файл' src=imgplay  />; 
+		чёрная &mdash; <img id='2.2' _src=imgstop  />;
+	</div>
+	<br />
+	<div class='olga5_Start:o5snd'>
+		3. задано <b>class='olga5_Start:o5snd'</b> - обрабатывается только <b>o5snd</b> <br />
+		красная &mdash; <img id='3.1' class='olga5_snd:_аудио_файл' src=imgplay />;
+		нету &mdash; <img id='3.2' _src=imgstop  />;
+	</div>
+	<br />
+	<div class='olga5_Start:o5ref'>
+		4. задано <b>class='olga5_Start:o5ref'</b> - обрабатывается только <b>o5ref</b><br />
+		нету &mdash; <img id='4.1' class='olga5_snd:_аудио_файл' src=imgplay  />;
+		чёрная &mdash; <img id='4.2' _src=imgstop  />;
+	</div>
+	<br />
+	<div>
+		5. НЕ задано <b>class='olga5_Start'</b> - НЕ обрабатывается ничем <br />
+		нету &mdash; <img id='5.1' class='olga5_snd:_аудио_файл' src=imgplay />;
+		нету &mdash; <img id='5.2' _src=imgstop  />;
+	</div>
+	<br />
+</div> 
+</body>
+
+</html>

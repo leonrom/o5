@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<title>shp2</title>
+	<link rel="shortcut icon" href="./favicon.svg" type="image/x-icon">
+
+	<link href='./add/alltst.css' media='screen' rel='stylesheet' />
+	<script src='./add/alltst.js'></script>
+
+	<script src='../olga5/o5com!.js' o5debug=0></script>
+	<script src='../olga5/o5shp!.js'></script>
+</head>
+
+<body id="body">
+	<div class='example olga5_Start'>
+		<script>
+			const eve = document.head.querySelector("script[src*='o5inc.js']") ? 'olga5-incls' : 'olga5_ready' 
+			window.addEventListener(eve, Init2, { once: true })
+		</script>
+		<!-- <style>
+			#shp1 {
+				zoom: 1.1;
+				transform: matrix(0.7, 0.7, 0, 1, 0, 0);
+			}
+
+			#cshp1 {
+				zoom: 1.21;
+			}
+
+			ccshp1 {
+				zoom: 1.02;
+			}
+		</style> -->
+		<div class='cboxed'>
+			<span>видимость</span><br />
+			<input type="checkbox" id="shdwcb" onclick="CC()" title="видимость исходников для объектов 'shp'"> видимость
+			shdw<br>
+			<input type="checkbox" id="cartcb" onclick="CC()" checked title="видимость подвисабельных объектов 'shp'">
+			видимость cart<br>
+			<input type="checkbox" id="cartol" onclick="OL(this, 'shp1')" checked
+				title="наличие синих рамок 'outline' вокруг всех 'shp'">с <i>outline</i><br>
+			<span>завис.: <b>Где</b>&nbsp;<b>Когда</b></span><br />
+			&nbsp;shp1:
+			&nbsp;<span id="pmark1" class="span-mark" onclick="CC2a(this)"></span>
+			&nbsp;<span id="dmark1" class="span-mark" onclick="CC2a(this)"></span>
+			<br>
+			<span id="fspan">зависать - <b>frames</b></span><br />
+			<input type="checkbox" id="fbody" onclick="CC2(this, 'shp1')"> фикс. body<br>
+			<input type="checkbox" id="fdiv1" onclick="CC2(this, 'shp1')"> фикс. div1<br>
+			<input type="checkbox" id="fdiv2" onclick="CC2(this, 'shp1')"> фикс. div2<br>
+			<input type="checkbox" id="fdiv3" onclick="CC2(this, 'shp1')"> фикс. div3<br>
+			<input type="checkbox" id="fdiv4" onclick="CC2(this, 'shp1')"> фикс. div4<br>
+			<span>обрезать - <b>owners</b></span><br />
+			<input type="checkbox" id="obody" onclick="CC2(this, 'shp1')"> окно. body<br>
+			<input type="checkbox" id="odiv1" onclick="CC2(this, 'shp1')"> окно. div1<br>
+			<input type="checkbox" id="odiv2" onclick="CC2(this, 'shp1')"> окно. div2<br>
+			<input type="checkbox" id="odiv3" onclick="CC2(this, 'shp1')"> окно. div3<br>
+			<input type="checkbox" id="odiv4" onclick="CC2(this, 'shp1')"> окно. div4<br>
+		</div>
+
+		<pre class="pre-head"><b>Дополнительные атрибуты <i>olga5_shp</i></b>
+	</pre>
+		<div class="thetext" style="height: 227px;">
+			<p>
+				Тестирование/иллюстрация дополнительных
+				атрибутов <b>olga5_frames</b> и <b>olga5_owners</b> тега <i>подвисабельного</i> объекта.
+				Объект <b>shp1</b> вложен в четыре контейнера
+				(<b>div1</b> &divide; <b>div4</b> выделенные рамками), три из которых м.б. скроллируемые.
+			</p>
+			<p>
+				Скроллируемость контейнеров может изменяться <b>div1</b>, <b>div2</b> и <b>div3</b> при изменении
+				размеров окна.
+				Следовательно, если для <b>shp1</b> не указан конкретный <b>olga5_frames</b>, то может меняться его
+				контейнер подвисания.
+			</p>
+			<p>
+				Справа от контейнеров - поля задания поведения объекта. Вверху, под заголовком "<b>видимость</b>,
+				два вспомогательных (никак не плияющих на <i>подвисание</i> объектов) <b>CheckBox</b>'а,
+				позволяющие для наглядности изменять видимость:
+			</p>
+			<ul>
+				<li><b>shdws</b> - исходные прототипы объектов (без включения <i>подвисабельности</i>), которые
+					нормально полностьб невидимы</li>
+				<li><b>carts</b> - полученные (программой) <i>подвисабельные</i> объекты.</li>
+			</ul>
+			<p>
+				Следующие два <b>CheckBox</b>'а под заголовком "<b>зависание</b>" позволяют задать:
+			</p>
+			<ul>
+				<li>"<b>Где</b>" - место где будет <i>подвисать</i> объект,- вверху или внизу фрейма;</li>
+				<li>"<b>Когда</b>" направление движения во фрейме, по достижении которого объект подвиснет (согласно
+					<b>CheckBox</b>'у "<b>Где</b>").
+				</li>
+			</ul>
+			<p>
+				CheckBox'ы под заголовком "зависать-<b>frames</b>" позволяют указать фреймы, на которых будет
+				происходить
+				<i>подвисание</i> объекта (описанное в предыдущем абзаце).
+				<br />
+				Если ни один из них не задан, то подвисание будет происходить на ближайшем скроллируемом фрейме,-
+				первоначально это <b>div3</b>.
+			</p>
+			<p>
+				CheckBox'ы под заголовком "обрезать-<b>owners</b>" позволяют указать фреймы,
+				в которых (хотя бы в одном из них) <i>подвисабельный</i> объект будет видимым.
+				<br />
+				Если ни один из них не задан, то обрезание будет происходить на ближайшем отличающемся фрейме,- в данном
+				примере это <b>div4</b>.
+			</p>
+			<p>
+				Объект имеет желтый фон с красной рамкой, создаваемой атрибутом "border: 12px solid red;".
+				Синяя рамка создаётся атрибутом "outline: solid 8px blue;",- она находится как бы вне объекта и
+				поэтому остаётся видимой, пока видеи хоть один пиксел объекта.
+			</p>
+			<p>
+				На самом объекте <b>shp1</b> отображаются:
+			</p>
+			<ul>
+				<li>в первой строке, после "к.=" значения квалификаторов класса <b>olga5_shp</b> согласно заданным
+					<b>Где</b> и <b>Когда</b>;
+				</li>
+				<li>во 2-й и 3-й строках значения <b>olga5_frames</b> и <b>olga5_owners</b> тега <b>id='shp1'</b>,
+					соответственно <b>CheckBox</b>'ам <b>frames</b> и <b>owners</b></li>
+				<li>в строке '<b>f:</b>' перечислены фреймы (<b>t</b><i>op</i>, <b>b</b><i>ottom</i> и другие )
+					к котоым предполагается зависание объекта</li>
+				<li>в строке '<b>o:</b>' перечислены аналогичные фреймы, ограничивающие видимость объекта</li>
+			</ul>
+			<p>
+				Задайте несколько фреймов <i>зависания</i> (или <i>обрезания</i>) и посмотрите изменение значений
+				<b>t</b> и <b>b</b>
+				при изменении взаимного положения контейнеров <b>div1</b>, <b>div2</b> и <b>div3</b>.
+				Оцените зависание <b>shp1</b> на <b>div1</b> при задании <b>Где</b>=<i>внизу</i>
+				в зависимости от наличия горизонтальной полосы скроллинга.
+			</p>
+		</div>
+		<div class="divSmall">пустышка</div>
+
+		<div id="div1" class="container main-div">
+			<span style="color:black;">div1</span>
+			<div class="divSmall">пустышка</div>
+			<div class="divSmall">пустышка</div>
+			<div class="divSmall">пустышка</div>
+			<div id="div2" class="container" style="border-color: blue; 
+				height: 333px;min-width: 444px;	border-bottom-width: 6px;">
+				<span style="color:blue;">div2</span>
+				<div class="divSmall">пустышка</div>
+				<div class="divSmall">пустышка</div>
+				<div class="divSmall">пустышка</div>
+				<div id="div3" class="container" style="border-color: red;height: 333px;">
+					<span style="color:red;">div3</span>
+					<div class="divSmall">пустышка</div>
+					<table id="div4" class="container" style="border-width: thin;
+						height: 177px;background-color: bisque;    padding-top: 8px;">
+						<tbody id='tbody1'>
+							<tr>
+								<td style="min-width: 33px;">
+									<p style="height: 74px;"><b>div4</b><br />контейнер
+									</p>
+
+								</td>
+								<td id="cshp1" class="ccshp1">
+									<div id="shp1" class="olga5_shp:Up:Top" olga5_frames='s'>
+										<p>название объекта</p>
+									</div>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<div class="divSmall">пустышка</div>
+					<div class="divSmall">пустышка</div>
+					<div class="divSmall">пустышка</div>
+					<div class="divSmall olga5_shp:k" id='k1'>
+						<p style="height: 74px;"><b>Kill:0</b><br />контейнер
+						</p>
+					</div>
+					<div class="divSmall">пустышка</div>
+					<div class="divSmall">пустышка</div>
+					<div class="divSmall">КОНЕЦ div3</div>
+				</div>
+				<div class="divSmall">пустышка</div>
+				<div class="divSmall">пустышка</div>
+				<div class="divSmall">пустышка</div>
+				<div class="divSmall">пустышка</div>
+				<div class="divSmall">КОНЕЦ div2</div>
+			</div>
+			<div class="divSmall">пустышка</div>
+			<div class="divSmall">пустышка</div>
+			<div class="divSmall">КОНЕЦ div1</div>
+		</div>
+		<div class="divSmall">пустышка</div>
+		<div class="divSmall">пустышка</div>
+		<div class="divSmall">пустышка</div>
+		<div class="divSmall">пустышка</div>
+		<div class="divSmall">пустышка</div>
+		<div class="divSmall">пустышка</div>
+		<div class="divSmall">КОНЕЦ</div>
+	</div>
+</body>
+
+</html>

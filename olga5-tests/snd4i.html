@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<title>snd4i</title>
+	<link rel="shortcut icon" href="./favicon.svg" type="image/x-icon">
+
+	<link href="../blog/csss/olga5.tableCode.css" media="screen" rel="stylesheet" />
+
+	<script src='../olga5/o5com.js' 
+	data-xxx=123
+	o5consts="o5debug=2"
+	o5urlrfs="
+		_блог_o5 = '_url_olga5+../2020/02';
+		sounds=https://archive.org/download/clouds_20200310;
+		images=_url_olga5 + ../blog/media/image;
+		# _url_html=' адрес текущей страницы (этот и 2 следующих - закомментированы)';
+		# _url_root='# адрес сайта (с текущей страницей)';
+		# _url_olga5='# адрес загрузки файла o5common.js';
+	"
+	></script>
+	<script data-src='+o5ref.js'
+		o5tag_attrs='
+			a, img, audio=href, data-href, src, _src
+		'	
+	o5urlrfs="  
+		myTunes-icon='images + /myMusikIT.png' # --- только для o5snd ---;
+
+		мой-блог=https://turkceile.blogspot.com/2017/02/   # --- только для o5shp ---;
+		_мой-блог=https://ariturlearn.blogspot.com/2017/02 # --- только для o5shp ---; 
+		"
+></script>
+<script data-src='+o5snd.js'	
+	o5urlrfs="
+		Ceza1-25=sounds+/Ceza1-25.mp3;
+		Ceza2-25=sounds+/Ceza2-25.mp3;
+		imageplay=images + /play.png;
+		solfedjio=images+ /solfedjio.png;
+	"
+	btn_stop='images + /icons8-youtube-music-48.png'
+	btn_play='images + /icons8-youtube-music-50.png'
+></script>
+
+</head>
+
+<body style="margin: 0 0.1em 0 0.3em;">
+	<div class='example, olga5_Start'>
+	<style>
+		#div1{
+			background-color: aliceblue;
+				border: solid 1px lightgray;
+				height: fit-content;
+				display: block;
+				padding: 4px;
+				overflow: auto;
+				max-width: fit-content;
+				margin-left: 11px;
+		}
+		#div1 tr{
+			white-space: nowrap;
+		}
+		#div1 table{			
+    border-spacing: 0.3em;
+    border-bottom-style: double;
+    border-bottom-color: lightgray;
+		}
+		#div1 tr:nth-child(odd) td:last-child{
+			background-color: aliceblue;
+		}
+		#div1 tr:nth-child(even) td:last-child{
+			background-color: blanchedalmond;
+		}
+	</style>
+	
+	<span>Примеры подключения <b>&lt;img&gt;</b> с вызовом всех модулей ядра библиотеки. 
+		<br/> Для звучания - кликнуть по иконке (или навести на неё - для 4, 5 и 6&lt;a&gt;)</span>
+	<div id='div1' class="olga5_shp:Up:Top" olga5_frames="i:olga5-Start_hr,n" olga5_owners="n">		
+		<p>
+			Использовались следующие 'кнопки' (эти ниже - некликабельные):
+			<br /><img id='i1' src=btn_stop class="olga5_snd:n" title="файл 'icons8-youtube-music-48.png'"/> &mdash; скриптовый параметр <b>btn-stop</b>
+			<br /><img id='i2' data-src=btn_play class="olga5_snd:n" title="файл 'icons8-youtube-music-50.png'"/> &mdash; скриптовый параметр <b>btn-play</b>
+			<br /><img id='i3' data-src=imageplay class="olga5_snd:n" title="файл 'play.png'"/> &mdash; теговый атрибут image_play=<b>imageplay</b>
+			<br /><img id='i4' _src=solfedjio class="olga5_snd:n" title="файл 'play.png'"/> &mdash; файл .../<b>solfedjio</b>.png
+		</p>
+	</div>
+</div>
+</body>
+
+</html>

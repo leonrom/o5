@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<title>splitparams</title>
+	<link rel="shortcut icon" href="./favicon.svg" type="image/x-icon">
+
+	<script async src='../olga5/o5com.js' o5debug=0></script>
+</head>
+
+<body style="margin: 0 0.1em 0 0.3em;">
+	<script>
+		window.addEventListener('olga5_ready', () => {
+			const  
+			r=RegExp,
+			C = window.olga5.C,
+			ta = [				
+				`v1=12, v2=15`,
+				`o5tag_attrs=,o5tag_table="182,10514,8642,8610,8660,8611;"`,
+				`o5tag= 12 , attrs = , sttr , o5tag_table="182;10514 , 8642;8610,8660,8611 ; " `,
+				`o5tag= 12, attrs = ,sttr ,o5tag_table="182;10514, 8642;8610,8660,8611; " `,
+				`o5tag= 12 ,attrs =, sttr, o5tag_table="182;10514 ,8642;8610,8660,8611 ;"`,
+				`a = href,data-href, xxx ;b, vv = xxx       ;img, audio = src,_src     ;`,
+
+	        `    a = href,data-href, xxx # Содержит ошибку;
+	            b, vv = xxx             # -"-            ;
+	            img, audio = src,_src                    ;
+	        `,
+				`		
+    		    ma   = /media                           # это промежуточная часть адресной строки;
+    		    tt   = _url_html + ma + /tt             # здесь '/tt' название папки, а не ссылка;
+    		    belo = _url_root + mma + /o5/blog       # спец. содержит ошибочную ссылку  'mma' ;
+    		    audio= _url_root + /o5/blog + ma+/audio # спец. демо формирования составного пути;
+        		btnSound = _url_root + o5/blog/media/image/play.png   # ссылка на конкретный файл;
+        	 `
+			]
+			for (let i = 0; i < ta.length; i++) {
+				const p = C.SplitParams(ta[i], i, ';,')
+				console.log(i)
+				console.log(ta[i])
+				console.table(p)
+			}
+		})
+	</script>
+</body>
+
+</html>

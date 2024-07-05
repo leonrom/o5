@@ -1,0 +1,33 @@
+
+.csrc {
+	font-family: monospace;
+	min-width: 444px;
+	display: inline-flex;
+}
+.crez {
+	width: 96%;
+	margin-top: 5px;
+	margin-bottom: 4px;
+	padding: 3px;
+	background-color: beige;
+	font-size: small;
+	font-family: monospace;
+	height: fit-content;
+	min-height: 42px;
+	border: 1px solid gainsboro;
+	white-space: break-spaces;
+	overflow: hidden;
+}
+li {
+	margin-bottom: 4px;
+}
+
+li::marker {
+    content: "p" counter(list-item);
+    font-size: larger;
+    font-weight: bolder;
+}
+li::before {
+    content: "";
+    margin-right: 0.5em;
+}

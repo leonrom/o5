@@ -1,0 +1,49 @@
+div.olga5_tableKuplet {
+    height: min-content;
+    width: 100%;
+    background-color:inherit;
+    margin-left: 33px;
+}
+
+.olga5_tableKuplet table {
+    background:white;
+    width: max-content;
+    max-width: 444px;
+    border-collapse: collapse;
+}
+
+.olga5_tableKuplet td {
+    line-height: 0.6em;
+    padding: 0;
+    border: 1px solid #000000;
+    font-family: monospace;
+    font-size: smaller;
+
+    min-width: 0;
+    width: 166px;
+    vertical-align: top;
+}
+
+.olga5_tableKuplet td:first-child {
+    border-right: none;
+    padding:  0cm;
+}
+
+.olga5_tableKuplet pre {
+   margin: 0;
+    top: 0;
+    padding: 0;
+    margin-left: 0.5em;
+    width: max-content;
+    /*background-color: yellow;*/
+}
+
+.olga5_tableKuplet td:first-child pre {
+    line-height: 1.09em;
+    font-size: 0.8em;
+}
+
+.olga5_tableKuplet td:last-child pre {
+    line-height: 1.1em;
+    font-size: 1em;
+}

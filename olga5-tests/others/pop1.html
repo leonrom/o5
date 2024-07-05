@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<title>pop1</title>
+	<!-- <base href="https://rombase.neocities.org/o5/olga5-tests/"> -->
+	<link rel="shortcut icon" href="./favicon.svg" type="image/x-icon">
+
+	<script src='../olga5/o5pop.js' o5timer='0.3' o5opacity='0.2' o5-debug="0" params="" o5timer="1"></script>
+</head>
+
+<body style="margin: 0 0.1em 0 0.3em;">
+	<div class='example olga5_Start'>
+		<style>
+			.moecomment {
+				font-size: small;
+				line-height: 0.85em;
+				font-style: italic;
+				margin-block-start: 0em;
+				margin-block-end: 0em;
+			}
+
+			.inLine {
+				vertical-align: baseline;
+				text-align: left;
+				text-align: -moz-left;
+				text-align: -webkit-left;
+				font-size: medium;
+				background-color: aliceblue;
+				border: solid lightpink 1px;
+				border-radius: 2px;
+				margin-left: 2px;
+				margin-right: 0px;
+				font-family: monospace;
+				padding-right: 0.2em;
+				padding-left: 0.2em;
+			}
+
+			input {
+				padding-top: 0;
+				padding-bottom: 0;
+				font-size: x-small;
+			}
+
+			.divE1,
+			.divE2 {
+				background-color: aliceblue;
+				border-radius: 2px;
+				margin: 6px;
+				font-size: small;
+			}
+
+			.divE1 {
+				border: solid red 2px;
+			}
+
+			.divE2 {
+				border: solid blue 2px;
+			}
+
+			ul.wide>li {
+				line-height: 26px;
+			}
+
+			ul>li>ul>li {
+				line-height: 16px;
+			}
+
+			#i1,
+			#i3,
+			#i4 {
+				width: 222px;
+				text-align: left;
+			}
+		</style>
+		<p>
+			1) Примеры вызова всплытия пустого окна (в автономном режиме в окне отображается файл
+			'<i title="Его местонахождение определяется тегом 'base'">./add/popup.html</i>'):
+		</p>
+		<ul class="wide">
+			<li><input id="p1" type="button" value="'открыть'"
+					o5popup='./add/popup.html; top =1, left: 9999; width=222, h:111; group=""'>
+				- клик по тегу &lt;<b>input</b>&gt; с заданным атрибутом <b>o5popup</b>
+				и параметрами окна
+				<br /><span class='inLine'>top =1, left: 9999; width=222, h:111; group=""</span>.
+				<br /><span class="moecomment">
+					Здесь, для примера, смешано использование символов: '<b>=</b>'|'<b>:</b>' и '<b>;</b>'|'<b>,</b>',
+					а также вместо '<b>height</b>' указано '<b>h</b>'
+				</span>
+				<br />Данный тег имеет <b>id="p1"</b> и на его параметры будут ссылки в последующих примерах;
+			</li>
+			<li><span class="olga5_popup"
+					onclick="window.olga5.PopUp(this, './add/popup.html', 'group=0, t:111, p1, text:закр. окно')">'открыть'</span>
+				- клик по локальному тегу &lt;<b>span</b>&gt; с классом <b>olga5_popup</b> с заданным <b>onClick</b> и
+				параметрами
+				<br /><span class='inLine'>PopUp(this, './add/popup.html', 'group=0, t:111, p1, text:закр. окно')</span>;
+			</li>
+			<li><span class="olga5_popup"
+					onclick="window.olga5.PopUp(this, 'https://rombase.neocities.org/o5/olga5-tests/add/popup.html', 'group=0, t:177, p1, text:закр. окно')">'открыть'</span>
+				- клик по тегу &lt;<b>span</b>&gt; с классом <b>olga5_popup</b> с заданным <b>onClick</b> и
+				параметрами
+				<br /><span class='inLine'>PopUp(this, 'https://rombase.neocities.org/o5/olga5-tests/add/popup.html', 'group=0, t:177, p1, text:закр. окно')</span> 
+				
+			</li>
+		</ul>
+
+		<p>
+			2) <span id="p01">Варианты вызова </span><b>PopUp</b>() при различном задании первого параметра
+			(задан class="<b>olga5_popup</b>"):
+		</p>
+		<ol style="white-space: nowrap;">
+			<li><span id="li1" class="olga5_popup" onclick="window.olga5.PopUp('p01', './add/popup.html', 'p1, p111')">
+					<span class='inLine'>...PopUp('<b>p01</b>', './add/popup.html', 'p1')</span>
+				</span>&nbsp; - <i>мигает</i> часть заголовка данного абзаца,- тег с id='<b>p01</b>';
+			</li>
+			<li><span id="li2" class="olga5_popup" onclick="window.olga5.PopUp(this, './add/popup.html', 'p1')">
+					<span class='inLine'>...PopUp(this, './add/popup.html', 'p1')&nbsp;</span>
+				</span>&nbsp; - <i>мигает</i> данный тег;
+			</li>
+			<li><span id="li3" class="olga5_popup" onclick="window.olga5.PopUp(p01, './add/popup.html', 'p1')">
+					<span class='inLine'>...PopUp(p01, './add/popup.html', 'p1')&nbsp;&nbsp;</span>
+				</span>&nbsp; - &nbsp;&nbsp;&nbsp;как 1;
+			</li>
+			<li><span id="li4" class="olga5_popup" onclick="window.olga5.PopUp('', './add/popup.html', 'p1')">
+					<span class='inLine'>...PopUp('', './add/popup.html', 'p1')&nbsp;&nbsp;&nbsp;</span>
+				</span>&nbsp; - <i>мигает</i> данный тег;
+			</li>
+			<li><span id="li5" class="olga5_popup" onclick="window.olga5.PopUp('./add/popup.html', 'p1')">
+					<span class='inLine'>...PopUp(&nbsp;&nbsp;'&nbsp;./add/popup.html', 'p1')
+						&nbsp;&nbsp;&nbsp;</span>
+				</span>&nbsp; - &nbsp;&nbsp;&nbsp;ошибка задания ссылки (пропущен <i>ссылочный</i> тег);
+			</li>
+
+			<li><span id="li8" class="olga o5popup" o5popup='тесты+add/popup.html;'>
+				<span class='inLine'>&nbsp;&nbsp;&nbsp;o5popup='тесты+add/popup.html, p1'
+					&nbsp;&nbsp;&nbsp;&nbsp;</span>
+			</span>&nbsp; - &nbsp;&nbsp;с использование атрибута <b>o5popup</b>;
+			</li>
+			<li><span id="li7" class="olga5_popup" onclick="window.olga5.PopShow(444,333, './add/popup.html')">
+					<span class='inLine'>PopShow(444, 333, './add/popup.html, p1')</span>
+				</span>&nbsp; - &nbsp;&nbsp;с использование <i>обёртки</i> <b>PopShow</b>.
+			</li>
+		</ol>
+		<p>
+			В примерах параметр <b>group</b> либо отсутствует, либо задан с нулевым или пустым значением.
+			Эти варианты интерпретируются одинаково как <b>group</b>='0', поэтому всплытие очередного окна
+			закрывает предыдущее всплывшее окно.
+			Для закрытия такого всплывшего окна следует кликнуть в
+			<span title="т.ч. и на вызывающем теге">любом</span> месте вызывающего окна.
+			<br />
+		</p>
+		<p id="p2" o5popup="nocss,width:33.3%,height:33.3%,left:33.3%,top:0%">
+			3) Примеры (надуманные)
+			<img src="data:image/png;base64,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"
+				style="height:22px; vertical-align: middle; margin: 0; padding: 0;" id="img21a"
+				title="слева: url='./add/popup.html'"
+				o5popup='./add/popup.html; p2, left:0%, top:0%, group:p21a'
+				onmouseenter="window.olga5.PopUp(this, './add/popup.html', '  p2, left:0%, top:99%, group:p22a')" />
+			<img src="data:image/png;base64,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"
+				style="height:22px; vertical-align: middle; margin: 0; padding: 0;" id="img21b"
+				title="в центре: https://rombase.h1n.ru/o5/olga5-tests/add/popup.html"
+				o5popup='https://rombase.h1n.ru/o5/olga5-tests/add/popup.html; p2, left:50%, top:0%, group:p21b'
+				onmouseenter="window.olga5.PopUp(this, 'https://rombase.h1n.ru/o5/olga5-tests/add/popup.html', '  p2, left:50%, top:99%, group:p22b')" />
+			<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAMRElEQVR42tVaCViVVRr+zv/ffWGXHUU0twdMB8UUFxDUtCYbUx4dTZuecdSGFqfF3E0RnazRyqx0alpcUjOXzARhEE0tXHLBBTFFgct62e6+/We+cxHkwsUlUJvv8fL8y/nP+d7zbe85RwL/50IetgK/WwBzvnxFVGU2y9i1t0xmfnvqGvvvFkBqxlJPk0ATrQIMpRT6Oih9xCYIftg9X9+COsQcV8kTkk8I/UXMkUMKEZcxb/jC2ocGYMWexcSqECcY7Y6ZFocwBhWXs+4oik2wE4fgAAEEysbggAOe46mYExEUoNiKI2CW8tw+Oc9/LLcJmXPGLKIPDMDSzNR4g822wmQXYgh2YbFbQW8zgslmAqvDioqjLrTlSBz+kfASkItloBIrQSqSMDAgF3E5CrF47uKEeVn3FcDKrBXeOpvjPZ3VNoUpiEqTGnMdWBwWikCcfTELOKf5Dtc4MpHyUvCSeSAYBbsHlUS8US3mX54bP7e63QGkZKZG11jt220OIdxsN5MKYxW1Omz3pLS7ayYSXkw7KHyITCQDMc9d8xDzExYlzj/ZbgDeykwZXWN2bHMIgrLKXANs1tkktqcwPMwaPjIvjBfO4CXjkxYnLPihzQCWovJVJvtOBxWkpfoKMNpNTndpy6w3t0DTe7lIRgNVHQhPOIu3TPSnxYm3B3FbACmZy6O1ZttBuyCoNPpyDFZL42D3CwC7lollJFjlDyKO03tLRXGLEhe06k6tAvgXBqzGZD1pRZ8vQeWNmGEepCjEcghCEBKeKwiQi6Nfj5/nNrBbBbAwbdlXdTbHFK2pmqLPt5it+2mBhmuMCeor9yaYmTamjFr47F0DSMlIia8w2zNNmG00ujLatN2DBMBug9UBhMWFn5RPWDhiYdYdAby15XVi8FL9ZLYL/Yt0Jc4i1eIj7H9klyGgtxrg6I1TzmLUVsEqDXbqaJHdWLELVQeBjOeOe9psj80fm+LSoAWA5fuXjiizO9J0FgPmeq3b2ZKLpOSr8Wucz2fsnguVxuo2WYA9mtZnHMmrvArHCn9p0a6DwhfUUiX1E/GjFj2+6MBtAczdteBbg4h/urC2hNgEm1sAkf7dyKTeT9EyfQXBdrDzYnqbXUjCi8jCuJfgo5yNtAT7bdpOzIkhzDOIKu2OXSueThnXKoA3VjzrbY2K0JjsVim6DyE3yVnzwRK7xJIKg5aGegSREI8AWH/i63aJgSBVB/hr9ES6LPsDl3bMRdGN0PISiyK/KDh19qfVbgHMXjszyREe8LXWWO2stg3yWGgf6BvUq/G+Ft8dLMiB6f0mwdWq68hhFLf17zOlF5HAyeFs2SUY1qk/dFD6um0nUIFRJOZGcAbbNhVWpX0V3sAXVkxcPWvdNrcAXtyQvJYL8vt7YZ3Ghec813c8Sc8/iKD0zkcjug4m3pjiErsOJS/uXcQC3Zmp/JU+UI6WAbiVRdjzfiFRMLLrELr57G5ytbqIsVKXzNYnsCc9XXrRea+SKpzjrTqywcVSjC+FeQQToUT74QfTP0h2CyD589lHiK960LWawsYBGgDsuZgG1ZZ6AGN7JJLJj46jCzJWkcvaa42K9gnoAadLLyCz5BoBIFAyodfj0MW3sxPAzZl1AfDqwOfpu8c+a/xm4bAXyT8Pf4Qs1+aSUjt7hRGq1R1d+9zq2BYAYkb05IYkT9AYqN2/UKdx4fMIAGpMNWCwmcEh2GHWgKmwLy8TbmAAc7hcaRCrzQJY+CDII9B5n1fxK0QHR0KETyeIDY+B1UfWA8uSbD3QIJWGKkiIGAjZ6JJeck9nGvVX+cLpkvNwAb9vGq1h6mBQElH5iS/2Bmd/e0pwATAwoZcsZnaSzmAzikp05S4B12ABiUgKa8YsoZ+f2krCvULpJye/dgm22LBoGNMtns7PXEUaVmdKsZy8FjsdkN/QjWd2kgsVV1oEcVMLsHeDwv5AWFyl//qjix5Ban+iFCvsZzd8p87afdLsAmDYkF4+feYkVeqsBoLpsQWA82j6+IhY5Osi+tmpbWRJ/Gwnxdhxfh8LeOqHfN5TpoZBHaPpd5cOEBGmvmau4va62lQLT3SLo/uvHCIeUrXznYjjCTJS2HZ+n4seAchS1RIlvbh2j2/6/lPVLgAGD+ruEz1vEgMACMAlAzAXOosmnYt5ek7acpgVMxV85F7oQkUQFdAL/n1iM4LQYUGrcmaoLj7hcLdSY66FJ7vFww/52VisnAAwYEWAsw1bc793aYsAAAFA7pqdfpkZZ6pcAPSI6qQcteIvNa250L68DFj31EpI2jqLbklaS+ampdJeAd0JY6kJEbF0Qea7reZ7L1Rs3rBk+h66SbGurP45jh3feSCzGKCb0XmZ7zR+M7hjP6KSKmF/frZbFzq4bJPXmZ/zDS4A/IO9JJM/TC40EQcGcalzgKYAimo1ENupH+y8kEbjOg8key6l08SIwWT/lWx4NfZvdNOZXcQbg7C5q+gsetLL/xHgsR7dqNEQ4eZz7I8sH/kmS49wvOg0TcvPJmqp6qar+BFWO3LLL98CgP/C1IFETvnyb15bH1b4a7nVBYCHj4qfkDrtiCLENwbTqAupYi7EgpjHweYMngk4GFzWXmUBi6YOgMPXj0PG1SNuXWQExk0/zER9Qx6Fd378GHKKzza+Y0EfFdAdtp//HrPXrS2ixXEvw8rD68DchEgyHJhGwVikzdm9bHNspaba4QJA4SEjiTOf+KTz0KjpN7CQ2ZoVsgOodA3WASRydHjEIBLqEUg7eoeSNCxwhwqOuw1QxgJC0OwsTQ7tPIiuPLSO5GsLmlvJ5V4lkdNpfSdgIVvv4o5iLGQdsZBdO3Ruw6H/pM+oqdBRaNYJDBg7YNqA6aM/1xqraK1F1whgQGgfgtWycTCBOjBTVVK74CDYMWDGaDXbnNLkOl2DXeOamgxBKtEaAOduC4I+WniKoPu4APCUqqkvZrqcT9Oe+2nnsS8aLeMS5WF+oRM/fOGKSbBKinWl4I7mM/K2OP4V+PbCfsBgR46idhah9pAgdQd4vm8SpKL7uKwLUMsQdSDIOYl1+yufdNVcLStyC0AsFYmfeWvKbv/ITo8XYpDZsOo2LzqYIegbQ2aRHbnfUwRJSnUVcK5psLWBTs8fluyk02UGbTM6LUI6HUzLc6/v35WyZaxZb7G5BcAkMi5y/PDXxm/ToQtVYF53t/jAoCS9A3pSpA2YjTKQRbZtSckevdB/CjmOAZ5TfMbNgsaH1Qia9e6OpHNZ575pqm8LABKZWPXsezN+VAb79kZWCshK28U97iRqpA56rCnNl5QszSILBYNGe3bTPzYMNhvqGWWrADieI90H9nhm5JtJ27BIkRJ9+UNd1Aep/IkCC92BlduSLv+ct8Nuc9x+TXwThGLcgombQvp3G1txkx48DPHERQxzn+Ljl3fvSt06GZU3Nm/T6r6Qp5/6kUlrZmRJPJXBGn0ZMdstD9QCMmS+waoAaq01FG+ZvX54bUVdvjs9WwWA3YnCe3ce+eSSydupiCg0yGFYPDwIAFKRhARjhSd2aty7ZNOE6+cK0gWB2u8JwM23ssi43pOGz376Y4FQCdvcNdnM9xUAzrxzc5ejxPrf1btmns8+twUrp7l1Fe8sisj4qEnxL419n4h4eSWuuOosuvuyvc7WA35yb6B2hynr/d0vnT+IylMw3va7u+xfEd47PHHUG+PXybyUwUabmSD3d56FtYcFsFA5F0RsQ9dcoy9Oe/ubFwrOFmTgK+OdFLuXIyYpMtZuicl/XB4W0/1JZgGdVe88YrIKtt90xCTBVRvbLlFLVOwdFObk7c1Y+938uir9ZWxmuSvL3aOl2bGpN9aJ0YOmJryuDvOLZA9ZhjJYjWCym+sDvV7LloMR4ixMcpEMlFi4WKZhoiuszD36ZeaqvGOX2GEGWyo67lah33rMKsVlq1/3gT1HRo3u9+fAyPAhwHNS1pmAEceoONuoFeoDhXAspRGeInMlbBeDHbOCg1pLcwsOn/vhxOa8YxfTBQetvNtZbw8AjUDw5+Hpqw4Jj+46LCSyU0yHiKCeHoHeYZxM4g3sZLVeBMFsra4rrS6suFpysTj3ek7BySvZtVpdMb6r+y2KtxeABmGKSvAnx58Mp1kil0ukyKucG0BWs81sMlktaBy2xGIpkR33sGuhrQPfr/8rQdz0TQHa4SDhAQF4YPI/HsHIml92310AAAAASUVORK5CYII="
+				style="height:22px; vertical-align: middle; margin: 0; padding: 0;" id="img21c"
+				title="вправа: https://rombase.neocities.org/o5/olga5-tests/add/popup.html"
+				o5popup='https://rombase.neocities.org/o5/olga5-tests/add/popup.html; p2, left:99%, top:0%, group:p21c'
+				onmouseenter="window.olga5.PopUp(this, 'https://rombase.neocities.org/o5/olga5-tests/add/popup.html', '  p2, left:99%, top:99%, group:p22c')" />
+			всплытия  (с разных доменов,- конкретноый <i>[адрес]</i> приводится во всплывающей подсказке после наведения курсора) по двум различным событиям на одном &lt;<b>img</b>&gt;-теге&nbsp;, где -
+		<ul>
+			<li>
+				наведение курсора (см. ниже <i>Пояснение</i>) обрабатывается событием <i>onMouseEnter</i> с аргументами (всплытие внизу в разных местах):
+				<br /><span class='inLine'>this, '<i>[адрес]</i>', ' <b>p2</b>, 
+					left:<i>[<b>0</b>, <b>50</b> или <b>99</b>]</i>%, top:99%, group:p22<i>[<b>a</b>, <b>b</b> или <b>c</b>]</i>'</span>
+				<br/> Закрытие окна - повторно навести курсор на иконку.
+			</li>
+			<li>
+				клик обрабатывается атрибутом (всплытие вверху в разных местах):
+				<br />"<span class='inLine'>o5popup="<i>[адрес]</i>; <b>p2</b>, group:p21<i>[<b>a</b>, <b>b</b> или <b>c</b>]</i>"</span>"
+				<br/> Закрытие окна - повторный клик по иконке.
+			</li>
+		</ul>
+		Здесь '<b>p2</b>' - имя некоторого тега <b>&lt;p&gt;</b> с атрибутом
+		<span class='inLine'>o5popup="width:33.3%,height:33.3%,left:33.3%,top:0%"</span>, 
+		из которых <b>left</b> и <b>top</b> переопределяются в самих тегах.
+		</p>
+		<p class="moecomment">
+			<b><u><i>Пояснение</i></u></b> к всплытию по наведению курсора: из соображений безопасности оно по-умолчанию отключено в браузерах. 
+			Его можно разрешить, но в разных браузерах - по-разному. 
+			Например, в <b>Chrome</b> (106.0.5249.91 64-bit) нужно кликать по окну <u>каждый</u> раз перед наведением курсора, а в 
+		<b>FireFox</b> (104.0.2 (64-bit) для MX Linux-1.0) достаточно подтвердить разрешение для <i>данного</i> сайта.
+			В приведенных примерах при возникновении такой блокировки иконка становится <i>бледной</i>,
+			а во всплывающем (по наведению курсора на иконку) подсказке сообщается об этом.
+		</p>
+		<p>
+			4) Еще примеры размещения тегов в разных углах экрана:
+		</p>
+		<ul>
+			<li><input type="button" id="i1" value="p1, top:11,left:11, group:лв, head='мой текст'"
+					o5popup="./add/popup.html?1;p1,top:11,left:11, group:лв, head='мой текст'">
+				- левый верхний угол, мигающий заголовок окна;
+			</li>
+			<li><input type="button" id="i3" value="p1,top:11,left:-11, group:пв, head=мой текст"
+					o5popup="./add/popup.html?3;p1,top:11,left:-11, group:пв">
+				- правый верхний угол, заголовок окна не мигает;
+			</li>
+			<li><input type="button" id="i4" value="p1,top:-11,left:-11, group:пн;text=закрыть"
+					o5popup="./add/popup.html?4;p1,top:-11,left:-11, group:пн;text=закрыть    ">
+				- правый нижний угол, текст тега меняется на 'закрыть'.
+			</li>
+		</ul>
+		<p>
+			Здесь параметры вызова всплывающих окона написаны прямо на 'кнопках'.
+			Наличие кавычек в значениях параметров - игнорируется.
+		</p>
+
+		<p>
+			5) Демонстрация вызовов всплывших окон при кликах на вложенных тегах:
+		</p>
+
+		<div id='d1' class="divE1" , style="width:333px;height: 140px;"
+			o5popup="./add/popup.html;p1,top:10,left:33%,group:1">
+			"<b id="'b1">./add/popup.html;p1,top:10,left:33%,group:1</b>"
+			<br />окно - вверху, левее
+			<div id='d2' class="divE2" , style="width: 300px;height: 33px;"
+				o5popup="./add/popup.html;p1,top:-10,left:67%,group:2">
+				"<b id="b2">./add/popup.html;p1,top:-10,left:67%,group<u>:2</u></b>"
+				<br />окно - внизу, правее
+			</div>
+			<div id='d2' class="divE2" , style="width: 300px;height: 33px;"
+				o5popup="./add/popup.html;p1,t:-50%,l:50%,g:2">
+				"<b id="b2">./add/popup.html;p1,t:-50%,l:50%,g<u>:2</u></b>"
+				<br />окно в центре, сокращены названия параметров
+			</div>
+		</div>
+		<span class="moecomment">
+			<b>Напоминание:</b> фокусировка всплывших окон может не срабатывать,
+			поэтому следует <b>отключить</b> полноэкранный режим основного окна.</span>
+	</div>
+</body>
+
+</html>

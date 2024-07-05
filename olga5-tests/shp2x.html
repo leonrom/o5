@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<title>shp2x</title>
+    <link rel="shortcut icon" href="./favicon.svg" type="image/x-icon">
+
+	<script src='../olga5/o5com.js'  
+		data-o5consts="o5debug='1'; o5nomnu='0'; o5noact='0'; 
+			o5init_events='DOMContentLoaded, transitionend, message'
+		"
+		data-o5urlrfs="
+			тесты='+ ../olga5-tests';
+			блог_o5='https://olga-5.blogspot.com/2020/02';
+			images=_url_olga5 + ../blog/media/image;       
+			_url_html='# адрес текущей страницы (этот и 2 следующих - закомментированы)';
+			_url_root='# адрес сайта с текущей страницей';
+			_url_olga5='# адрес загрузки файла o5common.js';
+		"
+	>
+	</script>
+	<script data-src='+o5shp.js'></script>
+	<script data-src='+o5pop.js'></script>
+	<script data-src='+o5mnu.js' scrollY='-32'></script>
+	<script data-src='+o5ref.js' 
+		o5tag_attrs="img=image_play;a,img,audio=href,data-href,src,_src;"
+		o5urlrfs="  
+			sounds=https://archive.org/download/clouds_20200310;
+			myTunes-icon=images + /myMusikIT.png               # --- только для o5snd ---;
+			Ceza1-25=sounds+/Ceza1-25.mp3;
+			мой-блог=https://ariturlearn..blogspot.com/2017/02/;   # --- только для o5shp ---;
+			
+		">
+		</script>
+	<script data-src='+o5snd.js' btn_play='images + /play.png' btn_stop='images + /play_Freepik.png'></script>
+	<script data-src='+add/pusto.js' moe-attr='мой атрибут'></script>
+
+	<link data-href='+../blog/csss/olga5.tableCode.css' media='screen' rel='stylesheet' />
+	<link data-href='+../blog/csss/olga5.textNshow.css' media='screen' rel='stylesheet' />
+	<link data-href='+../blog/csss/olga5.addStyles.css' media='screen' rel='stylesheet' />
+	<link data-href='+../blog/csss/olga5.menuPopDn.css' media='screen' rel='stylesheet' />
+	<link data-href='+../blog/csss/olga5.tableKuplet.css' media='screen' rel='stylesheet' />
+	<link data-href='+../blog/csss/tests.css' media='screen' rel='stylesheet' />
+
+</head>
+
+<body style="    background-color: aquamarine; outline: none; padding-left: 4px;">
+	<h4 id='head_21'>2.1. Пример подключения скриптов</h4>
+	<p>			
+		<code class="olga5_popup" onmouseup="window.olga5.PopShow( 560, 355, 'тесты+/all2.html')">Пример</code>
+		подключения нескольких файлов скриптов в секции &lt;<b>head</b>&gt; HTML-страницы:
+	</p>
+	<!-- height: fit-content -->
+	<!-- <table class="olga5_tableCode olga5_shp" id='tab-1' style="height: fit-content"> -->
+	<table class="olga5_tableCode olga5_shp" id='tab-1'>
+		<tbody>
+			<tr>
+				<td>
+					<pre>&nbsp;<br/>1<br/>2<br/>3<br/>4<br/>5<br/>6<br/>7<br/>8<br/>9<br/>10<br/>11<br/>12<br/>13<br/>14<br/>15<br/>16<br/>17<br/>18<br/>19<br/>20<br/>21</pre>
+				</td>
+				<td>
+					<pre>
+<span class="olga5_tableName">секция &lt;<b>head</b>&gt;</span>
+&lt;head&gt;
+&lt;meta http-equiv="content-type" content="text/html; charset=UTF-8"&gt;
+&lt;title&gt;olga5 поотдельности&lt;/title&gt;
+&lt;link rel="shortcut icon" href="./favicon.svg" type="image/x-icon"&gt;
+
+&lt;link href='+<code>o5ini.css</code>' media='screen' rel='stylesheet'/&gt;
+
+&lt;script src='../olga5/<code>o5common.js</code>' o5debug=0&gt;&lt;/script&gt;
+&lt;script data-src='+<code>o5ref.js</code>'
+o5tag_attrs='img= src, _src' 
+o5urlrfs="
+	музоны=_url_olga5 + ../blog/media; tt = музоны + /tt;
+	btnSound = '_url_olga5 + ../blog/media/image/play.png'
+"
+&gt;&lt;/script&gt;
+&lt;script _src='+<code>o5shp.js</code>'&gt;&lt;/script&gt;
+&lt;script data-src='+<code>o5snd.js</code>'
+кнопка_stop = '_url_olga5 + ../blog/media/image/myMusikIT.png'
+&gt;&lt;/script&gt;
+&lt;/head&gt;
+</pre>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+	<p>
+		Посмотреть протокол работы примера можно перейдя по 
+		<code class="olga5_popup" onmouseup="window.olga5.PopShow( 560, 355, 'тесты+/all2.html')">ссылке</code>
+		и, в открывшемся окне, вызвав отладчик браузера. Аналогичные примеры с различными вариантами подключения 
+		скомпилированных скриптов можно посмотреть тут:
+		<code class="olga5_popup" onmouseup="window.olga5.PopShow( 560, 355, 'тесты+/all2_.html')">all2_</code>,
+		<code class="olga5_popup" onmouseup="window.olga5.PopShow( 560, 355, 'тесты+/all2a.html')">all2a</code>,
+		<code class="olga5_popup" onmouseup="window.olga5.PopShow( 560, 355, 'тесты+/all2c.html')">all2c</code>,
+		<code class="olga5_popup" onmouseup="window.olga5.PopShow( 560, 355, 'тесты+/all2cc.html')">all2cc</code> 
+		(краткие пояснения приведены на страницах примеров).
+	</p>
+</div>
+</body>
+
+</html>

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<title>pop2_</title>
+
+	<!-- <script async src='../olga5/o5com.js' o5debug=2></script> -->
+	<!-- <script data-src='+ o5inc.js'></script> -->
+	<script src='../olga5/o5pop.js' o5timer='0.3' o5opacity='0.2' o5-debug="0" params="" o5timer="1"></script>
+</head>
+
+<body style="margin: 0 0.1em 0 0.3em;">
+	<div class='example, olga5_Start'>
+		<style>
+			.csrc {
+				font-family: monospace;
+				min-width: 444px;
+				display: inline-flex;
+			}
+
+			.crez {
+				width: 96%;
+				margin-top: 5px;
+				margin-bottom: 4px;
+				padding: 3px;
+				background-color: beige;
+				font-size: small;
+				font-family: monospace;
+				height: fit-content;
+				min-height: 42px;
+				border: 1px solid gainsboro;
+				white-space: break-spaces;
+				overflow: hidden;
+			}
+
+			li {
+				margin-bottom: 4px;
+			}
+		</style>
+		<p>
+			Примеры пересчета параметров по ссылочному аргументу.
+			<br /> умолчание:
+		<pre>
+	text: '', group: '', head: '', 
+	width: 588, height: 345, top: 11, left: -22, 
+	alwaysRaised: 1, alwaysOnTop: 1, menubar: 0, toolbar: 0, status: 0, resizable: 1, scrollbars: 0,innerwidth: '', innerheight: '', screenx: '', screeny: ''
+			</pre>
+		Результат показывается после клика по примеру
+		(значения <i>top</i> могут отличаться от заданных на десяток пикселов, из-за учета высоты заголовка окна)
+		</p>
+		<script>
+			function MyPopUp(s1, s2, s3) {
+				const
+					e = arguments.callee.caller.arguments[0],
+					tag = e.target.parentElement,
+					trez = tag.parentElement.getElementsByClassName('crez')[0],
+					rez = window.olga5.PopUp(s1, s2, s3)
+				// let args = ''
+				// for (const arg of arguments)
+				// 	args += `, '` + arg + `'`
+				// args[0] = '()'
+				// args = `...PopUp` + args + `)`
+
+				if (!trez) alert(`что за тег '${t}'  в  MyPopUp() ?`)
+				else
+					if (rez) trez.innerText = rezpp
+			}
+			function Init() {
+				const tsrcs = document.getElementsByClassName('csrc')
+				for (const tsrc of tsrcs) {
+					const atrs = tsrc.parentElement.attributes
+					for (const atr of atrs)
+						if (atr.name.match(/onclick/i)) {
+							tsrc.innerText = atr.value.replace('MyPopUp', '...')
+							break
+						}
+				}
+			}
+			window.addEventListener("DOMContentLoaded", Init)
+			// function MyPopUp(s1, s2, s3) {
+			// 	const
+			// 		e = arguments.callee.caller.arguments[0],
+			// 		t='t'+e.target.parentElement.id,
+			// 		tag = document.getElementById(t),
+			// 		rez = window.olga5.PopUp(s1, s2, s3)
+
+			// 	if (!tag) alert(`что за тег '${t}'  в  MyPopUp() ?`)
+			// 	else
+			// 	if (rez)
+			// 		tag.innerText = rez
+			// }
+		</script>
+
+		<ol start="0">
+			<li><span id="p0" class="olga5_popup" onclick="MyPopUp('t0', './popup.html', '')">
+					<span class='csrc'>...PopUp('', './popup.html', '')</span>
+				</span>
+				<br /><b>p1</b> - все параметры - по умолчанию
+				<p id="tp0" class="crez"></p>
+			</li>
+		</ol>
+		<ol style="white-space: nowrap;">
+			<li><span id="p1" class="olga5_popup"
+					onclick="MyPopUp('', './popup.html', 'left: 255; w=222, h:111; group=1')">
+					<span class='csrc'>...PopUp('', './popup.html', 'left: 255; w=222, h:111; group=1')</span>
+				</span>
+				<br /><b>p1</b> - <u>базовый</u> для остальных (его недостающее - из умалчиваемых значений)
+				<p id="tp1" class="crez"></p>
+			</li>
+			<li><span id="p2" class="olga5_popup" onclick="MyPopUp('', './popup.html', 'W:222, p1, p111, g:2')">
+					<span class='csrc'>...PopUp('', './popup.html', 'W:222, left=33, t:66, p1, p111, g:2')</span>
+				</span>
+				<br /><b>p2</b> недостающее - из <b>p1</b>(<i>left</i>, <i>width</i>), а <i>top</i> - из умалчиваемых;
+				ссылка на <b>p111</b> - ошибочна (см. протокол);
+				<p id="tp2" class="crez"></p>
+			</li>
+			<li><span id="p3" class="olga5_popup" onclick="MyPopUp('', './popup.html', 'top=11, p1, p2, g:3')">
+					<span class='csrc'>...PopUp('', './popup.html', 'top=11, p1, p2, g:3')</span>
+				</span>
+				<br /><b>p3</b> недостающее - из <b>p1</b> (<i>left</i>, <i>height</i>) и потом <b>p2</b>
+				(<i>width</i>);
+				<p id="tp3" class="crez"></p>
+			</li>
+			<li><span id="p4" class="olga5_popup" onclick="MyPopUp('', './popup.html', 'top=88, p2, p1, g:4')">
+					<span class='csrc'>...PopUp('', './popup.html', 'top=88, p2, p1, g:4')</span>
+				</span>
+				<br /><b>p4</b> недостающее - из <b>p2</b> (<i>left</i>, <i>width</i>) и потом <b>p1</b>
+				(<i>height</i>);
+				<p id="tp4" class="crez"></p>
+			</li>
+		</ol>
+	</div>
+</body>
+
+</html>

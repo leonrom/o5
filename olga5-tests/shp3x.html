@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<title>shp3x</title>
+	<link rel="shortcut icon" href="./favicon.svg" type="image/x-icon">
+
+	<link href='./add/alltst.css' media='screen' rel='stylesheet' />
+	<script src='./add/alltst.js'></script>
+
+	<script src='../olga5/o5shp!.js'></script>
+	<script src='../olga5/o5common.js' o5debug=0></script>
+</head>
+
+<body id="body">
+	<div class='example, olga5_Start'>
+		<script>
+			const eve = document.head.querySelector("script[src*='o5inc.js']") ? 'olga5-incls' : 'olga5_ready' 
+			window.addEventListener(eve, Init3, { once: true })
+			// window.addEventListener('olga5_ready', function () { Init3(), { once: true } })
+		</script>
+		<!-- <div class='cboxed'>
+			<span>видимость</span><br />
+			<input type="checkbox" id="shdwcb" onclick="CC()" title="видимость исходников для объектов 'shp'"> видимость
+			shdw<br>
+			<input type="checkbox" id="cartc0" onclick="CC()" checked title="видимость  'shp0'">видимость cart0<br>
+			<input type="checkbox" id="cartc1" onclick="CC()" checked title="видимость  'shp1'">видимость cart1<br>
+			<input type="checkbox" id="cartol" onclick="OL(this, 'shp1')" checked title="рамки 'outline' вокруг всех 'shp'">с <i>outline</i><br>
+	
+			<span>завис.: <b>Где</b>&nbsp;<b>Когда</b></span><br />
+			&nbsp;shp0:
+			&nbsp;<span id="pmark0" class="span-mark" onclick="shpX_ChgDirPos(this)"></span>
+			&nbsp;<span id="dmark0" class="span-mark" onclick="shpX_ChgDirPos(this)"></span>
+			<br>
+			&nbsp;shp1:
+			&nbsp;<span id="pmark1" class="span-mark" onclick="shpX_ChgDirPos(this)"></span>
+			&nbsp;<span id="dmark1" class="span-mark" onclick="shpX_ChgDirPos(this)"></span>
+			<br>
+			<span id="fspan">frames&nbsp;&nbsp;&nbsp;<b>shp0</b>&nbsp;&nbsp;<b>shp1</b></span>
+			<br>&nbsp;body
+			&nbsp;<input type="checkbox" id="fbody0" onclick="CC3(this)" style="opacity: 1.0;">
+			&nbsp;<input type="checkbox" id="fbody1" onclick="CC3(this)" style="opacity: 0.4;">
+			<br>&nbsp;div1
+			&nbsp;<input type="checkbox" id="fdiv10" onclick="CC3(this)" style="opacity: 1.0;">
+			&nbsp;<input type="checkbox" id="fdiv11" onclick="CC3(this)" style="opacity: 0.4;">
+			<br>&nbsp;shp0
+			&nbsp;<input type="checkbox" id="fshp00" onclick="CC3(this)" style="opacity: 0.4;">
+			&nbsp;<input type="checkbox" id="fshp01" onclick="CC3(this)" style="opacity: 1.0;">
+			<br>&nbsp;div2
+			&nbsp;<input type="checkbox" id="fdiv20" onclick="CC3(this)" style="opacity: 0.4;">
+			&nbsp;<input type="checkbox" id="fdiv21" onclick="CC3(this)" style="opacity: 1.0;">
+			<br>
+			<span id="fspan">owners&nbsp;&nbsp;&nbsp;<b>shp0</b>&nbsp;&nbsp;<b>shp1</b></span>
+			<br>&nbsp;body
+			&nbsp;<input type="checkbox" id="obody0" onclick="CC3(this)" style="opacity: 1.0;">
+			&nbsp;<input type="checkbox" id="obody1" onclick="CC3(this)" style="opacity: 0.4;">
+			<br>&nbsp;div1
+			&nbsp;<input type="checkbox" id="odiv10" onclick="CC3(this)" style="opacity: 1.0;">
+			&nbsp;<input type="checkbox" id="odiv11" onclick="CC3(this)" style="opacity: 0.4;">
+			<br>&nbsp;shp0
+			&nbsp;<input type="checkbox" id="oshp00" onclick="CC3(this)" style="opacity: 0.4;">
+			&nbsp;<input type="checkbox" id="oshp01" onclick="CC3(this)" style="opacity: 1.0;">
+			<br>&nbsp;div2
+			&nbsp;<input type="checkbox" id="odiv20" onclick="CC3(this)" style="opacity: 0.4;">
+			&nbsp;<input type="checkbox" id="odiv21" onclick="CC3(this)" style="opacity: 1.0;">
+			<br>
+			<span id="bord1" title="При невидимой рамке у tab1 объект shp1 будет 'обрезаться' рамкою div1">атрибуты
+				<b>tab1</b></span>
+			<br>
+			w=<input type="checkbox" id="bord1w" title="ненулевая ширина рамки " onclick="CC3a(this, 'ширина рамки')"
+				checked>
+			c=<input type="checkbox" id="bord1c" title="отличающийся цвет рамки" onclick="CC3a(this, 'цвет рамки')" checked>
+			b=<input type="checkbox" id="bord1b" title="отличающийся цвет фона " onclick="CC3a(this, 'цвет фона')" checked>
+	
+		</div>
+		<pre class="pre-head"><b><i>Подвисабельный</i> объект как контейнер таких объектов</b>
+		</pre>
+	
+		<div class="thetext" style="height: 227px;">
+			<p>
+				Показаны два <i>подвисабельныъ</i> объекта,- теги с красными рамками и синим обрамлением.
+				Их "<b>id</b>" указаны в квадратных скобках на желтоватом фоне, после которых дана глубина вложенности.
+			</p>
+			Далее показаны:
+			<ul>
+				<li>в первой строке, после "к.=" значения квалификаторов класса <b>olga5_shp</b> согласно заданным
+					<b>Где</b> и <b>Когда</b>;
+				</li>
+				<li>во 2-й и 3-й строках значения <b>olga5_frames</b> и <b>olga5_owners</b> тега <b>id='shp1'</b></li>
+				<li>в строке '<b>f:</b>' перечислены фреймы (<b>t</b><i>op</i>, <b>b</b><i>ottom</i>, <b>l</b><i>eft</i>
+					и <b>r</b><i>ight</i> )
+					к котоым предполагается зависание объекта</li>
+				<li>в строке '<b>o:</b>' перечислены аналогичные фреймы, ограничивающие видимость объекта</li>
+			</ul>
+			<p>
+				Chekbox'ы под строкой <b>border для tab1</b> позволяют двояко отключать различимость
+				между <b>div2</b> и <b>tab1</b>. Это создаёт различные варианты <i>подрезания</i>
+				нижней границы <b>shp1</b> при его подвисании (например на <b>div2</b>)
+			</p>
+		</div>
+	
+		<div class="divSmall">пустышка</div>
+		<div id="div1" class="container main-div">
+			<span><b><u>[div1]</u></b></span>
+			<div class="divSmall">пустышка</div>
+			<div class="divSmall">пустышка</div>
+			<!-- <div id="shp0" class="olga5_shp:Up:Top container" style="min-width:222px;max-width:644px;width: calc(99% - 33px);"> -->
+			<div id="shp0" class="olga5_shp:Up:Top container class1" style="background-color: yellow;opacity: 0.9;">
+				<!-- <span>shp0</span> -->
+				<p  id='p-shp0' class='p-opis' style="background-color: yellow;opacity: 0.9;margin-right: 55px;">
+					1 <br />3 <br />3 <br />4 
+				</p>
+	
+				<div class="divSmall">пустышка</div>
+				<div class="divSmall">пустышка</div>
+				<div class="divSmall">пустышка</div>
+				<div id="div2" class="container" style="border-color: blue; height: 222px;overflow-y: auto;">
+					<span style="float: left;"><b><u>[div2]</u></b></span>
+					<div class="divSmall">пустышка</div>
+					<div class="divSmall">пустышка</div>
+					<table id="tab1" class="container" style="border: 3px dotted red; height:155px; overflow: hidden; 
+							background-color: lightgreen; margin-left: 33px;">
+						<tr>
+							<td id="td1" style="width: 100%;">
+								<span style="float: left;"><b><u>[tab1]</u></b></span>
+								<div id="shp1" class="olga5_shp:Up:Top:P1" olga5_frames="" olga5_owners=""
+									style="float:right;margin-top: 22px;">
+									<!-- <div id="shp1" class="olga5_shp:Up:Top:P1" olga5_frames="" olga5_owners="" style="float:right;zoom:0.7"> -->
+									<!-- <div id="shp1" class="olga5_shp:Up:Top:P1" olga5_frames="" olga5_owners="" style="float:right;transform: scale(0.7)"> -->
+	
+									<!-- <p id='p-shp1'>название объекта</p> -->
+									<p  id='p-shp1'>1 <br />3 <br />3 <br />4 </p>
+									<!-- <p  id='p-shp1' class='p-opis' style="width:277px; background-color: yellow;opacity: 0.9;">1 <br />3 <br />3 <br />4 </p> -->
+									<!-- <p  id='p-shp1' class='p-opis' style="opacity: 0.9;">1 <br />3 <br />3 <br />4 </p> -->
+								</div>
+							</td>
+						</tr>
+					</table>
+					<div class="divSmall">пустышка</div>
+					<div class="divSmall">пустышка</div>
+					<div class="divSmall">пустышка</div>
+				</div>
+				<div class="divSmall">пустышка</div>
+				<div class="divSmall">пустышка</div>
+				<div class="divSmall">пустышка</div>
+				<div class="divSmall">пустышка</div>
+				<div class="divSmall">пустышка</div>
+			</div>
+			<div class="divSmall">пустышка</div>
+			<div class="divSmall">пустышка</div>
+			<div class="divSmall">пустышка</div>
+			<div class="divSmall">пустышка</div>
+			<div class="divSmall">пустышка</div>
+			<div class="divSmall">пустышка</div>
+			<div class="divSmall">пустышка</div>
+			<div class="divSmall">пустышка</div>
+			<div class="divSmall">пустышка</div>
+			<div class="divSmall">КОНЕЦ div1</div>
+		</div>
+		<div class="divSmall">пустышка</div>
+		<div class="divSmall">пустышка</div>
+		<div class="divSmall">пустышка</div>
+		<div class="divSmall">пустышка</div>
+		<div class="divSmall">пустышка</div>
+		<div class="divSmall">КОНЕЦ</div> -->
+	</div>
+</body>
+
+</html>

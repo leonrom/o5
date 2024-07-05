@@ -1,0 +1,300 @@
+
+.olga5_tableCode {
+  height: auto;
+      max-width: max-content;
+      width: calc(99% - 33px);
+      display: block;
+      /* width: 100%; */
+      margin-left: 33px;
+      overflow: auto;
+}
+
+.olga5_tableCode3 {
+  height: auto;
+      display: block;
+      width: calc(99% - 22px);
+      margin-left: 3px;
+   overflow-x: hidden;
+   overflow-y: auto;
+   font-size: smaller;
+}
+
+.olga5_tableTwo {
+    display: block;
+    overflow: visible;
+    width: 100%;
+    max-width: 100%;
+    height: min-content;
+    max-height: 333px;
+}
+
+.olga5_tableCode3  table{
+  display: flex;
+}
+
+.olga5_tableCode3  tbody,
+.olga5_tableCode tbody {
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.olga5_tableTwo tbody ,
+.olga5_tableCode tbody {
+    display: block;
+    width: max-content;
+}
+.olga5_tableTwo tbody {
+    height: 100%;
+}
+.olga5_tableTwo >tbody>tr,
+.olga5_tableTwo >tr {
+    width: 100%;
+    height: 100%;
+    display: inline-flex;
+}
+
+.olga5_tableTwo >tbody>tr>td,
+.olga5_tableTwo >tr>td,
+.olga5_tableTwo >td {
+    /*border: 2px dashed red;*/
+    max-width: max-content;
+    /*width: 50%;*/
+    max-height: 333px;
+    overflow-y: auto;
+    height: auto;
+}
+
+.olga5_tableTwo >tbody>tr>td:first-child,
+.olga5_tableTwo >tr>td:first-child,
+.olga5_tableTwo >td:first-child {
+    width: max-content;
+    padding-left: 12px;
+    display: table;
+}
+
+.olga5_tableTwo >tbody>tr>td:last-child,
+.olga5_tableTwo >tr>td:last-child,
+.olga5_tableTwo >td:last-child {
+    /*width:50%;*/
+    padding-left: 33px;
+    display: block;
+    max-width: 99%;
+}
+.olga5_tableCode3 tr,
+.olga5_tableCode tr {
+    max-width: 100%;
+    display: inline-flex;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.olga5_tableCode3 td,
+.olga5_tableCode td {
+    padding-top: 0;
+    padding-right: 4px;
+    margin: 0px;
+    height: min-content;
+    /* width: calc(100% - 1.2em - 1px); */
+    display: block;
+    max-width: 99%;
+    width: max-content;
+}
+
+.olga5_tableCode3 div{
+overflow-x: auto;
+background-color: transparent;
+}
+.olga5_tableCode3 td:first-child div{
+max-width: calc(100% - 0.1em);
+}
+.olga5_tableCode3 td:last-child div{
+max-width: calc(100% - 0.8em);
+}
+.olga5_tableCode3 td:last-child pre,
+.olga5_tableCode3 td:first-child pre{
+margin: 0.1em 0px;
+padding-right: 14px;
+}
+
+.olga5_tableCode td:first-child {
+    /* width: 1.2em; */
+    padding: 0px;
+    padding-right: 3px;
+    height: auto;
+    border: none;
+    max-width: 99%;
+    width: max-content;
+}
+
+.olga5_tableCode3 td:last-child,
+.olga5_tableCode3 td:first-child{
+width: 50%;
+  background-color: aliceblue;
+}
+
+.olga5_tableCode3 td:nth-child(2) div{
+text-align: center;
+text-align: -moz-center;
+text-align: -webkit-center;
+padding-top: 6px;
+color: coral;
+}
+.olga5_tableCode3 td:nth-child(2) pre{
+text-align: center;
+text-align: -moz-center;
+text-align: -webkit-center;
+}
+.olga5_tableCode td:first-child pre {
+    /* background-color: transparent; */    
+    background-color: aliceblue;
+    opacity: 0.8;
+    border-color: transparent;
+    width: 1.2em;
+    overflow: hidden;
+    padding: 0px;
+    padding-right: 4px;
+
+    white-space: -moz-pre-wrap;
+    white-space: -pre-wrap;
+    white-space: -o-pre-wrap;
+    white-space: -hp-pre-wrap;
+    white-space: -pre-wrap;
+    white-space: pre-wrap;
+    white-space: pre-line;
+    word-wrap: break-word;
+
+    text-align: right;
+	text-align: -moz-right;
+    text-align: -webkit-right;
+    color: gray;
+    font-weight: normal;
+
+    max-width: 100%;
+    min-width: 100%;
+}
+
+.olga5_tableNameInText,
+.olga5_tableName  {
+    color: gray;
+    font-weight: normal;
+    font-style: italic;
+    font-family: sans-serif;
+    background-color: transparent;
+}
+
+.olga5_tableNameInText  {
+    font-size: small;
+    font-weight: bold;
+}
+
+pre span.olga5_tableName  {
+    float: right;    
+    font-size: xx-small;
+}
+
+.olga5_codeText {
+    width: max-content;
+    padding: 0;
+    padding-left: 0.3em;
+    padding-right: : 0.3em;
+    border: none;
+    background-color: aliceblue;
+    border-radius: 6px;
+    font-family: monospace;
+}
+.olga5_imgDiv {
+    max-height: 355px;
+    overflow: auto;
+    border: 1px solid aqua;
+    border-radius: 5px;
+    width: max-content;
+    height: max-content;
+    max-width: 99%;
+}
+
+.olga5_tableCode td:last-child pre,
+.olga5_tableCode td pre,
+.olga5_codeTextSeparate,
+.olga5_codeTextInline {
+    vertical-align: baseline;
+    text-align: left;
+	text-align: -moz-left;
+    text-align: -webkit-left;
+    font-size: x-small;
+    /* background-color: seashell; */
+    background-color: aliceblue;
+    border: solid lightpink 1px;
+    border-radius: 2px;
+    /* font-family: courier new, monospace; */
+
+   font-family: monospace;
+    padding-right: 12px;
+    /*max-height: 444px;*/
+    /*overflow-y: auto;*/
+}
+
+.olga5_tableCode td:last-child pre,
+.olga5_tableCode td pre {
+/* различия*/
+    color: black;
+    /* font-weight: bold; */
+    font-weight: normal;
+    font-size: small;
+    margin: 0;
+    /* overflow: auto; */
+        overflow-x: auto;
+        overflow-y: hidden;
+    padding-left: 8px;
+    padding-right: 1.0em;
+    /*height:  calc(100% - 2px);   ужасно растягивает ?? */
+    line-height: 1.1em;
+    width: max-content;
+    font-size: small;
+}
+
+table.olga5_tableCode.olga5_scroll {
+  height: 333px;
+    overflow: auto;
+    /* border: solid black 4px; */
+    border: solid lightpink 1px;
+    border-radius: 2px;
+    background-color: white;
+    outline: solid white 2px;
+}
+
+table.olga5_tableCode.olga5_scroll td{
+  padding: 0px;
+  padding-bottom: 0px;
+    padding-right: 3px;
+    margin-right: 2px;
+}
+table.olga5_tableCode.olga5_scroll  td:last-child pre{
+  border:none;
+  /* border-left: solid lightyellow 1px; */
+  border-left: solid lightpink 1px;
+
+}
+
+.olga5_codeTextSeparate {
+    width: max-content;
+    padding: 0.2em;
+    padding-left: 1.0em;
+    padding-right: 1.0em;
+    margin-left: 3em;
+    color: black;
+/* font-size: medium; */
+font-family: serif;
+font-size: small;
+margin-top: 0px;
+margin-bottom: -0px;
+}
+
+.olga5_codeTextInline {
+    padding-left: 0.1em;
+    padding-right: 0.1em;
+}
+
+.olga5_codeTextInline.Big{
+    font-size: small;
+    font-weight: bolder;
+}

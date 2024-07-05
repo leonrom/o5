@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<title>pop2</title>
+	<!-- <base href="https://rombase.neocities.org/o5/olga5-tests/"> -->
+	<link rel="shortcut icon" href="./favicon.svg" type="image/x-icon">
+	<!-- <script src='../olga5/o5com.js' o5debug=0></script> -->
+	<!-- <script src='../olga5/o5dbg/events.js'></script> -->
+	<!-- <script src='../olga5/o5dbg/ccss.js'></script> -->
+	<!-- <script src='../olga5/o5dbg/pos.js'></script> -->
+	<script src='../olga5/o5dbg/evctrl.js'></script>
+	<script src='../olga5/o5pop.js' o5timer='0.3' o5opacity='0.2' o5-debug="0" params="" o5timer="1"></script>
+</head>
+
+<body style="margin: 0 0.1em 0 0.3em;">
+	<style>
+		.pp {
+    width: 96%;
+    margin-top: 5px;
+    margin-bottom: 4px;
+    padding: 3px;
+    background-color: beige;
+    font-size: small;
+    font-family: monospace;
+    height: fit-content;
+    min-height: 42px;
+    border: 1px solid gainsboro;
+    white-space: break-spaces;
+    overflow: hidden;
+		}
+
+		li {
+			margin-bottom: 4px;
+		}
+	</style>
+	<div class='example, olga5_Start'>
+		<p>
+			Примеры пересчета параметров по ссылочному аргументу.
+			<br /> умолчание:
+		<pre>
+	text: '', group: '', head: '', 
+	width: 588, height: 345, top: 11, left: -22, 
+	alwaysRaised: 1, alwaysOnTop: 1, menubar: 0, toolbar: 0, status: 0, resizable: 1, scrollbars: 0,innerwidth: '', innerheight: '', screenx: '', screeny: ''
+			</pre>
+		Результат показывается в поле 'Рез:' после клика по примеру
+		</p>
+		<script>
+			function MyPopUp(t, s2, s3) {
+				const  // caller = arguments.callee.caller.arguments[0],
+					rez = window.olga5.PopUp('', s2, s3),
+					tag = document.getElementById(t)
+				if (tag)
+					tag.innerText = rez
+				else
+					alert(`что за тег '${t}'  в  MyPopUp() ?`)
+			}
+		</script>
+		<!-- <span class="olga5_popup" onclick="window.olga5.PopUp('t0', './popup.html', '')">
+			<span class='inline2'>...PopUp('', './popup.html', '') - прямой вызов</span>
+		</span> -->
+
+		<ol start="0">
+			<li><span class="olga5_popup" onclick="MyPopUp('t0', './popup.html', '')">
+					<span class='inline2'>...PopUp('', './popup.html', '')</span>
+				</span>
+				<br />- параметры по умолчанию
+				<p id="t0" class="pp"></p>
+			</li>
+		</ol>
+		<ol style="white-space: nowrap;">
+			<li><span id="p1" class="olga5_popup"
+					onclick="MyPopUp('t1', './popup.html', 'top =1, left: 199; width=222, h:111; group=1')">
+					<span class='inline2'>...PopUp('', './popup.html', 't =1, left: 199; width=222, h:111;
+						group=1')</span>
+				</span>
+				<br /><b>p1</b> - <u>базовый</u> для остальных (его недостающее - из умалчиваемых значений)
+				<p id="t1" class="pp"></p>
+			</li>
+			<li><span id="p2" class="olga5_popup"
+					onclick="MyPopUp('t2', './popup.html', 'width=77, left=33, p1, p111, g:2')">
+					<span class='inline2'>...PopUp('', './popup.html', 'width=77, left=33, p1, p111, g:2')</span>
+				</span>
+				<br /><b>p2</b> недостающее - из <b>p1</b>, ссылка на <b>p111</b> - ошибочна (см. протокол);
+				<p id="t2" class="pp"></p>
+			</li>
+			<li><span id="p3" class="olga5_popup" onclick="MyPopUp('t3', './popup.html', 'width=77, p1, p2')">
+					<span class='inline2'>...PopUp('', './popup.html', 'width=77, p1, p2')</span>
+				</span>
+				<br /><b>p3</b> недостающее - из <b>p1</b> и потом <b>p2</b>;
+				<p id="t3" class="pp"></p>
+			</li>
+			<li><span id="p4" class="olga5_popup" onclick="MyPopUp('t4', './popup.html', 'width=88, p2, p1')">
+					<span class='inline2'>...PopUp('', './popup.html', 'width=88, p2, p1')</span>
+				</span>
+				<br /><b>p4</b> недостающее - из <b>p2</b> и потом <b>p1</b>,- от предыдущего отличается <b>left</b> и
+				<b>group</b>;
+				<p id="t4" class="pp"></p>
+			</li>
+		</ol>
+		<p>Результирующие значения <i>top</i> могут отличаться от заданных на десяток пикселов, из-за учета высоты заголовка окна
+		</p>
+	</div>
+</body>
+
+</html>

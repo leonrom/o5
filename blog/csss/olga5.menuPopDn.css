@@ -1,0 +1,151 @@
+.olga5_menuPopDn {
+    margin: 0 !important;
+    padding: 0 !important;
+    font-size: small;
+    height: min-content;
+    width: max-content;
+    position: fixed;
+    z-index: 1111111;
+    top: 1px;
+    right:1px;
+}
+.olga5_menuPopDn .left {
+    left:55px;
+}
+
+.olga5_menuPopDn ul {
+    margin: 0 !important;
+    padding: 0 !important;
+    border-radius: 2px;
+    display: grid;
+    /* иначе переносит строки последующего пункта при открытии подменю */
+}
+
+.olga5_menuPopDn li {
+    display: block;
+    color: white;
+    background: gray;
+    height: 1.5em;
+    text-align: left;    
+	text-align: -moz-left;
+    text-align: -webkit-left;
+    border-bottom: 0.01em solid lightseagreen;
+
+    padding: 1px 5px 1px 2px;
+    cursor: pointer;
+    font-family: sans-serif;
+    font-size: small;
+
+    margin-bottom: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+.olga5_menuPopDn li>ul {
+    position: absolute;
+    top: unset;
+    float: right;
+    display: none;
+    padding: 0;
+    margin: 0;
+    border: 1px solid darkgrey;
+    outline: 1px solid white;
+}
+
+.olga5_menuPopDn>li {
+    /* т.е. first-child */
+    background-color: white;
+    border: none;
+    /* height: 3em; */
+    text-align: right;    
+	text-align: -moz-right;
+    text-align: -webkit-right;
+    border-radius: 8px;
+    background-color: transparent;
+}
+
+.olga5_menuPopDn>li>ul {
+    outline: 1px solid bisque;
+    top: 0.5em;
+    /* padding-top: 0.35em; */
+    position: relative;
+    right: 0.1em;
+}
+.olga5_menuPopDn>li>ul>li>ul {
+    right: 3.1em;
+}
+.olga5_menuPopDn>li>ul>li>ul>li>ul {
+    right: 6.1em;
+}
+.olga5_menuPopDn>li>ul>li>ul>li>ul>li>ul {
+    right: 9.1em;
+}
+.olga5_menuPopDn>li>ul>li>ul>li>ul>li>ul>li>ul {
+    right: 12.1em;
+}
+
+.olga5_menuPopDn li>span {
+    display: flex;
+    padding-left: 6px;
+    height: 100%;
+    align-items: center;
+    width: max-content;
+    justify-content: flex-start;
+    overflow: hidden;
+}
+
+.olga5_menuPopDn>li>span {
+    border: 1px solid darkgray;
+    border-radius: 8px;
+    color: black;
+    background-color: lavender;
+    padding: 3px 4px 2px 4px;
+    justify-content: center;
+    height: min-content;
+}
+
+.olga5_menuPopDn li:hover {
+    color: black;
+    background-color: lavender;
+}
+
+.olga5_menuPopDn>li:hover {
+    background: transparent;
+    height: 3em;
+}
+
+.olga5_menuPopDn>li:hover>span {
+    color: white;
+    background: gray;
+    border: 0.01em solid lightseagreen;
+    padding-bottom: 4px;
+}
+/*
+#div1, #div2 {
+    display: block;
+} */
+
+.olga5_menuPopDn li:hover>ul,
+.olga5_menuPopDn li>ul:hover {
+    display: block;
+    /* если дать block то будет искажать следующие пункты */
+}
+
+.olga5_menuPopDn li:active>ul {
+    /* для корректного "гашения" - д.б. ПОСЛЕДНИМ ! */
+    display: none;
+}
+
+/* .olga5_PopUpH {
+    cursor: pointer;
+}
+
+span.olga5_PopUpH {
+    font-style: italic;
+    font-weight: bold;
+    color: blue;
+    text-decoration: underline;
+    border: 1px lightblue solid;
+    border-radius: 5px;
+    padding-bottom: 3px;
+} */

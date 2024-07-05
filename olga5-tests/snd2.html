@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<title>snd2</title>
+	<link rel="shortcut icon" href="./favicon.svg" type="image/x-icon">
+
+	<link href="../blog/csss/olga5.tableCode.css" media="screen" rel="stylesheet" />
+	
+	<script async src='../olga5/o5com!.js' o5consts="o5debug=0" o5urlrfs="
+			media = + ../blog/media;
+			sounds= media + /audio;
+			images=_url_olga5 + ../blog/media/image; 
+			_sounds=https://archive.org/download/clouds_20200310;
+		"></script>
+	<script src='../olga5/o5snd.js' o5urlrfs="
+		btn_stop='images + /icons8-youtube-music-48.png';
+		btn_play='images + /icons8-youtube-music-50.png';
+		imagestop='_url_olga5 + ../blog/media/image/myMusikIT.png';
+		imageplay='images + /play.png';
+		аудио_файл=sounds+/Ceza1-25.mp3;
+		solfedjio=images+ /solfedjio.png;
+		"></script>
+
+</head>
+
+<body style="margin: 0 0.1em 0 0.3em;">
+	<div class='example olga5_Start'>
+		Примеры <span title="Для звучания - кликнуть по иконке (и чуток подождать)">задания</span> атрибутов тега
+		<b>&lt;img&gt;</b> :
+		<style>
+			.olga5_codeTextSeparate {
+				width: max-content;
+				padding: 0.5em;
+				padding-left: 1.0em;
+				padding-right: 1.0em;
+				margin-left: 3em;
+				vertical-align: baseline;
+				text-align: left;
+				text-align: -moz-left;
+				text-align: -webkit-left;
+				font-size: x-small;
+				background-color: aliceblue;
+				border: solid lightpink 1px;
+				border-radius: 2px;
+				font-family: monospace;
+				padding-right: 12px;
+			}
+
+			span {
+				background-color: beige;
+				border: 1px solid gold;
+			}
+
+			span[title] {
+				cursor: help;
+				padding-left: 2px;
+				padding-right: 2px;
+				color: black;
+				font-style: italic;
+				background-color: LavenderBlush;
+				border-radius: 6px;
+				padding-bottom: 2px;
+				font-family: sans-serif;
+				font-size: 88%;
+				border: 1px dotted aqua;
+			}
+
+			audio {
+				height: 16px;
+				width: 244px;
+			}
+
+			p,
+			span {
+				font-size: small;
+				white-space: nowrap;
+			}
+
+			p {
+				margin: 0;
+			}
+
+			p>img {
+				height: 32px;
+			}
+		</style>
+		<p>1 <img id="1" _src=imagestop image_play=imageplay class="olga5_snd:аудио_файл" />
+			Заданы: <b>src</b> для <u><i>без звука</i></u> - 'imagestop', а для <u><i>звучание</i></u> -
+			<b>image_play</b>
+		</p>
+		<p class="olga5_codeTextSeparate">
+			&lt;img id="1" <b>src</b>=imagestop <b>image_play</b>=imageplay class="olga5_snd:аудио_файл"&nbsp;/&gt;
+		</p>
+
+		<p>2 <img id="2" _src=imagestop class="olga5_snd:аудио_файл" />
+			<u><i>без звука</i></u> как в <b>1</b>, но при <u><i>звучании</i></u> иконка не меняется (т.к. не задан
+			<b>image_play</b>)
+		</p>
+		<p class="olga5_codeTextSeparate">
+			&lt;img id="2" <b>src</b>=imagestop class="olga5_snd:аудио_файл"&nbsp;/&gt;
+		</p>
+
+		<p>3 <img id="3" _src=imagestop image_play=_src class="olga5_snd:аудио_файл" />
+			То же, что <b>2</b>, при этом <b>image_play</b> задан равным <b>_src</b>
+		</p>
+		<p class="olga5_codeTextSeparate">
+			&lt;img id="3" <b>_src</b>=imagestop <b>image_play</b>=_src class="olga5_snd:аудио_файл"&nbsp;/&gt;
+		</p>
+
+		<p>4 <img id="4" image_play=imageplay class="olga5_snd:аудио_файл" />
+			Не задан <b>src</b>, поэтому <u><i>без звука</i></u> берётся из <b>btn-stop</b> (а <u><i>звучание</i></u> -
+			<b>image_play</b>)
+		</p>
+		<p class="olga5_codeTextSeparate">
+			&lt;img id="4" <b>image_play</b>=imageplay class="olga5_snd:аудио_файл"&nbsp;/&gt;
+		</p>
+
+		<p>5 <img id="5" class="olga5_snd:аудио_файл" />
+			Не заданы ни <u><i>без звука</i></u>, ни <u><i>звучание</i></u>,- берутся, соответственно, из
+			<b>btn_stop</b> и <b>btn_play</b>.
+		</p>
+		<p class="olga5_codeTextSeparate">
+			&lt;img id="5" class="olga5_snd:аудио_файл"&nbsp;/&gt;
+		</p>
+
+		<br />
+		<p>Дополнительно: ссылка на <a id='6' href=аудио_файл class="olga5_snd:O:href">аудио_файл</a>
+			в качестве квалификатора <b>audio_play</b> будет взят <b>href</b>
+		</p>
+		<p class="olga5_codeTextSeparate">
+			&lt;a <b>href</b>=аудио_файл class="olga5_snd:over"/&gt;аудио_файл&lt;/a/&gt;
+		</p>
+
+		<br />
+		<p>
+			Использовались следующие 'кнопки' (эти ниже - некликабельные):
+			<br /><img id='i1' _src=imagestop class="olga5_snd:n" title="файл 'myMusikIT.png'" /> &mdash; теговый
+			атрибут src=<b>imagestop</b>;
+			<br /><img id='i2' _src=imageplay class="olga5_snd:n" title="файл 'play.png'" /> &mdash; теговый атрибут
+			image_play=<b>imageplay</b>;
+			<br /><img id='i3' _src=btn-stop class="olga5_snd:n" title="файл 'icons8-youtube-music-48.png'" /> &mdash;
+			скриптовый параметр <b>btn-stop</b>;
+			<br /><img id='i4' _src=btn-play class="olga5_snd:n" title="файл 'icons8-youtube-music-50.png'" /> &mdash;
+			скриптовый параметр <b>btn-play</b>.
+		</p>
+		<br />
+		<p>
+			Здесь подключение <code>o5snd.js</code> имеет вид:
+		</p>
+		<table class="olga5_tableCode">
+			<tbody>
+				<tr>
+					<td>
+					</td>
+					<td>
+						<pre>
+&lt;script async src='../olga5/o5snd.js'
+    <b>btn_stop</b>='images + /icons8-youtube-music-48.png';
+    <b>btn_play</b>='images + /icons8-youtube-music-50.png';
+    <b>imagestop</b>='_url_olga5 + ../blog/media/image/myMusikIT.png';
+    <b>imageplay</b>='images + /play.png';
+    <b>аудио_файл</b>=sounds + /Ceza1-25.mp3;
+/&gt;&lt;/script/&gt;
+&lt;script async src='../olga5/o5com!.js' o5debug=0
+    <b>images</b>="_url_olga5 + ../blog/media/image"
+    <b>sounds</b>=https://archive.org/download/clouds_20200310;
+/&gt;&lt;/script/&gt;
+</pre>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		<p>
+			В первом теге &lt;<b>script</b>&gt; атрибут <b>btn_play</b> не задан - он
+			<spam
+				title="Там '#' не есть знак комментария (у атрибутов нет коментариев),- этот 'произвольный' символ дописан слитно просто чтобы 'спрятать' атрибут.">
+				как-бы</spam> заремлен.
+		</p>
+	</div>
+</body>
+
+</html>

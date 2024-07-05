@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>i5_2</title>
+    <script src="./o5h.js"></script>
+</head>
+
+<body>
+    <div class='container'>
+        <p>
+            Простейший способ подключения всплытия окна по
+            <span title="наряду с иными возможными действиями по этому событию">событию</span> 
+            <b><i>click</i></b> - добавление тегу атрибута <b>o5popup</b>,
+            значением которого должна быть одна или две подстроки, разделённые символом '<b>;</b>':
+        </p>
+        <p class='olga5_codeTextSeparate'>
+            &lt;span <b>o5popup</b>='./add/popup.html <b>;</b> width: 211, height: 211'&gt; показать &lt;/span&gt;,
+        </p>
+        <p>
+            Список параметров в правой подстроке может содержать 
+            стандартные параметры окна, а также иметь дополнительные:
+        </p>
+        <ul>
+            <li><b>text</b> - содержит 'текст тега' при открывшемся окне;</li>
+            <li><b>head</b> - альтернативный заголовок <i>всплывающего</i> окна,
+                при отсутствии значения - мигания не будет;
+            </li>
+            <li><b>defid</b> - <b>id</b> тега с <i>умалчиваемыми</i> значениями.</li>
+        </ul>
+        <p>
+            При отсутствии у тега атрибута <b>id</b> всплывшее окно исчезает после клика по основному окну.
+        </p>
+        <p>
+            Для возможности <i>всплытия</i> окна по произвольному событию тега предусмотрена функция <b>PopUp</b>,
+            например
+        </p>
+        <p class='olga5_codeTextSeparate'>
+            &lt;span on<b>mouseenter</b>="window.olga5.<b>PopUp</b>(this, './add/popup.html', 'width: 211, height: 211')&gt; показать &lt;/span&gt;,
+        </p>
+        <p>
+            Более общий способ всплытия окон - использование функции <b><i>PopUp()</i></b>, например:
+        </p>        
+			<p class='olga5_codeTextSeparate'>
+				&lt;span on<b>Click</b>="window.olga5.<b>PopUp</b>(this, './add/popup.html',
+				'width: 211, height: 211')&gt; показать &lt;/span&gt;,
+			</p>
+        <p class='olga5_codeTextSeparate'>
+            &lt;span on<b>mouseenter</b>="window.olga5.<b>PopUp</b>(this, './add/popup.html', 'width: 211, height: 211')&gt; показать &lt;/span&gt;,
+        </p>
+        <p>            
+            Для визуализации всплывающих окон могут автоматически добавляться классы:
+            <b>olga5_popup</b>, <b>olga5_popup_isTag</b> и <b>olga5_popup_isAct</b>.
+        </p>
+    </div>
+</body>
+
+</html>

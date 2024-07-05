@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<title>shp's</title>
+    <link rel="shortcut icon" href="./favicon.svg" type="image/x-icon">
+	<link data-href="+../blog/csss/tests.css" media="screen" rel="stylesheet" />
+	
+	<script src='../olga5/o5common.js' o5debug = '1'></script>
+	<script src='+o5pop.js'></script>
+
+	<link href='./add/alltst.css' media='screen' rel='stylesheet' />
+	<script src='./add/calltst.js'></script>
+</head>
+
+<body onload="shp_WinOpen()">
+	<h3>
+		Примеры использования подвисабельных объектов
+	</h3>
+	<div class="select-shp" style="max-width: 666px;">
+		<table>
+			<tr>
+				<td>
+					<input id='shp1' type="button" value="показать" onclick="window.olga5.PopUp(this, '../olga5-tests/shp1')">
+				</td>
+				<td>
+					<span>
+						<br/>1.
+						В зависимости от размеров экрана <i>объекты</i> при подвисании либо сдвигают друг друга, либо зависают одновременно.
+						<br/>
+						Здесь существенно, что <b>shp2</b> находится под <b>shp1</b> и все три <i>объекта</i> одновремнно находятся в кадре.
+					</span>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<input id='shp2' type="button" value="показать" onclick="window.olga5.PopUp(this, '../olga5-tests/shp2')">
+				</td>
+				<td>
+					<span>
+						<br/>2.
+						Данный пример иллюстрирует варианты задания <i>фреймов</i> (задаются теговым атрибутом <b>olga5_frames</b>),
+						на границах которых подвисает <i>объект</i> (здесь <i>объект</i> - синоним <b>shp1</b>)
+						и <i>овнеров</i> (владельцев <i>объекта</i>, задаваемых теговым атрибутом <b>olga5_owners</b>),
+						ограничивающих область видимости <i>объекта</i>. И тех и других может быть произвольное количество.
+					</span>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<input id='shp3' type="button" value="показать" onclick="window.olga5.PopUp(this, '../olga5-tests/shp3')">
+				</td>
+				<td>
+					<span>
+						<br/>3.
+						Этот пример показывает возможность использования вложенных <i>объектов</i>. Здесь объект <b>shp0</b> содержит в себе
+						вложенный <i>объект</i> <b>shp1</b> (поведение которого тоже можно менять).
+						Также <b>shp0</b> содержит <b>shp2</b>&div;<b>shp5</b> как
+						<span title="без возможности динамического изменения их поведения">статистов</span>,
+						иллюстрирующих возможность реализации разных уровней вложенности.
+					</span>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<input id='shp4' type="button" value="показать" onclick="window.olga5.PopUp(this, '../olga5-tests/shp4')">
+				</td>
+				<td><span>
+					<br/>4.Доделывать! Иллюстрация использования подвисабельных объектов контейнерами других таких объектов.
+				</span></td>
+			</tr>
+		</table>
+	</div>
+</body>
+
+</html>

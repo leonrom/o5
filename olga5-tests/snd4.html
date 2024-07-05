@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<title>snd4</title>
+	<link rel="shortcut icon" href="./favicon.svg" type="image/x-icon">
+
+	<link href="../blog/csss/olga5.tableCode.css" media="screen" rel="stylesheet" />
+	
+<!-- <script src='../olga5/o5com.js'  -->
+<script async src='../olga5/o5com.js' o5debug=0
+data-xxx=123
+o5consts="o5debug=2"
+o5urlrfs="
+	_блог_o5 = '_url_olga5+../2020/02';
+	_sounds=https://archive.org/download/clouds_20200310;
+	media = + ../blog/media;
+	sounds= media + /audio;
+	images=_url_olga5 + ../blog/media/image;
+	# _url_html=' адрес текущей страницы (этот и 2 следующих - закомментированы)';
+	# _url_root='# адрес сайта (с текущей страницей)';
+	# _url_olga5='# адрес загрузки файла o5com!.js';
+"
+></script>
+
+	<script data-src='+o5snd.js'	
+	o5urlrfs="
+		Ceza1-25=sounds+/Ceza1-25.mp3;
+		Ceza2-25=sounds+/Ceza2-25.mp3;
+		imageplay=images + /play.png;
+		solfedjio=images+ /solfedjio.png;
+	"
+	btn_stop='images + /icons8-youtube-music-48.png'
+	btn_play='images + /icons8-youtube-music-50.png'
+></script>
+	<!-- <script src='https://rombase.h1n.ru/o5/olga5/o5dbg/events.js'></script> -->
+	<script data-src='+o5ref.js'
+		o5tag_attrs='
+			a, img, audio=href, data-href, src, _src
+		'	
+	o5urlrfs="  
+		myTunes-icon='images + /myMusikIT.png' # --- только для o5snd ---;
+
+		мой-блог=https://turkceile.blogspot.com/2017/02/   # --- только для o5shp ---;
+		_мой-блог=https://ariturlearn.blogspot.com/2017/02 # --- только для o5shp ---; 
+		"
+></script>
+
+</head>
+
+<body style="margin: 0 0.1em 0 0.3em;">
+	<div class='example olga5_Start'>
+	<style>
+		#div1{
+			background-color: aliceblue;
+				border: solid 1px lightgray;
+				height: fit-content;
+				display: block;
+				padding: 4px;
+				overflow: auto;
+				max-width: fit-content;
+				margin-left: 11px;
+		}
+		#div1 tr{
+			white-space: nowrap;
+		}
+		#div1 table{			
+    border-spacing: 0.3em;
+    border-bottom-style: double;
+    border-bottom-color: lightgray;
+		}
+		#div1 tr:nth-child(odd) td:last-child{
+			background-color: aliceblue;
+		}
+		#div1 tr:nth-child(even) td:last-child{
+			background-color: blanchedalmond;
+		}
+	</style>
+	
+	<span>Примеры подключения <b>&lt;img&gt;</b> с вызовом всех модулей ядра библиотеки. 
+		<br/> Для звучания - кликнуть по иконке (или навести на неё - для 4, 5 и 6&lt;a&gt;)</span>
+	<div id='div1' class="olga5_shp:Up:Top" olga5_frames="i:olga5-Start_hr,n" olga5_owners="n">		
+		<p style="text-align: left;text-align: -moz-left;text-align: -webkit-left;margin: 4px;font-size: small;">
+			Ссылки на аудиофайл содержащие пробелы д.б. записана в 
+			<span title="в любой паре одинаковых из `'">кавычках</span>, как в <b>2</b>, <b>3</b>
+			и <b>5</b> (с <i>вольностями</i> в задании квалификаторов у класса <b>olga5_snd</b>).
+			В примере <b>6</b>&lt;a&gt; показано использование атрибута <b>href</b> для ссылки на аудиофайл. 
+			При клике в состоянии 'pause' выполнится переход по ссылке
+			<br/>
+			Иконка меняется (при проигрывании) только для <b>3</b> и <b>4</b>, у которых (по-разному) заданы <b>image_play</b>.
+			Проигрывание иконок с квалификатором <b>O</b><i>ver</i> выполняется лишь после <u>активации</u> страницы,
+			Чтобы отсановить звучание иконок с квалификатором <b>A</b><i>live</i> следует повторно <i>кликнуть</i> 
+			для паузы и потом увести курсор.
+			<br/>
+			В примерах 1, 2, 3, 4  показаны различные вариантты подключения аудио-файла <b>Ceza2-25.mp3</b>
+		</p>
+		<table class="tableIllu">
+			<tbody>
+				<tr>
+					<td>1</td>
+					<td>
+						<img class="olga5_snd:+Ceza1-25" title="img01" id="01" loop src="+ myTunes-icon" />
+					</td>
+					<td>&lt;<b>img</b> class="olga5_snd:+Ceza1-25" 
+						<b>src</b>= "+myTunes-icon"/&gt;
+						<br />&nbsp;&nbsp;&nbsp;
+						простейший пример для &lt;<b>img</b>&gt;,- звучание по клику, прекращение по уходу курсора.
+					</td>
+				</tr>
+				<tr>
+					<td>2</td>
+					<td>
+						<img class="olga5_snd:alive:'  +   Ceza1-25  '" title="img02" id='02' />
+					</td>
+					<td>&lt;<b>img</b> class="olga5_snd:alive:'&nbsp;&nbsp;+&nbsp;&nbsp;&nbsp;Ceza1-25&nbsp;&nbsp;'" /&gt;
+						<br />&nbsp;&nbsp;&nbsp;
+						не прерывается по уходу курсора; <b>src</b> не указан,- берутся <b>btn-stop</b> и <b>btn-play</b> 
+					</td>
+				</tr>
+				<tr>
+					<td>3</td>
+					<td><img class="olga5_snd:L:A:Ceza1-25" title="img03" id='03'
+							src="+myTunes-icon"
+							image_play="https://icons.iconarchive.com/icons/froyoshark/enkel/48/Spotify-icon.png" />
+					</td>
+					<td>&lt;<b>img</b> class="olga5_snd:L:A:Ceza1-25"
+						<b>src</b>= "+myTunes-icon" <b>image_play</b>=".../Spotify-icon.png"/&gt;
+						<br />&nbsp;&nbsp;&nbsp;
+						зацикленное звучание по клику до следующего клика ('L'= 'loop', 'A'= 'alive')
+					</td>
+				</tr>
+				<tr>
+					<td>4</td>
+					<td><img class="olga5_snd:over:sounds+Ceza2-25.mp3" title="img04" id='04' 
+							src="images+ /solfedjio.png" image_play=btn_play />
+					</td>
+					<td>&lt;<b>img</b> class="olga5_snd:over:sounds+Ceza2-25.mp3"
+						<b>src</b>="images+ /solfedjio.png"  <b>image_play</b>=btn_play/&gt;
+						<br />&nbsp;&nbsp;&nbsp;
+						однократное звучание (с изменением иконки) по наведению курсора.
+					</td>
+				</tr> 
+				<tr>
+					<td>5</td>
+					<td><img class='dlassaaa:A olga5_snd:over : a-11_z: loop :  "  sounds + Ceza1-25.mp3" ' title="img05" id='05'
+							src=solfedjio />
+					</td>
+					<td>&lt;<b>img</b> class='dlassaaa:A olga5_snd:<b>o</b>ver&nbsp;:&nbsp;<b>a</b>Яё:&nbsp;<b>l</b>oop&nbsp; :&nbsp;&nbsp; "&nbsp;&nbsp; sounds + Ceza1-25.mp3" '
+						<b>src</b>=solfedjio/&gt;
+						<br />&nbsp;&nbsp;&nbsp;
+						зацикленное звучание по наведению курсора, не прерывается с его уходом.
+					</td>
+				</tr>
+				<tr>
+					<td>6</td>
+					<td>
+						<a id='6' class='olga5_snd:href' target="olga5-addPage" href="sounds+/Ceza1-25.mp3"
+							title="кликни чтобы прослушать">&lt;<b>a</b>&gt;</a>
+						<br />
+						<a id='6a' class='olga5_snd:over:href' target="olga5-addPage" href=sounds+/Ceza1-25.mp3
+							title="задержи курсор чтобы прослушать">&lt;<b>a</b>&gt;</a>
+						<br />
+						<b id='6b' class="olga5_snd:alive:'sounds+ /Ceza2-25.mp3'" 
+							title="кликни чтобы прослушать" style="background-color: transparent;">&lt;<b>b</b>&gt;
+						</b>
+					</td>
+					<td>
+						&lt;<b>a</b> class='olga5_snd:<b>href</b>' target="olga5-addPage" href="sounds+/Ceza1-25.mp3" &gt;
+						<a id='7' class='olga5_snd:href' target="olga5-addPage" href="sounds+/Ceza1-25.mp3"
+							title="кликни чтобы прослушать">кликнуть тут</a>
+						&lt;/a&gt;
+						<br />
+						&lt;<b>a</b> class='olga5_snd:<b>over</b>:<b>href</b>' target="olga5-addPage" href=Ceza1-25 &gt;
+						<a id='7a' class='olga5_snd:over:href' target="olga5-addPage" href="sounds+/Ceza1-25.mp3"
+							title="задержи курсор чтобы прослушать">навести курсор</a>
+						&lt;/a&gt;
+						<br />
+						&lt;<b>b</b> class="olga5_snd:alive:'sounds+/Ceza2-25.mp3'"&gt;
+						<b id='7b' class="olga5_snd:alive:'sounds+/Ceza2-25.mp3'"
+							title="кликни чтобы прослушать">кликнуть тут</b>
+						&lt;/b&gt;
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		<p>
+			Использовались следующие 'кнопки' (эти ниже - некликабельные):
+			<br /><img id='i1' _src=btn-stop class="olga5_snd:n" title="файл 'icons8-youtube-music-48.png'"/> &mdash; скриптовый параметр <b>btn-stop</b>   (icons8-youtube-music-48.png)
+			<br /><img id='i2' _src=btn-play class="olga5_snd:n" title="файл 'icons8-youtube-music-50.png'"/> &mdash; скриптовый параметр <b>btn-play</b>  (icons8-youtube-music-50.png)
+			<br /><img id='i3' _src=imageplay class="olga5_snd:n" title="файл 'play.png'"/> &mdash; теговый атрибут image_play=<b>imageplay</b>  (play.png)
+			<br /><img id='i4' _src=solfedjio class="olga5_snd:n" title="файл 'solfedjio.png'"/> &mdash; файл <b>solfedjio</b>.png
+		</p>
+		<table style="border-color: transparent; line-height: 1.1; width: 100%; font-size: smaller;max-width: 844px;">
+			<caption style="text-align: left;text-align: -moz-left;text-align: -webkit-left;margin: 4px">
+				Дополнительно показаны варианты подключения стандартных плейеров:
+			</caption>
+			<tbody>
+				<tr>
+					<td>
+						<div><audio id="a1" controls="controls" class='olga5_snd:H' src="sounds+/Ceza1-25.mp3">
+							</audio></div>
+					</td>
+					<td>
+						<div><audio id="a2" controls="controls" data-src="sounds+ Ceza2-25.mp3">
+							</audio></div>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						здесь: <b>class</b>='olga5_snd:H' - игнорируется в <b>o5snd</b>
+						<br/>&lt;audio <b>_src</b>="sounds+/Ceza1-25.mp3"&gt;
+						<br/>атрибут <b>_src</b> будет обработан модулем <b>o5ref</b>
+						<br/>и 'сразу' заменит <b>src</b>.
+					</td>
+					<td>
+						здесь: <b>class</b> - не задан,
+						<br />&lt;audio <b>data-src</b>= &nbsp;"sounds+ Ceza1-25.mp3"&gt;.
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		
+		<p>
+			Здесь подключение <code>o5snd.js</code> имеет вид:
+		</p>
+		<table class="olga5_tableCode">
+			<tbody>
+				<tr>
+					<td>
+					</td>
+					<td>
+						<pre>
+&lt;script async src='+o5snd.js'
+    o5urlrfs="
+        Ceza1-25=sounds+/Ceza1-25.mp3;
+        Ceza2-25=sounds+/Ceza2-25.mp3;
+        imageplay=images + /play.png;
+        solfedjio=images+ /solfedjio.png;
+    "
+    btn_stop='images + /icons8-youtube-music-48.png'
+    btn_play='images + /icons8-youtube-music-50.png'
+/&gt;&lt;/script/&gt;
+</pre>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		<p>
+			Тут отсутствует иконка
+			<img id='i3' _src=myTunes-icon class="olga5_snd:n" title="файл 'myTunes-icon.png'"/>
+			&mdash; <b>myTunes-icon</b>
+			&nbsp;,- она задана (для тестирования) в скриптовом атрибуте <b>o5urlrfs</b> подключения <code>o5ref.src</code>
+		</p>
+		<p style="font-size:small">
+			Примечание: сообщение об ошибке "o5ref: неопределённые адреса" в <i>console.log</i> 
+			выдаетя потому, что <i>те адреса</i> определены локально для модуля <b>o5snd</b>
+			и недоступны модулю <b>o5ref</b>. 
+		</p>
+	</div>
+</div>
+</body>
+
+</html>

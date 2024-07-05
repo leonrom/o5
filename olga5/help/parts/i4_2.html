@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <title>i4_2</title>
+  <script src="./o5h.js"></script>
+</head>
+
+<body>
+  <div class='container'>
+    <h4>Подключение зависания к объекту</h4>
+    <p>
+        В атрибуте <b>class</b> тега необходимо указать класс <b>olga5_shp</b> с возможными квалификаторами,
+        разделяемыми символом '<b>:</b>'.
+        Также можно задать дополнительные атрибуты <b>olga5_frames</b>, <b>olga5_owners</b> и <b>olga5_repeat</b>.
+        Например:
+    </p>
+    <pre>
+    &lt;div id='div1' class="<b></b>olga5_shp</b>:<b>Up</b>" <b>olga5_frames</b>="id:shp-demo,C:container:2"&gt;
+</pre>
+    <p>
+      Здесь <b>Up</b> - один из возможных квалификаторов:
+    </p>
+    <ul>
+        <li><b>T</b><i>op</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &mdash; блок зависает вверху контейнера;</li>
+        <li><b>B</b><i>ottom</i>&nbsp;&nbsp; &mdash; -"- внизу контейнера;</li>
+        <li><b>U</b><i>p</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &mdash; зависание происходит по достижении верха контейнера;</li>
+        <li><b>D</b><i>own</i>&nbsp;&nbsp;&nbsp; &mdash; -"- низа контейнера;</li>
+        <li><b>S</b><i>hift</i>&nbsp; &mdash; <i>сдвигает</i> предыдущий зависший блок;</li>
+        <li><b>P</b><i>ush</i>&nbsp;&nbsp; &mdash; <i>сталкивает</i> -"- ;</li>
+        <li><b>O</b><i>ver</i>&nbsp;&nbsp; &mdash; <i>наезжает</i> на -"- ;</li>
+        <li><i><b>i</b></i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &mdash; целое число,- <i>уровень</i> блока; </li>
+        <li><b>A</b><i>live</i>&nbsp; &mdash; автоматически восстанавливает зависание блока;</li>
+        <li><b>K</b><i>ill</i>&nbsp;&nbsp; &mdash; отключает зависание у находящихся выше блоков;</li>
+        <li><b>N</b><i>one</i>&nbsp;&nbsp; &mdash; отключение событий тега,- обработка не выполняется;</li>
+    </ul>
+    <p>
+      Дополнительные атрибуты <b>olga5_frames</b> и <b>olga5_owners</b> содержат один или несколько наборов
+      полей: <i>код</i>, <i>значение</i> и <i>счётчиков</i>.
+      Обязательное поле <i>код</i> определяет:
+    </p>
+    <ul>
+      <li><b>I</b><i>d</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &mdash; произвольный (блочный, не обязательно <i>контейнер</i>) тег с <b>id</b>
+          равным <i>значению</i>;</li>
+      <li><b>C</b><i>lass</i> &mdash; ближайший контейнер, содержащий класс заданный <i>значением</i>;</li>
+      <li><b>N</b><i>ode</i>&nbsp; &mdash; аналогично контейнер с <b>nodeName</b> равным <i>значению</i>;</li>
+      <li><b>S</b><i>croll</i> &mdash; контейнером является <i>счётчик</i>-ный по в<b>ы</b>ложенности
+          <i>скроллируемый</i> контейнер;</li>
+      <li><b>B</b><i>ord</i> &mdash; блочный контейнер с <i>видимой</i> границей.</li>
+  </ul>
+    <p>
+        Если <b>olga5_owners</b> не указан (или не определён код), то принимается по-умолчанию значение '<b>B</b>'.
+        Для <b>olga5_frames</b> аналогично принимается значение '<b>S</b>'.
+    </p>
+  </div>
+</body>
+
+</html>

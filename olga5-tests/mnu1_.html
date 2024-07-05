@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>mnu1_</title>
+    <link rel="shortcut icon" href="./favicon.svg" type="image/x-icon">
+
+    <script src=" ../olga5/o5common.js" o5debug="2"></script>
+	<script data-src='+ o5inc.js'></script>
+    <!-- <script src='https://rombase.h1n.ru/o5/olga5/o5dbg/events.js'></script> -->
+    <script src=" ../olga5/o5mnu.js" o5menu="
+            {span: 'меню <script> ',right: '311px',top: '33px',add: '233px',
+                target:'_olga5',
+                base:'https://olga-5.blogspot.com/blog/02'
+            },
+                {span: '3. Подключение аудио-файлов',ref: '/olga5-snd.html',add: '288px',id: 'div1'},
+                    {span: '3.1. Подключение к тегам 31',ref: 'snd_31',},
+                    {span: '3.2. Просто к тегам 32',ref: 'snd_32',ret: 1},
+                {span: '4. CSS-описания REF',ref: '/olga5-ref.html'},
+                {span: 'Заключение SHP',id: 'div5',ref: '/olga5-shp.html'},
+            "></script>
+</head>
+
+<body class="olga5_Start">
+    <p>
+        В этом варианте первые 3 меню отсутствуют (см. файл <b>mnu1.html</b>), т.к. скрипты, в которых они
+        вызываются вставлены уже <u>после</u> загрузки документа.
+    </p>
+	<div o5include='./mnu1.html?.example'></div>    
+</body>
+
+</html>

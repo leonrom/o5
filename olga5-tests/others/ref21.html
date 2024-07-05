@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>ref2</title> 
+	<link rel="shortcut icon" href="./favicon.svg" type="image/x-icon">
+    
+    <script async src='../olga5/o5com.js' o5debug=0></script>
+    <script id='o5ref' _src='+o5ref.js'
+        o5tag_attrs='
+            a = href,data-href, xxx # Содержит ошибку;
+            b, vv = xxx             # -"-            ;
+            img = src,_src                    ;
+        '
+        o5urlrfs = "		
+        ma   = /media                           # это промежуточная часть адресной строки;
+        btns = _url_root +       /o5/blog       # спец. содержит ошибочную ссылку  'mma' ;
+        belo = _url_root + mma + /o5/blog       # спец. содержит ошибочную ссылку  'mma' ;
+        "
+    >
+    </script>
+</head>
+<body style="margin: 0 0.1em 0 0.3em;">
+	<div class='example olga5_Start' style="  line-height: 2em;">
+    <br/>2 <img   id="i2" 
+                         _src="+ btns + ma + /image/solfedjio.png"
+                         style="vertical-align: middle;"    />
+    <br/>4 <img   id="i4" 
+                        _src="+ belo + ma + /image/solfedjio.png"
+                        style="vertical-align: middle;" />
+</div>
+
+</body>
+</html>

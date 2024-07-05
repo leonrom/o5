@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<title>snd2_</title>
+	<link rel="shortcut icon" href="./favicon.svg" type="image/x-icon">
+
+	<link href="../blog/csss/olga5.tableCode.css" media="screen" rel="stylesheet" />
+	
+	<script async src='../olga5/o5com.js' 
+		o5consts="o5debug=2"
+		o5urlrfs="
+			images=_url_olga5 + ../blog/media/image; 
+			sounds=https://archive.org/download/clouds_20200310;
+		"
+	></script>
+	<script data-src='+ o5inc.js'></script>
+	<script async src='../olga5/o5snd.js'
+	o5urlrfs="
+		btn_stop='images + /icons8-youtube-music-48.png';
+		btn_play='images + /icons8-youtube-music-50.png';
+		imagestop='_url_olga5 + ../blog/media/image/myMusikIT.png';
+		imageplay='images + /play.png';
+		аудио_файл=sounds + /Ceza1-25.mp3;
+		solfedjio=images+ /solfedjio.png;
+	"	
+	></script>
+</head>
+
+<body style="margin: 0 0.1em 0 0.3em;">
+	<span>Примеры подключения <b>&lt;img&gt;</b> с вызовом всех модулей ядра библиотеки. 
+		Для звучания - кликнуть по иконке (и чуток подождать)</span>
+	<div class='olga5_Start' o5include='./snd2.html?.example'></div>
+</body>
+
+</html>

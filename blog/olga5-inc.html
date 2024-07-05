@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<title>olga5-inc</title>
+	<link rel="shortcut icon" href="+../blog/favicon.svg" type="image/x-icon">
+
+	<link data-href='+o5ini.css' media='screen' rel='stylesheet' />
+	<script data-src='+o5mnu.js' scrollY='-32'></script>
+	<script data-src='+o5shp.js'></script>
+	<script data-src='+o5pop.js'></script>
+	<script data-src='+o5ref.js' o5tag_attrs="img=image_play;a,img=href,data-href,src,_src;"></script>
+
+	<link data-href='+../blog/csss/olga5.tableCode.css' media='screen' rel='stylesheet' />
+	<link data-href='+../blog/csss/olga5.textNshow.css' media='screen' rel='stylesheet' />
+	<link data-href='+../blog/csss/olga5.addStyles.css' media='screen' rel='stylesheet' />
+	<link data-href='+../blog/csss/olga5.tableKuplet.css' media='screen' rel='stylesheet' />
+	<link data-href='+../blog/csss/tests.css' media='screen' rel='stylesheet' />
+
+	<script src='../olga5/o5com.js' o5urlrfs=" _блог_o5='https://olga-5.blogspot.com/2020/02' ; 
+		#_url_html='# адрес текущей страницы (этот и 2 следующих - закомментированы)' ;
+		#_url_root='# адрес сайта (с текущей страницей)' ; 
+		#_url_olga5='# адрес загрузки файла o5com!.js' ; ">
+		</script>
+
+<body>
+	<div class=" olga5_Start:o5pop" dir="ltr" trbidi="on">
+		<div class="olga5_diagonal"> статья ещё&nbsp;редактируется
+			<br /><span>(завершу, если будет потребность)</span>
+		</div>
+		<img alt="" border="0" width="200" style="display:none" style="display:none" data-original-height="599"
+			data-original-width="662"
+			src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgNTje191LQwh7WoHM2xt4gQz_Ji0Ru6AOl4IQysJ6ThNC820bmxtD6GQMiTqyeYWDOLnXjsaGzVMXHPKS9O_7nJUCjRLTvBv_f10gh3tKi4ATrBFOsSd_zwTwfvP0AiFT6RNW9rLYctBmuFr15GaAX29FECLJI-tVdZ9PauFHmXrOj68ujbhZcFCnC/s200/%D0%92%D1%81%D1%82%D0%B0%D0%B2%D0%BA%D0%B0.png" />
+
+		<p class="olga5_page_header">
+			Вставка html-файлов или их фрагментов в текст загруженного документа
+		</p>
+		<p>
+			Скрипт несколько расширяет возможности тега &lt;<b>iframe</b>&gt; при
+			вставке html-файлов или их фрагментов, находящихся в одном домене с основным документом. 
+		</p>
+		<p>
+			В отличие от большинства скриптов <i>библиотеки</i>
+			<span o5popup='+ ./help/o5help.html; width: 430, height: 390'><code>Olga5</code></span>&nbsp;
+			данный скрипт может использоваться автономно,- как без подключения ядра <code>o5com!.js</code>
+			так и при его подключении, но при этом скрипт д.б. размещен <u title="в заголовке 'head' документа">выше</u> скрипта ядра.
+			<br/>
+			Тег &lt;script&gt; вызова модуля <code>o5inc</code> должен находиться прежде вызовов остальных скриптов быблиотеки.
+		</p>
+		<p style="line-height: 1.3; margin-bottom: 0cm;">
+			Вставка выполняется <u>добавлением</u> содержимого (или его части) считанного файла к содержимому тега,
+			содержащего атрибут '<b>o5include</b>'.
+			Вставляться может как весь загруженный текст (т.е. секцияг &lt;<b>body</b>&gt;),
+			так и лишь содержимое некоторого тега, определяемого <i>селектором</i>.
+		</p>
+		<p class="moecomment">
+			Во вставляемом файле игнорируется содержимок секции &lt;<b>head</b>&gt;, поэтому она может отсутствовать.
+		</p>
+		<p>
+			Считывание файла реализовано с использованием 'веб API интерфейса' <b>XMLHttpRequest</b>.
+			На загрузку файлов с "чужиих доменов" действуют ограничния '<i>CORS policy</i>'.
+		</p>
+		<p>
+			Чтобы вставить только часть считываемого файла (т.е. содержимого его тега &lt;<b>body</b>&gt;) следует
+			после атрибута '<b>o5include</b>' написать '<b>?</b>' или '<b>!</b>' и селектор начинающийся символом:
+		</p>
+		<ul>
+			<li><b>[</b> - выбирается тег, удовлетворяющий querySelectorAll() для селектора</li>
+			<li><b>#</b> - выбирается тег с указанным далее <b>id</b></li>
+			<li><b>.</b> - выбирается тег, содержащий указанный далее класс</li>
+			<li>иначе - выбирается тег с таким наименованием</li>
+		</ul>
+		<p class="moecomment">
+			Классы могут содержать квалификаторы (черз ':'), <u>каждый</u> из которых должен присутствовать в теге
+		</p>
+		<p>
+			Вставляются (т.е. последовательно добавляются)
+			содержимые всех найденные по селектору тегов. Если разделителем указан '<b>!</b>', то
+			<span title="копируется значение 'outerHTML' тега">вставляются</span>
+			сам найденный тег и его содержимое;
+			<span title="копируется значение 'innerHTML' тега">иначе</span> (если указан '<b>?</b>') - только содержимое.
+			Для тега &lt;<b>body></b>&gt; всегда вставляется только содержимое.
+		</p>
+		<p>
+			Если же ни один тег не находится - записывается сообщение об ошибке: "<i>o5inc: обработка 'CInclude' - есть
+				ошибки</i>".
+		</p>
+		<p>
+			Теги &lt;<b>script</b>&gt; из вставляемых фрагментов НЕ обрабатываются (в этой версии).
+		</p>
+		<p>
+			Вставка может выполняться рекурсивно, т.е. скрипт обрабатывает ссылки во вставляемых фрагментах.
+		</p>
+
+		<p>
+			Посмотреть реализацию подгрузки разных фрагментов (из двух разных файлов) можно
+			<span class="olga5_popup"
+				onclick="window.olga5.PopUp(this, '+../olga5-tests/inc1_.html?o5debug=2', 'width: 444, height: 366')">
+				<u style="cursor:pointer;">здесь</u></span>, где
+			у атрибута <b>o5include</b> заданы различные квалификаторы.
+		</p>
+		<p>
+			Вставляются содержимые всех тегов (из загруженного файла), удовлетворяющие заданному выражению.
+			В примере были показаны ставки в теги <b>div</b>, однако можно вставлять в любые теги (дополняя при этом их
+			содержимое).
+		</p>
+		<p class="moecomment">
+			Разумеется, сами файлы <b>inc1.html</b> и <b>inc2.html</b> считываются только по одному разу.
+			Их содержимое можно увидеть в протоколе в раскрывающемся сообщении '<i>Содержимое прочитанного ...</i>'
+		</p>
+		<p>
+			Ядро библиотеки проверяет наличии данного скрипта и тегов с атрибутои <b>o5include</b> и, при их наличии,-
+			модуль <code>o5inc</code> выполняется в первую очередь, независимо от гположения его скрипта.
+
+			При подключении скрипта совместно с иными <i>библиотечными</i> скриптами он должен располагаться прежде них.
+		</p>
+
+		<!-- <p>
+			Также модуль может выполняться автономно,- без подключения ядра <i>библиотеки</i> <code>o5com!.js</code>,-
+			как это сделано в упомянутом
+			<code class="olga5_popup" onmouseup="window.olga5.PopShow( 555, 555, '+/incl/tst.html')">примере</code>.
+			Результаты загрузки файлов приводятся в сообщении "<i>Обработка 'CInclude'</i>" в <i>console.log</i>.
+		</p> -->
+		<p>
+			Скрипту м.б. заданы атрибуты <b><i>o5getall</i></b> и <b><i>o5isfinal</i></b>.
+		</p>
+		<p>
+			Умалчиваемое значение для <b><i>o5getall</i></b>= 'true'.
+			Если задать 'false', то вставка (и загрузка файлов) будет только <u><b>в</b></u> те теги,
+			у которых самих и их предков НЕ задан стиль <b><i>display</i> = 'none'</b>.
+			Это может снизить трафик, однако при изменении их видимости следует генерировать событие
+			<i>window.dispatchEvent(new CustomEvent('o5include'))</i> для (вероятной) вставки новых фрагментов.
+		</p>
+		<p>
+			Умалчиваемое значение для <b><i>o5isfinal</i></b>= '1'.
+			Если задать '0', то скрипт не будет гененрировать сообщение '<b>olga5_sinit</b>' об окончании своей работы
+			и инициация иных модулей <i>библиотеки</i> приостановится.
+			Такое сообщение должно быть сделано где-то (см. 
+			<code class="olga5_popup" onmouseup="window.olga5.PopShow( 777, 666, '+../olga5-tests/inc1_.html')">пример</code>
+			) в вызывающем модуле вызовом
+		</p>
+		<p class="olga5_codeTextSeparate">
+			window.olga5.C.E.DispatchEvent('olga5_sinit', 'o5inc')
+		</p>
+		<p>
+			После загрузки файлов, указанных в атрибутах <b>o5include</b> скриптом всегдагенерируется <b>window</b> сообщение
+			<b><i>olga5-incls</i></b>, которое должно использоваться вместо (вместе) сообщения <i>DOMContentLoaded</i>.
+		</p>
+	</div>
+</body>
+
+</html>

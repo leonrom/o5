@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<title>snd1</title>
+	<link rel="shortcut icon" href="./favicon.svg" type="image/x-icon">
+
+	<script async src='../olga5/o5com.js' o5consts="o5debug=0" o5urlrfs="
+		media = + ../blog/media;
+		моя_папка = media + /audio;
+		"></script>
+	<script async data-src='+ o5snd.js' o5urlrfs="
+			аудиоФайл =моя_папка + /Clouds.mp3;
+		"></script>
+</head>
+
+<body style="margin: 0 0.1em 0 0.3em;">
+	Примеры подключения аудио-файла в теге &lt;<b>audio</b>&gt;
+	<div class='example olga5_Start'>
+		<style>
+			audio {
+				height: 16px;
+				width: 244px;
+			}
+
+			p {
+				white-space: nowrap;
+			}
+
+			p span {
+				font-size: small;
+				font-family: monospace;
+				margin-left: 4em;
+			}
+		</style>
+		<p>1 <audio id="s1" src="https://archive.org/download/clouds_20200310/Clouds.mp3" controls="controls"></audio>
+			<br />Обычная ссылка на файл (атрибут <b>class</b> не указан):<br />
+			<span>src="https://archive.org/download/clouds_20200310/Clouds.mp3"</span>
+		</p>
+		<p>2 <audio id="s2" _src="https://archive.org/download/clouds_20200310/Clouds.mp3" controls="controls"></audio>
+			<br />Как '<b>1</b>', но с <b>_src</b> (вместо <b>src</b>):<br />
+			<span>_src="https://archive.org/download/clouds_20200310/Clouds.mp3"</span>
+		</p>
+		<p>3 <audio id="s3" _src="моя_папка + /gitme.mp3" controls class="olga5_snd"></audio>
+			<br />Как '<b>2</b>', но с символической ссылкой в <b>_src</b> (и ненужным <b>olga5_snd</b>):<br />
+			<span>_src="моя_папка + /gitme.mp3" class="olga5_snd"</span>
+		</p>
+		<p>4 <audio id="s4" data-src=моя_папка+gitme.mp3 controls class="olga5_snd"></audio>
+			<br />Как '<b>3</b>', но с <b>data-src</b> вместо <b>_src</b> (и без слэша и кавычек у ссылки):<br />
+			<span>data-src=моя_папка+gitme.mp3 class="olga5_snd"</span>
+		</p>
+		<p style="font-size:small">
+			Во всех, кроме '<b>1</b>', аудио-файл будет загружать после наведения курсора.<br />
+			Файл <b>gitme.mp3</b> находится в <b>моя_папка</b>, заданой в &lt;<b>script</b>&gt подключения
+			<b>o5snd.js</b>.;
+		</p>
+	</div>
+</body>
+
+</html>

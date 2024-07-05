@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<title>i2_1</title>
+	<script src="./o5h.js"></script>
+</head>
+
+<body>
+	<div class='container'>
+		<h4>Пример подключения</h4>
+			<pre>
+&lt;script async src='olga5/o5snd.js'
+    <b>btn_play</b> = '_url_html + /media/image/play.png'
+    <b>btn_stop</b> = '_url_html + /media/image/play_Freepik.png'
+&gt;&lt;/script&gt;
+<i>&lt;script async src='olga5/o5com!.js' &gt;&lt;/script&gt;</i>
+</pre>
+			<h4>Атрибуты скрипта:</h4>
+			<p>
+				Тег &lt;<b>script</b>&gt; может иметь дополнительные атрибуты:
+			</p>
+			<ul>
+				<li><b>btn_play &nbsp; </b> &mdash; ссылка на изображение `кнопки` когда звучит аудио;</li>
+				<li><b>btn_stop &nbsp; </b> &mdash; обычное (беззвучное) изображение кнопки;</li>
+    				<li><b>o5shift_speed</b> &mdash; относительная скорость проигрывания аудио (по умолчанию= 0.5).</li>
+			</ul>
+			<p>
+				Скрипт создаёт невидимый тег &lt;<b>audio</b>&gt; с <b>id</b>='<i><b>olga5_playSound</b></i>',
+				в котором выполняется воспроизведение <span title="аудио может быть 'подвешено' на тег любого типа">аудио-ссылок</span>.
+			</p>
+	</div>
+</body>
+
+</html>

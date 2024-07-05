@@ -1,0 +1,49 @@
+<html>
+
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<title>tst</title>
+	<link rel="shortcut icon" href="./favicon.svg" type="image/x-icon">
+
+	<script src='../o5inc.js'></script>
+	<style>
+		div {
+			height: 66px;
+			width: 22%;
+			border: 1px solid gray;
+			margin-top: 6px;
+			background-color: aliceblue;
+			overflow-y: scroll;
+			overflow-x: hidden;
+		}
+
+		div div {
+			width: 50%;
+			background-color:azure;
+			border: 1px solid aqua;
+		}
+	</style>
+</head>
+
+<body>
+	Примеры подключения
+	<br />
+	<div id="d1" o5include='./inc1.html' title="./inc1.html"></div>
+	<div o5include='./inc1.html?#i2' title="./inc1.html?#i2"></div>
+	<div o5include='./inc1.html?#i3' title="./inc1.html?#i3"></div>
+	<div o5include='./inc1.html?.s1' title="./inc1.html?.s1"></div>
+	<div o5include='./inc1.html?span' title="./inc1.html?span"></div>
+
+	<div o5include='./inc2.html' title="./inc1.htm2 нет такого"></div>
+	<div o5include=':./inc2.html' title="./inc1.htm2 url с ошибкой"></div>
+	<div o5include='https://rombase.h1n.ru/o5/tests/incl/inc1.html' title=".../inc1.html иной ресурс"></div>
+
+	<script>
+		if (window.olga5)
+		window.olga5[0].Init()
+		// window.olga5.o5com.CInclude()
+		// window.olga5.C.Includes()
+	</script>
+</body>
+
+</html>

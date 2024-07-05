@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<title>pop2_</title>
+
+	<!-- <script data-src='+ o5inc.js'></script> -->
+
+	<link href='../add/pop2.css' media='screen' rel='stylesheet' />
+	
+	<script async src='../olga5/o5com.js' o5debug=2 ></script>
+	<script src='../add/pop2.js'></script>
+	<script src='../olga5/o5pop.js' o5timer='0.3' o5opacity='0.2' o5-debug="0" params="" o5timer="1"></script>
+</head>
+
+<body style="margin: 0 0.1em 0 0.3em;">
+	<div class='example olga5_Start'>
+		<!-- <p>
+			Примеры пересчета параметров по ссылочному аргументу.
+			<br /> умолчание:
+		<pre>
+	text: '', group: '', head: '', 
+	width: 588, height: 345, top: 11, left: -22, 
+	resizable: 1, alwaysRaised: 1, alwaysOnTop: 1, menubar: 0, toolbar: 0, status: 0, scrollbars: 0, 
+			</pre> -->
+		Результат показывается в 'рыжих' полях после кликоа по 'серым' примерам
+		<br/>
+<span style="font-size: small;">
+		где значения <i><b>top</b></i> могут отличаться от заданных на десяток пикселов, из-за учета высоты заголовка окна; 
+		<br/>а значение <i><b>left</b></i> может пересчитываться чтобы окно не <i>вылезало</i> за правый край экрана;		
+		<br/>при нескольких мониторах <i><b>left</b></i> и <i><b>top</b></i> пересчитываются к текущему (идентичны только на первом мониторе);
+</span>
+		</p>
+
+		<ol start="0">
+			<li><span id="p0" class="olga5_popup" onclick="MyPopUp('t0', './add/popup.html', '')">
+					<span class='csrc'>...</span>
+				</span>
+				<br />умалчиваемые параметры:
+				<p id="t0" class="crez"></p>
+			</li>
+		</ol>
+		<ol style="white-space: nowrap;">
+			<li><span id="p1" class="olga5_popup"
+					onclick="MyPopUp('', './add/popup.html', 'l: 255; w=233, h:111; t=26, g=1,  resizable: 11')">
+					<span class='csrc'>...</span>
+				</span>
+				<br /><u>базовый</u> для остальных (его недостающее '<i>alwaysraised=1</i>' и т.д. - из умалчиваемых значений)
+				<p class="crez"></p>
+			</li>
+			<li><span id="p2" class="olga5_popup" onclick="MyPopUp('', './add/popup.html', 'W:122, top:54, p1, p111, g:2,  resizable: 12')">
+					<span class='csrc'>...</span>
+				</span>
+				<br /><b>p2</b> недостающее - из <b>p1</b>(<i>left</i>, <i>height</i>);
+				ссылка на <b>p111</b> - ошибочна (см. протокол);
+				<p class="crez"></p>
+			</li>
+			<li><span id="p3" class="olga5_popup" onclick="MyPopUp('', './add/popup.html', 'top=22, p1, p2, group:3')">
+					<span class='csrc'>...</span>
+				</span>
+				<br />недостающее <i>width</i> берётся из <b>p1</b>
+				(<i>width</i>);
+				<p class="crez"></p>
+			</li>
+			<li><span id="p4" class="olga5_popup" onclick="MyPopUp('', './add/popup.html', 'top=121, p2, p1, g:4')">
+					<span class='csrc'>...</span>
+				</span>
+				<br />недостающее <i>width</i> берётся из <b>p2</b>
+				(<i>height</i>);
+				<p class="crez"></p>
+			</li>
+		</ol>
+	</div>
+</body>
+
+</html>

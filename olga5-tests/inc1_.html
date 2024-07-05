@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<title>inc1_</title>
+	<link rel="shortcut icon" href="./favicon.svg" type="image/x-icon">
+
+	<!-- <link href='../add/alltst.css' media='screen' rel='stylesheet' />
+	<script src='../add/alltst.js'></script> -->
+
+	<script src='../olga5/o5com.js' o5debug=2></script>
+	<script data-src='+ o5inc.js' o5isfinal="0"></script>
+	<script data-src='+./o5shp.js'></script>
+	<script src='../olga5/o5pop.js'></script>
+	<style>
+		div.showdiv {
+			max-height: 14em;
+			overflow-y: scroll;
+			overflow-x: hidden;
+			direction: rtl;
+			max-width: 666px;
+			background-color: antiquewhite;
+			margin: 2px;
+			border: 1px solid greenyellow;
+			border-radius: 2px;
+		}
+
+		pre.showdiv {
+			overflow-y: auto;
+			font-size: smaller;
+			overflow-x: hidden;
+			direction: ltr;
+		}
+
+		span.showdiv,
+		pre.showdiv::first-line {
+			font-size: medium;
+			font-weight: bold;
+			background-color: aquamarine
+		}
+		.olga5-ifix >div{
+			background-color: aliceblue;
+			border:1px red solid;
+		}
+	</style>
+	<script>
+		function Init() {
+			const tags = document.querySelectorAll("[_o5include]")
+			for (const tag of tags) {
+				const atrs = tag.attributes
+				for (const atr of atrs)
+					if (atr.name.match(/o5include/i)) {
+						const div = document.createElement('div'),
+							pre = document.createElement('pre'),
+							s = tag.outerHTML + 'конец!'
+
+						tag.style.display = 'none'
+						tag.parentNode.insertBefore(div, tag.nextSibling)
+						div.appendChild(pre)
+
+						const s2 = s.replace(/\r?\n\s*<\s*\/div>конец!/, '')
+						pre.innerText = s2
+						div.className = 'showdiv'
+						pre.className = 'showdiv'
+
+						div.id = tag.id+'_div'
+						if (tag.classList.contains('olga5_shp')){
+							tag.classList.remove('olga5_shp')
+							div.className += ' ' + 'olga5_shp'}
+					}
+			}
+			window.olga5.C.E.DispatchEvent('olga5_sinit', 'o5inc')
+		}
+		window.addEventListener('olga5-incls', Init)
+	</script>
+</head>
+
+<body id="body" class="olga5_Start">
+	<p>
+		Варианты вызова вставляемого файла
+		<span o5popup='тесты+inc1.html;'>inc1.html</span>
+		(или <span o5popup='тесты+inc2.html;'
+			title="отличающегося содержащимся текстом 'inc2' вместо 'inc1'">inc2.html</span>.
+	</p>
+	<hr>
+
+	<p>Включение всего файла <b>inc1.html</b></p>
+	<div class='olga5_Start olga5_shp' o5include='./inc1.html' id="00"></div>
+	<p>Сравнение разделителей '<b>?</b>' и '<b>!</b>'</b> при одинаковом селекторе</p>
+	<div class='olga5_Start' o5include='./inc1.html?#cls12' id="01"></div>
+	<div class='olga5_Start' o5include='./inc1.html!#cls12' id="02"></div>
+	<p>Несколько тегов с одинаковым классом <b>cls2</b> </p>
+	<div class='olga5_Start' o5include='./inc1.html!.cls2' id="03"></div>
+	<p>Несколько тегов с одинаковым классом <b>cls2</b> и квалификатором <b>aa</b></p>
+	<div class='olga5_Start' o5include='./inc1.html!.cls2:aa' id="04"></div>
+	<p>Другие теги (с разделителем '<b>!</b>'</p>
+	<div class='olga5_Start' o5include='./inc1.html!span' id="05"></div>
+	<div class='olga5_Start' o5include='./inc1.html![moe]' id="06"></div>
+	<p class=" olga5_shp">Включение всего файла <b>inc2.html</b></p>
+	<div class='olga5_Start' o5include='./inc2.html' id="07"></div>
+
+</body>
+
+</html>

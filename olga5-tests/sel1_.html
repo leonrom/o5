@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>sel1_</title>
+    <link rel="shortcut icon" href="./favicon.svg" type="image/x-icon">
+</head>
+
+<body id="body">
+
+    <style>
+        #cx1a,
+        .CDIV {
+            background: antiquewhite;
+            border: 1px solid;
+            font-size: small;
+            font-family: monospace;
+            min-height: 11px;
+            min-width: 444px;
+            height: fit-content;
+            width: fit-content;
+            overflow-y: auto;
+            margin-bottom: 5px;
+            padding-right: 8px;
+        }
+
+        td {
+            padding-left: 4px;
+            padding-right: 8px;
+        }
+
+        td:last-child {
+            background-color: aqua;
+        }
+
+        pre {
+            display: block;
+            font-family: monospace;
+            white-space: pre;
+            margin: 0;
+            direction: ltr;
+        }
+
+        .olga5_Start>div {
+            background-color: aqua;
+        }
+        #html >b{
+            background-color: aqua;
+        }
+    </style>
+    <script>
+        window.addEventListener('olga5_ready', e => {
+            const C = window.olga5.C,
+                td1 = document.getElementById('td1'),
+                td2 = document.getElementById('td2'),
+                MakeObjName = obj => C.MakeObjName(obj).substring(1),
+                PrtS = mtags => {
+                    for (const mtag of mtags)
+                        mtag.tag.innerHTML += (mtag.tag.innerHTML.trim() ? '<br\>' : '') +
+                            `<b>${MakeObjName(mtag.tag)}</b>: исх.className= "${mtag.origcls}"<br\>` +
+                            `<span style="margin-left: 30px;">&nbsp;рез.className= "${mtag.tag.className}"</span>` +
+                            `<span style="margin-left: 30px;"> <b>квалиф</b>.: ${mtag.quals.length > 0 ? mtag.quals.join(', ') : ' -'}</span>`
+                },
+                Prt = (fun, query) => {
+                    // const tags =  C.GetTagsByQueryes(query, ''),// C[fun](query, ''),
+                    const tags = C[fun](query, ''),
+                        ss = [],
+                        add = td1.innerHTML ? '<br/>  ' : '  '
+                    tags.forEach(tag => { ss.push(MakeObjName(tag)) })
+                    td1.innerHTML += add + `C.<b>${fun}</b> ( '${query}',  '' )`
+                    td2.innerHTML += add + `${ss.join(', ')}`
+                },
+                olga5Start = 'olga5_Start',
+                starts = document.querySelectorAll("[class *= '" + olga5Start + "']")
+
+            C.QuerySelectorInit(starts, olga5Start) //  чтобы пересчитало область определения
+
+
+            // C.QuerySelectorInit(document.querySelectorAll("[class *= 'olga5_Start']"))
+
+            Prt('GetTagsByQueryes', '[o5popup],[title]')
+            Prt('GetTagsByIds', "i_p3, s0, cx1")
+            Prt('GetTagsByTagNames', 'h5, p')
+            Prt('GetTagsByClassNames', 'p3b, XXX')
+
+            const
+                start = document.getElementById('start'),
+                // start = document.getElementsByClassName('olga5_Start')[0],
+                html = document.getElementById('html')
+
+            html.innerText = start.innerHTML
+            let s = html.innerHTML
+
+            for (const sel of ['o5popup', 'title', 'i_p3', 's0', 'cx1', 'h4', 'p3b', 'XXX']) {
+                const match = new RegExp(`\\b` + sel + `\\b`, 'g'),
+                    mm = s.match(match)  // просто для контроля
+                s=s.replace(match, '<b>' + sel + '</b>')
+                // console.log(sel+'\n'+s)
+            }
+            html.innerHTML = s
+
+            const mtags = C.SelectByClassName('XXX', '')
+            PrtS(mtags)
+        })
+    </script>
+    <p>
+        Тестируется работа <i>новопридуманных</i> селекторов на тегах
+        с различными атрибутами или классами (в т.ч. при наличии квалификаторов). Обрабатываемые классы выделены
+        заглавными
+        буквами.
+    </p>
+
+    <h4>1. <i>обрабатываемый</i> фрагмент данного <i>документа</i></h4>
+    <p>
+        Шрифтом выделены селекторы, обрабатывемые в п. 2 (кроме &lt;<b>p</b>&gt;). 
+        Теги c <i>id</i>=<b>ip-3</b> специально <i>ошибочно</i> даны дважды.
+    </p>
+    <!-- <div class='olga5_Start'>  olga5_shp -->
+    <div class='XXX CDIV' title="тестовый текст" style="height: 222px;overflow-y: scroll;direction: rtl;">
+        <pre id="html">
+            </pre>
+    </div>
+<!-- </div> -->
+
+    <h4>2. результаты работы 4-х функций выборки</h4>
+    <p>
+        Показаны <i>id</i> тегов, удовлетворяющих написанному слева селектору
+    </p>
+    <table class="CDIV XXX">
+        <tbody>
+            <tr>
+                <td id="td1"></td>
+                <td id="td2"></td>
+            </tr>
+        </tbody>
+    </table>
+    <i>В GetTagsByClassNames() найдены лишь те XXX, после которых нет '<b>:</b>' </i>
+
+    <h4>3. результаты работы <i>SelectByClassName('<u>XXX</u>', '')</i></h4>
+    <p>
+        Показано выделение (в <i>обрабатываемом</i>) фрагменте из строк <i>class</i> собственно классов и квалификаторов
+        именно у классв <b>XXX</b> (остальные, типа <i>CDLA</i>, даны для антуража)
+    </p>
+
+// ниже - не выравнивать !!!
+    <div id="start">
+  <div class="olga5_Start" id="s0">
+      <i>Синтаксис без кавычек если нету двух слов подряд</i>
+      <i>Простой синтаксис</i>
+      <div id="cx0" class="CDIV XXX CDLA" title="простой класс">
+      </div>
+      <i>Простой синтаксис с квалификаторами</i>
+      <div id="cx1b" class="CDIV XXX:loop,main CDLA">
+      </div>
+      <i>Синтаксис с пробелами и кавычками</i>
+      <div id="cx2" class="CDIV CDLA:a XXX:over : a-11_z: loop :  '  sounds + Ceza1-25.mp3'CDLA">
+      </div>
+      <i>Синтаксис с комбинированными разделителями '<b>:</b>' и '<b>,</b>'</i>
+      <div id="cx3" class="CDIV CDLB:a XXX:over,a-11_z,loop,  '  sounds + Ceza1-25.mp3'  CDLA ">
+      </div>
+      <i>Синтаксис без кавычек, если нету двух слов подряд. Обработка дубля <b>XXX</b></i>
+      <div id="cx4"
+          class='CDIV CDLB:d XXX:over : a-11_z: loop1 :     + Ceza1-25.mp3   CDIV XXX : loop2, main  CDLA'>
+      </div>
+      <i>Обнаруживается и изменяется только первое вхождение класса</i>
+      <div id="cx5" class=' XXX : loop, main CDIV CDLB:a XXX : over, second CDLA XXX'>
+      </div>
+      <h5 id="u1">дальше теги <b>p</b> (не задействованы в <i>SelectByClassName()</i>) </h5>
+      <p id="i_p1" class="p1">какой-то текст в <b>p1</b></p>
+      <p id="i_p2" title="тест">какой-то текст в <b>p2</b></p>
+      <p id="i_p3" class="p3a">какой-то текст в <b>p3a</b></p>
+      <p id="i_p3" class="p3b" o5popup="1">какой-то текст в <b>p3b</b></p>
+  </div>
+    </div>
+    <script src='../olga5/o5com.js' o5consts="o5debug=2; "></script>
+    <script data-src='+o5shp.js'></script>
+</body>
+
+</html>

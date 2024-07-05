@@ -1,0 +1,129 @@
+DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>popK</title>
+    <!-- <base href="https://rombase.neocities.org/o5/olga5-tests/"> -->
+    <link rel="shortcut icon" href="./favicon.svg" type="image/x-icon">
+    <!-- <script src='../olga5/o5dbg/events.js'></script> -->
+    <!-- <script src='../olga5/o5dbg/ccss.js'></script> -->
+    <!-- <script src='../olga5/o5dbg/pos.js'></script> -->
+    <script src='../olga5/o5pop.js' o5timer='0.3' o5opacity='0.2' o5-debug="0" params="" o5timer="1"></script>
+    <link href='../blog/csss/olga5.addStyles.css' media='screen' rel='stylesheet' />
+    <!-- <script src='../olga5/o5com.js' o5debug=0></script> -->
+    
+</head>
+
+<body style="margin: 0 0.1em 0 0.3em;">
+    <div class='example, olga5_Start'>
+        <style>
+            .mydiv {
+                height: 44px;
+                background-color: aqua;
+                width: 111px;
+                margin: 11px;
+            }
+
+            .inLine {
+                vertical-align: baseline;
+                text-align: left;
+                text-align: -moz-left;
+                text-align: -webkit-left;
+                font-size: medium;
+                background-color: aliceblue;
+                border: solid lightpink 1px;
+                border-radius: 2px;
+                margin-left: 2px;
+                margin-right: 0px;
+                font-family: monospace;
+                padding-right: 0.2em;
+                padding-left: 0.2em;
+            }
+
+            input {
+                padding-top: 0;
+                padding-bottom: 0;
+                font-size: x-small;
+            }
+
+            .divE1,
+            .divE2 {
+                background-color: aliceblue;
+                border-radius: 2px;
+                margin: 6px;
+                font-size: small;
+            }
+
+            .divE1 {
+                border: solid red 2px;
+            }
+
+            .divE2 {
+                border: solid blue 2px;
+            }
+
+            ul.wide>li {
+                line-height: 26px;
+            }
+
+            ul>li>ul>li {
+                line-height: 16px;
+            }
+
+            #i1,
+            #i3,
+            #i4 {
+                width: 222px;
+                text-align: left;
+            }
+        </style>
+        <p>
+            0) Примеры вызова ссылки на './popup.html':
+        </p>
+        <ul class="wide">
+            <li><input id="p01" type="button" value="'открыть'"
+                    o5popup='id= K1  ; top =1, left: 9999; width=222, h:111; group="", p02'>
+                p01 - вызов K1 './popup.html';
+            </li>
+            <li><span id="p02" type="button" value="'открыть'"
+                    o5popup='id= K1  ; top =1, left: 9999; width=222, h:111; group="", k2'></span>
+                p02 - вызов K1 './popup.html';
+            </li>
+            <li><span id="p03" type="button" value="'открыть'"
+                    o5popup='id= K2  ; top =1, left: 9999; width=222, h:111; group=""'>xyz</span>
+                p03 - вызов K2 './popup.html';
+            </li>
+        </ul>
+        
+        <div class="mydiv">
+        </div>
+        <div class="mydiv">
+        </div>
+        <ol  id="o5contents">
+            <li>
+                <span id="K1"
+                    class="olga5_popup"
+                    o5popup="https://rombase.neocities.org/o5/olga5-tests/popup.html, group=0, t:177, p1, text:'закр. окно')">'ссылка
+                    на книгу'</span>
+                K1 - клик по тегу &lt;<b>span</b>&gt
+            </li>
+            <li>
+                    <a id='K2' target="olga5-addPage" 
+                    href="https://rombase.neocities.org/o5/olga5-tests/popup.html"
+                    >Ceza1-25.mp3</a>
+                K2 - клик по тегу &lt;<b>span</b>&gt;
+
+<!-- 
+                <span id="K2"
+                    class="olga5_popup"
+                    o5popup="https://rombase.neocities.org/o5/olga5-tests/popup.html, group=0, t:177, p1, text:'закр. окно')">'ссылка
+                    на книгу'</span>
+                K2 - клик по тегу &lt;<b>span</b>&gt -->
+            </li>
+        </ol>
+
+    </div>
+</body>
+
+</html>

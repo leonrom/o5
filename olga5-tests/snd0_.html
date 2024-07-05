@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<title>snd0</title>
+	<link rel="shortcut icon" href="./favicon.svg" type="image/x-icon">
+
+	<script async src='../olga5/o5com.js' o5consts="o5debug=0"
+		o5urlrfs="
+			#muzik=https://archive.org/download/clouds_20200310;
+			muzik='_url_olga5 + ../blog/media/audio';
+			_images=_url_olga5 + ../blog/media/image;
+		"
+	></script>
+	<script async data-src='+ o5snd.js'
+	o5urlrfs="
+	btn_stop='_images + /icons8-youtube-music-48.png';
+	btn_play='_images + /icons8-youtube-music-50.png';
+	imagestop='_url_olga5 + ../blog/media/image/myMusikIT.png';
+	imageplay='_images + /play.png';
+	"	
+	></script>
+</head>
+
+<body style="margin: 0 0.1em 0 0.3em;">
+
+	Просто два примера
+	<div class='example, olga5_Start'>
+		<style>
+			audio {
+				height: 16px;
+				width: 244px;
+			}
+
+			p {
+				font-size: small;
+				white-space: nowrap;
+			}
+		</style>
+		<p>1 <audio id="1" src="../blog/media/audio/Clouds.mp3" controls="controls"
+				class="olga5_snd"></audio>
+			Обычная ссылка на файл
+		</p>
+		<p>1 <audio id="1" data-src="muzik+/Clouds.mp3" controls="controls"
+				class="olga5_snd"></audio>
+			Именованная ссылка на файл
+		</p>
+		<p>2 <img id="2" src='../blog/media/image/solfedjio.png'
+				image_play='_images + /play.png'
+				class="olga5_snd:muzik+/LazyDay.mp3" />
+			то же самое аудио
+		</p>
+		<p>1 <img id="1" src=imagestop image_play=imageplay class="olga5_snd:_аудио_файл" />
+			Заданы: <b>src</b> для <u><i>без звука</i></u> - 'imagestop', а для <u><i>звучание</i></u> - <b>image_play</b> 
+		</p>
+		<p class="olga5_codeTextSeparate">
+			&lt;img id="1" <b>src</b>=imagestop <b>image_play</b>=imageplay class="olga5_snd:_аудио_файл"&nbsp;/&gt;
+		</p>
+	</div>
+</body>
+
+</html>
