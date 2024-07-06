@@ -1,4 +1,4 @@
-﻿/* global document, window, console */
+﻿/* -global document, window */
 /*jshint asi:true  */
 /*jshint strict:true  */
 /*jshint esversion: 6 */
@@ -22,7 +22,7 @@
 			},
 		},
 		olga5cart = 'olga5-cart',
-		olga5ifix = 'olga5-ifix',
+		// olga5ifix = 'olga5-ifix',
 		o5css = `
 .${olga5cart} {
     position : fixed;
@@ -39,7 +39,7 @@
 
 	function ShpInit() {
 
-		C.E.AddEventListener('olga5_ready', e => {
+		C.E.AddEventListener('olga5_ready', () => {
 			window.setTimeout(LastDoResize, 1)
 		})
 
@@ -59,7 +59,7 @@
 		window.olga5[W.modul].activated = false 	// признак, что было одно из activateEvents 
 		const activateEvents = ['click', 'keyup', 'resize'],
 			wd = window, // document
-			SetActivated = e => {
+			SetActivated = () => {
 				window.olga5[W.modul].activated = true
 				activateEvents.forEach(activateEvent => wd.removeEventListener(activateEvent, SetActivated))
 			}

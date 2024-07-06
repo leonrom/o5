@@ -1,18 +1,17 @@
-/* global window, document, console */
+/* -global window, document, console */
 /*jshint asi:true  */
 /*jshint strict:true  */
 /*jshint esversion: 6 */
 
 (function () {              // ---------------------------------------------- o5shp/MakeAO5 ---
     "use strict"
-    let wshp = {},  
-        debugids = ['shp_text', 'shp_1÷4']
+    let wshp = {} 
+        // debugids = ['shp_text', 'shp_1÷4']
 
     const
         olga5_modul = "o5shp",
         modulname = 'MakeAO5',
         C = window.olga5.C,
-        MyRound = (s) => { return Math.round(parseFloat(s)) },
         SetClick = (aO5, clk, next) => {
             if (next) aO5.act.underClick = clk
             else {
@@ -118,7 +117,9 @@
             if (aO5.cls.dirV == 'D') shdw.style.height = '0.1px' // на экране НЕ должно занимать месо
 
             // // коррекция shp
-            // const GPV = nam => { return MyRound(nst.getPropertyValue(nam)) },
+            // const 
+            // MyRound = (s) => { return Math.round(parseFloat(s)) },
+            //    GPV = nam => { return MyRound(nst.getPropertyValue(nam)) },
             //     nst = window.getComputedStyle(shp) // д.б. до replaceChild()
             // Object.assign(aO5.addSize, {
             //     w: Math.ceil(GPV('padding-left') + GPV('padding-right') + GPV('border-left-width') + GPV('border-right-width')),
@@ -241,7 +242,7 @@
             try {
                 aO5.prev.pO5 = new PO5(aO5.prev, aO5)
             } catch (err) {
-                console.error('--?? ' + C.MakeObjName(aO5.prev))
+                console.error('--?? ' + C.MakeObjName(aO5.prev), err.message)
             }
             pO5 = aO5.prev.pO5
         }
@@ -265,7 +266,7 @@
 
         if (shp.tagName.match(/\b(img|iframe|svg)\b/i) && !shp.complete) {
             if (C.consts.o5debug > 0) C.ConsoleInfo(`ожидается завершение загрузки '${aO5.name}'`)
-            shp.addEventListener('load', e => {
+            shp.addEventListener('load', () => {
                 wshp.DoResize(`из '${modulname}'`)
             })
         }

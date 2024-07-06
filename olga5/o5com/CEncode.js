@@ -1,4 +1,4 @@
-/* global document, window, console, Map*/
+/* -global document, window*/
 /* exported olga5_menuPopDn_Click*/
 /*jshint asi:true  */
 /*jshint esversion: 6*/
@@ -21,8 +21,8 @@
 				if (l == s0.length) break
 			} while (n++ < 99)
 
-			const s2s = s0.split('/'),
-				tt = []
+			const s2s = s0.split('/')
+				// tt = []
 			for (let i = 0; i < s2s.length; i++)
 				if (s2s[i] == mrk2) {
 					let j = i
@@ -70,7 +70,7 @@
 
 						if (isnam) parts.num++
 						if (refs && refs.find(r => ref == r))
-							errs.push(`цикл. ссылки ${refs.join('->')}=>${att};`)
+							errs.push(`цикл. ссылки ${refs.join('->')}=>${ref};`)
 						else {
 							const attr = (isnam && o5attrs) ? C.GetAttribute(o5attrs, ref) : null
 

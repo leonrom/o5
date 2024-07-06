@@ -1,5 +1,5 @@
 /*jshint asi:true  */
-/* global window, console */
+/* -global window, console */
 /*jshint strict:true  */
 /*jshint esversion: 6 */
 //!

@@ -1,4 +1,4 @@
-/* global document, window, console, Object*/
+/* -global document, window, console, Object*/
 /*jshint asi:true  */
 /*jshint esversion: 6*/
 /*eslint no-useless-escape: 0*/

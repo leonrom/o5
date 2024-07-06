@@ -1,4 +1,4 @@
-/* global window, console */
+/* -global window, console */
 /*jshint asi:true  */
 /*jshint strict:true  */
 /*jshint esversion: 6 */

@@ -1,4 +1,4 @@
-/* global window, document, console */
+/* -global window, document, console */
 /*jshint asi:true  */
 /*jshint strict:true  */
 /*jshint esversion: 6 */
@@ -99,7 +99,7 @@
                                     audio.play()
                                 }
                                 catch (e) {
-                                    console.error(`ошибка воспроизведения:`, e)
+                                    console.error(`ошибка воспроизведения:`, e.message)
                                 }
                             }
                             else
@@ -148,7 +148,7 @@
                                 type: 'error', Act: (snd, e) => {
                                     const aO5 = snd.aO5snd
                                     errTypes.AddError(aO5, 'неЗагружен',
-                                        `\n(это при audio_play= '${aO5.parms.audio_play}', attrs.aplay= '${aO5.modis.aplay}') `)
+                                        `\n${e.type}: (это при audio_play= '${aO5.parms.audio_play}', attrs.aplay= '${aO5.modis.aplay}') `)
                                 }
                             },
                             {

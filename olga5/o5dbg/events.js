@@ -1,4 +1,4 @@
-/* global document, window, console*/
+/* -global document, window, console*/
 /* exported olga5_menuPopDn_Click*/
 /*jshint asi:true  */
 /*jshint esversion: 6*/
@@ -8,8 +8,9 @@
 	const
 		C = window.olga5.C,
 		olga5_modul = "o5dbg",
-		modulname = 'Events',
-		wshp = C.ModulAddSub(olga5_modul, modulname, () => 
+		modulname = 'Events'
+
+	C.ModulAddSub(olga5_modul, modulname, () => 
 		{
 			const
 				excls = `key*, mouse*, pointer*`.replace(/[\s\n]/g, '').split(','),
@@ -47,7 +48,7 @@
 					{ src: window, eves: wins, key: 'win' },
 				]
 
-			let mybody = null,
+			let // mybody = null,
 				i = excls.length
 			while (i-- > 0)
 				if (excls[i])
@@ -94,7 +95,7 @@
 				},
 				{}
 			)
-			let s = `${'событие: '.padEnd(33)}  win doc искл.`
+			// let s = `${'событие: '.padEnd(33)}  win doc искл.`
 			console.groupCollapsed('обрабатываемые события')
 			for (const nam in salls) {
 				const all = salls[nam]

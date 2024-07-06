@@ -1,4 +1,4 @@
-/* global document, window, console, Map*/
+/* -global document, window, console, Map*/
 /* exported olga5_menuPopDn_Click*/
 /*jshint asi:true  */
 /*jshint esversion: 6*/
@@ -34,7 +34,7 @@
 				if (tab instanceof Array)
 					tab.forEach((v, nam) => {
 						let t = {}
-						const ss = [],
+						const // ss = [],
 							O = (o) => {
 								const uu = []
 								if (o instanceof NamedNodeMap) {

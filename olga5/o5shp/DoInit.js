@@ -1,4 +1,4 @@
-/* global window, document, console */
+/* -global window, document, console */
 /*jshint asi:true  */
 /*jshint strict:true  */
 /*jshint esversion: 6 */
@@ -170,7 +170,7 @@
         //     FillBords(pO5, 'pO5=' + C.MakeObjName(pO5.current))
         // },
         wshp = C.ModulAddSub(olga5_modul, modulname, () => {
-            const timeInit = Date.now() + Math.random(),
+            const       // timeInit = Date.now() + Math.random(),
                 mtags = C.SelectByClassName(wshp.W.class, olga5_modul),
                 errs = [],
                 MakeAO5s = () => {
@@ -239,7 +239,7 @@
                                 wshp.nests[nest].push(aO5)
                             }
                             aO5s.nest = nest 
-                            const slevel = ''.padEnd(nest * 4),
+                            const       //slevel = ''.padEnd(nest * 4),
                                 pr1 = '[(<\\',
                                 pr2 = '])>/'
                             aO5str += (nest > 3 ? '|' : pr1[nest]) + nest + ' '

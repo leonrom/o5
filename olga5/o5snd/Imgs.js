@@ -1,4 +1,4 @@
-/* global window, document, console */
+/* -global window, document, console */
 /*jshint asi:true  */
 /*jshint strict:true  */
 /*jshint esversion: 6 */
@@ -173,7 +173,7 @@
                     else
                         if (btns.stop) SetImgByRef(aO5.snd, btns.stop)
                         else
-                            errs.Add(aO5.name, 'PrepImage()', `тег <img>`, '', `Нет вариантов url'а и отсутствует 'btn_stop'`)
+                            console.error(aO5.name, 'PrepImage()', `тег <img>`, '', `Нет вариантов url'а и отсутствует 'btn_stop'`)
 
                     if (ori.atr == 'data-src' || ori.atr == '_src')
                         snd.removeAttribute(ori.atr)	// чтоб другие модули не повторяли

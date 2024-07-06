@@ -1,4 +1,4 @@
-/* global document, window, console*/
+/* -global document, window, console*/
 /* exported olga5_menuPopDn_Click*/
 /*jshint asi:true  */
 /*jshint esversion: 6*/
@@ -346,7 +346,7 @@
 
 	function Init() {
 		const
-			InitByText = (menu, tag) => {// если есть такой атрибут}
+			InitByText = menu => {// если есть такой атрибут}
 				const regval = /^["'`;{\s]*|["'`},\s]*$/g,
 					lis = menu.match(/{[^}]*}/g) || [],
 					items = [],
@@ -362,7 +362,7 @@
 								val = pair.substr(i + 1).replaceAll(regval, '')
 							item[nam] = val
 						} catch (err) {
-							errs.push({ li: li, pair: pair })
+							errs.push({ li: li, pair: pair, err:err.message })
 						}
 					}
 					items.push(item)
@@ -387,7 +387,7 @@
 			const tags = C.GetTagsByClassNames('olga5-menuhidden', W.modul)
 			if (tags)
 				tags.forEach(tag => {
-					InitByText(tag.innerText.trim(), tag)
+					InitByText(tag.innerText.trim())	//, tag)
 				})
 		}
 		// window.dispatchEvent(new CustomEvent('olga5_sinit', { detail: { modul: W.modul } }))

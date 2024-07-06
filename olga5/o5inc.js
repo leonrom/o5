@@ -1,4 +1,4 @@
-/* global document, window, console, Map*/
+/* -global document, window, console */
 /*jshint asi:true  */
 /*jshint esversion: 6*/
 (function () {              // ---------------------------------------------- o5inc ---	
@@ -6,7 +6,7 @@
 	let
 		incls = null
 	const
-		pard = window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/),
+		pard = window.location.search.match(/(&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/),
 		o5debug = (pard ? (pard[0].match(/=/) ? parseInt(pard[0].match(/\s*\d+/) || 1) : 1) : 2),
 		clrs = {	//	копия из CConsole
 			'E': "background: yellow; color: black;border: solid 1px gold;",
@@ -263,7 +263,7 @@
 			if (tags && tags.length > 0)
 				AddIncls(tags)
 		},
-		OnLoad = function (e) {
+		OnLoad = function () {
 			const
 				xhr = this,
 				incl = xhr.incl

@@ -1,10 +1,10 @@
-/* global document, window */
+/* -global document, window */
 /*jshint asi:true  */
 /*jshint esversion: 6*/
 (function () {              // ---------------------------------------------- o5dbg/pos ---
 	'use strict'
 
-	let wshp = {},
+	let // wshp = {},
 		mposPos = null, // объект, в котором позиция мыши
 		mposAct = null // текущий двигаемый объект (тот же самый)
 
@@ -133,7 +133,7 @@
 		}
 	}
 
-	wshp = C.ModulAddSub(olga5_modul, modulname, () => {
+	C.ModulAddSub(olga5_modul, modulname, () => {
 		const isInitiated = document.getElementById(id)
 		console.log(`${olga5_modul}.${modulname} : ` + (isInitiated ? 'игнорируется' : ''))
 		if (isInitiated) return
@@ -149,7 +149,7 @@
 		document.addEventListener('mouselive', StopMoveAct)
 		document.addEventListener('mouseup', StopMoveAct)
 		document.addEventListener('mousemove', MyMouseMove)
-		
+
 		SetVP()
 		ShowPos()
 	})

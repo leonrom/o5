@@ -1,4 +1,4 @@
-/* global document, window, console, Map*/
+/* -global document, window, console*/
 /* exported olga5_menuPopDn_Click*/
 /*jshint asi:true  */
 /*jshint esversion: 6*/
@@ -230,9 +230,13 @@
 			const rez = val.replace(/\s*;\s*\n+\s*/g, ';').replace(/\s*\n+\s*/g, ';')
 			return rez.replace(/\t+/g, ' ').trim()
 		},
+		HasProperty=(foo,nam)=>{
+			return  Object.prototype.hasOwnProperty.call(foo, nam)
+			// return  foo.hasOwnProperty(nam)
+		},
 		GetAttribute = (attrs, name) => { // нахождение значения 'attr' в массиве атрибутов 'attrs'
 			for (const nam of [name, 'data-' + name, '_' + name, 'data_' + name])
-				if (attrs.hasOwnProperty(nam)) return attrs[nam]
+				if (HasProperty(attrs, nam)) return attrs[nam]
 		},
 		GetAttrs = attributes => {
 			const attrs = {}
@@ -262,7 +266,7 @@
 							if (nam == 'debug') nam = 'o5debug'
 							// if (nam == 'o5debug') 
 							// 	nam = 'o5debug'
-							if (C.consts.hasOwnProperty(nam)) {
+							if (HasProperty(C.consts, nam)) {
 								const val = TryToDigit(prms[1])
 								xs[nam] = { val: val, source: C.save.urlName }
 								C.constsurl[nam] = val
@@ -276,8 +280,8 @@
 			const stradd = '(добавлен)'
 			for (const name in attrs) {
 				const nam = Repname(name)
-				if (defs.hasOwnProperty(nam) && !xs.hasOwnProperty(nam)) {
-					const add = defs.hasOwnProperty(nam) ? '' : stradd
+				if (HasProperty(defs, nam) && !HasProperty(xs, nam)) {
+					const add = HasProperty(defs, nam) ? '' : stradd
 					xs[nam] = { val: TryToDigit(attrs[name]), source: `атрибут${add}` }
 				}
 			}
@@ -293,7 +297,7 @@
 					if (i > 0) {
 						const nam = Repname(u.substring(0, i).trim())
 						if (!xs[nam]) {
-							const add = defs.hasOwnProperty(nam) ? '' : stradd,
+							const add = HasProperty(defs, nam) ? '' : stradd,
 								val = TryToDigit(u.substring(i + 1).trim())
 							xs[nam] = { val: val, source: `параметр${add}` }
 							// console.log(`${nam} = '${val}'`)

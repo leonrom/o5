@@ -1,4 +1,4 @@
-/* global document, window*/
+/* -global document, window*/
 /*jshint asi:true  */
 /*jshint esversion: 6*/
 /*eslint no-useless-escape: 0*/
@@ -114,16 +114,18 @@
 				onPlayerStateChange = e => {
 					const act = e.target.getPlayerState(),
 						aO5 = e.target.g.aO5
-					let s = ''
-					switch (act) {
-						case 0: s = 'воспроизведение видео завершено'; break
-						case 1: s = 'воспроизведение'; break
-						case 2: s = 'пауза'; break
-						case 3: s = 'буферизация'; break
-						case 5: s = 'видео находится в очереди'; break
-						default: s = 'воспроизведение видео не началось'
+					if (C.consts.o5debug > 0) {
+						let s = ''
+						switch (act) {
+							case 0: s = 'воспроизведение видео завершено'; break
+							case 1: s = 'воспроизведение'; break
+							case 2: s = 'пауза'; break
+							case 3: s = 'буферизация'; break
+							case 5: s = 'видео находится в очереди'; break
+							default: s = 'воспроизведение видео не началось'
+						}
+						console.log(aO5.tag.id, 2, act, s)
 					}
-					// console.log(aO5.tag.id, 2, act, s)
 					if (act == 1) {
 						window.dispatchEvent(new CustomEvent('olga5_stopPlay', { detail: { tag: aO5.tag, type: 'yt', } }))
 					}

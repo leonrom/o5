@@ -1,4 +1,4 @@
-/* global document, window, console*/
+/* -global document, window*/
 /*jshint asi:true  */
 /*jshint esversion: 6*/
 (function () {              // ---------------------------------------------- o5snd ---

@@ -1,4 +1,4 @@
-/* global document, window, console*/
+/* -global document, window, console*/
 /* exported olga5_menuPopDn_Click*/
 /*jshint asi:true  */
 /*jshint esversion: 6*/
@@ -78,8 +78,8 @@
 					for (let evt of Object.keys(evts)) {
 						for (let k = 0; k < evts[evt].length; k++) {
 							let eve = '  ' + evt
-							if (evt == 'olga5_unload')
-								eve = eve
+							// if (evt == 'olga5_unload')
+							// 	eve = eve
 							if (!/^on/.test(evt))
 								if (!currentElement.hasOwnProperty('on' + evt))
 									if ((currentElement == Window && awin.indexOf(evt) < 0) ||
@@ -106,7 +106,7 @@
 
 	EventTarget.prototype.addEventListener = function (a, b, c) {
 		if (c == undefined) c = false
-		else c = c
+		// else c = c
 		this._addEventListener(a, b, c);
 		if (!this.eventListenerList) this.eventListenerList = {};
 		if (!this.eventListenerList[a]) this.eventListenerList[a] = [];

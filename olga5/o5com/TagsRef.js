@@ -1,4 +1,4 @@
-/* global document, window, console, Map*/
+/* -global document, window, console, Map*/
 /* exported olga5_menuPopDn_Click*/
 /*jshint asi:true  */
 /*jshint esversion: 6*/
@@ -19,7 +19,7 @@
 				regExp = new RegExp(/[\\+<>'"`=#\\/\\\\]/)
 			let err = false
 			for (const attr of change.attributes) {
-				if (attr.name.match(regExp)) {
+				if (!err && attr.name.match(regExp)) {
 					errs.push({ tag: tagName, ref: attr.name, txt: `cодержит кавычки или '+><=#/'` })
 					err = true
 				}
@@ -27,7 +27,7 @@
 					try {
 						addnew.setAttribute(attr.name, attr.value) // здесь копирую "как есть" 
 					} catch (err) {
-						errs.push({ tag: tagName, ref: url, txt: (attr.name + '=' + attr.value) })
+						errs.push({ tag: tagName, ref: url, txt: (attr.name + '=' + attr.value), err:err.message })
 					}
 			}
 			addnew.setAttribute(adrName, url)
@@ -47,7 +47,7 @@
 				Orig = (obj) => {
 					const origs = obj.outerHTML.match(/\s(data-)?src\s*=\s*["*'][^"']*["*']/g)
 					if (origs && origs.length > 0) {
-						origs.forEach((orig) => {
+						origs.forEach(orig => {
 							orig = orig.replaceAll(/["'s*]/g, '')
 						})
 						return origs.join(', ')
@@ -138,8 +138,6 @@
 				sinc = 'o5inc',
 				o5inc = C.scrpts.find(scrpt => scrpt.modul == sinc)
 
-
-
 			for (const s of ss) {
 				const uu = s.trim().split(/\s*[:=]+\s*/), // split(/[:=]/), // 
 					u = uu[0],
@@ -226,7 +224,7 @@
 							if (!attr.name || attr.name.match(/['"`\+\.,;]/))
 								errs.push({ 'атрибут': attr.name, 'скрипт': scrpt.script.src, })
 					if (errs.length > 0)
-						C.ConsoleError(`${errs.length} странных атрибутов (м.б. перепутаны кавычки?) у скрипта`, scrpt.modul + '.js', errs)
+						C.ConsoleError(`${errs.length} странных атрибутов (м.б. перепутаны кавычки?) у скрипта`, s, errs)
 				}
 			}
 			if (errs.length > 0)

@@ -1,4 +1,4 @@
-/* global document, window, console, Map*/
+/* -global document, window, console, */
 /* exported olga5_menuPopDn_Click*/
 /*jshint asi:true  */
 /*jshint esversion: 6*/

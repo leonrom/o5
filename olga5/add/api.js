@@ -5,7 +5,7 @@ https://forum.freecodecamp.org/t/adding-a-click-event-to-the-youtube-without-usi
 https://developer.mozilla.org/en-US/docs/Web/HTML/Element/video
 */
 
-var scriptUrl = 'https:\/\/www.youtube.com\/s\/player\/b128dda0\/www-widgetapi.vflset\/www-widgetapi.js';
+var scriptUrl = 'https://www.youtube.com/s/player/b128dda0/www-widgetapi.vflset/www-widgetapi.js';
 window['yt_embedsEnableHouseBrandAndYtCoexistence'] = true;
 try {
 	var ttPolicy = window.trustedTypes.createPolicy("youtube-widget-api", {
@@ -14,7 +14,9 @@ try {
 		}
 	});
 	scriptUrl = ttPolicy.createScriptURL(scriptUrl)
-} catch (e) { }
+} catch (e) { 
+	console.error(e.message)
+}
 var YT;
 if (!window["YT"])
 	YT = {
@@ -43,7 +45,9 @@ if (!YT.loading) {
 			for (; i < l.length; i++)
 				try {
 					l[i]()
-				} catch (e$0) { }
+				} catch (e) { 
+	console.error(e.message)
+				}
 		}
 			;
 		YT.setConfig = function (c) {
@@ -73,7 +77,7 @@ if (!YT.loading) {
 
 /////////////
 
-AddFrame = e => {
+const AddFrame = e => {
 	if (YT === null) {
 		const script = document.createElement('script')
 		script.src = "https://www.youtube.com/iframe_api"

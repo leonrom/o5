@@ -1,4 +1,4 @@
-/* global document, window, console, Map*/
+/* -global document, window, console*/
 /* exported olga5_menuPopDn_Click*/
 /*jshint asi:true  */
 /*jshint esversion: 6*/
@@ -89,8 +89,14 @@
 		 * @param {isok}  необязательный признак готовности документа (наименование события)
 		 */
 		InitScripts = nam => {
-			if (!(C.page && C.page.pact && C.page.pact.ready)) return
+			if (!(C.page && C.page.pact && C.page.pact.ready)) {
+				if (C.consts.o5debug > 1)
+					console.log(`--->>>     ______ InitScripts _____     ${nam} -- return`)
+				return
+			}
 
+			if (C.consts.o5debug > 1)
+				console.log(`--->>>     ______ InitScripts _____     ${nam} `)
 			const start = C.page.pact.start
 			for (const scrpt of C.scrpts) {
 				const act = scrpt.act
@@ -453,8 +459,7 @@
 			document.body.classList.add('o5nomnu')
 
 		if (C.consts.o5noact > 0) {
-			((C && C.consts.o5debug > 0) ? C.ConsoleError : console.log)
-				("}---> загружено `ядро библиотеки`, но инициализация ОТКЛЮЧЕНА по o5noact= '" + C.consts.o5noact + "'")
+			((C && C.consts.o5debug > 0) ? C.ConsoleError : console.log)("}---> загружено `ядро библиотеки`, но инициализация ОТКЛЮЧЕНА по o5noact= '" + C.consts.o5noact + "'")
 			return
 		}
 

@@ -1,4 +1,4 @@
-/* global window, document, console */
+/* -global window, document, console */
 /*jshint asi:true  */
 /*jshint esversion: 6*/
 (function () {              // ---------------------------------------------- o5dbg/Ccss ---
@@ -8,8 +8,9 @@
 		olga5_modul = "o5dbg",
 		modulname = 'Ccss',
 		C = window.olga5.C,
-		lognam = olga5_modul + '.' + modulname + ': ',
-		wshp = C.ModulAddSub(olga5_modul, modulname, () => {
+		lognam = olga5_modul + '.' + modulname + ': '
+
+		C.ModulAddSub(olga5_modul, modulname, () => {
 			console.log(`${lognam}: CheckCSS()` + isInitiated ? 'игнорируется' : '')
 			if (isInitiated) return
 
@@ -53,7 +54,7 @@
 						}
 					}
 				} catch (e) {
-					errs += (errs.length == 0 ? '' : ', ') + i
+					errs += (errs.length == 0 ? '' : ', ') + i + ': ' + e.message
 				}
 			}
 
