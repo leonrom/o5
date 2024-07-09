@@ -110,8 +110,8 @@
 
                     if (wshp.actaudio && wshp.actaudio != audio)
                         wshp.StopSound(wshp.actaudio.aO5snd)
-                    
-					window.dispatchEvent(new CustomEvent('olga5_stopPlay', { detail: { tag: wshp.actaudio, type: 'audio(moe)', } }))
+
+                    window.dispatchEvent(new CustomEvent('olga5_stopPlay', { detail: { tag: wshp.actaudio, type: 'audio(moe)', } }))
 
                     if (audio.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA)
                         Play(aO5)
@@ -299,9 +299,14 @@
 
                 },
                 WaitActivate = snd => {
-                    if (snd.aO5snd.modis.none) return
+                    if (snd.aO5snd.modis.none ||
+                        snd.aO5snd.modis.activated
+                    )
+                        return
 
-                    if (o5debug > 2) console.log(`${lognam}  WaitActivate ${snd.id}`)
+                    if (o5debug > 1) console.log(`${lognam}  WaitActivate ${C.MakeObjName(snd)}`)
+
+                    snd.aO5snd.modis.activated = true
                     for (const eWait of eFocus)
                         snd.addEventListener(eWait, Activate, { capture: true })
                 }
@@ -332,18 +337,17 @@
 
                 snd = null; title = ''; name = ''; o5attrs = null; srcAtr = null;
 
-                modis = { over: false, alive: false, loop: snd.getAttribute('loop'), aplay: '', dspl: snd.style.display, none: false }
+                modis = { over: false, alive: false, loop: snd.getAttribute('loop'), aplay: '', dspl: snd.style.display, none: false, activated: false }
                 sound = { audio: null, errIs: { errs: false, }, state: ss.stop, eventsAreSet: false, ison: false, shiftKey: 0 }
                 parms = { audio_play: '', image_play: '' }
                 image = { stop: null, play: null }
 
                 // для доступа из o5snd
                 waitActivate = snd => WaitActivate(snd)
+                asdf=1
             }
             return new AO5snd(snd)
 
-        }
-
-        )
+        })
 
 })();

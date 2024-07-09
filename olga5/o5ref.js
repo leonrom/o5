@@ -22,6 +22,9 @@
 				const param = params[pnam]
 				if (!param)
 					errs.push({ 'где': `nam='${pnam}'`, err: `пустой параметр` })
+				else 				
+				if (typeof param !== 'string')
+					errs.push({ 'где': `nam='${pnam}'`, err: `тип '${typeof param}' (не присвоено значение?)` })
 				else {
 					const regexp = /\s*[,;]+\s*/g,
 						nams = pnam.split(regexp),

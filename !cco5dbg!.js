@@ -1,4 +1,4 @@
-/* global document, window, console*/
+/* -global document, window, console*/
 /* exported olga5_menuPopDn_Click*/
 /*jshint asi:true  */
 /*jshint esversion: 6*/
@@ -8,8 +8,9 @@
 	const
 		C = window.olga5.C,
 		olga5_modul = "o5dbg",
-		modulname = 'Events',
-		wshp = C.ModulAddSub(olga5_modul, modulname, () => 
+		modulname = 'Events'
+
+	C.ModulAddSub(olga5_modul, modulname, () => 
 		{
 			const
 				excls = `key*, mouse*, pointer*`.replace(/[\s\n]/g, '').split(','),
@@ -47,7 +48,7 @@
 					{ src: window, eves: wins, key: 'win' },
 				]
 
-			let mybody = null,
+			let // mybody = null,
 				i = excls.length
 			while (i-- > 0)
 				if (excls[i])
@@ -94,7 +95,7 @@
 				},
 				{}
 			)
-			let s = `${'событие: '.padEnd(33)}  win doc искл.`
+			// let s = `${'событие: '.padEnd(33)}  win doc искл.`
 			console.groupCollapsed('обрабатываемые события')
 			for (const nam in salls) {
 				const all = salls[nam]
@@ -104,7 +105,7 @@
 		})
 
 })();
-/* global window, console, document */
+/* -global window, console, document */
 /*jshint asi:true  */
 /*jshint esversion: 6*/
 (function () {              // ---------------------------------------------- o5dbg/Logs ---
@@ -112,24 +113,25 @@
 	const
 		olga5_modul = "o5dbg",
 		modulname = 'Logs',
-		C = window.olga5.C,
-		wshp = C.ModulAddSub(olga5_modul, modulname, () => {
-			const oldLog = console.log,
-				oldwin = window
-			let rez = '-НАШЁЛ',
-				err = ''
-			try {
-				const debug = window.open("", "", "width=200,height=100");
-				if (!debug) {
-					console.error(`ошибка создания всплывающенго окна (возможно дан 'http' а не  'httpS') ?- см. настроки безопасности браузера`)
-					return
-				}
-				const o5log = debug.document.body
+		C = window.olga5.C
 
-				if (debug.document.title == '') {
-					debug.document.title = modulname
-					// o5log.innerText = ''
-					o5log.innerHTML = `
+	C.ModulAddSub(olga5_modul, modulname, () => {
+		const oldLog = console.log,
+			oldwin = window
+		let rez = '-НАШЁЛ',
+			err = ''
+		try {
+			const debug = window.open("", "", "width=200,height=100");
+			if (!debug) {
+				console.error(`ошибка создания всплывающенго окна (возможно дан 'http' а не  'httpS') ?- см. настроки безопасности браузера`)
+				return
+			}
+			const o5log = debug.document.body
+
+			if (debug.document.title == '') {
+				debug.document.title = modulname
+				// o5log.innerText = ''
+				o5log.innerHTML = `
 <style>
 body{
 	background-color: oldlace;
@@ -147,38 +149,38 @@ pre span{
 }
 </style>
 `
-					rez = 'Создал'
-				}
-				if (o5log) console.log = function () {
-					oldLog.apply(console, arguments) // так точнее совпадение временных меток
-					const s = Array.prototype.join.call(arguments, ' '),
-						dt = new Date(),
-						ds = s.trim() == '' || s[0] == '\n' ? '' : (
-							(dt.getHours() + ':').padStart(3, '0') +
-							(dt.getMinutes() + ':').padStart(3, '0') +
-							(dt.getSeconds() + '.').padStart(3, '0') +
-							(dt.getMilliseconds() + '').padEnd(3, '0'))
-					// o5log.innerText += '\n' + ds + ' ' + s
-					o5log.innerHTML += '<pre>' + ds + ' ' + s + '</pre>'
-				}
-				else err = 'Не удалось инициировать ' + modulname + ' ?'
-			} catch (e) {
-				err = 'Ошибка инициализации ' + modulname + ' по причине: "' + e.message + '"'
+				rez = 'Создал'
 			}
-			if (err) console.error(err)
-			else console.log('\n<span>' + rez + ' ' + modulname + '</span>')
+			if (o5log) console.log = function () {
+				oldLog.apply(console, arguments) // так точнее совпадение временных меток
+				const s = Array.prototype.join.call(arguments, ' '),
+					dt = new Date(),
+					ds = s.trim() == '' || s[0] == '\n' ? '' : (
+						(dt.getHours() + ':').padStart(3, '0') +
+						(dt.getMinutes() + ':').padStart(3, '0') +
+						(dt.getSeconds() + '.').padStart(3, '0') +
+						(dt.getMilliseconds() + '').padEnd(3, '0'))
+				// o5log.innerText += '\n' + ds + ' ' + s
+				o5log.innerHTML += '<pre>' + ds + ' ' + s + '</pre>'
+			}
+			else err = 'Не удалось инициировать ' + modulname + ' ?'
+		} catch (e) {
+			err = 'Ошибка инициализации ' + modulname + ' по причине: "' + e.message + '"'
+		}
+		if (err) console.error(err)
+		else console.log('\n<span>' + rez + ' ' + modulname + '</span>')
 
-			oldwin.focus()
-		})
+		oldwin.focus()
+	})
 
 })();
-/* global document, window */
+/* -global document, window */
 /*jshint asi:true  */
 /*jshint esversion: 6*/
 (function () {              // ---------------------------------------------- o5dbg/pos ---
 	'use strict'
 
-	let wshp = {},
+	let // wshp = {},
 		mposPos = null, // объект, в котором позиция мыши
 		mposAct = null // текущий двигаемый объект (тот же самый)
 
@@ -307,7 +309,7 @@ pre span{
 		}
 	}
 
-	wshp = C.ModulAddSub(olga5_modul, modulname, () => {
+	C.ModulAddSub(olga5_modul, modulname, () => {
 		const isInitiated = document.getElementById(id)
 		console.log(`${olga5_modul}.${modulname} : ` + (isInitiated ? 'игнорируется' : ''))
 		if (isInitiated) return
@@ -323,7 +325,7 @@ pre span{
 		document.addEventListener('mouselive', StopMoveAct)
 		document.addEventListener('mouseup', StopMoveAct)
 		document.addEventListener('mousemove', MyMouseMove)
-		
+
 		SetVP()
 		ShowPos()
 	})

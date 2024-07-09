@@ -1,0 +1,196 @@
+/*
+    для olga5-shp.html
+*/
+
+div.olga5_tableKuplet {
+    height: min-content;
+    width: 100%;
+    background-color:inherit;
+    margin-left: 33px;
+}
+
+.olga5_tableKuplet table {
+    background:white;
+    width: max-content;
+    max-width: 444px;
+    border-collapse: collapse;
+}
+
+.olga5_tableKuplet td {
+    line-height: 0.6em;
+    padding: 0;
+    border: 1px solid #000000;
+    font-family: monospace;
+    font-size: smaller;
+
+    min-width: 0;
+    width: 166px;
+    vertical-align: top;
+}
+
+.olga5_tableKuplet td:first-child {
+    border-right: none;
+    padding:  0cm;
+}
+
+.olga5_tableKuplet pre {
+    margin: 0;
+     top: 0;
+     padding: 0;
+     margin-left: 0.5em;
+     width: max-content;
+     /*background-color: yellow;*/
+ }
+ 
+ .olga5_tableKuplet td:first-child pre {
+     line-height: 1.09em;
+     font-size: 0.8em;
+ }
+ 
+ .olga5_tableKuplet td:last-child pre {
+     line-height: 1.1em;
+     font-size: 1em;
+ }
+ 
+ .olga5_textNshow {
+    border: none;
+    width: 100%;
+    height: 166px;
+margin-bottom: 0.2em;
+    background-color: transparent;
+    padding: 0px;
+    border-radius: 3px;
+
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+.olga5_textNshow table {
+    border: none;
+    width: 100%;
+    /*padding: 2px !important;*/
+}
+
+.olga5_textNshow td {
+    border-width: 0px;
+    border: none !important;
+    padding: 0 !important;
+    border: solid 1px lightgray;
+    /*display: flex;*/
+}
+
+.olga5_textNshow td div {
+    width: 99%;
+    background-color: lavenderblush;
+    color: black;
+
+    font-size: smaller;
+    overflow-x: hidden;
+    overflow-y: hidden;
+
+    direction: rtl;
+    text-align: left;
+	text-align: -moz-left;
+	text-align: -webkit-left;
+}
+
+.olga5_textNshow pre {
+    padding-left: 6px;
+    margin-left: 4px;
+    margin-top: 0;
+        margin-bottom: 0;
+    direction: ltr;
+    background-color: aliceblue;
+    /*border: solid 1px lightblue;*/
+}
+
+.olga5_textNshow td:last-child {
+    max-width: 426px;
+    min-width: 40px;
+    width: 40%;
+    padding: 0px;
+    border: none;
+    /*background-color: darkgray;*/
+}
+
+.olga5_textNshow iframe {
+    height: calc(100% - 6px);
+    width: 100%;
+    border: none;
+    top: 2px;
+    position: relative;
+}
+
+/*  мой скроллинг
+*/
+
+.olga5_textNshow td,
+.olga5_textNshow tr,
+.olga5_textNshow tbody,
+.olga5_textNshow table {
+    height: inherit;
+}
+
+.olga5_textNshow td:first-child div::-webkit-scrollbar-track {
+    border-radius: 3px;
+}
+
+.olga5_textNshow td:first-child div::-webkit-scrollbar {
+    width: 6px;
+    background-color: lightgray;
+}
+
+.olga5_textNshow td:first-child div::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+    background-color: darkgray;
+    border-bottom: solid 1px gray;
+    border-top: solid 1px gray;
+}
+
+.olga5_textNshow td:first-child div:hover::-webkit-scrollbar-thumb {
+    background-color: gray;
+}
+.olga5_textNshow td div {
+    height: 95%;
+    background-color: transparent;
+    display: block;
+    overflow: auto;
+    border: solid 1px lightblue;
+}
+
+.actFirstLetter li::first-letter {
+    font-family: sans-serif;
+    font-size: medium;
+    padding-right: 1px;
+    font-weight: bold;
+}
+
+.actFirstLetter li :first-child {
+    font-family: cursive;
+    font-size: smaller;
+    font-weight: normal;
+}
+.select-shp td {
+    padding-left: 10px;
+    padding-bottom: 10px;
+}
+
+.select-shp input {
+    margin: 0;
+    padding: 0;
+    padding-left: 1px;
+    padding-right: 2px;
+    cursor: pointer;
+    border-radius: 4px;
+    background-color: gold;
+}
+
+h4 input {
+	margin: 0;
+padding: 0;
+padding-left: 4px;
+padding-right: 4px;
+cursor: pointer;
+border-radius: 9px;
+padding-bottom: 2px;
+}

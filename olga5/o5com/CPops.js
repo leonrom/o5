@@ -6,9 +6,9 @@
 	'use strict'
 	let diva = null
 
-	const C = window.olga5.C,
-		olga5_modul = 'o5com',
-		modulname = 'CPops',
+	const olga5_modul = 'o5com',
+		modulname = 'CPops',		
+		C = window.olga5.C,
 		wp = { W: 0, H: 0 },
 		divs = [],
 		zIndex = 99999,

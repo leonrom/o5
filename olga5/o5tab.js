@@ -387,7 +387,6 @@
 		// 	window.olga5 = {}
 
 		if (!window.olga5) window.olga5 = []
-		Object.assign(window.olga5, { PrepTables: PrepTables, })
 		W.consts = C.consts
 
 		PrepTables()
@@ -396,5 +395,7 @@
 	}
 	else
 		C.ModulAdd(W)
+
+	Object.assign(window.olga5, { PrepTables: PrepTables, })
 
 })();

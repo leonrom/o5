@@ -803,15 +803,15 @@ img.${thisClass} {
         // document.addEventListener('DOMContentLoaded', W.Init)
         // document.addEventListener('olga5-incls', W.Init)
         if (!window.olga5) window.olga5 = []
-        Object.assign(window.olga5, {
-            PopUp: PopUp,
-            PopShow: PopShow
-        })
 
         if (o5debug)
             console.log(`}---< ${document.currentScript.src.indexOf(`/${W.modul}.`) > 0 ? 'загружен  ' : 'включён   '}:  ${W.modul}.js`)
     } else 
         C.ModulAdd(W)   
 
+    Object.assign(window.olga5, {
+        PopUp: PopUp,
+        PopShow: PopShow
+    })
 
 })();

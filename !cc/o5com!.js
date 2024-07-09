@@ -1,4 +1,432 @@
-/* global document, window, console, Map*/
+/* -global document, window, console*/
+/* exported olga5_menuPopDn_Click*/
+/*jshint asi:true  */
+/*jshint esversion: 6*/
+/**
+ *  сборщик модулей ядра библиотеки
+ * 
+**/
+// 
+(function () {              // ---------------------------------------------- o5com ---
+	const
+		E = { // тут везде tag===window.  Д.б. перед 'use strict'
+			Err: err => {
+				console.error("%c%s", "background: yellow; color: black;border: solid 1px gold;", 'E: ' + err)
+			},
+			Msg: (txt, eve, nFun) => {
+				if (C.consts.o5debug > 0) {
+					console.groupCollapsed("%c%s", "background: lightblue; color: black;border: solid 1px gold;",
+						`${txt} для eve='${eve}'\n ф-ии "${nFun}"`)
+					console.trace()
+					console.groupEnd()
+				}
+			},
+			NFun: (Fun) => Fun.name || Fun,
+			events: [],
+			donets: [],
+			AddEventListener: (eve, Fun, opts) => {
+				const nFun = E.NFun(Fun)
+				E.Msg('AddEventListener', eve, nFun)
+				if (E.events.find(event => event.eve == eve && event.nFun == nFun && event.opts == opts))
+					E.Err(`повторная регистрация  '${eve}' для ф-ии "${nFun}"`)
+				else {
+					const
+						caller = arguments.callee
+					for (const donet of E.donets)
+						if (donet.eve == eve)
+							if (donet.callers.includes(caller))
+								E.Err(`Повторное выполнение '${eve}' для ф-ии "${nFun}"`)
+							else {
+								donet.callers.push(caller)
+								Fun(donet.e)
+							}
+
+					E.events.push({ eve: eve, nFun: nFun, opts: opts })
+					window.addEventListener(eve, Fun, opts)
+				}
+			},
+			RemoveEventListener: (eve, Fun) => {
+				const nFun = E.NFun(Fun)
+				E.Msg('RemoveEventListener', eve, nFun)
+				let i = E.events.length,
+					k = -1
+				while (i-- > 0 && k < 0)
+					if (E.events[i].eve == eve && E.events[i].nFun == nFun)
+						k = i
+
+				if (k < 0)
+					E.Err(`удаление неприсвоенного события '${eve}' функции "${nFun}" `)
+				else {
+					E.events.splice(k, 1)
+					window.removeEventListener(eve, Fun)
+				}
+			},
+			DispatchEvent: (eve, modulx, canrep) => {
+				const modul = modulx ? modulx : ''
+				if (C.consts.o5debug > 1 && !canrep) {
+					console.groupCollapsed(`DispatchEvent: '${eve}' для modul= '${modul}'`)
+					console.trace()
+					console.groupEnd()
+				}
+				const donet = E.donets.find(donet => donet.eve == eve && donet.modul == modul)
+				let e = null
+				if (donet) {
+					e = donet.e
+					if (!canrep)
+						E.Err(`повторная генерация события '${eve}' modul="${modul}"`)
+				}
+				else {
+					const e2 = new CustomEvent(eve, modul ? { detail: { modul: modul } } : {})
+					E.donets.push({ eve: eve, modul: modul, callers: [], e: e2, })
+					e = e2
+				}
+				window.dispatchEvent(e)
+			},
+			Init: () => {
+				E.events.splice(0, E.events.length)
+				E.donets.splice(0, E.donets.length)
+			},
+		}
+
+	'use strict'
+	const olga5_modul = "o5com"
+	if (!window.olga5) window.olga5 = []
+	if (!window.olga5.C) window.olga5.C = {}
+	if (!window.olga5[olga5_modul]) window.olga5[olga5_modul] = {}
+
+	const
+		modnames = ['CConsole', 'CEncode', 'CApi', 'CParams', 'TagsRef', 'IniScripts','CPops'], // 'IniScripts' д.б. ПОСЛЕДНИМ
+		wshp = window.olga5[olga5_modul],
+		C = window.olga5.C,
+		strt_time = Number(new Date()),
+		IncludeScripts = ({ modul = '', names = [], actscript = C.o5script, iniFun = {}, args = [] }) => {
+			const
+				nams = {},
+				load = { is_set: false, timeout: 0, path: '' },
+				actpath = actscript.src.match(/\S*\//)[0],
+				OnTimer = () => {
+					let s = ''
+					for (const nam in nams)
+						if (!nams[nam]) s += (s ? ', ' : '') + nam
+
+					if (s)
+						console.error(`Для ${modul} недозагрузились скрипты: ${s} (таймер o5timload=${C.consts.o5timload}с.)`)
+					load.timeout = 0
+				},
+				OnLoad = name => {
+					const lefts = []
+					nams[name] = true
+					for (const nam in nams)
+						if (!nams[nam]) lefts.push(nam)
+
+					if (C.consts.o5debug > 1)
+						console.log(`загружено включение '${name}' осталось [${lefts.join(', ')}]`)
+					if (lefts.length == 0) {
+						if (load.timeout > 0) {
+							window.clearTimeout(load.timeout)
+							load.timeout = 0
+						}
+						iniFun(args)
+					}
+				},
+				OnError = (name, e) => {
+					console.error(`Для ${name} ошибка дозагрузки '${name}' (из ${e.target.src})`)
+					// OnLoad(name)
+				}
+
+			for (const name of names)
+				nams[name] = false
+			for (const name of names) { // в очерёдности размещения	
+				if (!window.olga5[modul]) {
+					C.ConsoleError(`В скрипте, выполняющем дозагрузку скриптов, не создан объект 'window.olga5.${modul}'`)
+					continue
+				}
+				if (window.olga5[modul][name]) OnLoad(name)
+				else {
+					if (!load.is_set)
+						Object.assign(load, {
+							is_set: true,
+							path: actpath + modul + '/',
+							timeout: window.setTimeout(OnTimer, 1000 * C.consts.o5timload),
+						})
+
+					const script = document.createElement('script')
+
+					if (script.readyState) script.onreadystatechange = () => { OnLoad(name); }
+					else script.onload = () => { OnLoad(name); }
+					script.onerror = function (e) { OnError(name, e); }
+
+					script.src = load.path + name + '.js'
+					script.dataset.o5add = modul
+					script.setAttribute('async', '')
+
+					if (C.consts.o5debug > 0) {
+						const MakeObjName = obj => obj ? (
+							(obj.id && obj.id.length > 0) ? ('#' + obj.id) : (
+								('[' + obj.tagName ? obj.tagName : (obj.nodeName ? obj.nodeName : '?') + ']') +
+								'.' + (obj.className ? obj.className : '?'))) : 'НЕОПР.'
+						console.log(`вставка ${(name + '.js').padEnd(15)}  перед  ${modul + '.js'} (в parentNode=${MakeObjName(actscript.parentNode)})`)
+					}
+
+					if (actscript.parentNode)
+						actscript.parentNode.insertBefore(script, actscript)
+					else // это ватще-то заплатка. по-хорошему надо бы убрать 'actscript' оставив 'module'	
+						for (const scr of document.scripts)
+							if (scr.src.lastIndexOf('/' + modul + '.js') > 0) {
+								scr.parentNode.insertBefore(script, scr.nextSibling)   // т.е. тут insertAfter
+								break
+							}
+				}
+			}
+			// console.log('--------------------- load.timeout='+load.timeout)
+			// if (!load.timeout) iniFun(args)
+		},
+		RunO5com = () => {
+			const
+				DoneO5com = (e) => {
+					if (e)
+						document.removeEventListener('readystatechange', DoneO5com)
+
+					const _url_olga5 = C.o5script.src.match(/\S*\//)[0],
+						errs = []
+
+					for (const modname of modnames)
+						if (wshp[modname]) wshp[modname](_url_olga5)
+						else
+							errs.push(modname)
+
+					const dt = ('' + (Number(new Date()) - strt_time)).padStart(4) + ' ms',
+						name = dt + `        ${olga5_modul}`
+
+					if (errs.length > 0)
+						console.error('%c%s', "background: yellow; color: black;border: none;",
+							`Не найдены [${errs.join(', ')}] в ${olga5_modul}.js ( где-то синтаксическая ошибка ?)`)
+					console.log('%c%s', "background: blue; color: white;border: none;", '---<<<  инициализировано ядро      ' + name)
+				}
+
+			if (document.body) DoneO5com()
+			else
+				document.addEventListener('readystatechange', DoneO5com)
+		},
+		GetBaseHR = (root) => { // функции определения адреса текущиещей страницы и корня сайна
+			const url = new window.URL(window.location) //"http://rombase.h1n.ru/o5/2020/olga5-all.html")
+			if (root == 'root') return url.origin + '/'
+			else return url.origin + url.pathname.substring(0, url.pathname.lastIndexOf('/') + 1)
+		},
+		TryToDigit = x => {
+// if (x.indexOf && x.indexOf('182')>=0)			
+// console.log()
+			if (typeof x === 'undefined') return 1		// true
+			if (x === !!x) return x
+			const val = ('' + x).replace(C.repQuotes, '')
+
+			if (val == 'true') return true
+			if (val == 'false') return false
+
+			const i = parseInt(val)
+			if (i == val) return i
+			const f = parseFloat(val)
+			if (f == val) return f
+			const rez = val.replace(/\s*;\s*\n+\s*/g, ';').replace(/\s*\n+\s*/g, ';')
+			return rez.replace(/\t+/g, ' ').trim()
+		},
+		HasProperty=(foo,nam)=>{
+			return  Object.prototype.hasOwnProperty.call(foo, nam)
+			// return  foo.hasOwnProperty(nam)
+		},
+		GetAttribute = (attrs, name) => { // нахождение значения 'attr' в массиве атрибутов 'attrs'
+			for (const nam of [name, 'data-' + name, '_' + name, 'data_' + name])
+				if (HasProperty(attrs, nam)) return attrs[nam]
+		},
+		GetAttrs = attributes => {
+			const attrs = {}
+			for (const attribute of attributes)
+				attrs[Repname(attribute.name)] = TryToDigit(attribute.value)
+			return attrs
+		},
+		Repname = name => {
+			return name.trim().replaceAll('-', '_').toLowerCase()
+		},
+		ConstsFillFromUrl = (xs) => {  // параметры адресной строки,- м.б. (т.е. интерпретируются) только константы
+			const hash = window.location.hash
+			if (hash)
+				C.save.hash = hash ? hash.substring(1).trim() : ''
+
+			const smatchs = window.location.search.match(/[?&]\S+?(#|$)/) || []
+			for (const smatch of smatchs) {
+				const match = smatch.replaceAll(/(%20|\s)/g, '').trim()
+				if (match) {
+					const params = match.split(/[,;?&#]/)
+					for (const param of params) {
+						const u = param.trim()
+						if (u.length > 0) {
+							const prms = u.split(/[=:]/)
+							let nam = Repname(prms[0])
+							if (nam == 'o5nomenu' || nam == 'nomenu') nam = 'o5nomnu'
+							if (nam == 'debug') nam = 'o5debug'
+							// if (nam == 'o5debug') 
+							// 	nam = 'o5debug'
+							if (HasProperty(C.consts, nam)) {
+								const val = TryToDigit(prms[1])
+								xs[nam] = { val: val, source: C.save.urlName }
+								C.constsurl[nam] = val
+							}
+						}
+					}
+				}
+			}
+		},
+		ParamsFillFromScript = (xs, defs, attrs, p) => {
+			const stradd = '(добавлен)'
+			for (const name in attrs) {
+				const nam = Repname(name)
+				if (HasProperty(defs, nam) && !HasProperty(xs, nam)) {
+					const add = HasProperty(defs, nam) ? '' : stradd
+					xs[nam] = { val: TryToDigit(attrs[name]), source: `атрибут${add}` }
+				}
+			}
+
+			let partype = 'data-o5' + p  // тут в частности o5consts
+			if (!attrs[partype]) partype = 'data_o5' + p
+			if (!attrs[partype]) partype = 'o5' + p
+			if (attrs[partype]) {
+				const params = attrs[partype].split(/[;]/)  // параметры в атрибуте разделяются только ';'
+				for (const param of params) {
+					const u = param.replace(/\s*#.*$/, ''), // trim()
+						i = u.indexOf('=')
+					if (i > 0) {
+						const nam = Repname(u.substring(0, i).trim())
+						if (!xs[nam]) {
+							const add = HasProperty(defs, nam) ? '' : stradd,
+								val = TryToDigit(u.substring(i + 1).trim())
+							xs[nam] = { val: val, source: `параметр${add}` }
+							// console.log(`${nam} = '${val}'`)
+						}
+					}
+				}
+			}
+
+			let n = 0	// подсчет к-ва 'стандартных' параметров
+			for (const nam in defs) {
+				n++
+				if (!xs[nam])
+					xs[nam] = { val: TryToDigit(defs[nam]), source: 'default' }
+			}
+			return n
+		}
+
+	Object.assign(C, {
+		repQuotes: /^\s*((\\')|(\\")|(\\`)|'|"|`)?\s*|\s*((\\')|(\\")|(\\`)|'|"|`)?\s*$/g,
+		olga5ignore: 'olga5-ignore',
+		TryToDigit: TryToDigit,
+		ParamsFillFromScript,
+		GetAttrs: GetAttrs,
+		GetAttribute: GetAttribute,
+		Repname: Repname,
+		IncludeScripts: IncludeScripts,
+		E: E,
+		o5script: document.currentScript,
+		o5attrs: GetAttrs(document.currentScript.attributes),
+		cstate: {	 			// общее состояние 
+			depends: null,  	// только для подключенных скриптов, но с учетом как o5depends, так и очередности в задании и атрибута async
+		},
+		urlrfs: {
+			_url_html: GetBaseHR('href'),
+			_url_root: GetBaseHR('root'),
+			_url_olga5: '' // будет задан при инициализации (document.currentScript.src.match(/\S*\//)[0],)
+		},
+		consts: {
+			o5timload: 3, 	//mtiml ? (mtiml[5] ? mtiml[5] : 1) : (C.o5script.attributes['o5timload'] || 3),
+			o5debug: 0, 	// mdebug ? (mdebug[5] ? mdebug[5] : 1) : (C.o5script.attributes['o5debug'] || 0),
+			o5nomnu: 0,
+			o5noact: 0,
+			o5only: 0,
+			o5incls: '',
+			o5doscr: 'olga5_sdone',
+         // o5depends: "pusto; o5inc; o5pop= o5snd; o5shp: o5inc, o5ref; o5ref= o5inc; o5snd:o5ref; o5shp=o5snd, o5ref; o5shp; o5inc; o5mnu",
+			o5depends: "o5inc; o5pop:o5ref,o5snd; o5ref= o5inc; o5snd:o5ref; o5shp=o5snd, o5ref; o5mnu; o5tab",
+			o5init_events: 'readystatechange:d, message',	// , transitionrun, transitionend
+			o5hide_events: 'transitionrun',	// , transitionrun, transitionend
+			o5done_events: 'beforeunload, olga5_unload',
+		},
+		constsurl: {},
+		save: { hash: null, xs: null, p: '', n1: -1, urlName: 'url', libName: 'ядро', }, // сохранение для "красивой" печати - потом удалю
+
+		ModulAddSub: (modul, sub, Fun) => {
+			if (C.consts.o5debug) {
+				// const nam = `${modul}/${sub}.js`
+				// if ('o5shp/DoInit.js' == nam)
+				// 	console.log()
+				console.log(`}===< ${document.currentScript.src.indexOf(`/${modul}.`) > 0 ? 'дозагружен' : 'подключён '}:  ${modul}/${sub}.js`)
+			}
+
+			if (window.olga5[modul] && window.olga5[modul][sub]) {
+				console.groupCollapsed('%c%s', "background: yellow; color: black;border: solid 2px red;",
+					`}---< Повтор загрузки '${modul}/${sub}'`)
+				console.log(`Fun_old=${window.olga5[modul][sub]})`)
+				console.log(`Fun_new=${Fun})`)
+				console.groupEnd()
+			}
+
+			if (!window.olga5[modul])
+				window.olga5[modul] = {}
+			if (Fun)
+				window.olga5[modul][sub] = Fun
+			return window.olga5[modul]
+		},
+		ModulAdd: (W, pars) => {
+			const modul = W.modul
+			if (window.olga5.find(w => w.modul == modul))
+				console.error('%c%s', "background: yellow; color: black;border: solid 2px red;",
+					`}---< Повтор загрузки '${modul}`)
+			else {
+				if (C.consts.o5debug)
+					console.log(`}---< ${document.currentScript.src.indexOf(`/${modul}.`) > 0 ? 'загружен  ' : 'включён   '}:  ${modul}.js`)
+
+				if (!window.olga5[modul])
+					window.olga5[modul] = {}
+
+				if (pars)
+					Object.assign(window.olga5[modul], pars)
+
+				window.olga5[modul].W = W
+				window.olga5.push(W)
+				// window.dispatchEvent(new CustomEvent('olga5_sload', { detail: { modul: modul } }))
+				C.E.DispatchEvent('olga5_sload', W.modul)
+
+				return window.olga5[modul]
+			}
+		},
+        MyJoinO5s : aO5s => {
+            let s = ''
+            for (const aO5 of aO5s) s += (s ? ', ' : '') + aO5.name
+            return s
+        },
+	})
+
+	const xs = {}, // временное хранилилище для считываемых параметров
+		p = 'consts',
+		defs = C[p]
+
+	Object.assign(C.save, { xs: xs, p: p, n1: -1 })
+
+	ConstsFillFromUrl(xs)
+	C.save.n1 = ParamsFillFromScript(xs, defs, C.o5attrs, p)
+
+	for (const nam in xs) defs[nam] = xs[nam].val
+
+	const
+		mm = document.currentScript.src.match(/(!\.js)|(\bo5.js)\s*$/),
+		AscInclude = () =>
+			IncludeScripts({ modul: olga5_modul, names: modnames, actscript: C.o5script, iniFun: RunO5com, })
+
+	if (mm) wshp.AscInclude = AscInclude  // формальный вызов чтобы всё поотмечать и вызвать iniFun()
+	else
+		AscInclude()
+
+	console.log(`}+++< загружено ядро библиотеки`)
+})();
+/* -global document, window, console, Map*/
 /* exported olga5_menuPopDn_Click*/
 /*jshint asi:true  */
 /*jshint esversion: 6*/
@@ -8,12 +436,7 @@
 (function () {              // ---------------------------------------------- o5com/CConsole ---
 	'use strict'
 	const olga5_modul = 'o5com',
-		modulname = 'CConsole'
-	if (!window.olga5) window.olga5 = []
-	if (!window.olga5.C) window.olga5.C = {}
-	if (!window.olga5[olga5_modul]) window.olga5[olga5_modul] = {}
-
-	const wshp = window.olga5[olga5_modul],
+		modulname = 'CConsole',
 		C = window.olga5.C,
 		padd = "padding-left:0.5rem;",
 		clrtypes = {
@@ -39,7 +462,7 @@
 				if (tab instanceof Array)
 					tab.forEach((v, nam) => {
 						let t = {}
-						const ss = [],
+						const // ss = [],
 							O = (o) => {
 								const uu = []
 								if (o instanceof NamedNodeMap) {
@@ -110,7 +533,7 @@
 			console.groupEnd()
 		}
 
-	wshp[modulname] = () => {
+	C.ModulAddSub(olga5_modul, modulname, () => {
 		Object.assign(C, {
 			ConsoleMsg: ConsoleMsg,
 			ConsoleAlert: (txt, add, tab) => ConsoleMsg('alert', txt, add, tab),
@@ -120,23 +543,16 @@
 		})
 		return true
 	}
-
-	if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
-		console.log(`}===< ${document.currentScript.src.indexOf(`/${olga5_modul}.`) > 0 ? 'дозагружен' : 'подключён '}:  ${olga5_modul}/${modulname}.js`)
+	)
 })();
-/* global document, window, console, Map*/
+/* -global document, window*/
 /* exported olga5_menuPopDn_Click*/
 /*jshint asi:true  */
 /*jshint esversion: 6*/
 (function () {              // ---------------------------------------------- o5com/CEncode ---
 	'use strict'
 	const olga5_modul = 'o5com',
-		modulname = 'CEncode'
-	if (!window.olga5) window.olga5 = []
-	if (!window.olga5.C) window.olga5.C = {}
-	if (!window.olga5[olga5_modul]) window.olga5[olga5_modul] = {}
-
-	const wshp = window.olga5[olga5_modul],
+		modulname = 'CEncode',
 		C = window.olga5.C,
 		DelBacks = (s0) => {
 			// const s00 = s0
@@ -152,8 +568,8 @@
 				if (l == s0.length) break
 			} while (n++ < 99)
 
-			const s2s = s0.split('/'),
-				tt = []
+			const s2s = s0.split('/')
+				// tt = []
 			for (let i = 0; i < s2s.length; i++)
 				if (s2s[i] == mrk2) {
 					let j = i
@@ -173,7 +589,11 @@
 			let s = s2s.join('/').replaceAll(/\/\.\//g, '/')
 			return s.replaceAll(/[^:]\/\/+/g, (u) => { return u.substr(0, 2) })
 		},
-		IsUrlNam = u => { return !!(u.trim() && !u.match(/[\/.\\#]/)) },
+		// IsUrlNam = u => { return !!(u.trim() && !u.match(/[\/.\\#]/)) },
+		IsUrlNam = u => {
+			const isurl = !!(u && u.trim() && !u.match(/[\/.\\#]/))
+			return isurl
+		},
 		IsFullUrl = url => {
 			return url.match(/^https?:/i) ||
 				url.match(/^\s*\/*\s*(((\d{1,3}\.){3}\d{1,3})|localhost)\//i)
@@ -192,12 +612,12 @@
 				SplitRefs = (s, refs = null) => {
 					s.split('+').forEach(sprt => {
 						const prt = sprt.replace(C.repQuotes, ''),	// trim(),
-							isnam = IsUrlNam(prt), 
+							isnam = IsUrlNam(prt),
 							ref = isnam ? C.Repname(prt) : prt
 
 						if (isnam) parts.num++
 						if (refs && refs.find(r => ref == r))
-							errs.push(`цикл. ссылки ${refs.join('->')}=>${att};`)
+							errs.push(`цикл. ссылки ${refs.join('->')}=>${ref};`)
 						else {
 							const attr = (isnam && o5attrs) ? C.GetAttribute(o5attrs, ref) : null
 
@@ -250,13 +670,14 @@
 			return ret
 		},
 		TagDes = (tag, ref, errs = null) => {
+			const
+				regExp1 = /(.*(\/|\+)\s*)|(!*\.js\s*$)/g,
+				regExp2 = /(\s*\+\s*)+/g
 			for (const code of ['data-', '_', '']) {
 				const from = code + ref,
 					attr = tag.attributes[from]
 				if (attr) {
-					const orig = attr.nodeValue,
-						regExp1 = new RegExp('((.*\\/|\\+)\\s*)|(!*\\.js\\s*$)', 'g'),
-						regExp2 = new RegExp('(\\s*\\+\\s*)+', 'g')
+					const orig = attr.nodeValue
 
 					return {
 						code: code,
@@ -271,8 +692,7 @@
 				errs.push({ tag: C.MakeObjName(tag), ref: ref, txt: 'не определены атрибуты' })
 		}
 
-	wshp[modulname] = () => {
-		// if (C.consts.o5debug > 0) console.log(`===  инициализация ${olga5_modul}/${modulname}.js`)
+	C.ModulAddSub(olga5_modul, modulname, () => {
 		Object.assign(C, {
 			DelBacks: DelBacks,
 			IsFullUrl: IsFullUrl,
@@ -281,9 +701,7 @@
 		})
 		return true
 	}
-
-	if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
-		console.log(`}===< ${document.currentScript.src.indexOf(`/${olga5_modul}.`) > 0 ? 'дозагружен' : 'подключён '}:  ${olga5_modul}/${modulname}.js`)
+	)
 })();
 /* global document, window, console, Map*/
 /* exported olga5_menuPopDn_Click*/
@@ -291,18 +709,13 @@
 /*jshint esversion: 6*/
 (function () {              // ---------------------------------------------- o5com/CApi --- 111
 	'use strict'
-	const olga5_modul = 'o5com',
-		modulname = 'CApi'
-	if (!window.olga5) window.olga5 = []
-	if (!window.olga5.C) window.olga5.C = {}
-	if (!window.olga5[olga5_modul]) window.olga5[olga5_modul] = {}
-
-	const wshp = window.olga5[olga5_modul],
+	const
 		C = window.olga5.C,
-		Match = scls => new RegExp(`\\b` + scls + `(\\s*[,:+]\\s*((([\`'"\\(\[])(.*?)\\4)|[^\\s\`'":,+]*))*(\\s*|$)`),
-		// Match = scls => new RegExp(`\\b` + scls + `(\\s*[,:+]\\s*((([\`'"\\(\\[])(.*?)\\4)|[\\w\\-\\.]*))*(\\s|$)`),
-		// Match = scls => new RegExp(`\\b` + scls + `(\\s*[,:+]\\s*((([\`'"])(.*?)\\4)|[+\\s*\\-\\w]*))*`),
-		// Match = scls => new RegExp(`\\b` + scls + `[,:]*[^\\s\\)]*`),
+		olga5_modul = 'o5com',
+		modulname = 'CApi',
+		// Match = scls => new RegExp(`\\b` + scls + `(\\s*[,:+]\\s*((([\`'"\\(\[])(.*?)\\4)|[^\\s\`'":,+]*))*(\\s*|$)`),
+		// Match = scls => new RegExp(`\\b` + scls + `\\b(\\s*:\\s*\\w*|([\`'"\\([])(.*?)\\3)*`),
+		Match = scls => new RegExp(`\\b` + scls + `\\b(\\s*[,:+]\\s*[^\\s:\`'"]*|([\`'"\\([])(.*?)\\2)*`),
 		mquals = /\s*[:,]\s*/,
 		GetTagsBy = (modul, fun, ask) => {
 			const list = [],
@@ -314,11 +727,21 @@
 					const Fun = owner.start[fun]
 					if (Fun)
 						for (const nam of nams) {
-							const tags = Fun.call(owner.start, nam)
-							if (tags)
-								for (const tag of tags)
-									if (!list.includes(tag))
-										list.push(tag)
+							const matches = Fun.call(owner.start, nam)
+							let tags = []								
+								
+							// проверяю сам тег 'olga5_start'
+							if (owner.start.matches(nam)) 
+								tags.push(owner.start)
+								
+							if (matches) {
+								const amatches =Array.from(matches)
+								tags = tags.concat(amatches)
+							}
+
+							for (const tag of tags)
+								if (!list.includes(tag))
+									list.push(tag)
 						}
 					else
 						errs.push({ tag: C.MakeObjName(owner.start), Fun: fun })
@@ -328,8 +751,7 @@
 			return list
 		}
 
-	wshp[modulname] = () => {
-		// if (C.consts.o5debug > 0) console.log(`===  инициализация ${olga5_modul}/${modulname}.js`)
+	C.ModulAddSub(olga5_modul, modulname, () => {
 		Object.assign(C, {
 			owners: [],
 			scrpts: [],
@@ -399,22 +821,24 @@
 				else
 					for (const tag of starts) {
 						const quals = [],
-							ms = tag.className.match(match),
-							m = ms[0].trim()
+							ms = tag.className.match(match)
 						if (ms) {
+							const
+								m = ms[0].trim(),
+								ss = m.split(mquals)
+
 							tag.className = tag.className.replace(m, scls)// ВСЕГДА убираю квалификаторы (остальные в ms - не трогать!)
 
-							const ss = m.split(mquals)
 							for (let j = 1; j < ss.length; j++) {
 								const modul = ss[j]
 
 								if (C.scrpts.find(scrpt => scrpt.modul == modul)) quals.push(modul)
 								else errs.push(modul)
 							}
+							C.owners.push({ start: tag, modules: quals, origcls: m }) // специально чуть по-иному
+							if (C.consts.o5debug > 2)
+								console.log(`${olga5_modul}/${modulname} QuerySelectorInit: id='${tag.id}',  '${m}', \n\t${quals}`)
 						}
-						C.owners.push({ start: tag, modules: quals, origcls: m }) // специально чуть по-иному
-						if (C.consts.o5debug > 2)
-							console.log(`${olga5_modul}/${modulname} QuerySelectorInit: id='${tag.id}',  '${m}', \n\t${quals}`)
 					}
 				if (errs.length > 0)
 					C.ConsoleError(`Неопределены квалификаторы для '${scls}': `, errs.join(', '))
@@ -422,33 +846,9 @@
 		})
 		return true
 	}
-	if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
-		console.log(`}===< ${document.currentScript.src.indexOf(`/${olga5_modul}.`) > 0 ? 'дозагружен' : 'подключён '}:  ${olga5_modul}/logs.js`)
-	/*
-	тестирование Match()
-	\bolga5_snd(\s*[,:+]\s*((([`'"\(\[])(.*?)\4)|[^\s`'":,+]*))*(\s*|$)
-
-	olga5_snd
-aaa olga5_snd: q: q  asa
-aaa olga5_snd: q : q : a  asa
-aaa olga5_snd:over : a-11_z : loop  asa
-aaa olga5_snd:over : 'a-11_z : loop'  asa
-olga5_snd:аудио_файл  asa
-olga5_snd:+аудио_файл  asa
-olga5_snd:+ аудио_файл  asa
-olga5_snd: + аудио_файл  asa
-olga5_snd: + аудио_файл +bb asa
-olga5_snd:аудио_файл  : " sd  ffg sa" asa
-aaa olga5_snd:аудио_файл  : " sd  ffg sa" asa
-aaa olga5_snd : аудио_файл  : ' sd  ' ffg sa" asa
-aaa olga5_snd: xZa:'ёй-sounds_2 + /gitme.mp3 bbb:O'asa
-aaa olga5_snd: Lяя :Aюю:'ёй-sounds_2 + /gitme.mp3 bbb:O'asa
-aaa olga5_snd: Lяя :Aюю :'ёй-sounds_2 + /gitme.mp3 bbb:O' asa
-aaa dlassaaa:A olga5_snd:over : a-11_z: loop :  "  sounds + Ceza1-25.mp3" 
-
-	*/
+	)
 })();
-/* global document, window, console, Map*/
+/* -global document, window, console,*/
 /* exported olga5_menuPopDn_Click*/
 /*jshint asi:true  */
 /*jshint esversion: 6*/
@@ -461,23 +861,28 @@ aaa dlassaaa:A olga5_snd:over : a-11_z: loop :  "  sounds + Ceza1-25.mp3"
 (function () {              // ---------------------------------------------- o5com/CParams ---
 	'use strict'
 	const olga5_modul = 'o5com',
-		modulname = 'CParams'
-	if (!window.olga5) window.olga5 = []
-	if (!window.olga5.C) window.olga5.C = {}
-	if (!window.olga5[olga5_modul]) window.olga5[olga5_modul] = {}
-
-	const wshp = window.olga5[olga5_modul],
+		modulname = 'CParams',
 		C = window.olga5.C,
 		csslist = {}, // перечень наименований создаваемых классо
 		// repQuotes = /^['"`\s]+|['"`\s]+$/g,
-		SplitParams = (s, parnam, delims = ';') => {
+		SplitParams = (s, parnam, dlms = ';') => {
 			const errs = [],
 				params = {},
-				regexp = new RegExp('\\s*[' + delims + ']\\s*', 'g'),
+				regexp = new RegExp('\\s*[' + dlms + ']\\s*', 'g'),
+
 				regcomments = /(\s+\/\/|#).*?(\n|$|;)/g,
-				x = s.replace(/\/\*(.|\n)*?\*\//g, '').
+
+				x = s.replace(/\/\*(.|\n)*?\*\//gm, '').
 					replace(regcomments, ';'),		 // убрал оба типа коментов
 				spairs = x.trim().split(regexp)
+
+			// const
+			// 	match= new RegExp(`\\s*[${dlms}]\\s*$`),
+			// 	spairs = []
+
+			// for (const m of mm)
+			// 	spairs.push(m[0].replace(/\s+/g, ''))
+			// // ,m2=s(Symbol.matchAll(regexp))
 
 			if (C.consts.o5debug > 0) {
 				const comments = s.match(regcomments)
@@ -490,20 +895,24 @@ aaa dlassaaa:A olga5_snd:over : a-11_z: loop :  "  sounds + Ceza1-25.mp3"
 
 			for (const spair of spairs)
 				if (spair) {
-// if (spair.match('myMusikIT'))					
-// console.log(121212)
-					const pair = spair.split('=')
-					if (pair.length > 1) {
-						const nam = C.Repname(pair[0].trim()),
-							val = (pair[1] || '').replace(C.repQuotes, '') // .replace(C.repQuote2, '')
-
+					const pair = spair.split(/\s*=\s*/),
+						nam = C.Repname(pair[0].trim())
+					if (params[nam])	
+						errs.push({ par: spair, err: `повтор '${nam}' (замена)` })
+										
+					if (pair.length == 1) {
+						params[nam] = true
+						errs.push({ par: spair, err: `отсутствие '=' (принято =true)` })
+					}
+					else {
+						// const val = (pair[1] || '').replace(match, '').replace(C.repQuotes, '') // .replace(C.repQuote2, '')
+						const val = (pair[1] || '').replace(C.repQuote2, '')
+						
 						if (nam) params[nam] = C.TryToDigit(val)
 						else
 							if (val.length > 1)
 								errs.push({ par: spair, err: `у параметра (с val='${val}') нет имени` })
 					}
-					else
-						errs.push({ par: spair, err: `отсутствие '='` })
 				}
 
 			if (errs.length > 0)
@@ -517,8 +926,8 @@ aaa dlassaaa:A olga5_snd:over : a-11_z: loop :  "  sounds + Ceza1-25.mp3"
 
 			for (const nam in urlrfs) {
 				const val = urlrfs[nam]
-// if (val.match('myMusikIT'))					
-	// console.log(121212)				
+				// if (val.match('myMusikIT'))					
+				// console.log(121212)		isurl		
 				if (val != null && typeof val !== 'undefined') {
 					if (!val.replace)
 						alert('значение URL - не строка')
@@ -539,27 +948,27 @@ aaa dlassaaa:A olga5_snd:over : a-11_z: loop :  "  sounds + Ceza1-25.mp3"
 			if (urlerrs.length > 0)
 				C.ConsoleError(`${modul}: недоопределённые ссылки`, urlerrs.length, urlerrs)
 		},
-		CopyVals = (xs, c, type) => {
-			for (const nam in c) {
-				const x = xs.find(x => x.nam == nam)
-				if (x) Object.assign(x, { val: c[nam], source: type })
-				else xs.push({ nam: nam, val: c[nam], source: type })
-			}
-		},
+		// CopyVals = (xs, c, type) => {
+		// 	for (const nam in c) {
+		// 		const x = xs.find(x => x.nam == nam)
+		// 		if (x) Object.assign(x, { val: c[nam], source: type })
+		// 		else xs.push({ nam: nam, val: c[nam], source: type })
+		// 	}
+		// },
 		InitCSS = (W, o5css) => {
 			const chs = document.head.children,
 				id = W.class + '_internal',
-				csso = csslist[W.class]
+				cmodul = csslist[W.class]
 			let err = ''
 
-			if (typeof csso === 'undefined') {
+			if (typeof cmodul === 'undefined') {
 				for (const ch of chs)
 					if (ch.nodeName == "STYLE" && ch.id == id) {
 						err = `Стиль id='${id}' (модуль: '${W.modul}', класс: '${W.class}) уже определён в документе`
 						break
 					}
 			} else
-				if (csso != W.modul) err = `Класс '${W.class}' повторяется в модулях '${csso}' и '${modul}. '`
+				if (cmodul != W.modul) err = `Класс '${W.class}' повторяется в модулях '${cmodul}' и '${W.modul}. '`
 
 			if (err) C.ConsoleError('>>  создание CSS  ' + err, 'InitCSS')
 			else {
@@ -590,7 +999,7 @@ aaa dlassaaa:A olga5_snd:over : a-11_z: loop :  "  sounds + Ceza1-25.mp3"
 			const scrpt = C.scrpts.find(scrpt => scrpt.modul == W.modul)
 
 			if (!scrpt) {
-				C.ConsoleError(`? В 'C.scrpts' не наден модуль `, W.modul)
+				C.ConsoleError(`В 'C.scrpts' не наден модуль `, W.modul)
 				return
 			}
 
@@ -609,17 +1018,13 @@ aaa dlassaaa:A olga5_snd:over : a-11_z: loop :  "  sounds + Ceza1-25.mp3"
 			for (const p of ['consts', 'urlrfs']) {
 				const xs = {} // временное хранилилище для считываемых параметров
 
-				// let askps = {}
-				// if (W[p])   // т.е. если параметр был передан отдельно. Если еще не обрабатывался - SplitParams
-				// 	askps = (typeof W[p] === 'object') ? W[p] : SplitParams(W[p], p, ';,')
-
 				for (const nam in C[p]) {
 					const source = C.constsurl.hasOwnProperty(nam) ? C.save.urlName : `ядро`
 					if (!xs.hasOwnProperty(nam))
 						xs[nam] = { val: C[p][nam], source: source }
 				}
 				if (isnew) {
-					const askps = SplitParams(W.origs[p], p, ';,'),
+					const askps = SplitParams(W.origs[p], p, ';'),
 						n1 = C.ParamsFillFromScript(xs, askps, attrs, p)
 
 					W[p] = {}	// преобразовываю в объект
@@ -645,7 +1050,7 @@ aaa dlassaaa:A olga5_snd:over : a-11_z: loop :  "  sounds + Ceza1-25.mp3"
 			}
 		}
 
-	wshp[modulname] = url_olga5 => {
+	C.ModulAddSub(olga5_modul, modulname, url_olga5 => {
 		C.urlrfs._url_olga5 = url_olga5
 
 		Object.assign(C, {
@@ -653,7 +1058,7 @@ aaa dlassaaa:A olga5_snd:over : a-11_z: loop :  "  sounds + Ceza1-25.mp3"
 			SplitParams: SplitParams,
 		})
 
-		if (C.consts.o5debug > 0) PrintParams(C.consts, C.save.xs, C.save.p, C.save.n1)
+		if (C.consts.o5debug > 0) PrintParams(C.save.libName, C.save.xs, C.save.p, C.save.n1)
 
 		const p = 'urlrfs',
 			xs = {}, // временное хранилилище для считываемых параметров
@@ -665,17 +1070,12 @@ aaa dlassaaa:A olga5_snd:over : a-11_z: loop :  "  sounds + Ceza1-25.mp3"
 		DeCodeUrlRfs(defs, C.save.libName)
 
 		for (const nam in defs) { xs[nam].url = defs[nam] }
-		if (C.consts.o5debug > 0) (C.save.libName, xs, p, n1)
+		if (C.consts.o5debug > 0) PrintParams(C.save.libName, xs, p, n1)
 
-		// delete C.save
-		// Object.freeze(C)
 		return true
-	}
-
-	if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
-		console.log(`}===< ${document.currentScript.src.indexOf(`/${olga5_modul}.`) > 0 ? 'дозагружен' : 'подключён '}:  ${olga5_modul}/${modulname}.js`)
+	})
 })();
-/* global document, window, console, Map*/
+/* -global document, window, console, Map*/
 /* exported olga5_menuPopDn_Click*/
 /*jshint asi:true  */
 /*jshint esversion: 6*/
@@ -685,22 +1085,18 @@ aaa dlassaaa:A olga5_snd:over : a-11_z: loop :  "  sounds + Ceza1-25.mp3"
 //
 (function () {              // ---------------------------------------------- o5com/TagRefs ---
 	'use strict'
-	const olga5_modul = 'o5com',
-		modulname = 'TagsRef'
-	if (!window.olga5) window.olga5 = []
-	if (!window.olga5.C) window.olga5.C = {}
-	if (!window.olga5[olga5_modul]) window.olga5[olga5_modul] = {}
+	let wshp = {}
 
-	const wshp = window.olga5[olga5_modul],
+	const
+		olga5_modul = 'o5com',
+		modulname = 'TagsRef',
 		C = window.olga5.C,
-		// regExp = /[^\/\s+]+$/
-		// olga5_script = document.currentScript,
 		ReplaceTag = (tagName, change, adrName, url, errs) => {
 			const addnew = document.createElement(tagName),
 				regExp = new RegExp(/[\\+<>'"`=#\\/\\\\]/)
 			let err = false
 			for (const attr of change.attributes) {
-				if (attr.name.match(regExp)) {
+				if (!err && attr.name.match(regExp)) {
 					errs.push({ tag: tagName, ref: attr.name, txt: `cодержит кавычки или '+><=#/'` })
 					err = true
 				}
@@ -708,26 +1104,19 @@ aaa dlassaaa:A olga5_snd:over : a-11_z: loop :  "  sounds + Ceza1-25.mp3"
 					try {
 						addnew.setAttribute(attr.name, attr.value) // здесь копирую "как есть" 
 					} catch (err) {
-						errs.push({ tag: tagName, ref: url, txt: (attr.name + '=' + attr.value) })
+						errs.push({ tag: tagName, ref: url, txt: (attr.name + '=' + attr.value), err:err.message })
 					}
 			}
 			addnew.setAttribute(adrName, url)
-			// change.dataset.o5_old = 1 // это нужно, если не удалять оригинал
-			// if (err || C.consts.o5debug > 1)
-			// 	console.log(`добавляю тег <${tagName}> с атрибутом ${adrName}=${url} ${err ? ' с ошибками' : ''}`)
 
-			// if (trn>=7)
-			// 	console.log()
-			// if (addnew.tagName== "SCRIPT")	
-			// console.log(trn++, addnew.src, change.src)
-			// if (addnew.tagName== "LINK")	
-			// console.log(trn++, addnew.href, change.href)
 			change.parentNode.insertBefore(addnew, change)
 			change.parentNode.removeChild(change) //  ??  а вот удалять  -м.б. и не надо: для контроля
 
 			return addnew
 		},
 		ConvertScripts = () => {
+			// if (!(Symbol.iterator in Object(window.olga5))) return		//?
+
 			const errs = [],
 				scrs = [],
 				preloads = [],
@@ -735,7 +1124,7 @@ aaa dlassaaa:A olga5_snd:over : a-11_z: loop :  "  sounds + Ceza1-25.mp3"
 				Orig = (obj) => {
 					const origs = obj.outerHTML.match(/\s(data-)?src\s*=\s*["*'][^"']*["*']/g)
 					if (origs && origs.length > 0) {
-						origs.forEach((orig) => {
+						origs.forEach(orig => {
 							orig = orig.replaceAll(/["'s*]/g, '')
 						})
 						return origs.join(', ')
@@ -754,12 +1143,14 @@ aaa dlassaaa:A olga5_snd:over : a-11_z: loop :  "  sounds + Ceza1-25.mp3"
 				igns = [],
 				needs = {}
 
-			incls.forEach(incl => needs[incl] = 1)
+			incls.forEach(incl => { if (incl) needs[incl] = 1 })
 			for (const script of document.scripts) {
 				// if (C.consts.o5debug > 1) console.log(`тег <script>: id= '${script.id}', src= "${script.src}"`)
 
-				if (script === C.o5script) // это ядро, т.е. конец скриптов (не зависимо от наличия 'o5_scripts')
-					break
+				// if (script === C.o5script) // это ядро, т.е. конец скриптов (не зависимо от наличия 'o5_scripts')
+				// 	break
+				if (script === C.o5script) // пропускаю ядро и модуль o5inc
+					continue
 
 				if (script.dataset.o5add) continue 		// это добавленный мною скрипт		
 				if (script.innerText.trim()) continue	// это встроенный скрипт
@@ -795,6 +1186,8 @@ aaa dlassaaa:A olga5_snd:over : a-11_z: loop :  "  sounds + Ceza1-25.mp3"
 							errs.push({ tag: td.modul, ref: td.from, txt: wref.err })
 						url = wref.url
 					}
+					if (!script.getAttribute('async') && !script.getAttribute('defer'))
+						script.setAttribute('async', '')
 					scrpt.script = ReplaceTag('script', script, 'src', url, errs)
 				}
 
@@ -817,8 +1210,11 @@ aaa dlassaaa:A olga5_snd:over : a-11_z: loop :  "  sounds + Ceza1-25.mp3"
 					}
 			}
 
-			/* строю зависимости криптов (сначала идут скомпилированные) - сначала по 'o5depends'*/
-			const ss = C.consts['o5depends'].split(/\s*[;]+\s*/)
+			/* строю зависимости cкриптов (сначала идут скомпилированные) - сначала по 'o5depends'*/
+			const ss = C.consts['o5depends'].split(/\s*[;]+\s*/),
+				sinc = 'o5inc',
+				o5inc = C.scrpts.find(scrpt => scrpt.modul == sinc)
+
 			for (const s of ss) {
 				const uu = s.trim().split(/\s*[:=]+\s*/), // split(/[:=]/), // 
 					u = uu[0],
@@ -826,14 +1222,31 @@ aaa dlassaaa:A olga5_snd:over : a-11_z: loop :  "  sounds + Ceza1-25.mp3"
 				if (u) {
 					const scrpt = C.scrpts.find(scrpt => scrpt.modul == u)
 					if (scrpt) {
-						scrpt.depends ||= []
-						for (const rf of rfs) {
-							const scr = C.scrpts.find(scrpt => scrpt.modul == rf)
-							if (scr) scrpt.depends.push(scr)
-						}
+						scrpt.depends ||= (scrpt.modul != sinc && o5inc) ? [o5inc] : []
+						for (const rf of rfs)
+							if (rf != sinc) { // уже и так включено
+								const scr = C.scrpts.find(scrpt => scrpt.modul == rf)
+								if (scr && !scrpt.depends.includes(scr))
+									scrpt.depends.push(scr)
+							}
 					}
 				}
 			}
+
+			// const depends = []
+			// for (const s of ss) {
+			// 	const uu = s.trim().split(/\s*[:=]+\s*/)
+			// 	depends.push({ modul: uu[0], rfs: rfs })
+			// }
+			// for (const scrpt of C.scrpts) {
+			// 	scrpt.depends ||= (scrpt.modul != sinc && o5inc) ? [o5inc] : []
+			// 	for (const depend of depends)
+			// 		if (depend.modul == scrpt.modul) 
+			// 			for (const rf of depend.rfs)
+			// 				if (!scrpt.depends.includes(rf)) // уже и так включено
+			// 					scrpt.depends.push(scr)
+			// }
+
 			/* -"- тепер для остальны */
 			const sdeps = [],
 				cdeps = []
@@ -888,7 +1301,7 @@ aaa dlassaaa:A olga5_snd:over : a-11_z: loop :  "  sounds + Ceza1-25.mp3"
 							if (!attr.name || attr.name.match(/['"`\+\.,;]/))
 								errs.push({ 'атрибут': attr.name, 'скрипт': scrpt.script.src, })
 					if (errs.length > 0)
-						C.ConsoleError(`${errs.length} странных атрибутов (м.б. перепутаны кавычки?) у скрипта`, scrpt.modul + '.js', errs)
+						C.ConsoleError(`${errs.length} странных атрибутов (м.б. перепутаны кавычки?) у скрипта`, s, errs)
 				}
 			}
 			if (errs.length > 0)
@@ -938,15 +1351,12 @@ aaa dlassaaa:A olga5_snd:over : a-11_z: loop :  "  sounds + Ceza1-25.mp3"
 
 		}
 
-	wshp[modulname] = () => {
+	wshp = C.ModulAddSub(olga5_modul, modulname, () => {
 		ConvertScripts()
 		ConvertLinks()
-	}
-
-	if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
-		console.log(`}===< ${document.currentScript.src.indexOf(`/${olga5_modul}.`) > 0 ? 'дозагружен' : 'подключён '}:  ${olga5_modul}/${modulname}.js`)
+	})
 })();
-/* global document, window, console, Map*/
+/* -global document, window, console*/
 /* exported olga5_menuPopDn_Click*/
 /*jshint asi:true  */
 /*jshint esversion: 6*/
@@ -957,12 +1367,9 @@ aaa dlassaaa:A olga5_snd:over : a-11_z: loop :  "  sounds + Ceza1-25.mp3"
 (function () {              // ---------------------------------------------- o5com/IniScripts ---
 	'use strict'
 	const olga5_modul = 'o5com',
-		modulname = 'IniScripts'
-	if (!window.olga5) window.olga5 = []
-	if (!window.olga5.C) window.olga5.C = {}
-	if (!window.olga5[olga5_modul]) window.olga5[olga5_modul] = {}
-
-	const myclr = "background: blue; color: white;border: none;"
+		modulname = 'IniScripts',
+		C = window.olga5.C,
+		myclr = "background: blue; color: white;border: none;"
 	class MyEvents {
 		doceves = ['DOMContentLoaded', 'readystatechange', 'visibilitychange', 'blur']
 		meves = []
@@ -982,13 +1389,18 @@ aaa dlassaaa:A olga5_snd:over : a-11_z: loop :  "  sounds + Ceza1-25.mp3"
 		}
 		AddEvents = (Fun) => { // addEventListener
 			for (const meve of this.meves)
-				if (meve.isd) document.addEventListener(meve.eve, Fun,  true )
-				else window.addEventListener(meve.eve, Fun)
+				if (meve.isd) document.addEventListener(meve.eve, Fun, true)
+				else
+					window.addEventListener(meve.eve, Fun)
+			// C.E.AddEventListener(meve.eve, Fun)
 		}
 		RemEvents = (Fun) => { // addEventListener
 			for (const meve of this.meves)
-				if (meve.isd) document.removeEventListener(meve.eve, Fun,  true )
-				else window.removeEventListener(meve.eve, Fun)
+				if (meve.isd) document.removeEventListener(meve.eve, Fun, true)
+				else {
+					window.removeEventListener(meve.eve, Fun)
+					// C.E.RemoveEventListener(meve.eve, Fun)
+				}
 		}
 	}
 	class MyTimer {
@@ -1021,8 +1433,7 @@ aaa dlassaaa:A olga5_snd:over : a-11_z: loop :  "  sounds + Ceza1-25.mp3"
 			// console.log('...+', this.act.time,  this.act.name)
 		}
 	}
-	const wshp = window.olga5[olga5_modul],
-		C = window.olga5.C,
+	const
 		DocURL = () => document.URL.match(/[^?&#]*/)[0].trim(),
 		/**
 		 * InitScripts(nam) - выполнение очередного требуемого скрипта
@@ -1036,11 +1447,19 @@ aaa dlassaaa:A olga5_snd:over : a-11_z: loop :  "  sounds + Ceza1-25.mp3"
 		 * @param {isok}  необязательный признак готовности документа (наименование события)
 		 */
 		InitScripts = nam => {
-			if (!(C.page && C.page.pact && C.page.pact.ready)) return
+			if (!(C.page && C.page.pact && C.page.pact.ready)) {
+				if (C.consts.o5debug > 1)
+					console.log(`--->>>     ______ InitScripts _____     ${nam} -- return`)
+				return
+			}
 
+			if (C.consts.o5debug > 1)
+				console.log(`--->>>     ______ InitScripts _____     ${nam} `)
 			const start = C.page.pact.start
 			for (const scrpt of C.scrpts) {
 				const act = scrpt.act
+				// if (act.W.modul=='o5inc')				
+				// act.timera =0
 				if (!act.timera)
 					act.timera = new MyTimer(`---<<<             инициирован `)
 				if (start != act.start && act.W && !act.incls)
@@ -1051,7 +1470,7 @@ aaa dlassaaa:A olga5_snd:over : a-11_z: loop :  "  sounds + Ceza1-25.mp3"
 								console.log(`--->>>     ______ начало нинициализации _____     ${act.W.modul} `)
 							act.start = start
 							act.timera.Start(act.W.modul)
-							act.W.Init(C)
+							act.W.Init()
 						}
 					} else
 						Object.assign(act, { start: start, done: start })
@@ -1073,7 +1492,7 @@ aaa dlassaaa:A olga5_snd:over : a-11_z: loop :  "  sounds + Ceza1-25.mp3"
 			})
 			if (C.consts.o5debug > 1) {
 				console.log(`- - > после инициализации '${modul}': ` +
-					(lefts.length > 0 ? `осталось:  ${lefts.join(', ')}` : `больше не осталось`))
+					(lefts.length > 0 ? `осталось:  ${lefts.join(', ')}` : ` не осталось`))
 			}
 			if (scrpt) {
 				const act = scrpt.act
@@ -1092,10 +1511,11 @@ aaa dlassaaa:A olga5_snd:over : a-11_z: loop :  "  sounds + Ceza1-25.mp3"
 				Included = modul => {
 					const nam = `загружены включения для '${modul}'`,
 						scrpt = C.scrpts.find(scrpt => scrpt.modul == modul)
-					if (C.consts.o5debug > 1)
+					if (C.consts.o5debug > 0)
 						console.log(`OnLoad: '${nam}'`)
 
 					scrpt.act.incls = ''
+					// const debug = window.open("", "", "width=200,height=100");
 					InitScripts(nam)
 				}
 
@@ -1128,7 +1548,7 @@ aaa dlassaaa:A olga5_snd:over : a-11_z: loop :  "  sounds + Ceza1-25.mp3"
 		}
 
 	class Page {
-		pact = { url: '', ready: false, start: false, timerp: new MyTimer("}==  КОНЕЦ  обработки  страницы"), timer: 0, mos: [] }
+		pact = { url: '', ready: false, start: 0, timerp: new MyTimer("}==  КОНЕЦ  обработки  страницы"), timer: 0, mos: [] }
 		errs = []
 		ScriptsFinish = e => { // закрытие всех новых элементов страницы
 
@@ -1162,7 +1582,8 @@ aaa dlassaaa:A olga5_snd:over : a-11_z: loop :  "  sounds + Ceza1-25.mp3"
 			})
 
 			this.donePage.RemEvents(this.ScriptsFinish)
-			window.dispatchEvent(new window.Event('olga5_done'))
+			// window.dispatchEvent(new window.Event('olga5_done'))
+			C.E.DispatchEvent('olga5_done')
 		}
 		ScriptsStart = () => {  // начало обработки страницы
 
@@ -1180,6 +1601,16 @@ aaa dlassaaa:A olga5_snd:over : a-11_z: loop :  "  sounds + Ceza1-25.mp3"
 					}
 				}
 			}
+			if (C.consts.o5debug > 0) {
+				let asknoneed = []
+				for (const scrpt of C.scrpts)
+					if (!scrpt.act.need)
+						asknoneed.push(scrpt.modul)
+				const l = asknoneed.length
+				if (l > 0)
+					C.ConsoleError(`В скриптах заданы ${l} 'ненужн${l > 1 ? 'ых' : 'ый'}' модул${l > 3 ? 'ей' : (l > 1 ? 'я' : 'ь')}: `, asknoneed.join(', '))
+			}
+
 			if (C.consts.o5doscr) {  // запуск встроенных cкриптоав
 				const scrs = C.GetTagsByTagNames('script'),
 					scriptDone = C.consts.o5doscr,
@@ -1198,13 +1629,6 @@ aaa dlassaaa:A olga5_snd:over : a-11_z: loop :  "  sounds + Ceza1-25.mp3"
 						}
 					}
 				}
-			}
-
-			if (C.consts.o5debug > 0) {
-				const o5inc = C.scrpts.find(scrpt => scrpt.modul == 'o5inc'),
-					o5include = document.querySelector('[o5include]')
-				if (o5inc && !o5include) C.ConsoleError(`Задан скрипт 'o5inc.js' но отсутствует тег с атрибутом 'o5include'`)
-				if (!o5inc && o5include) C.ConsoleAlert(`Имеется тег с атрибутом 'o5include' но отсутствует  скрипт 'o5inc.js'`)
 			}
 		}
 		PageFinish = bytimer => { // конец инициалзации страницы
@@ -1245,7 +1669,8 @@ aaa dlassaaa:A olga5_snd:over : a-11_z: loop :  "  sounds + Ceza1-25.mp3"
 			}
 			this.loadDone.RemEvents(OnLoad)
 			this.initDone.RemEvents(OnInit)
-			window.dispatchEvent(new window.Event('olga5_ready'))
+			// window.dispatchEvent(new window.Event('olga5_ready'))
+			C.E.DispatchEvent('olga5_ready')
 		}
 		PageStart = (url) => {
 			if (C.consts.o5debug > 0)
@@ -1271,9 +1696,10 @@ aaa dlassaaa:A olga5_snd:over : a-11_z: loop :  "  sounds + Ceza1-25.mp3"
 
 			OnLoad()  // после InitScripts
 		}
-		clr = `background: green;color:white;`
-		CheckInit = e => { // проверка и начало инициализации страницы !
-			const pact = this.pact,
+		clr = "background: green;color:white;"
+		CheckInit = (e, second) => { // проверка и начало инициализации страницы !
+			const o5inc = 'o5inc',
+				pact = this.pact,
 				url = DocURL(),
 				starts = document.querySelectorAll("[class *= '" + this.olga5Start + "']"),
 				isolga5 = starts && starts.length,
@@ -1289,19 +1715,57 @@ aaa dlassaaa:A olga5_snd:over : a-11_z: loop :  "  sounds + Ceza1-25.mp3"
 					if (nam != 'type' && !(e[nam] instanceof Function)) console.log(nam.padEnd(24), e[nam])
 				console.groupEnd()
 			}
+			// if (isloaded && !C.scrpts.finish){ // уточняю конечный список скриптов - м.б. еще чего ждать
+			// 	C.scrpts.finish=true
+			// }
+			if (isnew && isloaded) {
 
-			if (isnew && isloaded && isolga5) {
+				pact.start = Number(new Date()) + Math.random()
 
-				this.ScriptsFinish(e)
+				let w = null,
+					o5include = null
+				if (!second) {
+					o5include = document.querySelector('[o5include]')
+					w = window.olga5.find(modul => modul.modul == o5inc)
 
-				Object.assign(pact, { url: url, ready: true, start: Number(new Date()) + Math.random() })
-				pact.mos.splice(0, pact.mos.length)
+					if (!w && o5include) C.ConsoleError(`Имеется тег с атрибутом 'o5include' но отсутствует модуль '${o5inc}'`)
+					else
+						if (w && !o5include && C.consts.o5debug > 0)
+							C.ConsoleInfo(`¿ Задан модуль '${o5inc}' но отсутствует тег с атрибутом 'o5include' ?`)
+				}
 
-				this.starts.splice(0, this.starts.length)
-				for (let i = 0; i < starts.length; i++)
-					this.starts[i] = starts[i]
 
-				this.PageStart(url)
+				// забрать в общую обработку
+				// проверить, чтобы в очерёдности обработки o5inc  всегда было первым!				
+				// 				if (w && o5include) {
+				// 					const
+				// 						scrpt = C.scrpts.find(scrpt => scrpt.modul == o5inc)
+				// 					if (scrpt)
+				// 						Object.assign(scrpt.act, { W: w, start: pact.start, done: pact.start, need:false })
+				// 					else
+				// 						C.ConsoleError(`Не найден scrpt для modul='${o5inc}'`)
+
+				// 					// window.addEventListener('olga5-incls', e => this.CheckInit(e, true))	//1
+				// 					C.E.AddEventListener('olga5-incls', e => this.CheckInit(e, true))	//1
+				// 					w.Init()
+				// 				}
+				// 				else
+
+
+				if (isolga5) {
+					this.ScriptsFinish(e)
+					Object.assign(pact, { url: url, ready: true })
+
+					pact.mos.splice(0, pact.mos.length)
+
+					this.starts.splice(0, this.starts.length)
+					for (let i = 0; i < starts.length; i++)
+						this.starts[i] = starts[i]
+
+					this.PageStart(url)
+				}
+				else
+					C.ConsoleError(`Отсутствует тег с класом '${this.olga5Start}'`) // или атрибутом 'o5include'`)
 			}
 		}
 		CheckHide = e => { // проверка и начало инициализации страницы
@@ -1314,6 +1778,16 @@ aaa dlassaaa:A olga5_snd:over : a-11_z: loop :  "  sounds + Ceza1-25.mp3"
 				this.ScriptsFinish(e)
 				pact.url = url
 			}
+		}
+		AppendChild = (owner, child) => {
+			child.aO5_pageOwner = owner
+			owner.appendChild(child)
+			this.childs.push(child)
+		}
+		InsertBefore = (owner, child, reference) => {
+			child.aO5_pageOwner = owner
+			owner.insertBefore(child, reference)
+			this.childs.push(child)
 		}
 
 		constructor() {
@@ -1336,320 +1810,33 @@ aaa dlassaaa:A olga5_snd:over : a-11_z: loop :  "  sounds + Ceza1-25.mp3"
 		}
 	}
 
-	let nbody = 0
-	if (!wshp[modulname])
-		wshp[modulname] = () => {
-			if (C.consts.o5debug > 0) console.log(` ===  инициализация ${olga5_modul}/${modulname}.js`)
+	let wshp = C.ModulAddSub(olga5_modul, modulname, () => {
+		if (C.consts.o5debug > 0) console.log(` ===  инициализация ${olga5_modul}/${modulname}.js`)
 
-			if (C.consts.o5nomnu > 0)
-				document.body.classList.add('o5nomnu')
+		if (C.consts.o5nomnu > 0)
+			document.body.classList.add('o5nomnu')
 
-			if (C.consts.o5noact > 0) {
-				((C && C.consts.o5debug > 0) ? C.ConsoleError : console.log)
-					("}---> загружено `ядро библиотеки`, но инициализация ОТКЛЮЧЕНА по o5noact= '" + C.consts.o5noact + "'")
-				return
-			}
-
-			if (C.scrpts.length > 0) {
-				Object.assign(C, {
-					page: new Page(),
-					AppendChild: (owner, child) => {
-						child.aO5_pageOwner = owner
-						owner.appendChild(child)
-						if (C.page) C.page.childs.push(child)
-					},
-					InsertBefore: (owner, child, reference) => {
-						child.aO5_pageOwner = owner
-						owner.insertBefore(child, reference)
-						if (C.page) C.page.childs.push(child)
-					}
-				})
-			}
-			else {
-				C.ConsoleError(`IniScripts.js: вообще нет скриптов для обработки`)
-				window.dispatchEvent(new window.Event('olga5_ready'))
-			}
-
-			return true
+		if (C.consts.o5noact > 0) {
+			((C && C.consts.o5debug > 0) ? C.ConsoleError : console.log)("}---> загружено `ядро библиотеки`, но инициализация ОТКЛЮЧЕНА по o5noact= '" + C.consts.o5noact + "'")
+			return
 		}
 
-	if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
-		console.log(`}===< ${document.currentScript.src.indexOf(`/${olga5_modul}.`) > 0 ? 'дозагружен' : 'подключён '}:  ${olga5_modul}/${modulname}.js`)
-})();/* global document, window, console, Map*/
-/* exported olga5_menuPopDn_Click*/
-/*jshint asi:true  */
-/*jshint esversion: 6*/
-/**
- *  сборщик модулей ядра библиотеки
- * 
-**/
-// 
-(function () {              // ---------------------------------------------- o5com ---
-	'use strict'
-	const olga5_modul = "o5com"
-
-	if (!window.olga5) window.olga5 = []
-	if (!window.olga5.C) window.olga5.C = {}
-	if (!window.olga5[olga5_modul]) window.olga5[olga5_modul] = {}
-
-	const modnames = ['CConsole', 'CEncode', 'CApi', 'CParams', 'TagsRef', 'IniScripts'],
-		wshp = window.olga5[olga5_modul],
-		C = window.olga5.C,
-		// wls = window.location.search,
-		// mdebug = wls.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=)(\s*\d*)/),
-		// mtiml = wls.match(/(\&|\?|\s)(is|o5)?(-|_)?timload\s*(\s|$|\?|#|&|=)(\s*\d*)/),
-		IncludeScripts = ({ modul = '', names = [], actscript = C.o5script, iniFun = {}, args = [] }) => {
-			const
-				nams = {},
-				load = { is_set: false, timeout: 0, path: '' },
-				actpath = actscript.src.match(/\S*\//)[0],
-				OnTimer = () => {
-					let s = ''
-					for (const nam in nams)
-						if (!nams[nam]) s += (s ? ', ' : '') + nam
-
-					if (s)
-						console.error(`Для ${modul} недозагрузились скрипты: ${s} (таймер o5timload=${C.consts.o5timload}с.)`)
-					load.timeout = 0
-				},
-				OnLoad = name => {
-					const lefts = []
-					nams[name] = true
-					for (const nam in nams)
-						if (!nams[nam]) lefts.push(nam)
-
-					if (C.consts.o5debug > 1)
-						console.log(`загружено включение '${name}' осталось [${lefts.join(', ')}]`)
-					if (lefts.length == 0) {
-						if (load.timeout > 0) {
-							window.clearTimeout(load.timeout)
-							load.timeout = 0
-						}
-						iniFun(args)
-					}
-				},
-				OnError = (name, e) => {
-					console.error(`Для ${name} ошибка дозагрузки '${name}' (из ${e.target.src})`)
-					// OnLoad(name)
-				}
-
-			for (const name of names) { // в очерёдности размещения	
-				if (!window.olga5[modul]) {
-					C.ConsoleError(`В скрипте, выполняющем дозагрузку скриптов, не создан объект 'window.olga5.${modul}'`)
-					continue
-				}
-				if (!window.olga5[modul][name]) {
-					if (!load.is_set) Object.assign(load, {
-						is_set: true,
-						// path: C.o5scriptPath + modul + '/',
-						path: actpath + modul + '/',
-						timeout: window.setTimeout(OnTimer, 1000 * C.consts.o5timload),
-					})
-					nams[name] = false
-
-					const script = document.createElement('script')
-
-					if (script.readyState) script.onreadystatechange = () => { OnLoad(name); }
-					else script.onload = () => { OnLoad(name); }
-					script.onerror = function (e) { OnError(name, e); }
-
-					script.src = load.path + name + '.js'
-					script.dataset.o5add = modul
-					if (C.consts.o5debug > 0) {
-						const MakeObjName = obj => obj ? (
-							(obj.id && obj.id.length > 0) ? ('#' + obj.id) : (
-								('[' + obj.tagName ? obj.tagName : (obj.nodeName ? obj.nodeName : '?') + ']') +
-								'.' + (obj.className ? obj.className : '?'))) : 'НЕОПР.'
-						console.log(`вставка ${(name + '.js').padEnd(15)}  перед  ${modul + '.js'} (в parentNode=${MakeObjName(actscript.parentNode)})`)
-					}
-
-					if (actscript.parentNode)
-						actscript.parentNode.insertBefore(script, actscript)
-					else // это ватще-то заплатка. по-хорошему надо бы убрать 'actscript' оставив 'module'	
-						for (const scr of document.scripts)
-							if (scr.src.lastIndexOf('/' + modul + '.js') > 0) {
-								scr.parentNode.insertBefore(script, scr)
-								break
-							}
-				}
-			}
-			// console.log('--------------------- load.timeout='+load.timeout)
-			if (!load.timeout) iniFun(args)
-		},
-		RunO5com = () => {
-			const _url_olga5 = C.o5script.src.match(/\S*\//)[0],
-				errs = [],
-				myclr = "background: blue; color: white;border: none;",
-				strt_time = Number(new Date())
-
+		if (C.scrpts.length > 0) {
 			Object.assign(C, {
-				IncludeScripts: IncludeScripts,
+				page: new Page(),
 			})
-
-			for (const modname of modnames) {
-				if (wshp[modname]) wshp[modname](_url_olga5)
-				else
-					errs.push(modname)
-			}
-
-			const dt = ('' + (Number(new Date()) - strt_time)).padStart(4) + ' ms',
-				name = dt + `        ${olga5_modul}`
-
-			if (errs.length > 0)
-				console.error('%c%s', "background: yellow; color: black;border: none;",
-					`Не найдены [${errs.join(', ')}] в ${olga5_modul}.js ( где-то синтаксическая ошибка ?)`)
-			console.log('%c%s', myclr, '---<<<  инициализировано ядро      ' + name)
-		},
-		GetBaseHR = (root) => { // функции определения адреса текущиещей страницы и корня сайна
-			const url = new window.URL(window.location) //"http://rombase.h1n.ru/o5/2020/olga5-all.html")
-			if (root == 'root') return url.origin + '/'
-			else return url.origin + url.pathname.substring(0, url.pathname.lastIndexOf('/') + 1)
-		},
-		TryToDigit = x => {
-			if (typeof x === 'undefined') return true
-			if (x === !!x) return x
-			const val = ('' + x).replace(C.repQuotes, '')
-
-			const i = parseInt(val)
-			if (i == val) return i
-			const f = parseFloat(val)
-			if (f == val) return f
-			const rez = val.replace(/\s*;\s*\n+\s*/g, ';').replace(/\s*\n+\s*/g, ';')
-			return rez.replace(/\t+/g, ' ').trim()
-		},
-		GetAttribute = (attrs, name) => { // нахождение значения 'attr' в массиве атрибутов 'attrs'
-			for (const nam of [name, 'data-' + name, '_' + name, 'data_' + name])
-				if (attrs.hasOwnProperty(nam)) return attrs[nam]
-		},
-		GetAttrs = attributes => {
-			const attrs = {}
-			for (const attribute of attributes)
-				attrs[Repname(attribute.name)] = TryToDigit(attribute.value)
-			return attrs
-		},
-		Repname = name => {
-			return name.trim().replaceAll('-', '_').toLowerCase()
-		},
-		ConstsFillFromUrl = (xs) => {  // параметры адресной строки,- м.б. (т.е. интерпретируются) только константы
-			const hash = window.location.hash
-			if (hash)
-				C.save.hash = hash ? hash.substring(1).trim() : ''
-
-			const smatchs = window.location.search.match(/[?&]\S+?(#|$)/) || []
-			for (const smatch of smatchs) {
-				const match = smatch.replaceAll(/(%20|\s)/g, '').trim()
-				if (match) {
-					const params = match.split(/[,;?&#]/)
-					for (const param of params) {
-						const u = param.trim()
-						if (u.length > 0) {
-							const prms = u.split(/[=:]/),
-								nam = Repname(prms[0])
-							if (C.consts.hasOwnProperty(nam)) {
-								const val = TryToDigit(prms[1])
-								xs[nam] = { val: val, source: C.save.urlName }
-								C.constsurl[nam] = val
-							}
-						}
-					}
-				}
-			}
-		},
-		ParamsFillFromScript = (xs, defs, attrs, p) => {
-			const stradd = '(добавлен)'
-			for (const name in attrs) {
-				const nam = Repname(name)
-				if (defs.hasOwnProperty(nam) && !xs.hasOwnProperty(nam)) {
-					const add = defs.hasOwnProperty(nam) ? '' : stradd
-					xs[nam] = { val: TryToDigit(attrs[name]), source: `атрибут${add}` }
-				}
-			}
-
-			let partype = 'data-o5' + p  // тут в частности o5consts
-			if (!attrs[partype]) partype = 'data_o5' + p
-			if (!attrs[partype]) partype = 'o5' + p
-			if (attrs[partype]) {
-				const params = attrs[partype].split(/[;]/)  // параметры в атрибуте разделяются только ';'
-				for (const param of params) {
-					const u = param.replace(/\s*#.*$/, ''), // trim()
-						i = u.indexOf('=')
-					if (i > 0) {
-						const nam = Repname(u.substring(0, i).trim())
-						if (!xs[nam]) {
-							const add = defs.hasOwnProperty(nam) ? '' : stradd,
-								val = TryToDigit(u.substring(i + 1).trim())
-							xs[nam] = { val: val, source: `параметр${add}` }
-							// console.log(`${nam} = '${val}'`)
-						}
-					}
-				}
-			}
-
-			let n = 0	// подсчет к-ва 'стандартных' параметров
-			for (const nam in defs) {
-				n++
-				if (!xs[nam])
-					xs[nam] = { val: TryToDigit(defs[nam]), source: 'default' }
-			}
-			return n
+			C.E.Init()  // сброс событий
+		}
+		else {
+			C.ConsoleInfo(`IniScripts.js: вообще нет скриптов для обработки`)
+			// window.dispatchEvent(new window.Event('olga5_ready'))
+			C.E.DispatchEvent('olga5_ready')
 		}
 
-	Object.assign(C, {
-		repQuotes: /^\s*((\\')|(\\")|(\\`)|'|"|`)?\s*|\s*((\\')|(\\")|(\\`)|'|"|`)?\s*$/g,
-		olga5ignore: 'olga5-ignore',
-		TryToDigit: TryToDigit,
-		ParamsFillFromScript, 
-		GetAttrs: GetAttrs,
-		GetAttribute: GetAttribute,
-		Repname: Repname,
-		o5script: document.currentScript,
-		o5attrs: GetAttrs(document.currentScript.attributes),
-		cstate: {	 			// общее состояние 
-			activated: false, 	// признак, что было одно из activateEvents = ['click', 'keyup', 'resize']
-			depends: null,  	// только для подключенных скриптов, но с учетом как o5depends, так и очередности в задании и атрибута async
-		},
-		urlrfs: {
-			_url_html: GetBaseHR('href'),
-			_url_root: GetBaseHR('root'),
-			_url_olga5: '' // будет задан при инициализации (document.currentScript.src.match(/\S*\//)[0],)
-		},
-		consts: {
-			o5timload: 3, 	//mtiml ? (mtiml[5] ? mtiml[5] : 1) : (C.o5script.attributes['o5timload'] || 3),
-			o5debug: 0, 	// mdebug ? (mdebug[5] ? mdebug[5] : 1) : (C.o5script.attributes['o5debug'] || 0),
-			o5nomnu: 0, o5noact: 0, o5only: 0,
-			o5incls: '',
-			o5doscr: 'olga5_sdone',
-			o5depends: "pusto; o5pop; o5inc; o5ref= o5inc; o5snd:o5ref, o5inc; o5shp=o5snd, o5ref; o5shp:o5inc; o5inc; o5mnu= o5inc",
-			o5init_events: 'readystatechange:d, message',	// , transitionrun, transitionend
-			o5hide_events: 'transitionrun',	// , transitionrun, transitionend
-			o5done_events: 'beforeunload, olga5_unload',
-		},
-		constsurl: {},
-		save: { hash: null, xs: null, p: '', n1: -1, urlName: 'url', libName: 'ядро', }, // сохранение для "красивой" печати - потом удалю
-	})
+		return true
+	}
+	)
 
-	const xs = {}, // временное хранилилище для считываемых параметров
-		p = 'consts',
-		defs = C[p]
-
-	Object.assign(C.save, { xs: xs, p: p, n1: -1 })
-
-	ConstsFillFromUrl(xs)
-	C.save.n1 = ParamsFillFromScript(xs, defs, C.o5attrs, p)
-
-	for (const nam in xs) defs[nam] = xs[nam].val
-
-	IncludeScripts({ modul: olga5_modul, names: modnames, actscript: C.o5script, iniFun: RunO5com, })
-	if (![0, 1, 2, 3].includes(C.consts.o5debug))
-		C.consts.o5debug = 1
-
-	const activateEvents = ['click', 'keyup', 'resize'],
-		wd = window, // document
-		SetActivated = e => {
-			C.cstate.activated = true
-			activateEvents.forEach(activateEvent => wd.removeEventListener(activateEvent, SetActivated))
-		}
-	activateEvents.forEach(activateEvent => wd.addEventListener(activateEvent, SetActivated))
-
-	console.log(`}+++< загружено ядро библиотеки`)
+	if (wshp.AscInclude)
+		wshp.AscInclude()
 })();

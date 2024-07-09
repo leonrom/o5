@@ -1,3 +1,45 @@
+/*
+    для olga5-all.html
+        olga5-blog.html
+        olga5-inc.html
+        olga5-mnu.html
+        olga5-pop.html
+        olga5-ref.html
+        olga5-snd.html
+
+        addStyles.css
+        olga5/help
+        olga5-tests/
+*/
+
+i[title]:not(.olga5_popup),
+u[title]:not(.olga5_popup),
+b[title]:not(.olga5_popup),
+code[title]:not(.olga5_popup),
+span[title]:not(.olga5_popup) {
+  cursor: help;
+  padding-left: 2px;
+  padding-right: 2px;
+  color: black;
+  font-style: italic;
+
+    background-color: LavenderBlush;
+    border-radius: 6px;
+    padding-bottom: 2px;
+    font-family: sans-serif;
+    font-size: 88%;
+    border: 1px dotted aqua;
+}
+
+i[title].olga5_snd:not(.olga5_popup) ,
+b[title].olga5_snd:not(.olga5_popup) ,
+code[title].olga5_snd:not(.olga5_popup) ,
+span[title].olga5_snd:not(.olga5_popup)  {
+    cursor: pointer;
+    background-color: gold;
+    border: 1px solid darkgray;
+    border-radius: 5px;
+}
 
 .olga5_tableCode {
   height: auto;

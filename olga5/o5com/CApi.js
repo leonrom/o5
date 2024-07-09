@@ -26,7 +26,7 @@
 							let tags = []								
 								
 							// проверяю сам тег 'olga5_start'
-							if (owner.start.matches(nam)) 
+							if (nam && owner.start.matches(nam)) 
 								tags.push(owner.start)
 								
 							if (matches) {

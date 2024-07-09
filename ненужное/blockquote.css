@@ -1,0 +1,67 @@
+/*
+ * ненужные CSS'ы'
+ */
+.blockquote,
+blockquote {
+    box-shadow: 1px 2px 2px rgba(0, 0, 0, 0.2);
+    margin: 6px 5px 28px 16px;
+    padding: 16px 24px;
+    position: relative;
+    font-size: 16px;
+    background: #efefef;
+    color: #000;
+    font-style: italic;
+    width: max-content;
+    max-width: 90%;
+}
+
+.blockquote {
+    margin: 0;
+    padding: 0;
+    padding-left: 16px;
+    margin-left: 16px;
+}
+
+blockquote::before {
+    border: 14px solid transparent;
+    border-top: 14px solid #efefef;
+    border-bottom: 0;
+    height: 0;
+    width: 0;
+    border-top-width: 25px;
+    content: '';
+    display: block;
+    position: absolute;
+    left: 40px;
+    bottom: -25px;
+    transform-origin: center;
+    transform: rotate(90deg) skew(-25deg) translateY(17px);
+}
+
+blockquote cite {
+    position: absolute;
+    bottom: -24px;
+    left: 55px;
+    font-size: 13px;
+    font-style: normal;
+    font-weight: 300;
+    color: #000;
+}
+
+blockquote p {
+    margin: 0 !important;
+}
+
+.olga5_divimg {
+    width: max-content;
+    max-width: 95%;
+    height: 266px;
+    overflow: scroll;
+    margin-left: 33px;
+}
+
+.o_comment {
+    line-height: 0.42cm;
+    margin-bottom: 0cm;
+    font-size: small;
+}

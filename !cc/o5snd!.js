@@ -1,4 +1,4 @@
-/* global window, document, console */
+/* -global window, document, console */
 /*jshint asi:true  */
 /*jshint strict:true  */
 /*jshint esversion: 6 */
@@ -55,7 +55,7 @@
                     AddError: (aO5, mrk, txt) => {
                         if (!aO5.sound.errIs[mrk]) {
                             errTypes.SetT(aO5, mrk, true)
-                            C.ConsoleError(`"${errTypes[mrk]}" (${mrk})` + (txt ? ` ${txt}` : '') + ` для '${aO5.name}'`)
+                            C.ConsoleError(`"${errTypes[mrk]}" (код=${mrk})` + (txt ? ` ${txt}` : '') + ` для '${aO5.name}'`)
 
                             aO5.sound.errIs.errs = true
                             if (!aO5.snd.classList.contains(olga5sndError))
@@ -99,7 +99,7 @@
                                     audio.play()
                                 }
                                 catch (e) {
-                                    console.error(`ошибка воспроизведения:`, e)
+                                    console.error(`ошибка воспроизведения:`, e.message)
                                 }
                             }
                             else
@@ -110,6 +110,8 @@
 
                     if (wshp.actaudio && wshp.actaudio != audio)
                         wshp.StopSound(wshp.actaudio.aO5snd)
+                    
+					window.dispatchEvent(new CustomEvent('olga5_stopPlay', { detail: { tag: wshp.actaudio, type: 'audio(moe)', } }))
 
                     if (audio.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA)
                         Play(aO5)
@@ -146,7 +148,7 @@
                                 type: 'error', Act: (snd, e) => {
                                     const aO5 = snd.aO5snd
                                     errTypes.AddError(aO5, 'неЗагружен',
-                                        `\n(это при audio_play= '${aO5.parms.audio_play}', attrs.aplay= '${aO5.modis.aplay}') `)
+                                        `\n${e.type}: (это при audio_play= '${aO5.parms.audio_play}', attrs.aplay= '${aO5.modis.aplay}') `)
                                 }
                             },
                             {
@@ -202,7 +204,7 @@
                                 aO5 = snd.aO5snd,
                                 sound = aO5.sound
 
-                            if (o5debug > 1) console.log(`${lognam}  CallStartSound() ${aO5.name} '${aO5.sound.state}'  e.type= '${e.type}'`)
+                            // if (o5debug > 1) console.log(`${lognam}  CallStartSound() ${aO5.name} '${aO5.sound.state}'  e.type= '${e.type}'`)
                             Object.assign(aO5.sound, { ison: true, shiftKey: e.shiftKey ? (e.location == 2 ? 1 : -1) : 0 })
 
                             if (e.type == 'mouseenter')
@@ -345,7 +347,7 @@
         )
 
 })();
-/* global window, document, console */
+/* -global window, document, console */
 /*jshint asi:true  */
 /*jshint strict:true  */
 /*jshint esversion: 6 */
@@ -480,7 +482,7 @@
 
                 aO5.waitActivate(snd)
 
-                Object.freeze(aO5.modis)
+                Object.seal(aO5.modis) // м.б. изменено 'none'
                 Object.freeze(aO5.parms)
             }
 
@@ -494,7 +496,8 @@
             */
             const audios = C.GetTagsByTagNames('audio', wshp.W.modul),
                 efirsts = ['mouseenter', 'focusin'],
-                OnPlay = (audio) => {
+                OnPlay = (audio) => {                    
+					window.dispatchEvent(new CustomEvent('olga5_stopPlay', { detail: { tag: audio, type: 'audio(тег)', } }))
                     const a = wshp.actaudio
                     if (a && a != audio)
                         wshp.StopSound(a.aO5snd)
@@ -590,6 +593,9 @@
         },
         StopSound: aO5 => {
             if (o5debug > 1) console.log(`${lognam}  StopSound (${aO5.name})`)
+
+			// тут его НИЗЗЯ ! window.dispatchEvent(new CustomEvent('olga5_stopPlay', { detail: { tag: aO5.audio, type: 'audio', } }))
+
             wshp.actaudio = null
 
             const image = aO5.image,
@@ -609,10 +615,14 @@
         },
     })
 
-
+    window.addEventListener('olga5_stopPlay', e => {
+        if (wshp.actaudio && wshp.actaudio != e.detail.tag)
+            wshp.StopSound(wshp.actaudio.aO5snd)
+        // console.log(act.id, 5, e.detail)
+    })
 
 })();
-/* global window, document, console */
+/* -global window, document, console */
 /*jshint asi:true  */
 /*jshint strict:true  */
 /*jshint esversion: 6 */
@@ -787,7 +797,7 @@
                     else
                         if (btns.stop) SetImgByRef(aO5.snd, btns.stop)
                         else
-                            errs.Add(aO5.name, 'PrepImage()', `тег <img>`, '', `Нет вариантов url'а и отсутствует 'btn_stop'`)
+                            console.error(aO5.name, 'PrepImage()', `тег <img>`, '', `Нет вариантов url'а и отсутствует 'btn_stop'`)
 
                     if (ori.atr == 'data-src' || ori.atr == '_src')
                         snd.removeAttribute(ori.atr)	// чтоб другие модули не повторяли
@@ -806,7 +816,7 @@
         }
         )
 })();
-/* global document, window, console*/
+/* -global document, window*/
 /*jshint asi:true  */
 /*jshint esversion: 6*/
 (function () {              // ---------------------------------------------- o5snd ---
@@ -822,12 +832,12 @@
 				o5shift_speed=0.5 # при Shift - замедлять вдвое;
 				o5return_time=0.3 # при возобновлении "отмотать" 0.3 сек ;
 			`,
-			urlrfs: 'btn_play="", btn_stop=',
+			urlrfs: 'btn_play=""; btn_stop=',
 			incls: {
 				names: ['AO5snd', 'Imgs', 'Prep'],
 				actscript: document.currentScript,
 			}
-		},	
+		},
 		wshp = C.ModulAdd(W),
 		css = {
 			olga5sndError: `olga5-sndError`, olga5sndLoad: `olga5-sndLoad`, olga5sndPause: `olga5-sndPause`,
@@ -887,10 +897,19 @@
 
 		C.ParamsFill(W, o5css)
 
+
+		const excls = document.getElementsByClassName('olga5_snd_none') 
+		for (const excl of excls) {
+			const exs = excl.querySelectorAll('[class *=olga5_snd]')
+			for (const ex of exs)
+				ex.classList.add('olga5-sndNone')
+		}
+
 		const mtags = C.SelectByClassName(W.class, W.modul)
 		wshp.Prep(mtags)
+
 		// window.dispatchEvent(new CustomEvent('olga5_sinit', { detail: { modul: W.modul } }))
-			C.E.DispatchEvent('olga5_sinit', W.modul)
+		C.E.DispatchEvent('olga5_sinit', W.modul)
 	}
 
 })();

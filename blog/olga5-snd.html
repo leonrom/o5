@@ -6,10 +6,10 @@
 	Content-Security-Policy: default-src 'self' example.com *.example.com
 	>
 	<title>olga5-snd</title>
-	<!-- <link rel="shortcut icon" href="+../blog/favicon.svg" type="image/x-icon"> -->
+	<!-- <link rel="shortcut icon" href="./media/favicon.svg" type="image/x-icon"> -->
 	<!-- <script src="https://rombase.h1n.ru/o5/olga5/o5dbg/events.js"></script> -->
 
-    <link href='+../blog/favicon.svg' rel='shortcut icon' type='image/x-icon' />
+    <link href='./media/favicon.svg' rel='shortcut icon' type='image/x-icon' />
 
 	<!-- 
 		src="../o5/olga5/o5.js"
@@ -28,7 +28,7 @@
         " 
 	></script>
 
-	<link data-href="+o5ini.css" media="screen" rel="stylesheet" />
+	<link data-href="+css/o5ini.css" media="screen" rel="stylesheet" />
     
     <script data-src="+ o5inc.js"></script>
     <script data-src="+ o5shp.js"></script>
@@ -55,13 +55,9 @@
 	></script>
     <script data-src="+ add/pusto.js" moe-attr="мой атрибут"></script>
 
-    <link data-href="+../blog/csss/olga5.tableCode.css" media="screen" rel="stylesheet" />
-    <link data-href="+../blog/csss/olga5.textNshow.css" media="screen" rel="stylesheet" />
-    <link data-href="+../blog/csss/olga5.addStyles.css" media="screen" rel="stylesheet" />
-    <link data-href="+../blog/csss/olga5.menuPopDn.css" media="screen" rel="stylesheet" />
-    <link data-href="+../blog/csss/olga5.tableKuplet.css" media="screen" rel="stylesheet" />
-    <link data-href="+../blog/csss/tests.css" media="screen" rel="stylesheet" />
-
+	<link data-href='+../css/olga5-a.css' media='screen' rel='stylesheet' />
+	<link data-href='+../css/olga5-o5.css' media='screen' rel='stylesheet' />
+  
 </head>
 
 <body>
@@ -78,7 +74,7 @@
 		<h3 id='snd_1'>1. Общие сведения</h3>
 		<div>
 			Скрипт <code>o5snd.js</code> входит в <i>библиотеку</i>
-			<span o5popup='+ ./help/o5help.html; width: 430, height: 390'><code>Olga5</code></span>&nbsp;
+			<span o5popup='+ ../help/o5help.html; width: 430, height: 390'><code>Olga5</code></span>&nbsp;
 			и добавляет к использованию стандартного аудиоплейера (тега &lt;<b>audio</b>&gt;) следующие
 			возможности:
 			<ul>

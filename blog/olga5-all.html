@@ -4,17 +4,17 @@
 <head>
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 	<title>olga5-all</title>
-	<!-- <link rel="shortcut icon" href="+../blog/favicon.svg" type="image/x-icon"> -->
+	<!-- <link rel="shortcut icon" href="./media/favicon.svg" type="image/x-icon"> -->
 
-	<link data-href="+../blog/favicon.svg" type="image/x-icon" rel="shortcut icon olga5" />
-	<link data-href='+o5ini.css' media='screen' rel='stylesheet' />
+	<link data-href="./media/favicon.svg" type="image/x-icon" rel="shortcut icon olga5" />
+	<link data-href='../css/o5ini.css' media='screen' rel='stylesheet' />
 
 	<!-- варианты размещения библиотеки
 		src='https://rombase.neocities.org/olga5/o5com!.js'   # 'промышленная' эксплуатация
 		src='https://rombase.h1n.ru/o5/olga5/o5com!.js'       # отладка на моём сервере
 		src='http://localhost/o5/olga5/o5com!.js'             # локальная отладка
 	-->
-	<script src='../olga5/o5.js' o5consts="o5debug='0'; o5nomnu='0'; o5noact='0';" o5urlrfs="
+	<script src='../olga5/o5com.js' o5consts="o5debug='0'; o5nomnu='0'; o5noact='0';" o5urlrfs="
 			тесты='+ ../olga5-tests';
 			блог_o5='https://olga-5.blogspot.com/2020/02';
 			images=_url_olga5 + ../blog/media/image;       
@@ -22,7 +22,7 @@
 			# _url_root='# адрес сайта с текущей страницей';
 			# _url_olga5='# адрес загрузки файла o5com!.js';
 		">
-		</script>
+	</script>
 
 	<script data-src='+o5shp!.js'></script>
 	<script data-src='+o5pop.js'></script>
@@ -38,11 +38,8 @@
 	<script data-src='+o5snd!.js' btn_play='images + /play.png' btn_stop='images + /play_Freepik.png'></script>
 	<script data-src='+add/pusto.js' moe-attr='мой атрибут'></script>
 
-	<link data-href='+../blog/csss/olga5.tableCode.css' media='screen' rel='stylesheet' />
-	<link data-href='+../blog/csss/olga5.textNshow.css' media='screen' rel='stylesheet' />
-	<link data-href='+../blog/csss/olga5.addStyles.css' media='screen' rel='stylesheet' />
-	<link data-href='+../blog/csss/olga5.menuPopDn.css' media='screen' rel='stylesheet' />
-	<link data-href='+../blog/csss/olga5.tableKuplet.css' media='screen' rel='stylesheet' />
+	<link data-href='+../css/olga5-a.css' media='screen' rel='stylesheet' />
+	<link data-href='+../css/olga5-o5.css' media='screen' rel='stylesheet' />
 </head>
 
 <body>
@@ -56,13 +53,14 @@
 
 		<h3 id='head_1'>1. Общие сведения</h3>
 		<p>
-			<span class="olga5_popup" o5popup='+ ./help/o5help.html; width: 555, height: 390'>Библиотека</span>&nbsp;
+			<span class="olga5_popup" o5popup='+ ../help/o5help.html; width: 555, height: 390'>Библиотека</span>&nbsp;
 			расширяет динамические возможности веб-страниц создаваемых в <b>Blogger</b>'е и отдельных HTML-документах.
 		</p>
 		<p>
 			Библиотека <code>Olga5</code> является пятой версией набора <b>js</b>-скриптов, первоначально написанных
 			для технической поддержки лучшего блога изучения турецкого языка
-			<a title="Лучший блог изучения турецкого языка и не только" href="https://turkish4dummies1.blogspot.com/"
+			<a title="Лучший блог изучения турецкого языка и не только" 
+			href="https://turkish4dummies1.blogspot.com/"
 				target="olga5-addPage">"Турецкий язык для (не)особо
 				одаренных"</a>
 			и названа именем его автора, руководившей разработкой всего функционала этой <i>библиотеки</i>.
@@ -102,7 +100,7 @@
 				отображение меню документа;</li>
 			<li><a href="_url_html+/olga5-tab.html" target="olga5-addPage"><code>o5mnu.js</code></a> &mdash;
 				формирование таблиц (тегов &lt;table&gt;);</li>
-			<li><code>o5ini.css</code> &mdash; информирование (миганием тега <b>body</b>) о процессе загрузки модулей.
+			<li><code>css/o5ini.css</code> &mdash; информирование (миганием тега <b>body</b>) о процессе загрузки модулей.
 			</li>
 		</ul>
 		<p>
@@ -143,7 +141,7 @@
 			</li>
 		</ul>
 		<p>Пример подключения (к блогу) всех скриптов со всеми их предопределёнными параметрами можно посмотреть
-			<code class="olga5_popup" onmouseup="window.olga5.PopShow( 555, 555, '+/help/blogger.html')">здесь</code>.
+			<code class="olga5_popup" onmouseup="window.olga5.PopShow( 555, 555, '+ ../help/blogger.html')">здесь</code>.
 		</p>
 
 		<h4 id='head_12'>1.2. Инкапсуляция <b>CSS</b>
@@ -201,7 +199,7 @@
 			Подробное описание этих ссылок приведено
 			<span title="Использование <i>именованных</i> <i>ссылок</i> в библиотеке <code>Olga5</code>"
 				class="olga5_popup"
-				onmouseup="window.olga5.PopShow( 666, 555, '+./help/urlrfs.html?o5nomnu')">здесь</span>.
+				onmouseup="window.olga5.PopShow( 666, 555, '+ ../help/urlrfs.html?o5nomnu')">здесь</span>.
 		</p>
 
 		<h4 id='head_14'>1.4. Системные требования</h4>
@@ -316,9 +314,9 @@
 &lt;head&gt;
   &lt;meta http-equiv="content-type" content="text/html; charset=UTF-8"&gt;
   &lt;title&gt;all2&lt;/title&gt;
-  &lt;link rel="shortcut icon" href="+../blog/favicon.svg" type="image/x-icon"&gt;
+  &lt;link rel="shortcut icon" href="./media/favicon.svg" type="image/x-icon"&gt;
 
-&lt;link href='+<code>o5ini.css</code>' media='screen' rel='stylesheet'/&gt;
+&lt;link href='./media<code>css/o5ini.css</code>' media='screen' rel='stylesheet'/&gt;
 
 &lt;script src='../olga5/<code>o5com!.js</code>' 
     o5consts="o5debug=1;"
@@ -344,10 +342,11 @@
 			</p>
 			Пояснения к (некоторым) строкам файла:
 			<ul>
-				<li><b>&nbsp;&nbsp;6</b> &mdash; первым указан необязательный <b>link</b> на <code>o5ini.css</code>,
+				<li><b>&nbsp;&nbsp;6</b> &mdash; первым указан необязательный <b>link</b> на <code>css/o5ini.css</code>,
 					содержащий описание класса, <span title="на время инициализации">временно</span> подключаемого
 					к тегу <b>body</b> при инициализации страницы для визуальной сигнализации состояния загрузки
-					<i>библиотеки</i>.
+					<i>библиотеки</i>. Этот файл имеет смысл подключать перед самым началом инициализации, поэтому 
+					следует задавать ему конкретный путь (не используя <i>библиотечное</i> переопределение ссылок).
 				</li>
 				<li><b>&nbsp;8</b> &mdash; первым всегда
 					должен быть скрипт ядра библиотеки ( <code>o5com!.js</code> или <code>o5com.js</code>).
@@ -369,7 +368,7 @@
 					Ниже, в п.п 2.2 и 3.2 изложены причины целесообразности такого <i>маскирования</i>
 					при использовании именованных
 					<span class="olga5_popup"
-						onmouseup="window.olga5.PopShow( 666, 555, '+./help/urlrfs.html?o5nomnu#head_1')">ссылок</span>;
+						onmouseup="window.olga5.PopShow( 666, 555, '+ ../help/urlrfs.html?o5nomnu#head_1')">ссылок</span>;
 				</li>
 				<li><b>&nbsp;&nbsp;19</b> &mdash; скрипт имеет атрибут <b>_src</b> чтобы
 					отладчик не 'ругался' на неопределённый (изначально) адрес "+o5shp.js;</li>
@@ -917,7 +916,7 @@
 			<br>
 			<li>декодирование именованных <i title="содержащих символ '+' либо не содержащих ни '.', ни '/'"
 					class="olga5_popup"
-					onmouseup="window.olga5.PopShow( 666, 555, '+./help/urlrfs.html?o5nomnu')">ссылок</i>:
+					onmouseup="window.olga5.PopShow( 666, 555, '+ ../help/urlrfs.html?o5nomnu')">ссылок</i>:
 				<ul>
 					<!-- <li><b>IsUrlNam</b>(u) &mdash; проверка, что адрес (не содержащий символа '<b>+</b>') 
 						является именованной ссылкой,- т.е. не содержит '<b>.</b>', '<b>/</b>' или '<b>#</b>'.
@@ -1225,7 +1224,7 @@
 			Параметры, необходимые для инициализации скриптов, могут, как правило, передаваться
 			через <i>скриптовые атрибуты</i> <b>o5consts</b> и <b>o5urlrfs</b> (а также <b>o5depends</b>),
 			которые могут содержать любое количество (соответственно) модульных <i>констант</i> и именованных
-			<i class="olga5_popup" onmouseup="window.olga5.PopShow( 666, 555, '+./help/urlrfs.html?o5nomnu')">ссылок</i>,
+			<i class="olga5_popup" onmouseup="window.olga5.PopShow( 666, 555, '+ ../help/urlrfs.html?o5nomnu')">ссылок</i>,
 			разделённых символом '<b>;</b>'. Примеры такой передачи параметров показаны в строках 9, 10 и 13 примера
 			<span title="" class="olga5_popup"
 				onmouseup="window.olga5.PopShow( 666, 555, '_url_html+./olga5-all.html?o5nomnu#head_21')">п.
@@ -1452,8 +1451,9 @@
 					<li><span title='записанным(и) после символа ?'>параметром</span> адресной строки.</li>
 				</ul>
 				<p>
-					Подробнее ознакомиться с переопределением (и заданием) констант можно на этом
-					<span o5popup="'тесты+/all0_.html'; width: 533, height: 240; click" )>примере</span>.
+					Подробнее ознакомиться с переопределением (и заданием) констант можно, например, на этом
+					<span o5popup="'тесты+/all0_.html?o5debug'; width: 533, height: 240; click" )>примере</span>
+					(вызывается с ключом отладки <b>o5debug</b>).
 					Для чего раскрыть в системном журнале отладчика сообщения, содержащие текст
 					'<i>... <b>все константы</b> ...</i>' и сравнить их
 					со значениями атрибутов файла примера и вызываемых в нём скриптов
