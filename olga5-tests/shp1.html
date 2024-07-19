@@ -2,7 +2,7 @@
 <html lang="ru">
 
 <head>
-	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<!-- <meta http-equiv="content-type" content="text/html; charset=UTF-8">
 	<title>shp1</title>
 	<link rel="shortcut icon" href="./add/favicon.svg" type="image/x-icon">
 
@@ -10,7 +10,7 @@
 	<script src='./add/alltst.js'></script>
 
 	<script src='../olga5/o5com.js' o5debug=0></script>
-	<script data-src='+./o5shp.js'></script>
+	<script data-src='+./o5shp.js'></script> -->
 </head>
 
 <body id="body">
@@ -21,12 +21,14 @@
 	<div class='example olga5_Start' id="example-1">
 		<div class='cboxed'>
 			<span>видимость</span><br />
-			<input type="checkbox" id="shdwcb" onclick="CC()" title="видимость исходников для объектов 'shp'">shdws:
+			<input type="checkbox" id="shdwcb" onclick="CC()" checked
+			 	title="видимость исходников для объектов 'shp'">shdws:
 			тени<br>
-			<input type="checkbox" id="cartcb" onclick="CC()" checked
-				title="видимость подвисабельных объектов 'shp'">carts: видино<br>
+			<input type="checkbox" id="cartcb" onclick="CC()" 
+				title="видимость подвисабельных объектов 'shp'">clons: видимы<br>
 			<input type="checkbox" id="cartol" onclick="OL(this, 'shp1')" checked
-				title="наличие синих рамок 'outline' вокруг всех 'shp'">с <i>outline</i><br>
+				title="наличие синих рамок 'outline' вокруг всех 'shp'
+				-------  сейчас работает некорректно  ">с <i>outline</i><br>
 			<span>завис.: <b>Где</b>&nbsp;<b>Когда</b></span><br />
 			&nbsp;shp1:
 			&nbsp;<span id="pmark1" class="span-mark" onclick="CC1a(this)"></span>
@@ -86,10 +88,13 @@
 				выполняют сброс <i>подвисания</i> объектов соответствующего <b>level</b>'а.
 			</p>
 			<p>
-				Справа вверху - два <b>CheckBox</b>'а' <i>видимости</i>,
-				позволяющие отображать положение прототипов подвисабельных объектов.
+				Справа вверху - триа <b>CheckBox</b>'а': 
+				2 первых - позволяют изменять <i>видимости</i> объекта и его клона, 
+				а третий - <b>css</b>-свойство <i>outline</i> 
+				(у первого объекта задан <b>outline-offset</b>: 2px;).
 				Остальные опции позволяют (не редактируя данный HTML-файл) изменять характеристики <i>зависания</i>:
 			</p>
+			<u>третий <b>CheckBox</b> сейчас отрабатывает некорректно - позднее м.б. исправлю</u>
 			<ul>
 				<li><b>Где</b> &mdash; место, где будет <i>зависать</i> объект: <b>&#8869;</b> - внизу или
 					<b>&#8868;</b> -
@@ -135,11 +140,11 @@
 				style="text-align: right;margin-bottom: 5px;display: inline-block;background-color: aqua;	padding-left: 3px;padding-right: 3px;">
 				main (с <b>outline-offset</b>: 2px;)
 			</span>
-			<div id="shp1" class="aaa olga5_shp" style="float: none; outline-offset:2px;">
+			<div id="shp1" class="olga5_shp:2" style="float: none; outline-offset:2px;">
 				<p>название объекта</p>
 			</div>
 			<div class="divSmall">пустышка</div>
-
+			
 			<table id="tab2" class="container">
 				<tbody id="tbody2">
 					<tr id="tr2">
@@ -155,14 +160,13 @@
 						</td>
 						<td id="td2" style="width: 100%;">
 							<div id="shp2" class="olga5_shp" olga5_owners="n" style="float: right;">
-								<!-- <div id="shp2" class="olga5_shp" olga5_owners="n" style="float: right;zoom:0.7;"> -->
-								<!-- <div id="shp2" class="olga5_shp" olga5_owners="n" style="float: right;transform: scale(0.7);"> -->
 								<p>название объекта</p>
 							</div>
 						</td>
 					</tr>
 				</tbody>
 			</table>
+<!-- 
 			<div class="divSmall">пустышка</div>
 			<table id="tab3" class="container">
 				<tbody id="tbody3">
@@ -177,7 +181,6 @@
 							</p>
 						</td>
 						<td id="td3" style="width: 100%;">
-							<!-- <div id="shp3" class="olga5_shp" olga5_owners="n" style="float: right;"> -->
 							<div id="shp3" class="olga5_shp:s" style="float: right;margin-right: 5px;">
 								<p>название объекта</p>
 							</div>
@@ -186,8 +189,9 @@
 				</tbody>
 			</table>
 			<div class="divSmall"> пустышка_1 </div>
-			<div class="divSmall" style="color: blue;width: 77%;"> будет &lt;<b>hr</b>&gt; REMO (т.е. 0)</div>
+			<div class="divSmall" style="color: blue;width: 77%;"> будет &lt;<b>hr</b>&gt; REMO (т.е. 0)</div>  
 			<hr class="olga5_shp:Remo" id='remo_0' />
+	
 			<div class="divSmall"> пустышка_2 </div>
 			<div class="divSmall"> пустышка_3 </div>
 			<div class="divSmall"> пустышка_4 </div>
@@ -199,6 +203,12 @@
 			<div class="divSmall" style="color: blue;width: 66%;"> будет &lt;<b>hr</b>&gt; KILL:1 </div>
 			<hr class="olga5_shp:Kill:1" id='kill_1' />
 			<div class="divSmall"> КОНЕЦ </div>
+-->					
+	
+			<div class="divSmall"> пустышка_2 </div>
+			<div class="divSmall"> пустышка_3 </div>
+			<div class="divSmall"> пустышка_4 </div>
+			<div class="divSmall"> пустышка_5 </div>
 		</div>
 	</div>
 

@@ -17,7 +17,7 @@
                 wshp.StopSound(wshp.actaudio.aO5snd)
         },
         TryEncode = (ori, tag) => {
-            const wref = C.DeCodeUrl(wshp.W.urlrfs, ori.url, tag ? tag.aO5snd.o5attrs : '')
+            const wref = C.DeCodeUrl(wshp.W.urlrfs, ori.url, tag ? tag.aO5snd.attrs : '')
             if (wref.err.length > 0)
                 errs.Add(C.MakeObjName(tag), ori.url, "декодир. ссылки", ori.atr, wref.err)
             return wref.url
@@ -133,7 +133,7 @@
 
                 aO5.waitActivate(snd)
 
-                Object.seal(aO5.modis) // м.б. изменено 'none'
+                // Object.seal(aO5.modis) // м.б. изменено 'none'
                 Object.freeze(aO5.parms)
             }
 
@@ -167,7 +167,7 @@
                     audio: audio,
                     sound: { state: wshp.setClass.stop, },
                     name: C.MakeObjName(audio),
-                    o5attrs: C.GetAttrs(audio.attributes),
+                    attrs: C.GetAttrs(audio.attributes),
                 }
 
                 const name = C.MakeObjName(audio),
@@ -231,7 +231,7 @@
         },
         OriForTag: (tag, ref, atnam) => {
             const ori = { url: '', atr: '' },
-                attr = atnam ? C.GetAttribute(tag.aO5snd.o5attrs, atnam) : ''
+                attr = atnam ? C.GetAttribute(tag.aO5snd.attrs, atnam) : ''
             if (attr)
                 Object.assign(ori, { url: attr.value, atr: atnam })
             else

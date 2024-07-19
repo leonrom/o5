@@ -80,56 +80,118 @@
                 }
             }
         },
-        CheckIsUp = (aO5, canPush) => {
-            const
-                allbords = aO5.allbords,
-                level = aO5.cls.level,
+        CutBounds = (aO5) => {
+            const putV = aO5.cls.putV,
+                act = aO5.act,
                 posC = aO5.posC,
-                IsConnect = iO5 => {
-                    const posI = iO5.posW,
-                        clsI = iO5.cls
-                    return (
-                        (posI.left > posC.left && posI.left < posC.right) ||
-                        (posI.right < posC.right && posI.right > posC.left)
-                    ) && (
-                            (clsI.dirV == 'U' && posI.top < posC.bottom) ||
-                            (clsI.dirV == 'D' && posI.bottom > posC.top)
-                        )
-                },
-                DoPush = iO5 => {
-                    /*   
-                        сжимание (при iO5.cls.level <= level)
-                        висит - aO5, а iO5 - подползает
-                    */
-                    const d = iO5.posC.bottom - aO5.posC.top
-                     
-                    if (iO5.cls.pitch == 'P') {
-                        aO5.UnFixV()
-                        aO5.act.pushedBy = iO5
+                top = aO5.located.to.pos.top,
+                bT = (putV == 'T') ? Math.max(aO5.hovered.to.located.to.pos.top, top) : top,
+                bot = aO5.located.bo.pos.bottom,
+                bB = (putV == 'B') ? Math.min(aO5.hovered.bo.located.bo.pos.bottom, bot) : bot,
+                bL = aO5.located.le.pos.left, // эти два - без выпендрёжа
+                bR = aO5.located.ri.pos.right
+
+            if (debugids.includes(aO5.id))
+                if (debugids); // контрольный останов
+            if (bT > bB || bL >= bR) {
+                // if (act.wasClick && act.dspl)
+                //     aO5.SetClick(false)
+                // aO5.Hide()
+            } else {
+                // if (aO5.fix.putV) 
+                {
+                    if (posC.top < bT) {
+                        const d = bT - posC.top
+                        if (posC.height <= d) aO5.Hide()
+                        else {
+                            posC.top = bT
+                            posC.height -= d
+                            aO5.posS.top -= d
+                        }
                     }
-                    else {
-                        aO5.posC.height -= d
-                        if (iO5.cls.pitch == 'S') aO5.shp.style.top = -d + 'px'
+                    if (act.dspl && posC.top + posC.height > bB) {
+                        if (posC.top >= bB) aO5.Hide()
+                        else posC.height -= posC.top + posC.height - bB
                     }
                 }
-
-            for (const bord of allbords) {
-                const iO5s = bord.pO5.aO5s
-
-                for (const iO5 of iO5s)
-                    if ((iO5.cls.alive || !iO5.act.isKilled) &&
-                        iO5 !== aO5 && !iO5.act.checkup &&           // && iO5.act.checkStep !== checkStep
-                        (iO5.cls.putV === 'T' && (iO5.cls.dirV === 'U' || iO5.cls.remo)) // лепим только движущиеся вверх !!
-                    )
-                        if (IsConnect(iO5)) {
-                            if (canPush && iO5.cls.level <= level) {
-                                DoPush(iO5)
-                                break       // достаточно сдвига от самого верхнего         
-                            }
-
-                            if (!canPush && iO5.cls.level > level)
-                                iO5.DoFixV(aO5)
+                if (act.dspl && bL > posC.left) {
+                    const d = bL - posC.left
+                    if (d >= posC.width) aO5.Hide()
+                    else {
+                        posC.left = bL
+                        posC.width -= d
+                        aO5.posS.left -= d
+                    }
+                }
+                if (posC.left + posC.width > bR) {
+                    if (posC.left >= bR) aO5.Hide()
+                    else
+                        posC.width -= (posC.left + posC.width - bR)
+                }
+            }
+        },
+        CheckIsUp = function (k, aO5s) {
+            const aO5 = aO5s[k],
+                cls = aO5.cls,
+                posC = aO5.posC,
+                minIndex = aO5s[0].cls.zIndex - 1,
+                HideByO5 = (iO5) => {
+                    iO5.Hide()  // iO5.act.dspl = false
+                    iO5.act.pushedBy = aO5
+                    iO5.cart.style.zIndex = minIndex
+                }
+            let i = k
+            while (--i >= 0) {
+                const iO5 = aO5s[i],
+                    iposC = iO5.posC,
+                    iposS = iO5.posS
+                if ( cls.putV != iO5.cls.putV || posC.left + posC.width < iposC.left || posC.left > iposC.left + iposC.width || !iO5.act.dspl) 
+                    continue
+                if (cls.putV == 'T') {
+                    const d = iO5.posC.top + iO5.posC.height - posC.top
+                    if (cls.dirV == 'U' || cls.remo) { //только при движении вверх
+                        if (d > 0) {
+                            if (cls.level <= iO5.cls.level) {
+                                if (cls.pitch == 'P' || iposC.height <= d) HideByO5(iO5)
+                                else
+                                    if (cls.pitch == 'S') {
+                                        iposC.height -= d
+                                        iposS.top = -d
+                                    }
+                                    else
+                                        if (cls.pitch == 'C') {
+                                            iposC.height -= d
+                                            // iposS.height = -d
+                                        }
+                            } else
+                                if (cls.dirV == 'U')
+                                    aO5.DoFixV(iO5)
                         }
+                    } else
+                        if (cls.dirV == 'D') // никаких просто else - всегда проверять!
+                            if (posC.top + posC.height > aO5.located.bo.pos.bottom) {
+                                if (cls.level <= iO5.cls.level) iO5.Hide()  // iO5.act.dspl = false
+                                else aO5.DoFixV(iO5)
+                            }
+                } else {//                    if (cls.putV == 'B') { // можно и не проверять,                    
+                    const posW = aO5.posW
+                    if (cls.dirV == 'U' && posW.top < aO5.hovered.to.pos.top) {
+                        if (cls.level <= iO5.cls.level) HideByO5(iO5)
+                        else aO5.DoFixV(iO5)
+                    } else {
+                        const b = aO5.hovered.bo.pos.bottom
+                        if (cls.dirV == 'D' && posW.top < b) {
+                            if (cls.pitch == 'P' || posW.top + posW.height <= 1 + b) HideByO5(iO5)
+                            else {
+                                if (cls.pitch == 'S' || cls.pitch == 'C') {
+                                    iposC.height = iO5.posW.height - (b - posW.top)
+                                    if (iposC.height <= 1) iO5.Hide()  // iO5.act.dspl = false
+                                } else
+                                    if (posW.top + posW.height <= b) aO5.DoFixV(iO5)
+                            }
+                        }
+                    }
+                }
             }
         },
         Scroll = aO5s => {
@@ -145,104 +207,94 @@
 
                 CalcParentsLocates(aO5) // пересчитываются размеры всех предков-контейнеров        
                 PrepareBords(aO5)       // обределение минимальных границ контейнеров (родвисания и владения)
-
-                const act = aO5.act,
-                    posW = aO5.posW
-
+                
                 const b = aO5.shdw.getBoundingClientRect() // д.б. ОТДЕЛЬНО - текущее положение объекта или его клона
-                Object.assign(posW, { top: b.top, left: b.left, height: b.height, width: b.width, right: b.right, bottom: b.bottom })
-
-                if (act.isFixed) {
+                Object.assign(aO5.posW, { top: b.top, left: b.left, height: b.height, width: b.width, right:b.right, bottom:b.bottom })
+                if (aO5.id==='shp1')
+                console.log('t='+parseInt(b.top), 'h='+parseInt(b.height))
+                if (aO5.act.isFixed) {
                     const c = aO5.cart.getBoundingClientRect() // д.б. ОТДЕЛЬНО - текущее положение объекта или его клона
-                    Object.assign(aO5.posC, { top: c.top, left: c.left, height: c.height, width: c.width, right: c.right, bottom: c.bottom })
-                } else
+                    Object.assign(aO5.posC, { top: c.top, left: c.left, height: c.height, width: c.width, right:c.right, bottom:c.bottom })
+                }else
                     Object.assign(aO5.posC, aO5.posW)
-
-                const pos = aO5.located.to.pos
-                // обнуление Kill'еров
-                Object.assign(act, { doKill: false, checkup: false, checkStep: 0, })
-
-                // обределение видимости клона (или объекта)              
-                Object.assign(act.visi, {
-                    part: posW.top <= pos.bottom && posW.bottom >= pos.top,
-                    full: posW.top >= pos.top && posW.bottom <= pos.bottom
-                })
             }
 
-            /*
-                установка подверженности  Kill'ерам на границах всех 'владельцев'
-            */
+            const
+                Visi = aO5 => {
+                    const located = aO5.located,
+                        pos = located.to.pos,
+                        posW = aO5.posW
+                    return {
+                        part: posW.top <= pos.bottom && posW.bottom >= pos.top,
+                        full: posW.top >= pos.top && posW.bottom <= pos.bottom
+                    }
+                }
+
             for (const aO5 of aO5s) {
-                const vpart = aO5.act.visi.part
+                aO5.act.doKill = false
+                aO5.act.checkB = false
+            }
 
-                if (aO5.cls.kill && vpart) {        //  если Kill'ер частично видим
+            for (const aO5 of aO5s) {
+                const visi = Visi(aO5)
+
+                if (aO5.cls.kill && visi.part != aO5.act.visible) {
                     const allbords = aO5.allbords
-
                     for (const bord of allbords) {
                         const iO5s = bord.pO5.aO5s
                         for (const iO5 of iO5s)
                             if (iO5 !== aO5)
-                                iO5.act.doKill = true
+                                iO5.act.doKill ||= visi.part
                     }
                 }
             }
 
             for (const aO5 of aO5s) {
-                const posW = aO5.posW,
+                const visi = Visi(aO5),
+                    posW = aO5.posW,
                     act = aO5.act
 
-                if (act.visi.full) {        // очистка при полном появлении
+                if (visi.full) {
                     act.isKilled = false
-                    act.pushedBy = null
+                    act.pushedBy = false
                     act.underClick = false
-                    if (aO5.act.isFixed)
+                    if (aO5.act.isFixed) 
                         aO5.UnFixV()
                 } else {
                     const cls = aO5.cls
 
-                    if ((act.visi.part || act.isFixed) &&
+                    if ((visi.part || act.isFixed) &&
                         !(act.underClick || act.pushedBy)
                         && ((cls.dirV == 'U' && posW.top < aO5.hovered.to.pos.top && aO5.located.to.pos.top <= aO5.hovered.to.pos.top)
                             || (cls.dirV == 'D' && posW.bottom < aO5.hovered.bo.pos.bottom)
                         )
-                    ) {     // виксация подвисания если не было
+                    ) {
                         if (act.doKill) {
                             act.isKilled = true
-                            if (aO5.act.isFixed)
-                                aO5.UnFixV()
+                            if (aO5.act.isFixed) 
+                                            aO5.UnFixV()
                         }
                         else
-                            if (cls.alive || !act.isKilled) {
+                            if (cls.alive || !act.isKilled)
                                 aO5.DoFixV()
-                                CheckIsUp(aO5, true)    // те, которые могут выталкивать
-                                CheckIsUp(aO5)          // те, которые могут прилипать
-                            }
                     }
                 }
             }
 
-            /*
-                проверка и фиксация 'наезда' остальных на уже зафиксированные
-            
-            let n = 1,
-                checkStep = 0
+            let n = 1
             while (n > 0) {
                 n = 0
-                checkStep++
                 for (const aO5 of aO5s)
-                    if (aO5.act.isFixed && !aO5.act.checkup && aO5.act.checkStep !== checkStep) {
+                    if (aO5.act.isFixed && !aO5.act.checkB) {
                         const allbords = aO5.allbords,
                             posC = aO5.posC
 
                         for (const bord of allbords) {
                             const iO5s = bord.pO5.aO5s
                             for (const iO5 of iO5s)
-                                if (iO5 !== aO5 && !iO5.act.checkup && iO5.act.checkStep !== checkStep &&
-                                    (iO5.cls.alive || !iO5.act.isKilled)
-                                ) {
+                                if (iO5 !== aO5 && (iO5.cls.alive || !iO5.act.isKilled)) {
                                     const posI = iO5.posW,
                                         clsI = iO5.cls
-
                                     if ((
                                         (posI.left > posC.left && posI.left < posC.right) ||
                                         (posI.right < posC.right && posI.right > posC.left)
@@ -252,15 +304,14 @@
                                         )
                                     ) {
                                         iO5.DoFixV(aO5)
-                                        iO5.act.checkStep = checkStep
                                         n++
                                     }
                                 }
                         }
-                        aO5.act.checkup = true // чтобы к ЭТОМУ уже не "лепились"
+                        aO5.act.checkB = true // чтобы к ЭТОМУ уже не "лепились"
                     }
             }
-            */
+
 
             // let k2 = -1,
             //     onscr = true

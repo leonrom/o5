@@ -166,12 +166,8 @@ div.olga5_shp {
     outline-style: solid;
     outline-color: blue;
     /* outline: solid 9px blue; */
-	width: 250px;
+	width: 270px;
     height: 60px;
-    /* padding: 9px;
-    padding-top: 2px !important;
-    margin-top: 11px;
-    margin-left: 10px; */
 }
 
 .olga5_shp.container {
@@ -285,4 +281,9 @@ div.olga5_shp {
   /* vertical-align: super; */
   font-size: large;
   padding-top: 5px;
+}
+
+#main .olga5_shp{
+    width: 260px;
+    padding-left: 4px;
 }

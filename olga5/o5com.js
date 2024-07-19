@@ -14,9 +14,10 @@
 				console.error("%c%s", "background: yellow; color: black;border: solid 1px gold;", 'E: ' + err)
 			},
 			Msg: (txt, eve, nFun) => {
-				if (C.consts.o5debug > 0) {
+				if (C.consts.o5debug > 1) {
 					console.groupCollapsed("%c%s", "background: lightblue; color: black;border: solid 1px gold;",
-						`${txt} для eve='${eve}'\n ф-ии "${nFun}"`)
+						`${txt} для eve='${eve}'`)
+					console.log(`для вызова:\n${nFun}`)
 					console.trace()
 					console.groupEnd()
 				}

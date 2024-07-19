@@ -133,6 +133,9 @@
     - mouseover   отправляется в самый глубокий элемент дерева DOM, затем оно всплывает в иерархии
                 */
                 eFocus = ['mouseenter', 'focus'],
+                eBlurs = ['mouseleave', 'blur'],
+                // eFocus = ['pointerenter', 'focus'],
+                // eBlurs = ['pointerleave', 'blur'],
                 Activate = e => {
                     const snd = GetTargetObj(e),
                         aO5 = snd.aO5snd,
@@ -207,15 +210,7 @@
                             // if (o5debug > 1) console.log(`${lognam}  CallStartSound() ${aO5.name} '${aO5.sound.state}'  e.type= '${e.type}'`)
                             Object.assign(aO5.sound, { ison: true, shiftKey: e.shiftKey ? (e.location == 2 ? 1 : -1) : 0 })
 
-                            if (e.type == 'mouseenter')
-                                switch (sound.state) {
-                                    case ss.pause: sound.audio.play()
-                                        break
-                                    case ss.stop: if (aO5.modis.over) StartSound(aO5)
-                                        break
-                                    default: return
-                                }
-                            else if (e.type == 'click') {
+                            if (e.type == 'click') {
                                 const isA = snd.tagName.toUpperCase() == 'A'
                                 switch (sound.state) {
                                     case ss.pause:
@@ -235,12 +230,21 @@
                                 if (isA)
                                     return StopBubble(e)
                             }
+                            else
+                                if (eFocus.includes(e.type))
+                                    switch (sound.state) {
+                                        case ss.pause: sound.audio.play()
+                                            break
+                                        case ss.stop: if (aO5.modis.over) StartSound(aO5)
+                                            break
+                                        default: return
+                                    }
                         },
                         CallStopSound = e => {
                             const snd = GetTargetObj(e),
                                 aO5 = snd.aO5snd
 
-                            if (e.type == 'mouseleave') {
+                            if (eBlurs.includes(e.type)) {
                                 aO5.sound.ison = false
                             }
                             if (aO5.sound.state != ss.stop &&
@@ -266,7 +270,8 @@
                             }
                         },
                         SetEventListeners = snd => {
-                            snd.addEventListener('mouseleave', CallStopSound, { capture: true })
+                            for (const eBlur of eBlurs)
+                                snd.addEventListener(eBlur, CallStopSound, { capture: true })
                             snd.addEventListener('keydown', DoKeyDown, { capture: true })
                             snd.addEventListener('click', CallStartSound, { capture: true })
                             if (snd.aO5snd.modis.over)
@@ -294,7 +299,8 @@
                         else
                             aO5.image.play = aO5.image.stop
 
-                    snd.addEventListener('mouseenter', CallStartSound, { capture: true })
+                    for (const eFocu of eFocus)                    
+                        snd.addEventListener(eFocu, CallStartSound, { capture: true })
                     SetEventListeners(snd)
 
                 },
@@ -309,6 +315,7 @@
                     snd.aO5snd.modis.activated = true
                     for (const eWait of eFocus)
                         snd.addEventListener(eWait, Activate, { capture: true })
+                    // snd.addEventListener('keydown', DoKeyDown, { capture: true })
                 }
 
             class AO5snd {
@@ -317,7 +324,7 @@
                     aO5.snd = snd
                     aO5.title = snd.title
                     aO5.name = C.MakeObjName(snd)
-                    aO5.o5attrs = C.GetAttrs(snd.attributes)
+                    aO5.attrs = C.GetAttrs(snd.attributes)
                     aO5.srcAtr = snd.hasAttribute('href') ? 'href' : (snd.hasAttribute('src') ? 'src' : '')
 
                     for (const errType in errTypes)
@@ -327,6 +334,7 @@
                     Object.seal(aO5.parms)  // -"-
                     Object.seal(aO5.sound)	// не замораживается 
                     Object.seal(aO5.image)	// -"-
+                    Object.seal(aO5.modis)  //  -"-
                     Object.freeze(aO5)
 
                     if (snd.tagName.match(/img/i))
@@ -335,7 +343,7 @@
                     snd.aO5snd = aO5
                 }
 
-                snd = null; title = ''; name = ''; o5attrs = null; srcAtr = null;
+                // snd = null; title = ''; name = ''; o5attrs = null; srcAtr = null;
 
                 modis = { over: false, alive: false, loop: snd.getAttribute('loop'), aplay: '', dspl: snd.style.display, none: false, activated: false }
                 sound = { audio: null, errIs: { errs: false, }, state: ss.stop, eventsAreSet: false, ison: false, shiftKey: 0 }
@@ -344,7 +352,7 @@
 
                 // для доступа из o5snd
                 waitActivate = snd => WaitActivate(snd)
-                asdf=1
+                asdf = 1
             }
             return new AO5snd(snd)
 

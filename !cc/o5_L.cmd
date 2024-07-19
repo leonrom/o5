@@ -7,10 +7,10 @@ cat o5com.js \
 cat o5snd/AO5snd.js o5snd/Prep.js o5snd/Imgs.js o5snd.js \
   > ../!cc/o5snd!.js        2>>../!cc/o5.log
   
-cat o5shp/MakeAO5.js o5shp/DoInit.js o5shp/DoResize.js o5shp/DoScroll.js o5shp.js \
+cat o5shp/AO5shp.js o5shp/PO5shp.js o5shp/DoInit.js o5shp/DoResize.js o5shp/DoScroll.js o5shp.js \
   > ../!cc/o5shp!.js        2>>../!cc/o5.log
 
-cat o5dbg/events.js o5dbg/logs.js o5dbg/pos.js o5dbg.js \
+cat o5dbg/Events.js o5dbg/Logs.js o5dbg/Pos.js o5dbg/Ccss.js o5dbg/Utils.js o5dbg.js \
   > ../!cc/o5dbg!.js        2>>../!cc/o5.log
 
 cat o5inc.js o5tab.js o5pop.js o5mnu.js \

@@ -593,7 +593,6 @@
         modulname = 'DoResize',
         C = window.olga5.C,
         errs = [],
-        MyRound = (s) => { return Math.round(parseFloat(s)) },
         IsInClass = (classList, clss) => {
             for (const cls of clss)
                 if (cls !== '' && !classList.contains(cls)) return false

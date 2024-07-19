@@ -298,10 +298,10 @@
 				` ${C.avtonom ? ('автономно по ' + e.type) : 'из библиотеки'} `)
 			_div.style.display = 'none'
 			_div.id = 'moe'
-			if (C.consts.o5debug > 1) {
-				_div.title = "моя копия: чтобы посмотреть, чего загрузили"
-				document.body.appendChild(_div)
-			}
+			// if (C.consts.o5debug > 1) {
+			// 	_div.title = "моя копия: чтобы посмотреть, чего загрузили"
+			// 	document.body.appendChild(_div)
+			// }
 		}
 		if (C.ParamsFill)
 			C.ParamsFill(W)

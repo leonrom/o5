@@ -101,6 +101,7 @@ function shpX_BordNames() {
                         ':<b>' + cls.dirV + '</b>' + dirput[cls.dirV] +
                         ':<b>' + cls.putV + '</b>' + dirput[cls.putV] +
                         ':<b>' + cls.pitch + '</b>' + pitches[cls.pitch] +
+                        ':<b>' + cls.level + '</b>' + 
                         '<br/>&nbsp;olga5_frames= ' + aO5.hovered.attr +
                         '<br/>&nbsp;olga5_owners= ' + aO5.located.attr +
                         '<br/>f: ' + Sid('t', f.to) + Sid('b', f.bo) + Sid('l', f.le) + Sid('r', f.ri) +
@@ -118,14 +119,39 @@ function shpX_BordNames() {
     }
 }
 
+function ShowCarcCB(){
+    const 
+        cartcb = document.getElementById('cartcb'),
+        clons = document.getElementsByClassName('olga5-clon')
+    let txt='не видны'
+
+    cartcb.style.opacity = 0.11
+    if (clons && clons.length>0){
+        let display=false
+        for (const clon of clons) 
+            if (clon.style.display !=='none'){
+                display=true
+                break
+            }
+        if (display){
+            cartcb.style.opacity = 1
+            txt='видны'
+        }
+    }
+    else
+        txt='еще нету'
+    cartcb.nextSibling.nodeValue = 'clons: ' + txt
+}
+
 function CC() {
     "use strict";
-    const shdwcb = document.getElementById('shdwcb'),
+    const 
+        shdwcb = document.getElementById('shdwcb'),
         cartcb = document.getElementById('cartcb'),
         cartc0 = document.getElementById('cartc0'),
         cartc1 = document.getElementById('cartc1'),
-        shdws = document.getElementsByClassName('olga5_shp olga5-ignore'),
-        carts = document.getElementsByClassName('olga5-cart'),
+        shps = document.getElementsByClassName('olga5_shp'),
+        clons = document.getElementsByClassName('olga5-clon'),
         SetOpacity = (shps, val, o) => {
             for (const shp of shps) {
                 shp.style.opacity = val ? 1 : o
@@ -136,10 +162,10 @@ function CC() {
             cart.style.opacity = val ? 1 : o
             return val ? 'видно' : 'тени'
         }
-    if (shdws && shdwcb) shdwcb.nextSibling.nodeValue = 'shdws: ' + SetOpacity(shdws, shdwcb.checked, 0.22)
-    if (carts && cartcb) cartcb.nextSibling.nodeValue = 'carts: ' + SetOpacity(carts, cartcb.checked, 0.11)
-    if (cartc0) cartc0.nextSibling.nodeValue = 'cart0: ' + SetOpacit2(carts[0], cartc0.checked, 0.11)
-    if (cartc1) cartc1.nextSibling.nodeValue = 'cart1: ' + SetOpacit2(carts[1], cartc1.checked, 0.11)
+    if (shps && shdwcb) shdwcb.nextSibling.nodeValue = 'shps : ' + SetOpacity(shps, shdwcb.checked, 0.22)
+    if (clons && cartcb) cartcb.nextSibling.nodeValue = 'clons: ' + SetOpacity(clons, cartcb.checked, 0.11)
+    if (cartc0) cartc0.nextSibling.nodeValue = 'cart0: ' + SetOpacit2(clons[0], cartc0.checked, 0.11)
+    if (cartc1) cartc1.nextSibling.nodeValue = 'cart1: ' + SetOpacit2(clons[1], cartc1.checked, 0.11)
 }
 
 const outlin = { e: '', eOffset: '' }
@@ -276,7 +302,7 @@ function CC1(cb) {
             if (level && level == cb) {
                 cls.level = level.value
             }
-            shp.aO5shp.act.wasClick = false
+// ??            shp.aO5shp.act.wasClick = false
         } else {
             if (level) level.value = cls.level
             if (alive) alive.checked = cls.alive
@@ -407,16 +433,19 @@ function Init0() {
         // shpX_BordNames()
         shpX_SetWindow(599, 411)
         window.scrollTo(0, 99)
+        
         StartBordNames()
+        ShowCarcCB()
     }
     window.olga5.C.E.AddEventListener('olga5_ready', Init0i)
+    window.olga5.C.E.AddEventListener('olga5_fix-act', ShowCarcCB)   
 }
 
 function Init1() {
     "use strict";
     if (!IsInitEvents()) return
     const Init1i = () => {
-        console.log('Init2() --------------')
+        console.log('Init1() --------------')
 
         for (let i = 0; i < 3; i++) {
             const cb = document.getElementById('pshp' + (i + 1))
@@ -431,9 +460,11 @@ function Init1() {
         window.scrollTo(0, 233)
 
         StartBordNames()
+        ShowCarcCB()
     }
     // window.aaddEventListener('olga5_ready', Init)
     window.olga5.C.E.AddEventListener('olga5_ready', Init1i)
+    window.olga5.C.E.AddEventListener('olga5_fix-act', ShowCarcCB)
 }
 
 function Init2() {

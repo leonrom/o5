@@ -50,7 +50,8 @@
 		Object.assign(C, {
 			owners: [],
 			scrpts: [],
-			Match: Match,
+			Match: Match,			
+			MyRound: s => { return Math.round(parseFloat(s)) },
 			MakeObjName: function (obj, len) { // моё формирование имени объекта
 				if (obj) {
 					const nam = Object.is(obj, window) ? '#window' : (

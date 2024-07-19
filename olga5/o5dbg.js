@@ -34,12 +34,13 @@
 	else {
 		const
 			o5load = actscript.attributes['o5load'],
-			nms = !o5load ? 'CELP' : o5load.toUpperCase(),
-			names = W.incls.names
-		if (nms.includes('C')) names.push('Ccss')
-		if (nms.includes('E')) names.push('Events')
-		if (nms.includes('L')) names.push('Logs')
-		if (nms.includes('P')) names.push('pos')
+			nms = !o5load ? 'CELP' : o5load.toUpperCase()
+			
+		if (nms.includes('C')) W.incls.names.push('Ccss')
+		if (nms.includes('E')) W.incls.names.push('Events')
+		if (nms.includes('L')) W.incls.names.push('Logs')
+		if (nms.includes('P')) W.incls.names.push('Pos')
+		if (nms.includes('U')) W.incls.names.push('Utils')
 	}
 	wshp = C.ModulAdd(W)
 })();

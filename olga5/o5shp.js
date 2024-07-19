@@ -17,32 +17,31 @@
                 olga5_owners='b';
 			`,
 			incls: {
-				names: ['DoScroll', 'DoResize', 'MakeAO5', 'DoInit'],
+				names: ['DoScroll', 'DoResize', 'AO5shp', 'PO5shp', 'DoInit'],
 				actscript: document.currentScript,
 			},
 		},
-		olga5cart = 'olga5-cart',
-		// olga5ifix = 'olga5-ifix',
 		o5css = `
-.${olga5cart} {
-    position : fixed;
-    overflow : hidden;
-    background-color : transparent;
-    direction : ltr; // эти 4 д.б. тут чтобы "перебить" из shp
-	opacity: 0;  // это только вначале
-	cursor: pointer;
-}`,
+			.olga5-clon {
+				opacity: 0;
+			}
+			.olga5-cart {
+				cursor: pointer;
+                position: fixed;
+				overflow: hidden;
+			}
+		`,
 		LastDoResize = () => {
 			// if (window.olga5.o5shp && window.olga5.o5shp.DoResize)
 			window.olga5.o5shp.DoResize('по olga5_ready')
 		}
 
 	function ShpInit() {
-
 		C.E.AddEventListener('olga5_ready', () => {
 			window.setTimeout(LastDoResize, 1)
 		})
 
+		// C.ParamsFill(W)
 		C.ParamsFill(W, o5css)
 
 		const excls = document.getElementsByClassName('olga5_shp_none') 
@@ -53,7 +52,7 @@
 		}
 
 		window.olga5[W.modul].DoInit()
-
+		
 		C.E.DispatchEvent('olga5_sinit', W.modul)
 
 		window.olga5[W.modul].activated = false 	// признак, что было одно из activateEvents 
@@ -66,6 +65,6 @@
 		activateEvents.forEach(activateEvent => wd.addEventListener(activateEvent, SetActivated))
 	}
 
-	// C.ModulAdd(W, { olga5cart: olga5cart, olga5ifix: olga5ifix, })	
-	C.ModulAdd(W, { olga5cart: olga5cart, })
+	C.ModulAdd(W, {})
+	// C.ModulAdd(W, { olga5cart: olga5cart, })
 })();

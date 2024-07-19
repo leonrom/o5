@@ -5,11 +5,11 @@ type o5com.js ^
      o5com\TagsRef.js o5com\IniScripts.js ^
    > o5com!.js  2> o5.log
 
-type o5shp\AO5shp.js o5shp\DoInit.js o5shp\DoResize.js o5shp\DoScroll.js ^
+type o5shp\AO5shp.js o5shp\PO5shp.js o5shp\DoInit.js o5shp\DoResize.js o5shp\DoScroll.js ^
      o5shp.js ^
    > o5shp!.js  2>>o5.log
 
-type o5snd\MakeAO5.js o5snd\Prep.js o5snd\Imgs.js ^
+type o5snd\cAO5.js o5snd\Prep.js o5snd\Imgs.js ^
      o5snd.js ^
    > o5snd!.js  2>>o5.log
 
