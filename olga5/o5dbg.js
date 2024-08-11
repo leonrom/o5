@@ -22,25 +22,26 @@
 		if (wshp.Pos) wshp.Pos()
 		if (wshp.Ccss) wshp.Ccss()
 		if (wshp.Logs) wshp.Logs()
+		if (wshp.Utils) wshp.Utils()
 		if (wshp.Events) wshp.Events()
-		
+
 		window.dispatchEvent(new CustomEvent('olga5_sinit', { detail: { modul: W.modul } }))
 
 	}
-	if (C.consts.o5no_mnu || C.consts.o5no_act)
+	if (C.consts.o5nomnu || C.consts.o5noact)
 		console.error(`DbgInit не выполняется, т.к. задано:` +
-			C.consts.o5no_mnu ? `  o5no_mnu=${C.consts.o5no_mnu}` : '' +
-				C.consts.o5no_act ? `  o5no_act=${C.consts.o5no_act}` : '')
+			C.consts.o5nomnu ? `  o5nomnu=${C.consts.o5nomnu}` : '' +
+				C.consts.o5noact ? `  o5noact=${C.consts.o5noact}` : '')
 	else {
 		const
 			o5load = actscript.attributes['o5load'],
-			nms = !o5load ? 'CELP' : o5load.toUpperCase()
-			
-		if (nms.includes('C')) W.incls.names.push('Ccss')
-		if (nms.includes('E')) W.incls.names.push('Events')
-		if (nms.includes('L')) W.incls.names.push('Logs')
+			nms = o5load ? o5load.value.toUpperCase() : 'U'
+
 		if (nms.includes('P')) W.incls.names.push('Pos')
+		if (nms.includes('C')) W.incls.names.push('Ccss')
+		if (nms.includes('L')) W.incls.names.push('Logs')
 		if (nms.includes('U')) W.incls.names.push('Utils')
+		if (nms.includes('E')) W.incls.names.push('Events')
 	}
 	wshp = C.ModulAdd(W)
 })();

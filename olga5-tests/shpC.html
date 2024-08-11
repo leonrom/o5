@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<title>shpC</title>
+	<link rel="shortcut icon" href="./add/favicon.svg" type="image/x-icon">
+	<!-- 
+	<link href='./add/alltst.css' media='screen' rel='stylesheet' />
+	<script src='./add/alltst.js'></script> -->
+
+	<script src='../olga5/o5com.js' o5debug=0></script>
+	<script data-src='+./o5shp.js'></script>
+</head>
+
+<body id="body" class='olga5_Start' style="margin: 0;">
+	<script>
+		let oldname = '',
+			oldakey = ''
+		const
+			List = e => {
+				const log = document.getElementById('log'),
+					aO5 = e.detail.aO5,
+					akey = e.detail.akey,
+					blngs = aO5[akey]
+
+				if (oldname !== aO5.name) {
+					oldname = aO5.name
+					log.innerHTML += '<span class="span1">' +
+						`<b>${aO5.name.padEnd(3, ' ')}</b>` +
+						'</span><br/>'
+				}
+				for (const blng of blngs) {
+					let u = ''
+					if (oldakey !== akey) {
+						oldakey = akey
+						u = akey
+					}
+					if (blng.typ === 'N')
+						console.log()
+					log.innerHTML += '<span class="span2">' +
+						`${u.padEnd(8, '.')} ::  ` +
+						`${blng.typ.substring(0, 1)}:` +
+						`${blng.cod.padEnd(9, '.')}:` +
+						('' + blng.num).padStart(3, '.') +
+						` --> ` +
+						blng.bord.pO5.name.padEnd(6, '.') + ' [' + blng.bord.className + '] ' +
+						`</span> ` +
+						(blng.err ? '<span class="span3"> (' + blng.err + `)</span>` : '') +
+						'<br/>'
+				}
+			}
+		Init = () => {
+			const divs = document.getElementsByTagName('div')
+			for (const div of divs) {
+				if (div.classList.contains('shp')) {
+					const oframs = div.getAttribute('olga5_oframs'),
+						owners = div.getAttribute('olga5_owners')
+					let s = ''
+					if (owners) s += `<u>owners</u>= ${owners}, `
+					if (oframs) s += `<u>oframs</u>= ${oframs}, `
+					div.innerHTML = '#<b>' + div.id + '</b>:  ' + s +
+						div.innerHTML
+				} else
+				if (div.id !== 'strt')
+					div.innerHTML = '#' + div.id + ' &nbsp; [' + div.className + ']' +
+					div.innerHTML
+			}
+			// document.body.style.transform = 'scale(0.85)';
+		}
+		window.addEventListener('olga5-containers', List)
+		window.addEventListener('DOMContentLoaded', Init)
+	</script>
+
+	<style>
+		table td {
+			align-content: baseline;
+			font-size: small;
+		}
+
+		table td:first-child {
+			max-width: 300px;
+			display: block;
+		}
+
+		table td:last-child {
+			overflow: auto;
+			background-color: cornsilk;
+			white-space: nowrap;
+		}
+
+		.span1 {
+			margin-left: 2em;
+		}
+/* 
+		.span1:: {
+			font-weight: bold;
+			margin-left: 2em;
+		} */
+
+		.span2 {
+			font-family: monospace;
+			margin-left: 1em;
+		}
+
+		.span3 {
+			font-size: small;
+		}
+
+		.shp {
+			background-color: yellow;
+			border: 2px solid blue;
+			width: 233px;
+			height: 18px;
+			font-size: small;
+			padding: 5px;
+			margin: 3px;
+		}
+
+		div {
+			border: 1px dashed gray;
+			padding: 5px;
+			margin: 5px;
+		}
+
+		.inner {
+			margin-left: 32px;
+			margin-right: 32px;
+		}
+
+		#strt {
+			height: 211px;
+			overflow-y: scroll;
+			overflow-x: hidden;
+			position: sticky;
+			background-color: white;
+			top: 0;
+			margin-top: 0;
+		}
+	</style>
+
+	<div id="strt">
+		<h4 style="margin: 5px;		display: grid;		place-items: center;">
+			Тестирование определения вложенности контейнеров.
+		</h4>
+		<table>
+			<tr>
+				<td>
+					Для каждого <i>подвисабельного</i> объекта определяются (по мере их появления на экране)
+					его контейнеры согласно <b>olga5_oframs</b> и/или <b>olga5_owners</b>. <br />
+					<br />
+					Результат протоколируется в окне справа. <br />
+					<br />
+					PS если <i>oframs</i> или <i>owners</i> не задан, то по умолчанию берётся ':B'
+				</td>
+				<td id="log"></td>
+			</tr>
+		</table>
+	</div>
+
+	<div id="main" class="">
+		<div id="pos" class="pos1 clasA clsA clsB">
+			<div id="pos" class="pos2 clasA">
+				<div id="divX" class="">
+					<div id="pos" class="pos3 clasA inner">
+						<div id="6" class=" clsA clsB">
+							<div id="7" class="">
+								<div id='shp1-1' class="olga5_shp shp" olga5_oframs="i:pos"></div>
+								<div id='shp1-2' class="olga5_shp shp" olga5_oframs="c:clsA.clsB"></div>
+								<div id='shp1-3' class="olga5_shp shp" olga5_oframs="c:clsA.clsB:1"></div>
+								<div id='shp1-4' class="olga5_shp shp" olga5_oframs="c:clsA.clsB:0"></div>
+								<div id='shp1-5' class="olga5_shp shp" olga5_oframs="c:clasA:2, n:div:4"></div>
+							</div>
+						</div>
+					</div>
+					<div id="moe" class="moe1 inner">
+						<div id="moe" class="moe2">
+							<div id="moe" class="moe3">
+								<div id='shp2-1' class="olga5_shp shp" olga5_oframs="i:pos" olga5_owners="i:moe:2">
+								</div>
+								<div id='shp2-2' class="olga5_shp shp" olga5_oframs="b"></div>
+								<div id='shp2-3' class="olga5_shp shp" olga5_oframs="b::1,b::2"></div>
+							</div>
+						</div>
+					</div>
+					<div id="moe" class="moe1 olga5_shp">
+						<i style="font-size: small;">
+						это <span style="background-color: yellow;">контейнер с <b>olga5_shp</b></span>
+						(верхние уровни - не видны)
+						</i>
+						<div id="moe" class="moe2">
+							<div id="moe" class="moe3">
+								<div id='shp3-1' class="olga5_shp shp" olga5_oframs="i:pos" olga5_owners="i:moe:2">
+								</div>
+								<div id='shp3-2' class="olga5_shp shp" olga5_oframs="b"></div>
+								<div id='shp3-3' class="olga5_shp shp" olga5_oframs="b::1,b::2"></div>
+							</div>
+						</div>
+					</div>
+					<div id="moe1" class="moe1 inner">
+						<div id="moe2" class="moe2" style="border: none">
+							(без рамки)
+							<div id="moe3" class="moe3">
+								<div id='shp4' class="olga5_shp shp" olga5_oframs="b::2"></div>
+								<!-- <div id='shp7' class="olga5_shp shp" olga5_oframs="b::1,b::2"></div> -->
+							</div>
+						</div>
+					</div>
+					<div id="moe1" class="moe1 inner">
+						<div id="moe2" class="moe2" style="border: none">
+							<i style="font-size: small;">(рамки, но зато тут разные фоны)</i> 
+							<div id="moe3" class="moe3" style="background: aliceblue;">
+								<div id='shp5' class="olga5_shp shp" olga5_oframs="b::2"></div>
+								<!-- <div id='shp7' class="olga5_shp shp" olga5_oframs="b::1,b::2"></div> -->
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+
+</html>

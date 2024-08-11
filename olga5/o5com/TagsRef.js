@@ -215,7 +215,7 @@
 				else C.ConsoleInfo("Не найдены olga5 SCRIPT'ы ?")
 
 				if (igns.length > 0)
-					C.ConsoleInfo(`Проигнорированы скрипты, отсутствующие в 'o5incls': `, igns.join(', '))
+					C.ConsoleError(`Проигнорированы скрипты, отсутствующие в 'o5incls': `, igns.join(', '))
 
 				if (C.consts.o5debug > 1) { // тестирование атрибутов
 					const errs = []

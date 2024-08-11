@@ -50,7 +50,7 @@
     z-index: 999999;
 	padding-left: 3px;    
     overflow-y: auto;
-    width: fit-content;
+    width: 133px;
     max-height: 96%;
     height: fit-content;    
     overflow-x: hidden;
@@ -258,6 +258,9 @@ div.olga5_shp {
     background: aliceblue;
     margin: 20px;
     margin-left: 44px;
+
+    background: lightblue;
+    border: 1px gray dotted;
 }
 
 .thetext ul {

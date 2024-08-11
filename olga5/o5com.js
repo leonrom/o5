@@ -25,6 +25,11 @@
 			NFun: (Fun) => Fun.name || Fun,
 			events: [],
 			donets: [],
+			HasEventListener: (eve, Fun) => {
+				const nFun = E.NFun(Fun),
+					has = E.events.find(event => event.eve === eve && event.nFun === nFun)
+				return has
+			},
 			AddEventListener: (eve, Fun, opts) => {
 				const nFun = E.NFun(Fun)
 				E.Msg('AddEventListener', eve, nFun)
@@ -63,14 +68,17 @@
 				}
 			},
 			DispatchEvent: (eve, modulx, canrep) => {
-				const modul = modulx ? modulx : ''
 				if (C.consts.o5debug > 1 && !canrep) {
-					console.groupCollapsed(`DispatchEvent: '${eve}' для modul= '${modul}'`)
+					console.groupCollapsed(`DispatchEvent: '${eve}' ${modulx ? (' из  ' + modulx) : ''} `)
 					console.trace()
 					console.groupEnd()
 				}
-				const donet = E.donets.find(donet => donet.eve == eve && donet.modul == modul)
+
+				const
+					modul = modulx ? modulx : '',
+					donet = E.donets.find(donet => donet.eve == eve && donet.modul == modul)
 				let e = null
+
 				if (donet) {
 					e = donet.e
 					if (!canrep)
@@ -96,7 +104,7 @@
 	if (!window.olga5[olga5_modul]) window.olga5[olga5_modul] = {}
 
 	const
-		modnames = ['CConsole', 'CEncode', 'CApi', 'CParams', 'TagsRef', 'IniScripts','CPops'], // 'IniScripts' д.б. ПОСЛЕДНИМ
+		modnames = ['CConsole', 'CEncode', 'CApi', 'CParams', 'TagsRef', 'IniScripts', 'CPops'], // 'IniScripts' д.б. ПОСЛЕДНИМ
 		wshp = window.olga5[olga5_modul],
 		C = window.olga5.C,
 		strt_time = Number(new Date()),
@@ -215,8 +223,8 @@
 			else return url.origin + url.pathname.substring(0, url.pathname.lastIndexOf('/') + 1)
 		},
 		TryToDigit = x => {
-// if (x.indexOf && x.indexOf('182')>=0)			
-// console.log()
+			// if (x.indexOf && x.indexOf('182')>=0)			
+			// console.log()
 			if (typeof x === 'undefined') return 1		// true
 			if (x === !!x) return x
 			const val = ('' + x).replace(C.repQuotes, '')
@@ -231,8 +239,8 @@
 			const rez = val.replace(/\s*;\s*\n+\s*/g, ';').replace(/\s*\n+\s*/g, ';')
 			return rez.replace(/\t+/g, ' ').trim()
 		},
-		HasProperty=(foo,nam)=>{
-			return  Object.prototype.hasOwnProperty.call(foo, nam)
+		HasProperty = (foo, nam) => {
+			return Object.prototype.hasOwnProperty.call(foo, nam)
 			// return  foo.hasOwnProperty(nam)
 		},
 		GetAttribute = (attrs, name) => { // нахождение значения 'attr' в массиве атрибутов 'attrs'
@@ -344,7 +352,7 @@
 			o5only: 0,
 			o5incls: '',
 			o5doscr: 'olga5_sdone',
-         // o5depends: "pusto; o5inc; o5pop= o5snd; o5shp: o5inc, o5ref; o5ref= o5inc; o5snd:o5ref; o5shp=o5snd, o5ref; o5shp; o5inc; o5mnu",
+			// o5depends: "pusto; o5inc; o5pop= o5snd; o5shp: o5inc, o5ref; o5ref= o5inc; o5snd:o5ref; o5shp=o5snd, o5ref; o5shp; o5inc; o5mnu",
 			o5depends: "o5inc; o5pop:o5ref,o5snd; o5ref= o5inc; o5snd:o5ref; o5shp=o5snd, o5ref; o5mnu; o5tab",
 			o5init_events: 'readystatechange:d, message',	// , transitionrun, transitionend
 			o5hide_events: 'transitionrun',	// , transitionrun, transitionend
@@ -398,11 +406,11 @@
 				return window.olga5[modul]
 			}
 		},
-        MyJoinO5s : aO5s => {
-            let s = ''
-            for (const aO5 of aO5s) s += (s ? ', ' : '') + aO5.name
-            return s
-        },
+		MyJoinO5s: aO5s => {
+			let s = ''
+			for (const aO5 of aO5s) s += (s ? ', ' : '') + aO5.name
+			return s
+		},
 	})
 
 	const xs = {}, // временное хранилилище для считываемых параметров
@@ -424,6 +432,25 @@
 	if (mm) wshp.AscInclude = AscInclude  // формальный вызов чтобы всё поотмечать и вызвать iniFun()
 	else
 		AscInclude()
+
+	if (!C.Debug) {
+		const
+			errors = [],
+			Error = nam => {
+				if (!errors.includes(nam)) {
+					errors.push(nam)
+					const err = C.Debug.loaded ? `отсутствует ф-я '${nam}' в модуле 'o5dbg'` :
+						`не подключен модуль 'o5dbg' (для вызова '${nam}')`
+					console.error("%c%s", "background: yellow; color: black;", err)
+				}
+			}
+
+		C.Debug = { // тут д.б.  пустышки для всех из o5dbg.Utils
+			loaded: false,
+			ShowShpBords: () => Error('ShowShpBords'),
+			ShowBounds: () => Error('ShowBounds'),
+		}
+	}
 
 	console.log(`}+++< загружено ядро библиотеки`)
 })();

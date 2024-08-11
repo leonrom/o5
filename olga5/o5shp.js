@@ -13,11 +13,11 @@
 			class: 'olga5_shp',
 			consts: `		
 				o5shp_dummy=0.123 //  просто так, для проверок в all0_.html;
-                olga5_frames='s';
+                olga5_frames='b';
                 olga5_owners='b';
 			`,
 			incls: {
-				names: ['DoScroll', 'DoResize', 'AO5shp', 'PO5shp', 'DoInit'],
+				names: ['DoScroll', 'Boards', 'DoResize', 'AO5shp', 'PO5shp', 'DoInit'],
 				actscript: document.currentScript,
 			},
 		},
@@ -27,14 +27,15 @@
 			}
 			.olga5-cart {
 				cursor: pointer;
-                position: fixed;
+                position: sticked;
 				overflow: hidden;
 			}
 		`,
 		LastDoResize = () => {
-			// if (window.olga5.o5shp && window.olga5.o5shp.DoResize)
+			if (window.olga5.o5shp && window.olga5.o5shp.DoResize)
 			window.olga5.o5shp.DoResize('по olga5_ready')
 		}
+
 
 	function ShpInit() {
 		C.E.AddEventListener('olga5_ready', () => {

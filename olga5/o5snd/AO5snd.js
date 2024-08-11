@@ -191,7 +191,7 @@
                                 aO5 = snd.aO5snd
 
                             if (o5debug > 1) console.log(`${lognam}  OnPlayAct.${txt}  ${('' + e.timeStamp).padStart(8)}` +
-                                ` для ${aO5.name} '${type}' при isOny= ${aO5.sound.ison}`)
+                                ` для тега '${aO5.name}' с типом '${type}' при isOny= ${aO5.sound.ison}`)
 
                             eacts.find(eact => eact.type == type).Act(snd, e)
                         },
@@ -207,7 +207,6 @@
                                 aO5 = snd.aO5snd,
                                 sound = aO5.sound
 
-                            // if (o5debug > 1) console.log(`${lognam}  CallStartSound() ${aO5.name} '${aO5.sound.state}'  e.type= '${e.type}'`)
                             Object.assign(aO5.sound, { ison: true, shiftKey: e.shiftKey ? (e.location == 2 ? 1 : -1) : 0 })
 
                             if (e.type == 'click') {
@@ -279,7 +278,8 @@
                         },
                         audio = aO5.sound.audio = new Audio() // ocument.createElement('audio'),
 
-                    if (o5debug > 1) console.log(`${lognam}  Activate ${aO5.name} '${e.type}'`)
+                    if (o5debug > 1) 
+                        console.log(`${lognam}  Activate тега '${aO5.name}' с типом '${e.type}'`)
 
                     setVolume.SetV(aO5, 0)
 

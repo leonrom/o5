@@ -93,16 +93,16 @@ function shpX_BordNames() {
                     cls = aO5.cls,
                     o = aO5.located, //.botNam,
                     f = aO5.hovered, //.botNam,
-                    s1 = ' к.=' + (cls.alive ? ':<b>A</b>live' : '') + (cls.level > 0 ? ':<b>' + cls.level + '</b>' : ''),
-                    s2 = ':<b>' + cls.dirV + '</b>' + dirput[cls.dirV],
-                    s3 = ':<b>' + cls.putV + '</b>' + dirput[cls.putV],
+                    // s1 = ' к.=' + (cls.alive ? ':<b>A</b>live' : '') + (cls.level > 0 ? ':<b>' + cls.level + '</b>' : '0'),
+                    // s2 = ':<b>' + cls.dirV + '</b>' + dirput[cls.dirV],
+                    // s3 = ':<b>' + cls.putV + '</b>' + dirput[cls.putV],
                     s = '[<b><u>' + aO5.id + '</u></b>]/' + aO5.cls.nest +
-                        ' к.=' + (cls.alive ? ':<b>A</b>live' : '') + (cls.level > 0 ? ':<b>' + cls.level + '</b>' : '') +
+                        ' к.=' + (cls.alive ? ':<b>A</b>live' : '') +
+                        (cls.level > 0 ? ':<b>' + cls.level + '</b>' : '0') +
                         ':<b>' + cls.dirV + '</b>' + dirput[cls.dirV] +
                         ':<b>' + cls.putV + '</b>' + dirput[cls.putV] +
                         ':<b>' + cls.pitch + '</b>' + pitches[cls.pitch] +
-                        ':<b>' + cls.level + '</b>' + 
-                        '<br/>&nbsp;olga5_frames= ' + aO5.hovered.attr +
+                        '<br/>&nbsp;olga5_oframs= ' + aO5.hovered.attr +
                         '<br/>&nbsp;olga5_owners= ' + aO5.located.attr +
                         '<br/>f: ' + Sid('t', f.to) + Sid('b', f.bo) + Sid('l', f.le) + Sid('r', f.ri) +
                         '<br/>o: ' + Sid('t', o.to) + Sid('b', o.bo) + Sid('l', o.le) + Sid('r', o.ri)
@@ -119,33 +119,33 @@ function shpX_BordNames() {
     }
 }
 
-function ShowCarcCB(){
-    const 
+function ShowCarcCB() {
+    const
         cartcb = document.getElementById('cartcb'),
         clons = document.getElementsByClassName('olga5-clon')
-    let txt='не видны'
+    let txt = 'невидно'
 
     cartcb.style.opacity = 0.11
-    if (clons && clons.length>0){
-        let display=false
-        for (const clon of clons) 
-            if (clon.style.display !=='none'){
-                display=true
+    if (clons && clons.length > 0) {
+        let display = false
+        for (const clon of clons)
+            if (clon.style.display !== 'none') {
+                display = true
                 break
             }
-        if (display){
+        if (display) {
             cartcb.style.opacity = 1
-            txt='видны'
+            txt = 'видны'
         }
     }
     else
-        txt='еще нету'
+        txt = 'еще нету'
     cartcb.nextSibling.nodeValue = 'clons: ' + txt
 }
 
 function CC() {
     "use strict";
-    const 
+    const
         shdwcb = document.getElementById('shdwcb'),
         cartcb = document.getElementById('cartcb'),
         cartc0 = document.getElementById('cartc0'),
@@ -302,7 +302,7 @@ function CC1(cb) {
             if (level && level == cb) {
                 cls.level = level.value
             }
-// ??            shp.aO5shp.act.wasClick = false
+            // ??            shp.aO5shp.act.wasClick = false
         } else {
             if (level) level.value = cls.level
             if (alive) alive.checked = cls.alive
@@ -314,7 +314,7 @@ function CC1(cb) {
             // }
         }
     }
-    window.olga5.o5shp.DoResize(`CC1(${cb})`)
+    // window.olga5.o5shp.DoResize(`CC1(${cb})`)
 }
 
 function CC1a(cb) {
@@ -329,7 +329,7 @@ function CC2(cb, namshp) {
         frams = shpX_GetFrams(t, ''),
         atr = frams.length > 0 ? frams : (t == 'f' ? 's' : 'b')
 
-    shp.setAttribute(t == 'f' ? 'olga5_frames' : 'olga5_owners', atr)
+    shp.setAttribute(t == 'f' ? 'olga5_oframs' : 'olga5_owners', atr)
     window.olga5.o5shp.DoResize(`CC2(${cb}, ${namshp})`)
 }
 
@@ -352,7 +352,7 @@ function CC3(cb) {
         if (errs.length > 0)
             console.log("Ошибка в задании '" + u + "' для " + aO5.nam + ": " + errs[0].err)
         else {
-            shp.setAttribute(t == 'f' ? 'olga5_frames' : 'olga5_owners', atr)
+            shp.setAttribute(t == 'f' ? 'olga5_oframs' : 'olga5_owners', atr)
             wshp.DoResize()
         }
     } else {
@@ -433,12 +433,12 @@ function Init0() {
         // shpX_BordNames()
         shpX_SetWindow(599, 411)
         window.scrollTo(0, 99)
-        
+
         StartBordNames()
         ShowCarcCB()
     }
     window.olga5.C.E.AddEventListener('olga5_ready', Init0i)
-    window.olga5.C.E.AddEventListener('olga5_fix-act', ShowCarcCB)   
+    window.olga5.C.E.AddEventListener('olga5_fix-act', ShowCarcCB)
 }
 
 function Init1() {
@@ -461,6 +461,23 @@ function Init1() {
 
         StartBordNames()
         ShowCarcCB()
+
+// // -------------------------------------------------------        
+// const observer = new IntersectionObserver(entries => {
+//     entries.forEach(entry => {
+//         if (entry.isIntersecting) {
+//             console.log('Элемент видимый');
+//         } else {
+//             console.log('Элемент не видимый');
+//         }
+//     });
+// });
+
+// const shp3 = document.getElementById('shp3'); // Замените на ваш элемент
+// if (shp3)
+//     observer.observe(shp3);
+// // -------------------------------------------------------
+
     }
     // window.aaddEventListener('olga5_ready', Init)
     window.olga5.C.E.AddEventListener('olga5_ready', Init1i)
@@ -486,7 +503,7 @@ function Init2() {
         // ResizeDiv1()
 
         if (div3) div3.scrollTo(0, 66)
-        if (div2) div2.scrollTo(0, 144)
+        if (div2) div2.scrollTo(0, 333)
         if (div1) div1.scrollTo(0, 188)
 
         // shpX_BordNames()
