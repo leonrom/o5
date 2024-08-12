@@ -27,7 +27,7 @@
 			}
 			.olga5-cart {
 				cursor: pointer;
-                position: sticked;
+                position: fixed;
 				overflow: hidden;
 			}
 		`,

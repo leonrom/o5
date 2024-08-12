@@ -21,7 +21,7 @@
                     t0 = tt[0],
                     c = t0.substr(0, 1).toUpperCase()
 
-                if (c != '' && !isNaN(t0)) cls.level = Number(t0)
+                if (c !== '' && !isNaN(t0)) cls.level = Number(t0)
                 else if (c === 'N') cls.cnone = true
                 else if (c === 'C') cls.pitch = 'C' // сжимает предыдущий
                 else if (c === 'P') cls.pitch = 'P' // сталкивает предыдущий
@@ -41,28 +41,27 @@
         ReadAttrs = (aO5, blng) => { // определение вложенностей shp's друг в друга
             const
                 shp = aO5.shp,
-                atr = 'olga5_' + blng.akey,                   // т.е.  olga5_owner либо olga5_ofram
+                atr = 'olga5_' + blng.akey,                   // т.е.  olga5_owners либо olga5_oframs
                 str = shp.getAttribute(atr) || shp.getAttribute(atr + 's')
                 
             if (str) {
-                const ss = str ? str.split(/\s*[,;]\s*/g) : ['']
-                let n = 0
-
+                const ss = str ? str.split(/\s*[,;]\s*/g) : [''],
+                typs='CINSB'
+                
                 for (const s of ss) // ss оставил для контроля устаревших заданий контейнеров
                     if (s.length > 0) {
                         const
                             cc = s.split(':'),
                             u = cc[0].trim(),
                             t = u.length > 0 ? u[0].toUpperCase() : '?'
-                        if ('CINSB'.includes(t)) {
+
+                        if (typs.includes(t)) {
                             const cod = cc.length > 1 ? cc[1].trim() : '',
-                                num = cc.length > 2 ? C.MyRound(cc[2]) : 0
-                            if ((n++ === 0))
-                                Object.assign(blng, { typ: t, cod: cod, num: num, bord: null, err: '', })
-                            else {
-                                errs.push({ name: aO5.name, str: str, err: "несколько контейнеров - устарело" })
-                                break
-                            }
+                                num = cc.length > 2 ? C.MyRound(cc[2]) : 0,
+                                bord={tag: null, typ: t, cod: cod, num: num, err: '', }
+                            
+                            Object.seal(bord)
+                            blng.bords.push(bord)
                         }
                         else
                             errs.push({ name: aO5.name, str: str, err: "тип ссылки не начинается одним из '" + typs + "'" })
@@ -114,7 +113,7 @@
                 Clone(aO5)
 
             Object.assign(aO5.shp.style, {
-                position: 'relative',
+                position: 'absolute',
                 top: 0,
                 left: 0,
                 marginTop: 0,
@@ -239,7 +238,7 @@
             }
         },
         errs = [],
-        To = { typ: 'B', cod: '', num: 0, bord: null, err: '', }
+        Tbelong = { bords: [], to: null, le: null, ri: null, bo: null }
 
     class AO5 {
         constructor(shp) {
@@ -252,7 +251,7 @@
             aO5.node = shp.parentNode
             shp.aO5shp = aO5
 
-            for (const nam of ['cls', 'old', 'act', 'visi', 'margs', 'outln', 'posW', 'posC', 'posS', 'ofram', 'owner'])
+            for (const nam of ['cls', 'old', 'act', 'visi', 'margs', 'outln', 'posW', 'posC', 'posS', 'oframs', 'owners'])
                 Object.seal(this[nam])
             Object.seal(this)
 
@@ -261,14 +260,17 @@
         name = '' // повтор - чтобы было 1-м в отладчике
 
         cls = { dirV: 'U', putV: 'T', alive: false, none: false, level: 0, pitch: 'S', }
-        act = { dspl: false, isFixed: false, isKilled: false, underClick: false, pushedBy: null, zIndex: 0, }
+        act = { dspl: false, isFixed: false, isCloned: false, isKilled: false, underClick: false, pushedBy: null, zIndex: 0, }
         visi = { doKill: false, doFix: '', checkUp: false, part: false, full: false, } //time:0,checkUp: false, top: 0, }
 
         margs = { t: '', l: '', r: '', b: '', }
         outln = { w: '', s: '', c: '', o: '', }
 
-        ofram = Object.assign({ akey: 'ofram' }, To)
-        owner = Object.assign({ akey: 'owner' }, To)
+        oframs = Object.assign({ akey: 'oframs' }, Tbelong)
+        owners = Object.assign({ akey: 'owners' }, Tbelong)
+
+        // frames = Object.assign({ act: 'frames', asks: [], bords: [] }, Tbelong) // массивы д.б.персонально
+        // owners = Object.assign({ act: 'owners', asks: [], bords: [] }, Tbelong)
 
         posW = Object.assign({}, { top: 0, left: 0, height: 0, width: 0, })
         posC = Object.assign({}, this.posW)
@@ -294,12 +296,11 @@
 
         DecodeType(aO5, quals)
 
-        ReadAttrs(aO5, aO5.ofram)
-        ReadAttrs(aO5, aO5.owner)
+        ReadAttrs(aO5, aO5.oframs)
+        ReadAttrs(aO5, aO5.owners)
 
         if (errs.length > 0)
             C.ConsoleError("Ошибки в атрибутах  для тегов", errs.length, errs)
-
 
         if (shp.tagName.match(/\b(img|iframe|svg)\b/i) && !shp.complete) {
             if (C.consts.o5debug > 0) C.ConsoleInfo(`ожидается завершение загрузки '${aO5.name}'`)

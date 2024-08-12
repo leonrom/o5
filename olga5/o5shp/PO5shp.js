@@ -95,8 +95,10 @@
         prevs = []; // всегда содержит самого себя
         coldi = { c: 0, t: 0, l: 0, r: 0, b: 0, }
         // owners = { to: null, le: null, ri: null, bo: null, timeStamp: 0 } // для тех которые в aO5.oframs
-        owns =[]
-        frms =[]
+        // owns =[]
+        // frms =[]
+        oframs = []
+        owners = []
 
         observ={observer : null}
     }
