@@ -13,7 +13,7 @@
         o5debug = C.consts.o5debug,
         Observe = (entries, observer) => {
             /*
-            инициализация подвисабельных обектов по мере их появления на экране
+            инициализация подвисабельных обектов по мере их ПОЛНОГО появления на экране
             когда все буду инициализированы - отключаем
             */
             const fmt = "background: aquamarine; color: black;"
@@ -24,7 +24,7 @@
                     const shp = entry.target,
                         aO5 = wshp.AO5shp(shp, shp.aO5quals)
 
-                    if (!aO5.prev.pO5)  // сделать цепочку контейнеров
+                    if (!aO5.prev.pO5)  // сделать цепочку контейнеров 
                         wshp.PO5shp(aO5)
 
                     wshp.Boards(aO5) // найти в контейнерах ofram  и  owner       
@@ -39,8 +39,8 @@
 
                     if (o5debug > 0) {
                         console.log("%c%s", fmt,
-                            `обработал '${aO5.name}' (видно ${parseFloat(entry.intersectionRatio).toFixed(2)}) `,
-                            `  включено в ${aO5.owner.bord.pO5.name}, виснет на ${aO5.ofram.bord.pO5.name} `
+                            `обработал '${aO5.name}' (видно ${parseFloat(entry.intersectionRatio).toFixed(2)}) `
+                            // `  включено в ${aO5.owner.bord.pO5.name}, виснет на ${aO5.ofram.bord.pO5.name} `
                         )
                         C.Debug.ShowShpBords()
 
@@ -56,7 +56,7 @@
                 observer = new IntersectionObserver(Observe, {
                     root: null,
                     rootMargin: '0px',
-                    threshold: [0.1],
+                    threshold: [1],
                 })
 
             observer.pO5 = { n: mtags.length }

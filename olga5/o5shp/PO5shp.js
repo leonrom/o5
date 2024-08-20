@@ -12,7 +12,7 @@
         modulname = 'PO5shp',
         C = window.olga5.C,
         o5debug = C.consts.o5debug,
-        FillBords = (pO5, strt) => { // РЕКУРСИЯ !
+        FillPrevs = (pO5, strt) => { // РЕКУРСИЯ !
             if (pO5.prevs.length > 0)
                 return
 
@@ -29,78 +29,127 @@
 
                 if (!prev.pO5) {
                     prev.pO5 = new PO5(prev)
-                    FillBords(prev.pO5, strt)
+                    FillPrevs(prev.pO5, strt)
                 }
                 for (const parent of prev.pO5.prevs)
                     pO5.prevs.push(parent)
 
-            }         
-            
-            const nst = window.getComputedStyle(pO5.current),
-            minScrollW = 3
-
-            Object.assign(pO5.scroll,{
-        dw : minScrollW + C.MyRound(nst.borderLeftWidth) + C.MyRound(nst.borderRightWidth) + C.MyRound(nst.paddingLeft) + C.MyRound(nst.paddingRight),
-        dh : C.MyRound(nst.borderTopWidth) + C.MyRound(nst.borderBottomWidth) + C.MyRound(nst.paddingTop) + C.MyRound(nst.paddingBottom),
-        ovfX : nst.overflowX,
-        ovfY : nst.overflowY},
-            )
-
-        for (const bord of ['top', 'left', 'right', 'bottom'])
-            pO5.add[bord] = parseFloat(nst.getPropertyValue('border-' + bord + '-width'))
-        
-        const
-            IsFloat001 = (s) => { return Math.abs(parseFloat(s) > 0.01) },
-            CN = (nst, nam) => {
-                const color = nst.getPropertyValue(nam + '-color'),
-                    rgb = color.match(/^rgba?[\s+]?\([\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?/i),
-                    GRGB = (i) => { return ("0" + parseInt(rgb[i], 10).toString(16)).slice(-2) }
-                return (rgb && rgb.length === 4) ? "#" + GRGB(1) + GRGB(2) + GRGB(3) : ''
             }
-        
-        Object.assign(pO5.coldi, {
-            c: CN(nst, 'background'),
-            t: IsFloat001(nst.borderTopWidth),
-            l: IsFloat001(nst.borderLeftWidth),
-            r: IsFloat001(nst.borderRightWidth),
-            b: IsFloat001(nst.borderBottomWidth),
-        })
+            Object.freeze(pO5.prevs)
+        },
+        CalcDiffColor0 = prevs => {
+            const minScrollW = 3,
+                IsFloat001 = s => { return Math.abs(parseFloat(s)) > 0.01 },
+                CN = (nst, nam) => {
+                    const color = nst.getPropertyValue(nam + '-color'),
+                        rgb = color.match(/^rgba?[\s+]?\([\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?/i),
+                        GRGB = (i) => { return ("0" + parseInt(rgb[i], 10).toString(16)).slice(-2) }
+                    return (rgb && rgb.length === 4) ? "#" + GRGB(1) + GRGB(2) + GRGB(3) : ''
+                }
+            let i = prevs.length,
+                oldc = -1
+
+            while (i-- > 0) {
+                const prev = prevs[i],
+                    pO5 = prev.pO5,
+                    nst = window.getComputedStyle(prev),
+                    newc = CN(nst, 'background'),
+                    diff = (i === prevs.length - 1) || (newc !== oldc && pO5.current.style.backgroundColor)
+
+                // console.log(`${pO5.name}: '${pO5.current.style.backgroundColor}'`)
+                // if (pO5.name=="div4" )
+                //     console.log(`${pO5.name}`)
+                // if (pO5.name == '#moe82')
+                //     console.log('')
+                pO5.scroll.diffT = diff || IsFloat001(nst.borderTopWidth)
+                pO5.scroll.diffB = diff || IsFloat001(nst.borderBottomWidth)
+
+                Object.assign(pO5.scroll, {
+                    dw: minScrollW + C.MyRound(nst.borderLeftWidth) + C.MyRound(nst.borderRightWidth) + C.MyRound(nst.paddingLeft) + C.MyRound(nst.paddingRight),
+                    dh: C.MyRound(nst.borderTopWidth) + C.MyRound(nst.borderBottomWidth) + C.MyRound(nst.paddingTop) + C.MyRound(nst.paddingBottom),
+                    ovfX: nst.overflowX,
+                    ovfY: nst.overflowY,
+                })
+
+                for (const btyp of ['top', 'left', 'right', 'bottom'])
+                    pO5.add[btyp] = parseFloat(nst.getPropertyValue('border-' + btyp + '-width'))
+
+                oldc = newc
+            }
+        },
+        CalcDiffColor = prevs => {
+            const minScrollW = 3,
+                IsFloat001 = s => { return Math.abs(parseFloat(s)) > 0.01 },
+                CN = (nst, nam) => {
+                    const color = nst.getPropertyValue(nam + '-color'),
+                        rgb = color.match(/^rgba?[\s+]?\([\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?/i),
+                        GRGB = (i) => { return ("0" + parseInt(rgb[i], 10).toString(16)).slice(-2) }
+                    return (rgb && rgb.length === 4) ? "#" + GRGB(1) + GRGB(2) + GRGB(3) : ''
+                }
+            let i = prevs.length,
+                oldC = -1
+
+            while (i-- > 0) {
+                const prev = prevs[i],
+                    pO5 = prev.pO5
+                let newC = pO5.scroll.newC
+
+                if (newC === null) {   // эта проверка - чтобы обсчитывать только 1 раз
+                    const nst = window.getComputedStyle(prev)
+
+                    newC = CN(nst, 'background')
+
+                    const diff = (i === prevs.length - 1) || (newC !== oldC && pO5.current.style.backgroundColor)
+
+                    Object.assign(pO5.scroll, {
+                        dw: minScrollW + C.MyRound(nst.borderLeftWidth) + C.MyRound(nst.borderRightWidth) + C.MyRound(nst.paddingLeft) + C.MyRound(nst.paddingRight),
+                        dh: C.MyRound(nst.borderTopWidth) + C.MyRound(nst.borderBottomWidth) + C.MyRound(nst.paddingTop) + C.MyRound(nst.paddingBottom),
+                        ovfX: nst.overflowX,
+                        ovfY: nst.overflowY,
+                        diffT: diff || IsFloat001(nst.borderTopWidth),
+                        diffB: diff || IsFloat001(nst.borderBottomWidth),
+                        newC: newC,
+                    })
+
+                    for (const btyp of ['top', 'left', 'right', 'bottom'])
+                        pO5.add[btyp] = parseFloat(nst.getPropertyValue('border-' + btyp + '-width'))
+                }
+                oldC = newC
+            }
         }
 
     class PO5 {
         constructor(current) {
             const pO5 = this
 
-            current.pO5=pO5
+            current.pO5 = pO5
             pO5.current = current
+
             pO5.id = current.id
             pO5.name = C.MakeObjName(current)
             pO5.isBody = current === document.body || current.nodeName == 'BODY'
             pO5.isFinal = pO5.isBody ||
                 ['overview-content', 'viewitem-panel'].find(cls => current.classList.contains(cls)) ||
                 false
-            pO5.isDIV = current.tagName.match(/\bdiv\b/i)  // == "DIV"
 
-            Object.seal(pO5.add)
-            // Object.seal(pO5.cdif)
-            Object.seal(pO5.pos)
-            Object.seal(pO5.scroll)
-          
+            for (const cls of current.classList)
+                // if (!cls.match(/\bolga5[-_]/))
+                pO5.classTag.push(cls)
+
+            for (const nam of ['add', 'pos', 'scroll'])
+                Object.seal(this[nam])
+            Object.seal(this)
         }
         add = { top: 0, left: 0, right: 0, bottom: 0 }
-        pos = { top: 0, left: 0, right: 0, bottom: 0, } // пересчитывается при DoScroll
-        scroll = { yesV: false, yesH: false, dw: 0, dh: 0, ovfX: false, ovfY: false } // пересчитывается при Resize
+        pos = { top: 0, left: 0, right: 0, bottom: 0, tim: 0, } // пересчитывается при DoScroll
+        scroll = { newC: null, diffT: false, diffB: false, yesV: false, yesH: false, dw: 0, dh: 0, ovfX: false, ovfY: false } // пересчитывается при Resize
 
-        // aO5s = []
-        prevs = []; // всегда содержит самого себя
-        coldi = { c: 0, t: 0, l: 0, r: 0, b: 0, }
-        // owners = { to: null, le: null, ri: null, bo: null, timeStamp: 0 } // для тех которые в aO5.oframs
-        // owns =[]
-        // frms =[]
+        prevs = []      // всегда содержит самого себя
         oframs = []
         owners = []
+        classTag = []   // для поиск контейнеров 'c:'
 
-        observ={observer : null}
+        observ = { observer: null }
     }
 
     // --------------------------------------------------------------------- //    
@@ -114,13 +163,15 @@
                 return
             }
             // давать ВНЕ инициализации, чтобы легче идентифицировать ошибку
-            
-            FillBords(pO5, 'pO5=' + pO5.name + (aO5 ? (' для aO5=' + aO5.name) : ''))
-
-            Object.freeze(pO5.prevs)
-            Object.freeze(pO5.coldi)
-            Object.freeze(pO5.owners)
             Object.freeze(pO5)
+
+            FillPrevs(pO5, 'pO5=' + pO5.name + (aO5 ? (' для aO5=' + aO5.name) : ''))
+
+            CalcDiffColor(pO5.prevs)
+
+
+            // Object.freeze(pO5.owners)
+            // Object.freeze(pO5.oframs)
 
             if (o5debug > 2)
                 console.log("создан pO5 для '" + pO5.name + "'")

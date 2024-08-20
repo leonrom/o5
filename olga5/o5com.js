@@ -18,7 +18,11 @@
 					console.groupCollapsed("%c%s", "background: lightblue; color: black;border: solid 1px gold;",
 						`${txt} для eve='${eve}'`)
 					console.log(`для вызова:\n${nFun}`)
-					console.trace()
+					{
+						console.groupCollapsed(`Трассировка вызова`)
+						console.trace()
+						console.groupEnd()
+					}
 					console.groupEnd()
 				}
 			},

@@ -98,10 +98,10 @@
 					console.table(tt)
 				}
 			}
-			console.table()
-			// console.groupCollapsed(` ... трассировка вызовов :`)
+			console.table()	
+			console.groupCollapsed(`трассировка вызова`)
 			console.trace()
-			// console.groupEnd()
+			console.groupEnd()
 			console.groupEnd()
 		}
 

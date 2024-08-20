@@ -7,6 +7,7 @@
 (function () {              // ---------------------------------------------- o5shp/Boards ---
 	"use strict"
 
+	let isScroll = false
 	const
 		olga5_modul = "o5shp",
 		modulname = 'Boards',
@@ -37,7 +38,7 @@
 					c = (bord.cod || '').trim(),
 					t = bord.typ
 				let err = '',
-					itag = null,
+					tag = null,
 					n = bord.num
 
 				if ('SIBNC'.indexOf(t) < 0)
@@ -106,6 +107,21 @@
 			if (err)
 				C.ConsoleError(`Тег '${aO5.name}' - устранил дублирующие контейнеры:`, err)
 
+
+			// const bs = []
+			// for (const bord of blng.bords) {
+			// 	const pO5 = bord.tag.pO5,
+			// 		b = bs.find(b => bs.pO5 === pO5)
+
+			// 	if (b) b.n++
+			// 	else
+			// 		bs.push({ pO5: pO5, typ: bord.typ, cod: bord.cod, num: bord.num, n: 1 })
+			// }
+			// const 				ebs = ''
+			// for (const b of bs) 
+			// 				if (b.n>1){
+			// }
+
 			if (errs.length > 0)
 				C.ConsoleError(`Тег '${aO5.name}' - ошибки определения контейеров`, errs.length, errs)
 
@@ -121,36 +137,67 @@
 				for (const entry of entries) {
 					const shp = entry.target,
 						aO5 = shp.aO5shp
-					s += `${aO5.name} ${entry.isIntersecting ? 'видно' : 'нету '} ${entry.intersectionRatio.toFixed(3)} ${(shp.classList.contains('olga5-clon') ? 'clon' : '')}`
+					s += `${aO5.name} ${entry.isIntersecting?'видно':'нету '}					 ${entry.intersectionRatio.toFixed(2)} ${(shp.classList.contains('olga5-clon') ? 'clon' : '')}`
 				}
-				console.log('--:  Observe', pO5.name, s)
+				console.log(pO5.name, s)
 			}
 
 			for (const entry of entries) {
 				const shp = entry.target,
-					aO5 = shp.aO5shp,
-					act = aO5.act,
-					isr = entry.intersectionRatio
+					aO5 = shp.aO5shp
 
 				if (entry.isIntersecting) {
-					if (isr === 1) 
-						act.readyFix = true
+					const isclon=shp.classList.contains('olga5-clon')
 
-					if (shp.classList.contains('olga5-clon')) { // т.е. это есть клон) 
-						if (isr === 1 || !act.readyFix) {
+					if (entry.intersectionRatio === 1) {
+						if (isclon && aO5.act.isFixed) { // т.е. это есть клон) 
 							observer.observe(aO5.shp)
 							observer.unobserve(aO5.clon)
-							wshp.DoScroll(aO5, null)
+							// AskStopScroll()
+							aO5.UnFixV()
+							aO5.ShowFix()
+							wshp.DoScroll(aO5, false)
 						}
 					}
 					else
-						if (isr < 1 && !act.isFixed && act.readyFix &&
-							wshp.DoScroll(aO5, entry) !== 'N'
-						) {
-							observer.unobserve(aO5.shp)
-							observer.observe(aO5.clon)
+						if (!isclon && !aO5.act.isFixed) {
+							const
+								// posC = aO5.posC,
+								top = entry.intersectionRect.top,
+								bottom = entry.intersectionRect.bottom,
+								doFix =
+									(entry.boundingClientRect.top < top && aO5.cls.dirV === 'U') ? 'U' :
+										(entry.boundingClientRect.bottom > bottom && aO5.cls.dirV === 'D' ? 'D' : '')
+
+							if (doFix) {
+								const
+									posC = aO5.posC,
+									b = aO5.shdw.getBoundingClientRect() // д.б. ОТДЕЛЬНО - текущее положение объекта или его клона
+
+								Object.assign(aO5.posW, { top: b.top, left: b.left, height: b.height, width: b.width, })
+								Object.assign(posC, aO5.posW)
+								posC.top = doFix === 'U' ? top : bottom - height
+								aO5.DoFixV()
+								aO5.ShowFix()
+								wshp.DoScroll(aO5, doFix)
+								observer.unobserve(aO5.shp)	
+								observer.observe(aO5.clon)
+
+								if (!isScroll) {
+									isScroll = true
+									window.addEventListener('scroll', wshp.DoScroll)
+								}
+							}
 						}
 				}
+				// else {
+				// 	// u += `из '${pO5.name.padEnd(6)}' удалён    ${aO5.name.padEnd(6)}`
+				// 	const i = pO5.frms.indexOf(aO5)
+				// 	if (i >= 0) {
+				// 		pO5.frms.splice(i, 1)
+				// 		// wshp.DoScroll(aO5, 0)
+				// 	}
+				// }
 			}
 		},
 		Boards = aO5 => {
@@ -158,12 +205,11 @@
 				fmt = "background: cornsilk; color: black;",
 				pO5s = []
 
-			FindBords(aO5, aO5.owner)
-			FindBords(aO5, aO5.ofram)
+			FindBords(aO5, aO5.owners)
+			FindBords(aO5, aO5.oframs)
 
-			// for (const bord of aO5.ofram.bords) {
+			for (const bord of aO5.oframs.bords) {
 				const
-				bord = aO5.ofram.bords[aO5.ofram.bords.length-1],
 					pO5 = bord.tag.pO5
 
 				if (!pO5.observ.observer) {
@@ -181,11 +227,11 @@
 				pO5.observ.observer.observe(aO5.shp)
 				if (o5debug > 1)
 					pO5s.push(pO5.name)
-			// }
+			}
 
 			if (o5debug > 1)
 				console.log("%c%s", fmt,
-					`для ${aO5.name} добавил ofram observer'ы:  ${pO5s.join(', ')}`)
+					`для ${aO5.name} добавил oframs observer'ы:  ${pO5s.join(', ')}`)
 		},
 		wshp = C.ModulAddSub(olga5_modul, modulname, Boards)
 

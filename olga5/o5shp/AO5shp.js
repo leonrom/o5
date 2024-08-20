@@ -33,21 +33,21 @@
                 else err += (err ? ', ' : '') + t0
             }
 
-            Object.freeze(cls)
+            // Object.freeze(cls)
 
             if (err)
                 C.ConsoleError(`Для тега ${aO5.name} не определены квалификаторы: `, err)
         },
-        ReadAttrs = (aO5, blng) => { // определение вложенностей shp's друг в друга
+        ReadAttrs = (aO5, blng, def) => { // определение вложенностей shp's друг в друга
             const
                 shp = aO5.shp,
-                atr = 'olga5_' + blng.akey,                   // т.е.  olga5_owners либо olga5_oframs
-                str = shp.getAttribute(atr) || shp.getAttribute(atr + 's')
-                
+                atr = 'olga5_' + blng.akey,
+                str = shp.getAttribute(atr)
+
             if (str) {
                 const ss = str ? str.split(/\s*[,;]\s*/g) : [''],
-                typs='CINSB'
-                
+                    typs = 'CINSB'
+
                 for (const s of ss) // ss оставил для контроля устаревших заданий контейнеров
                     if (s.length > 0) {
                         const
@@ -57,15 +57,18 @@
 
                         if (typs.includes(t)) {
                             const cod = cc.length > 1 ? cc[1].trim() : '',
-                                num = cc.length > 2 ? C.MyRound(cc[2]) : 0,
-                                bord={tag: null, typ: t, cod: cod, num: num, err: '', }
-                            
-                            Object.seal(bord)
-                            blng.bords.push(bord)
+                                num = cc.length > 2 ? C.MyRound(cc[2]) : 0
+
+                            blng.bords.push({ tag: null, typ: t, cod: cod, num: num, err: '', })
                         }
                         else
                             errs.push({ name: aO5.name, str: str, err: "тип ссылки не начинается одним из '" + typs + "'" })
                     }
+            }
+            if (blng.bords.length === 0) {
+                blng.bords.push({ tag: null, typ: def, cod: '', num: 0, err: '', })
+                if (str)
+                    errs.push({ name: aO5.name, str: str, err: `дал умолчание '${def}' для '${blng.akey}'` })
             }
         },
         Clone = function (aO5) {
@@ -76,8 +79,9 @@
             Object.assign(aO5.orig, { display: style.display, position: style.position, zIndex: style.zIndex })
 
             const clon = aO5.clon = aO5.shp.cloneNode(true)
-            clon.aO5 = aO5
-            clon.classList.add('olga5-clon')    // нужно ля тестов - CC()
+            clon.aO5shp = aO5
+            clon.classList.add('olga5-clon')
+
             if (clon.id) clon.id += '_clon'
             aO5.shp.parentNode.insertBefore(clon, aO5.shp)
 
@@ -128,7 +132,7 @@
 
             Object.assign(aO5.cart.style, {
                 display: '',
-                zIndex: aO5.act.zIndex,
+                zIndex: aO5.cls.zIndex,
                 marginTop: margs.t,
                 marginLeft: margs.l,
                 marginRight: margs.r,
@@ -149,14 +153,15 @@
             aO5.shdw = aO5.clon
             aO5.act.isFixed = true
 
-            C.E.DispatchEvent('olga5_fix-act', { detail: (aO5.name + ' - isFixed==true') })
+            window.dispatchEvent(new CustomEvent('olga5_fix-act', { detail: { name: aO5.name, isFixed: true } }))
+            // C.E.DispatchEvent('olga5_fix-act', aO5.name + ' - isFixed==true')
         },
         UnFixV = aO5 => {
             const posW = aO5.posW
 
             Object.assign(aO5.shp.style, {
                 position: aO5.orig.position,
-                zIndex: aO5.act.zIndex,
+                zIndex: aO5.cls.zIndex,
                 top: posW.top + 'px',
                 left: posW.left + 'px',
                 marginTop: aO5.margs.t,
@@ -182,32 +187,27 @@
             aO5.shdw = aO5.shp
             aO5.act.isFixed = false
 
-            C.E.DispatchEvent('olga5_fix-act', { detail: (aO5.name + ' - isFixed==false') })
+            // C.E.DispatchEvent('olga5_fix-act', aO5.name + ' - isFixed==false')
+            window.dispatchEvent(new CustomEvent('olga5_fix-act', { detail: { name: aO5.name, isFixed: false } }))
         },
         ShowFix = aO5 => {
             const
                 posC = aO5.posC,
                 posS = aO5.posS
 
-            Object.assign(aO5.cart.style, {
-                top: posC.top + 'px',
-                left: posC.left + 'px',
-                width: posC.width + 'px',
-                height: posC.height + 'px',
-            })
+            if (posC.width <= 0 || posC.height<=0) 
+                aO5.cart.style.display = 'none'
+            else
+                Object.assign(aO5.cart.style, {
+                    top: posC.top + 'px',
+                    left: posC.left + 'px',
+                    width: posC.width + 'px',
+                    height: posC.height + 'px',
+                })
             Object.assign(aO5.shp.style, {
                 top: posS.top + 'px',
                 left: posS.left + 'px',
             })
-        },
-        SetFix = aO5 => {     // отображение изменеий - только для зафиксированных
-            const act = aO5.act,
-                visi = aO5.visi
-            if (visi.doFix && !act.isFixed) DoFixV(aO5)
-            else
-                if (!visi.doFix && act.isFixed) UnFixV(aO5)
-            if (aO5.act.isFixed)
-                ShowFix(aO5)
         },
         DblClick = e => {
             const aO5 = e.target.aO5shp
@@ -238,7 +238,7 @@
             }
         },
         errs = [],
-        Tbelong = { bords: [], to: null, le: null, ri: null, bo: null }
+        Tbelong = { to: null, le: null, ri: null, bo: null }
 
     class AO5 {
         constructor(shp) {
@@ -251,7 +251,7 @@
             aO5.node = shp.parentNode
             shp.aO5shp = aO5
 
-            for (const nam of ['cls', 'old', 'act', 'visi', 'margs', 'outln', 'posW', 'posC', 'posS', 'oframs', 'owners'])
+            for (const nam of ['cls', 'old', 'act', 'visi', 'margs', 'outln', 'posW', 'posC', 'posS', 'ofram', 'owner'])
                 Object.seal(this[nam])
             Object.seal(this)
 
@@ -259,18 +259,16 @@
         }
         name = '' // повтор - чтобы было 1-м в отладчике
 
-        cls = { dirV: 'U', putV: 'T', alive: false, none: false, level: 0, pitch: 'S', }
-        act = { dspl: false, isFixed: false, isCloned: false, isKilled: false, underClick: false, pushedBy: null, zIndex: 0, }
-        visi = { doKill: false, doFix: '', checkUp: false, part: false, full: false, } //time:0,checkUp: false, top: 0, }
+        cls = { dirV: 'U', putV: 'T', alive: false, none: false, level: 0, pitch: 'S', zIndex: 0, }
+        act = { isFixed: false, isCloned: false, readyFix:true} //  bordFix: false,
+        // act = { dspl: false, isFixed: false, isCloned: false, isKilled: false, underClick: false, pushedBy: null, zIndex: 0, } //  bordFix: false,
+        // visi = { doKill: false, checkUp: false, part: false, full: false, } //time:0,checkUp: false, top: 0, }
 
         margs = { t: '', l: '', r: '', b: '', }
         outln = { w: '', s: '', c: '', o: '', }
 
-        oframs = Object.assign({ akey: 'oframs' }, Tbelong)
-        owners = Object.assign({ akey: 'owners' }, Tbelong)
-
-        // frames = Object.assign({ act: 'frames', asks: [], bords: [] }, Tbelong) // массивы д.б.персонально
-        // owners = Object.assign({ act: 'owners', asks: [], bords: [] }, Tbelong)
+        ofram = Object.assign({ akey: 'oframs', bords: [], }, Tbelong)
+        owner = Object.assign({ akey: 'owners', bords: [], }, Tbelong)
 
         posW = Object.assign({}, { top: 0, left: 0, height: 0, width: 0, })
         posC = Object.assign({}, this.posW)
@@ -283,7 +281,7 @@
 
         DoFixV = () => DoFixV(this)
         UnFixV = () => UnFixV(this)
-        SetFix = () => SetFix(this)
+        // SetFix = () => SetFix(this)
         ShowFix = () => ShowFix(this)
         IsConnect = (upO5) => IsConnect(this, upO5)
     }
@@ -296,8 +294,8 @@
 
         DecodeType(aO5, quals)
 
-        ReadAttrs(aO5, aO5.oframs)
-        ReadAttrs(aO5, aO5.owners)
+        ReadAttrs(aO5, aO5.ofram, 'S')     // S - screen
+        ReadAttrs(aO5, aO5.owner, 'B')     // B - блок с выделенной границей
 
         if (errs.length > 0)
             C.ConsoleError("Ошибки в атрибутах  для тегов", errs.length, errs)

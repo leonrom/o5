@@ -9,6 +9,7 @@
 		C = window.olga5.C,
 		utils = {
 			ShowBounds: (aO5s) => {
+				return  // исправить! в т.ч.  'hovered' 'located'
 				const fmt = [12, 26, 18, 12, 1],
 					nms = ['shp', 'asks', 'bords', ' to..bo', '',],
 					MyRound4 = s => { return ('' + Math.round(parseFloat(s))).padStart(4) },
@@ -95,8 +96,8 @@
 			ShowShpBords: () => {
 
 				const
-					owners = document.getElementsByClassName('olga5-owner'),
-					oframs = document.getElementsByClassName('olga5-ofram'),
+					owners = document.getElementsByClassName('olga5-owners'),
+					oframs = document.getElementsByClassName('olga5-oframs'),
 					sowns = [],
 					sfrms = [],
 					Fill = (owns) => {
@@ -108,12 +109,12 @@
 
 				for (const owner of owners) {
 					const pO5 = owner.pO5,
-						s = Fill(pO5.owns)
+						s = Fill(pO5.owners)
 					sowns.push({ name: pO5.name, aO5s: s })
 				}
 				for (const ofram of oframs) {
 					const pO5 = ofram.pO5,
-						s = Fill(pO5.frms)
+						s = Fill(pO5.oframs)
 					sfrms.push({ name: ofram.pO5.name, aO5s: s })
 				}
 
