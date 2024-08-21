@@ -59,14 +59,14 @@
                             const cod = cc.length > 1 ? cc[1].trim() : '',
                                 num = cc.length > 2 ? C.MyRound(cc[2]) : 0
 
-                            blng.bords.push({ tag: null, typ: t, cod: cod, num: num, err: '', })
+                            blng.bords.push({ tag: null, itag:-1, typ: t, cod: cod, num: num, err: '', })
                         }
                         else
                             errs.push({ name: aO5.name, str: str, err: "тип ссылки не начинается одним из '" + typs + "'" })
                     }
             }
             if (blng.bords.length === 0) {
-                blng.bords.push({ tag: null, typ: def, cod: '', num: 0, err: '', })
+                blng.bords.push({ tag: null, itag:-1, typ: def, cod: '', num: 0, err: '', })
                 if (str)
                     errs.push({ name: aO5.name, str: str, err: `дал умолчание '${def}' для '${blng.akey}'` })
             }

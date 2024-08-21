@@ -133,7 +133,6 @@
                 false
 
             for (const cls of current.classList)
-                // if (!cls.match(/\bolga5[-_]/))
                 pO5.classTag.push(cls)
 
             for (const nam of ['add', 'pos', 'scroll'])
@@ -142,7 +141,7 @@
         }
         add = { top: 0, left: 0, right: 0, bottom: 0 }
         pos = { top: 0, left: 0, right: 0, bottom: 0, tim: 0, } // пересчитывается при DoScroll
-        scroll = { newC: null, diffT: false, diffB: false, yesV: false, yesH: false, dw: 0, dh: 0, ovfX: false, ovfY: false } // пересчитывается при Resize
+        scroll = { newC: null, diffT: false, diffB: false, dw: 0, dh: 0, ovfX: false, ovfY: false, zIndex:1, } // yesV: false, yesH: false, 
 
         prevs = []      // всегда содержит самого себя
         oframs = []

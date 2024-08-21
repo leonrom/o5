@@ -37,7 +37,7 @@
 					c = (bord.cod || '').trim(),
 					t = bord.typ
 				let err = '',
-					itag = null,
+					itag = -1,
 					n = bord.num
 
 				if ('SIBNC'.indexOf(t) < 0)
@@ -49,12 +49,13 @@
 					let first = true
 
 					if (t === 'S') {                    // Screen - подвисание на верхнем уровне (на целом экране)                            
-						tag = prevs[prevs.length - 1]
+						itag = prevs.length - 1
 						n--
 					}
 					else
-						for (const prev of prevs) {
+						for (let i = 0; i < prevs.length; i++) {
 							const
+								prev = prevs[i],
 								pO5 = prev.pO5
 
 							// if (pO5.name == '#main')
@@ -65,13 +66,13 @@
 								(t === 'N' && prev.nodeName == cu) ||
 								(t === 'C' && IsInClass(pO5, clss))
 							) {
-								tag = prev
+								itag = i
 								if (--n <= 0 || bord.num <= 1) // именно в такой очередности
 									break
 							}
 						}
-					if (!tag) {
-						tag = prevs[prevs.length - 1]
+					if (itag < 0) {
+						itag = prevs.length - 1
 						err = `'${t}:${c}' - не найден`
 					}
 					else
@@ -82,11 +83,15 @@
 					bord.err = err
 					errs.push(`Селектор '${t}:${c}:${bord.num}':  ${err}`)
 				}
+
+				const tag = prevs[itag]
+
 				if (!tag.pO5[akey].includes(aO5)) {
 					tag.pO5[akey].push(aO5)
 					tag.classList.add('olga5-' + akey)
 				}
 				bord.tag = tag
+				bord.itag = itag
 			}
 
 			// устранение дублирования
@@ -103,6 +108,11 @@
 					err += (err ? ', ' : '') + pO5.name + ' (' + bord.typ + ':' + bord.cod + ':' + bord.num + ')'
 				}
 			}
+			// сортировка по вложенности от внутреннего к внешнему
+			blng.bords.sort((b1, b2) => { return b1.itag - b2.itag })
+			// if (blng.bords.length>1)
+			// console.log(blng.bords[0].tag.id, blng.bords[1].tag.id)
+
 			if (err)
 				C.ConsoleError(`Тег '${aO5.name}' - устранил дублирующие контейнеры:`, err)
 
@@ -133,7 +143,7 @@
 					isr = entry.intersectionRatio
 
 				if (entry.isIntersecting) {
-					if (isr === 1) 
+					if (isr === 1)
 						act.readyFix = true
 
 					if (shp.classList.contains('olga5-clon')) { // т.е. это есть клон) 
@@ -156,36 +166,47 @@
 		Boards = aO5 => {
 			const
 				fmt = "background: cornsilk; color: black;",
-				pO5s = []
+				
+				MaxZIndex = children=>{
+					let maxZIndex = 0
+					for (const child of children) {
+						const zIndex = parseInt(child.style.zIndex);
+						if (!isNaN(zIndex) && zIndex > maxZIndex) 
+							maxZIndex = zIndex
+					}
+					return maxZIndex
+				}
 
 			FindBords(aO5, aO5.owner)
 			FindBords(aO5, aO5.ofram)
 
 			// for (const bord of aO5.ofram.bords) {
-				const
-				bord = aO5.ofram.bords[aO5.ofram.bords.length-1],
-					pO5 = bord.tag.pO5
+			const
+				bord = aO5.ofram.bords[aO5.ofram.bords.length - 1],
+				pO5 = bord.tag.pO5
 
-				if (!pO5.observ.observer) {
-					pO5.observ.observer = new IntersectionObserver(Observe, {
-						root: pO5.current === document.body ? null : pO5.current,
-						rootMargin: '0px',
-						threshold: [0.001, 1],
-					})
-					pO5.observ.observer.pO5 = pO5
+			if (!pO5.observ.observer) {
+				pO5.observ.observer = new IntersectionObserver(Observe, {
+					root: pO5.current === document.body ? null : pO5.current,
+					rootMargin: '0px',
+					threshold: [0.001, 1],
+				})
+				pO5.observ.observer.pO5 = pO5
+				pO5.scroll.zIndex += MaxZIndex(pO5.current.children)
 
-					if (o5debug > 1)
-						console.log("%c%s", fmt,
-							`создал observer на ${pO5.name.padEnd(6)}  [${pO5.current.className}]`)
-				}
-				pO5.observ.observer.observe(aO5.shp)
 				if (o5debug > 1)
-					pO5s.push(pO5.name)
+					console.log("%c%s", fmt,
+						`создал observer на ${pO5.name.padEnd(6)}  [${pO5.current.className}]`)
+			}
+
+			pO5.observ.observer.observe(aO5.shp)
+			// if (o5debug > 1)
+			// 	pO5s.push(pO5.name)
 			// }
 
 			if (o5debug > 1)
 				console.log("%c%s", fmt,
-					`для ${aO5.name} добавил ofram observer'ы:  ${pO5s.join(', ')}`)
+					`добавил ${aO5.name} в observer на  ${pO5.name}`)
 		},
 		wshp = C.ModulAddSub(olga5_modul, modulname, Boards)
 

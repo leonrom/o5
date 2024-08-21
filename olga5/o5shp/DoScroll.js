@@ -137,7 +137,7 @@
 					const bords = aO5.ofram.bords,
 						xO5 = bords[bords.length - 1].aO5shp
 					if (xO5)
-						CalcLever(xO5, ++level)
+						CalcLevel(xO5, ++level)
 					return level
 				},
 				level = aO5.cls.level = CalcLevel(aO5, 0)
@@ -161,18 +161,21 @@
 					(br.bottom <= bottom && aO5.cls.dirV === 'D')
 				)
 					return 'N'
-				console.log(`--:  DoScroll entry.intersectionRect.top=${entry.intersectionRect.top}`)
-				const
-					posC = aO5.posC,
-					b = aO5.shdw.getBoundingClientRect() // д.б. ОТДЕЛЬНО - текущее положение объекта или его клона
 
-				Object.assign(aO5.posW, { top: b.top, left: b.left, height: b.height, width: b.width, })
-				Object.assign(posC, aO5.posW)
-				posC.top = aO5.cls.dirV === 'U' ? top : bottom - posC.height
+				console.log(`--:  DoScroll entry.intersectionRect.top=${entry.intersectionRect.top}`)
+				// const
+				// 	posC = aO5.posC,
+				// 	b = aO5.shdw.getBoundingClientRect() // д.б. ОТДЕЛЬНО - текущее положение объекта или его клона
+
+				// Object.assign(aO5.posW, { top: b.top, left: b.left, height: b.height, width: b.width, })
+				// Object.assign(posC, aO5.posW)
+				// posC.top = aO5.cls.dirV === 'U' ? top : bottom - posC.height
 
 				aO5.DoFixV()
 
-				Add2fixed(aO5)
+				Add2fixed(aO5)  // упорядочить по уровням вложенности shp-тегов
+				
+				Scroll({timeStamp:1})
 				if (!isScroll) {
 					console.log(`добавляю: addEventListene для ${aO5.name} `)
 					window.addEventListener('scroll', Scroll, true)
@@ -189,7 +192,7 @@
 					isScroll = false
 				}
 			}
-			aO5.ShowFix()
+			// aO5.ShowFix()
 
 
 			if (o5debug > 2)
