@@ -11,20 +11,12 @@
         modulname = 'DoInit',
         C = window.olga5.C,
         o5debug = C.consts.o5debug,
-        Observe0 = (entries, obsrv0) => {
+        Observe = (entries, observer) => {
             /*
             инициализация подвисабельных обектов по мере их ПОЛНОГО появления на экране
             когда все буду инициализированы - отключаем
             */
-            const 
-            fmt = "background: aquamarine; color: black;",
-				CalcLevel = (aO5, level) => {
-					const bords = aO5.ofram.bords,
-						xO5 = bords[bords.length - 1].aO5shp
-					if (xO5)
-						CalcLevel(xO5, ++level)
-					return level
-				}
+            const fmt = "background: aquamarine; color: black;"
 
             for (const entry of entries) {
                 if (entry.isIntersecting) {
@@ -37,25 +29,23 @@
                         aO5 = wshp.AO5shp(shp),
                         top = aO5.cls.top
 
-                        aO5.act.level = CalcLevel(aO5, 0)
-
                     let i = wshp.aO5s.length
                     while (i-- > 0)
                         if (wshp.aO5s[i].cls.top < top)
                             break
 
-                    wshp.aO5s.splice(i + 1, 0, ...[aO5]) // aO5s.push()
+                    wshp.aO5s.splice(i + 1, 0, ...[aO5])
                     
                     if (!aO5.prev.pO5)  // сделать цепочку контейнеров 
                         wshp.PO5shp(aO5)
 
                     wshp.Boards(aO5) // найти в контейнерах ofram  и  owner       
 
-                    obsrv0.unobserve(shp)
+                    observer.unobserve(shp)
 
                     const noact = wshp.shps.find(shp => !shp.aO5shp)
                     if (!noact)
-                        obsrv0.disconnect()
+                        observer.disconnect()
 
                     if (o5debug > 0) {
                         console.log("%c%s", fmt,
@@ -65,7 +55,7 @@
                         C.Debug.ShowShpBords()
 
                         if (!noact)
-                            console.log("%c%s", fmt, `конец первичного обосрения: obsrv0.disconnected (все shp обработаны)!`)
+                            console.log("%c%s", fmt, `конец первичного обосрения: observer.disconnected !`)
                     }
                 }
             }
@@ -73,18 +63,18 @@
         DoInit = () => {
             const
                 mtags = C.SelectByClassName(wshp.W.class, olga5_modul),
-                obsrv0 = new IntersectionObserver(Observe0, {
+                observer = new IntersectionObserver(Observe, {
                     root: null,
                     rootMargin: '0px',
-                    threshold: 0,
+                    threshold: [1],
                 })
 
-            // obsrv0.pO5 = { n: mtags.length }
+            observer.pO5 = { n: mtags.length }
             for (const mtag of mtags) {
                 const shp = mtag.tag
 
                 shp.aO5shp2 = { quals: mtag.quals, top: 0 }
-                obsrv0.observe(shp)
+                observer.observe(shp)
                 wshp.shps.push(shp)
             }
 
@@ -100,7 +90,7 @@
         },
         wshp = C.ModulAddSub(olga5_modul, DoInit)
 
-    wshp.shps = [] // это ВСЕ подвисабельные
-    wshp.aO5s = [] // это инициированные подвисабельные
+    wshp.shps = []
+    wshp.aO5s = []
 })();
 

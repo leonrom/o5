@@ -379,12 +379,6 @@
 			window.addEventListener('olga5-incls', W.Init)
 		else
 			document.addEventListener('DOMContentLoaded', W.Init)
-		// window.addEventListener('olga5-incls', e=>{
-		// 	C.incdone = true	
-		// 	TabInit(e)
-		// })
-		// if (!window.olga5)
-		// 	window.olga5 = {}
 
 		if (!window.olga5) window.olga5 = []
 		W.consts = C.consts

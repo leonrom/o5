@@ -12,8 +12,6 @@
 		modulname = 'DoScroll',
 		C = window.olga5.C,
 		o5debug = C.consts.o5debug,
-		fmtOK = "background: cornsilk; color: black;",
-		fmtErr = "background: lightgoldenrodyellow; color: black;",
 		doc = document.documentElement,
 		PrepareBords = (bords, isf, timeStamp) => {
 			const
@@ -75,9 +73,8 @@
 			return a
 		},
 		CutBounds = aO5 => {
-			const
-				// putV = aO5.cls.putV,
-				// act = aO5.act,
+			const putV = aO5.cls.putV,
+				act = aO5.act,
 				posC = aO5.posC
 
 			const owner = aO5.owner,
@@ -118,154 +115,169 @@
 			// 	Missed = (l1, r1, l2, r2) => {
 			// 		return r1 < l2 || l1 > r2  // || r2 < l1 || l2 > r1
 			// 	}
-			let foundAdh = false
-			// posC = null,
-			// posS = null,
-			// level = 0,
-			// pitch = ''
-
+			let found = false
 			const
-				FixV = (aO5, fO5, b, top) => {
+				FixV = (aO5, b, top) => {
 					Object.assign(aO5.posC, b)
 					aO5.posC.top = top
-					if (!aO5.act.xFixed) {
-						aO5.DoFixV(fO5)
-						aO5.ShowFix()
-					}
-					foundAdh = true
-				},
-				ActOnTop = (pitch, posC, posS, d) => {	// спихиваю верхний в зависимоти ЕГо pitch'а
-					switch (pitch) {
-						case 'P':
-							posC.height = 0
-							break
-						case 'S':
-							posC.height -= d
-							posS.top = -d
-							break
-						case 'C':
-							posC.height -= d
-							break
-						default: // case 'O' - просто наезжает
-					}
-				},
-				ActOnBottom = (pitch, posC, posS, d) => { 	// спихиваю нижний в зависимоти ЕГо pitch'а
-					switch (pitch) {
-						case 'P':
-							posC.topo += posC.height
-							posC.height = 0
-							break
-						case 'S':
-							posC.top += d
-							posC.height -= d
-							break
-						case 'C':
-							posC.top += d
-							posC.height -= d
-							posS.top = -d
-							break
-						default: // case 'O' - просто наезжает
-					}
+					if (!aO5.act.isFixTo)
+						aO5.DoFixV(aO5, false)
+					aO5.ShowFix()
+					found = true
 				}
 
 			for (const fO5 of wshp.aO5s) {
-				if (fO5.act.xFixed) {
-					const posC = fO5.posC
-					// posS = fO5.posS
-					// level = fO5.act.level
-					// pitch = fO5.cls.pitch
+				if (fO5.IsFixed()) {
+					const
+						posC = fO5.posC,
+						// posW = fO5.posW,
+						posS = fO5.posS,
+						level = fO5.act.level,
+						pitch = fO5.cls.pitch,
+						isOnTop = fO5.cls.putV === 'T'
 
 					for (const aO5 of wshp.aO5s) {
-						if (aO5.act.xFixed)
+						if (aO5.IsFixed())
 							continue
 
 						const b = aO5.shdw.getBoundingClientRect()
+						// if (IsAbove(b.left, b.lef + b.width, posC.left, posC.left + posC.width))
 						if (!(b.lef + b.width < posC.left || b.left > posC.left + posC.width))
-							if (fO5.cls.putV === 'T') {
+							if (isOnTop) {
 								const d = posC.top + posC.height - b.top
-
 								if (posC.top < b.top && d > 0) {
-									if (fO5.act.level > aO5.act.level)  // прижимаюсь и фиксируюсь
-										FixV(aO5, fO5, b, posC.top + posC.height)
-									else
-										ActOnTop(fO5.cls.pitch, posC, fO5.posS, d)
+									if (level > aO5.act.level)  // прижимаюсь и фиксируюсь
+										FixV = (aO5, b, posC.top + posC.height)
+									else 	// спихиваю верхний в зависимоти ЕГо pitch'а
+										switch (pitch) {
+											case 'P':
+												posC.height = 0
+												break
+											case 'S':
+												posC.height -= d
+												posS.top = -d
+												break
+											case 'C':
+												height -= d
+												break
+											default: // case 'O' - просто наезжает
+										}
 								}
 								else
-									if (aO5.act.xFixed === fO5)
-										aO5.UnFixV()
+									if (aO5.act.isFixTo)
+										aO5.UnFixV(aO5)
 							} else {
 								const d = b.top + b.height - posC.top
-
 								if (posC.top > b.top && b > 0) {
-									if (fO5.act.level > aO5.act.level)  // прижимаюсь и фиксируюсь
-										FixV(aO5, fO5, b, posC.top - aO5.posC.height)
-									else
-										ActOnBottom(fO5.cls.pitch, posC, fO5.posS, d)
+									if (level > aO5.act.level)  // прижимаюсь и фиксируюсь
+										FixV = (aO5, b, posC.top - aO5.posC.height)
+									else 	// спихиваю нижний в зависимоти ЕГо pitch'а
+										switch (pitch) {
+											case 'P':
+												posC.topo += posC.height
+												posC.height = 0
+												break
+											case 'S':
+												posC.top += d
+												posC.height -= d
+												break
+											case 'C':
+												posC.top += d
+												posC.height -= d
+												posS.top = -d
+												break
+											default: // case 'O' - просто наезжает
+										}
 								}
 								else
-									if (aO5.act.xFixed === fO5)
-										aO5.UnFixV()
+									if (aO5.act.isFixTo)
+										aO5.UnFixV(aO5)
 							}
 					}
 				}
 			}
-			if (foundAdh)
+			if (found)
 				Adhereds(timeStamp)
 		},
-		DoScroll = e => {
+		Scroll = e => {
 			for (const aO5 of wshp.aO5s) {    // делаю для всех, т.к. могут понадобиться в Adhereds()
 				const
 					b = aO5.shdw.getBoundingClientRect() // д.б. ОТДЕЛЬНО - текущее положение объекта или его клона
 				Object.assign(aO5.posW, { top: b.top, left: b.left, height: b.height, width: b.width, })
 			}
+			for (const aO5 of wshp.fixed) {
+				// итоговые внутренние и внешние рамки
+				Object.assign(aO5.ofram, PrepareBords(aO5.ofram.bords, true, e.timeStamp))
+				Object.assign(aO5.owner, PrepareBords(aO5.owner.bords, false, e.timeStamp))
 
-			for (const aO5 of wshp.aO5s)
-				if (aO5.act.xFixed === true) {
-					// итоговые внутренние  рамки подвисания
-					Object.assign(aO5.ofram, PrepareBords(aO5.ofram.bords, true, e.timeStamp))
+				// положение зафиксированного
+				const
+					posC = aO5.posC
 
-					// положение зафиксированного
-					Object.assign(aO5.posS, { top: 0, left: 0, })
-					Object.assign(aO5.posC, aO5.posW)
-					aO5.posC.top = aO5.cls.putV === 'T' ?
-						aO5.ofram.to.pos.top :
-						aO5.ofram.bo.pos.bottom - posC.height
+				Object.assign(aO5.posS, { top: 0, left: 0, })
+				Object.assign(posC, aO5.posW)
+				posC.top = aO5.cls.putV === 'T' ?
+					aO5.ofram.to.pos.top :
+					aO5.frames.bo.pos.bottom - posC.height
+
+				// console.log(`--:  aO5.ofram.to.pos.top=${aO5.ofram.to.pos.top}`)
+
+				CutBounds(aO5)		// обрезание зафиксированных
+				Adhereds(e.timeStamp) // прилипнувшие
+
+				aO5.ShowFix()		// отображение зафиксированного
+			}
+		},
+		Add2fixed = aO5 => {
+			const
+				CalcLevel = (aO5, level) => {
+					const bords = aO5.ofram.bords,
+						xO5 = bords[bords.length - 1].aO5shp
+					if (xO5)
+						CalcLevel(xO5, ++level)
+					return level
+				},
+				level = aO5.act.level = CalcLevel(aO5, 0)
+
+			let i = wshp.fixed.length
+			while (i-- > 0)
+				if (wshp.fixed[i].act.level < level)
+					break
+
+			wshp.fixed.splice(i + 1, 0, ...[aO5])
+		},
+		DoScroll = aO5 => {
+			if (aO5.act.isFixed) { // д.б. именно isFixed (не IsFixed())
+
+				Add2fixed(aO5)  // упорядочить по уровням вложенности shp-тегов
+
+				Scroll({ timeStamp: 1 })
+
+				C.E.DispatchEvent('o5shp_scroll', 'DoScroll', true)  // вызов shpX_BordNames в alltst.js
+
+				if (!isScroll) {
+					console.log(`добавляю: addEventListene для ${aO5.name} `)
+					window.addEventListener('scroll', Scroll, true)
+					isScroll = true
 				}
+			} else {
 
-			for (const aO5 of wshp.aO5s)
-				if (aO5.act.xFixed) {
-					// итоговые  внешние рамки обрезания
-					Object.assign(aO5.owner, PrepareBords(aO5.owner.bords, false, e.timeStamp))
+				wshp.fixed.splice(wshp.fixed.indexOf(aO5), 1)
 
-					CutBounds(aO5)			// обрезание зафиксированных
-					Adhereds(e.timeStamp) 	// прилипнувшие
-
-					aO5.ShowFix()			// отображение зафиксированного
+				if (wshp.fixed.length === 0 && isScroll) {
+					console.log(`убрал   : removeEventListener для ${aO5.name} `)
+					window.removeEventListener('scroll', Scroll, true)
+					isScroll = false
 				}
+			}
+
+			if (o5debug > 2)
+				if (wshp.fixed.length > 0)
+					C.Debug.ShowBounds(wshp.fixed)
+				else
+					console.log('нету подвисших')
 		},
 		wshp = C.ModulAddSub(olga5_modul, DoScroll)
 
 	wshp.fixed = []
-	wshp.escroll = new class {
-		#eve
-		#isScroll
-		constructor() {
-			this.#eve = 'scroll'
-			this.#isScroll = null
-		}
-		ScrollAct(act, txt) {
-			if (act !== this.#isScroll) {
-				this.#isScroll = act
-				if (act)
-					window.addEventListener(this.#eve, DoScroll, true)
-				else
-					window.removeEventListener(this.#eve, DoScroll, true)
-				if (o5debug > 0)
-					console.log("%c%s", fmtOK, `Скроллинг  EventListener : ${act ? 'запуск' : 'убрал   '} после "${txt}"`)
-			}
-			else
-				if (o5debug > 0)
-					console.log("%c%s", fmtErr, `Скроллинг  EventListener : повтор ${act ? 'запуска ' : 'останова'} после "${txt}"`)
-		}
-	}()
 })();

@@ -9,7 +9,7 @@
 		C = window.olga5.C,
 		utils = {
 			ShowBounds: (aO5s) => {
-				return  // исправить! в т.ч.  'hovered' 'located'
+				return  // исправить! 
 				const fmt = [12, 26, 18, 12, 1],
 					nms = ['shp', 'asks', 'bords', ' to..bo', '',],
 					MyRound4 = s => { return ('' + Math.round(parseFloat(s))).padStart(4) },
@@ -58,9 +58,9 @@
 						let names = ''
 						for (const aO5 of aO5s)
 							if (aO5.act.dspl)
-								for (const blng of [aO5.hovered, aO5.located]) {
-									const ish = blng === aO5.hovered,
-										old = ish ? aO5.old.hovered : aO5.old.located,
+								for (const blng of [aO5.ofram, aO5.owner]) {
+									const ish = blng === aO5.ofram,
+										old = ish ? aO5.old.ofram : aO5.old.owner,
 										name = aO5.name + (ish ? '/H' : '/L')
 
 									if (old.to != blng.to || old.bo != blng.bo) { // показывать только для изменённых
@@ -102,23 +102,31 @@
 					sfrms = [],
 					Fill = (owns) => {
 						let s = ''
-						for (const own of owns)
-							s += (s ? ', ' : '') + own.name
+						for (const own of owns) // {aO5: AO5, act: false}
+							s += (s ? ', ' : '') + own.aO5.name
 						return s
 					}
 
-				for (const owner of owners) {
-					const pO5 = owner.pO5,
-						s = Fill(pO5.owners)
-					sowns.push({ name: pO5.name, aO5s: s })
-				}
+				// for (const owner of owners) {
+				// 	const pO5 = owner.pO5,
+				// 		s = Fill(pO5.owners)
+				// 	sowns.push({ name: pO5.name, aO5s: s })
+				// }
 				for (const ofram of oframs) {
 					const pO5 = ofram.pO5,
-						s = Fill(pO5.oframs)
+						pO5L = pO5.scroll.pO5L
+					let s = 'нет крайних aO5'
+					if (pO5L) {
+						const bords = pO5.scroll.pO5L.paO5s
+						s = Fill(bords)	// pO5.oframs)}
+					}
+					// else 
+					// 	console.log('pO5L ?')
+
 					sfrms.push({ name: ofram.pO5.name, aO5s: s })
 				}
 
-				C.ConsoleInfo(`Контейнеры-владельцы  (owner)`, sowns.length, sowns)
+				// C.ConsoleInfo(`Контейнеры-владельцы  (owner)`, sowns.length, sowns)
 				C.ConsoleInfo(`Контейнеры подвисания (ofram)`, sfrms.length, sfrms)
 
 			}

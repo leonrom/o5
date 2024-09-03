@@ -4,34 +4,32 @@
 /*jshint strict:true  */
 /*jshint esversion: 6 */
 
-(function () {              // ---------------------------------------------- o5shp/Boards ---11
+(function () {              // ---------------------------------------------- o5shp/Boards ---
 	"use strict"
 
 	const
 		olga5_modul = "o5shp",
-		// modulname = 'Boards',
+		modulname = 'Boards',
 		C = window.olga5.C,
 		o5debug = C.consts.o5debug,
-		fmtOK = "background: cornsilk; color: black;",
-		fmtErr = "background: lightgoldenrodyellow; color: black;",
-		pO5Ls = [],
 		FindBords = (aO5, blng) => {
 			const
 				errs = [],
 				akey = blng.akey,
 				prevs = aO5.prev.pO5.prevs,
 				IsInClass = (pO5, clss) => {
-					const clst = pO5.classOrig
+					const classTag = pO5.classTag
 
 					for (const cls of clss)
 						if (
-							(cls === '' && clst.length > 0) ||
-							(cls !== '' && (clst.length === 0 || !clst.includes(cls)))
+							(cls === '' && classTag.length > 0) ||
+							(cls !== '' && (classTag.length === 0 || !classTag.includes(cls)))
 						)
 							return false
 					return true
 				}
 
+			console.log(aO5.name, akey)
 			// if (aO5.name == '#shp4-2')
 			// 	console.log('')
 			for (const bord of blng.bords) {
@@ -48,6 +46,7 @@
 					const
 						cu = c.toUpperCase(),
 						clss = c.split(/[.,]/)
+					let first = true
 
 					if (t === 'S') {                    // Screen - подвисание на верхнем уровне (на целом экране)                            
 						itag = prevs.length - 1
@@ -81,26 +80,25 @@
 						if (n > 0)
 							err = ` контейнер '${t}:${c}:${bord.num}' - найдено ${bord.num - n} из ${bord.num}`
 				}
-
 				if (err) {
 					bord.err = err
 					errs.push(`Селектор '${t}:${c}:${bord.num}':  ${err}`)
 				}
 
-				const tag = prevs[itag],
-					cls = 'olga5-' + akey
+				const tag = prevs[itag]
 
-				if (!tag.classList.contains(cls))
-					tag.classList.add('olga5-' + akey)		// olga5-oframs, olga5-owners`
+				if (!tag.pO5[akey].includes(aO5)) {
+					tag.pO5[akey].push(aO5)
+					tag.classList.add('olga5-' + akey)
+				}
 				bord.tag = tag
 				bord.itag = itag
 			}
 
 			// устранение дублирования
-			const pO5s = []
-
-			let err = '',
-				i = blng.bords.length
+			const pO5s = [],
+				err = ''
+			let i = blng.bords.length
 
 			while (i-- > 0) {
 				const bord = blng.bords[i],
@@ -113,14 +111,9 @@
 			}
 			// сортировка по вложенности от внутреннего к внешнему
 			blng.bords.sort((b1, b2) => { return b1.itag - b2.itag })
+			// if (blng.bords.length>1)
+			// console.log(blng.bords[0].tag.id, blng.bords[1].tag.id)
 
-
-			if (o5debug > 1) {
-				let s = ''
-				for (const bord of blng.bords)
-					s += (s ? ', ' : '') + bord.tag.pO5.name
-				console.log("%c%s", fmtOK, aO5.name, akey, '[ ' + s + ' ]')  //, akey=='oframs'?('bordL=' + blng.bordL.tag.pO5.name):'')
-			}
 			if (err)
 				C.ConsoleError(`Тег '${aO5.name}' - устранил дублирующие контейнеры:`, err)
 
@@ -131,65 +124,62 @@
 				window.dispatchEvent(new CustomEvent('olga5-containers', { detail: { aO5: aO5, akey: akey } }))
 
 		},
-		AddToObserver = (aO5, blng) => {
+		Observe = (entries, observer) => {
+			const pO5 = observer.pO5
 
-			// создание observer'а на bord'е и включение в него aO5			
-			blng.bordL = blng.bords[blng.bords.length - 1]
+			if (o5debug > 1) {
+				let s = ''
+				for (const entry of entries) {
+					const shp = entry.target,
+						aO5 = shp.aO5shp
 
-			let tag = blng.bordL.tag,
-				pO5 = tag.pO5,
-				pO5L = pO5.scroll.pO5L
-
-			if (pO5L === null) {	// т.е. еще не инициирован
-				pO5L = pO5.scroll.pO5L = new wshp.PO5L(pO5)
-				pO5Ls.push(pO5L)
+					s += `${aO5.name} ${entry.isIntersecting ? 'видно' : 'нету '} ${entry.intersectionRatio.toFixed(3)} ${(shp.classList.contains('olga5-clon') ? 'clon' : '')}`
+				}
+				console.log('--:  Observe', pO5.name, s)
 			}
-			pO5L.AddO5(aO5)
-		},
-		ObserveM = entries => {
-			// ПРОВЕРКА и останавливаем блочные обосреватели и отключаем контроль скроллинга
-
-			// let isf = false
-			// for (const pO5 of obsrvM.pO5s)
-			// 	if (!isf && pO5.po.active)
-			// 		for (const paO5 of pO5.po.paO5s)
-			// 			if (paO5.aO5.xFixed) {
-			// 				isf = true
-			// 				break
-			// 			}
-
-			if (o5debug > 1)
-				console.log("%c%s", fmtOK, `ObserveM - задание скроллинга`)
 
 			for (const entry of entries) {
-				const pO5L = entry.target.pO5.scroll.pO5L
-				pO5L.ActPO(entry.isIntersecting)
-			}
+				const shp = entry.target,
+					aO5 = shp.aO5shp,
+					act = aO5.act,
+					isr = entry.intersectionRatio
 
-			let nf = 0,
-				s = ''
-			for (const pO5L of pO5Ls)
-				if (pO5L.IsVisi()) {
-					if (pO5L.HasFix()) {
-						nf++
-						s += '+'
+				if (entry.isIntersecting) {
+					if (isr === 1)
+						act.readyFix = true
+
+					if (shp.classList.contains('olga5-clon')) { // т.е. это есть клон) 
+						if (isr === 1 || !act.readyFix) {
+							aO5.UnFixV()
+							observer.observe(aO5.shp)
+							observer.unobserve(aO5.clon)
+							wshp.DoScroll(aO5)
+						}
 					}
 					else
-						s += '-'
-					s += pO5L.pO5.name + ', '
+						if (isr < 1 && !act.isFixed && act.readyFix) { // д.б. именно isFixed (не IsFixed())
+							const
+								br = entry.boundingClientRect,
+								top = entry.intersectionRect.top,
+								bottom = entry.intersectionRect.bottom
+
+							if (
+								(br.top < top && aO5.cls.dirV === 'U') ||
+								(br.bottom > bottom && aO5.cls.dirV === 'D')
+							) {
+								aO5.DoFixV(pO5, shp)
+								observer.unobserve(aO5.shp)
+								observer.observe(aO5.clon)
+								wshp.DoScroll(aO5)
+							}
+
+						}
 				}
-
-			wshp.escroll.ScrollAct(nf > 0, `видимость bord'ов [${s}] (+- наличие fixed)`)
-
-			if (o5debug > 2) {
-				if (wshp.aO5s.length > 0)
-					C.Debug.ShowBounds(wshp.aO5s)
-				else
-					console.log('нету подвисабельных')
 			}
 		},
 		Boards = aO5 => {
 			const
+				fmt = "background: cornsilk; color: black;",
 				MaxZIndex = bords => {
 					let cIndex = 1
 					for (const bord of bords) {
@@ -209,24 +199,36 @@
 					return cIndex
 				}
 
-			if (o5debug > 1)
-				console.log("%c%s", fmtOK,
-					`Bords: добавляю ${aO5.name} `)
-
 			FindBords(aO5, aO5.owner)
 			FindBords(aO5, aO5.ofram)
 
-			AddToObserver(aO5, aO5.ofram)
+			const
+				bord = aO5.ofram.bords[aO5.ofram.bords.length - 1],
+				pO5 = bord.tag.pO5
+
+			if (!pO5.observ.observer) {
+				pO5.observ.observer = new IntersectionObserver(Observe, {
+					root: pO5.current === document.body ? null : pO5.current,
+					rootMargin: '0px',
+					threshold: [0.001, 1],
+				})
+				pO5.observ.observer.pO5 = pO5
+
+				if (o5debug > 1)
+					console.log("%c%s", fmt,
+						`создал observer на ${pO5.name.padEnd(6)}  [${pO5.current.className}]`)
+			}
+
+			pO5.observ.observer.observe(aO5.shp)
 
 			aO5.act.cIndex += MaxZIndex(aO5.ofram.bords) + 1
 
-			obsrvM.observe(aO5.ofram.bordL.tag)
+			C.E.DispatchEvent('o5shp_scroll', 'DoScroll', true)  // вызов shpX_BordNames в alltst.js
+
+			if (o5debug > 1)
+				console.log("%c%s", fmt,
+					`добавил ${aO5.name} в observer на  ${pO5.name}`)
 		},
-		obsrvM = new IntersectionObserver(ObserveM, {
-			root: null,
-			rootMargin: '10px',
-			threshold: [0.01],
-		}),
 		wshp = C.ModulAddSub(olga5_modul, Boards)
 
 })();

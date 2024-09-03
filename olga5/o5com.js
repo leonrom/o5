@@ -149,12 +149,15 @@
 
 			for (const name of names)
 				nams[name] = false
+
 			for (const name of names) { // в очерёдности размещения	
-				if (!window.olga5[modul]) {
+				const wshp = window.olga5[modul]
+
+				if (!wshp) {
 					C.ConsoleError(`В скрипте, выполняющем дозагрузку скриптов, не создан объект 'window.olga5.${modul}'`)
 					continue
 				}
-				if (window.olga5[modul][name]) OnLoad(name)
+				if (wshp[name]) OnLoad(name)
 				else {
 					if (!load.is_set)
 						Object.assign(load, {
@@ -364,30 +367,34 @@
 		},
 		constsurl: {},
 		save: { hash: null, xs: null, p: '', n1: -1, urlName: 'url', libName: 'ядро', }, // сохранение для "красивой" печати - потом удалю
+		ModulAddSub: (modul, p1, p2) => {
 
-		ModulAddSub: (modul, sub, Fun) => {
+			if (!window.olga5[modul])
+				window.olga5[modul] = {}
+
+			const
+				wshp = window.olga5[modul],
+				sub = p2 ? p1 : p1.name,
+				Fun = p2 ? p2 : p1
+
 			if (C.consts.o5debug) {
-				// const nam = `${modul}/${sub}.js`
-				// if ('o5shp/DoInit.js' == nam)
-				// 	console.log()
 				console.log(`}===< ${document.currentScript.src.indexOf(`/${modul}.`) > 0 ? 'дозагружен' : 'подключён '}:  ${modul}/${sub}.js`)
 			}
 
-			if (window.olga5[modul] && window.olga5[modul][sub]) {
+			if (wshp && wshp[sub]) {
 				console.groupCollapsed('%c%s', "background: yellow; color: black;border: solid 2px red;",
 					`}---< Повтор загрузки '${modul}/${sub}'`)
-				console.log(`Fun_old=${window.olga5[modul][sub]})`)
+				console.log(`Fun_old=${wshp[sub]})`)
 				console.log(`Fun_new=${Fun})`)
 				console.groupEnd()
 			}
 
-			if (!window.olga5[modul])
-				window.olga5[modul] = {}
-			if (Fun)
-				window.olga5[modul][sub] = Fun
-			return window.olga5[modul]
+			wshp[sub] = Fun
+
+			return wshp
 		},
-		ModulAdd: (W, pars) => {
+
+		ModulAdd: (W) => {
 			const modul = W.modul
 			if (window.olga5.find(w => w.modul == modul))
 				console.error('%c%s', "background: yellow; color: black;border: solid 2px red;",
@@ -399,15 +406,18 @@
 				if (!window.olga5[modul])
 					window.olga5[modul] = {}
 
-				if (pars)
-					Object.assign(window.olga5[modul], pars)
+				const wshp = window.olga5[modul]
 
-				window.olga5[modul].W = W
+				// if (pars)
+				// 	Object.assign(window.olga5[modul], pars)
+
+				wshp.W = W
+				wshp.name = W.modul // просто для облегченияидентификации
 				window.olga5.push(W)
-				// window.dispatchEvent(new CustomEvent('olga5_sload', { detail: { modul: modul } }))
+
 				C.E.DispatchEvent('olga5_sload', W.modul)
 
-				return window.olga5[modul]
+				return wshp
 			}
 		},
 		MyJoinO5s: aO5s => {

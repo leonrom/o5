@@ -13,8 +13,8 @@
 		C = window.olga5.C,
 		o5debug = C.consts.o5debug,
 		fmtOK = "background: cornsilk; color: black;",
-		fmtErr = "background: lightgoldenrodyellow; color: black;",
-		pO5Ls = [],
+		fmtErr = "background: yellowgreen; color: black;",
+		pO5Ls=[],
 		FindBords = (aO5, blng) => {
 			const
 				errs = [],
@@ -114,12 +114,24 @@
 			// сортировка по вложенности от внутреннего к внешнему
 			blng.bords.sort((b1, b2) => { return b1.itag - b2.itag })
 
+			// создание observer'а на bord'е и включение в него aO5			
+			blng.bordL = blng.bords[blng.bords.length - 1]
+
+			let tag = blng.bordL.tag,
+			pO5=tag.pO5,
+				pO5L = pO5.scroll.pO5L
+
+			if (pO5L === null) {	// т.е. еще не инициирован
+				pO5L = pO5.scroll.pO5L = new wshp.PO5L(pO5)
+				pO5Ls.push(pO5L)
+			}
+			pO5L.AddO5(aO5)
 
 			if (o5debug > 1) {
 				let s = ''
 				for (const bord of blng.bords)
 					s += (s ? ', ' : '') + bord.tag.pO5.name
-				console.log("%c%s", fmtOK, aO5.name, akey, '[ ' + s + ' ]')  //, akey=='oframs'?('bordL=' + blng.bordL.tag.pO5.name):'')
+				console.log("%c%s", fmtOK, aO5.name, akey, s, 'bordL=' + blng.bordL.tag.pO5.name)
 			}
 			if (err)
 				C.ConsoleError(`Тег '${aO5.name}' - устранил дублирующие контейнеры:`, err)
@@ -130,21 +142,6 @@
 			if (o5debug > 1) // для тестирования в shpC.html
 				window.dispatchEvent(new CustomEvent('olga5-containers', { detail: { aO5: aO5, akey: akey } }))
 
-		},
-		AddToObserver = (aO5, blng) => {
-
-			// создание observer'а на bord'е и включение в него aO5			
-			blng.bordL = blng.bords[blng.bords.length - 1]
-
-			let tag = blng.bordL.tag,
-				pO5 = tag.pO5,
-				pO5L = pO5.scroll.pO5L
-
-			if (pO5L === null) {	// т.е. еще не инициирован
-				pO5L = pO5.scroll.pO5L = new wshp.PO5L(pO5)
-				pO5Ls.push(pO5L)
-			}
-			pO5L.AddO5(aO5)
 		},
 		ObserveM = entries => {
 			// ПРОВЕРКА и останавливаем блочные обосреватели и отключаем контроль скроллинга
@@ -159,27 +156,14 @@
 			// 			}
 
 			if (o5debug > 1)
-				console.log("%c%s", fmtOK, `ObserveM - задание скроллинга`)
-
+				console.log("%c%s", fmtOK, `ObserveM - scroll`)
+			let nf = 0
 			for (const entry of entries) {
-				const pO5L = entry.target.pO5.scroll.pO5L
-				pO5L.ActPO(entry.isIntersecting)
+				obsrvM.mtags
+				nf += entry.target.pO5.scroll.pO5L.ActPO(entry.isIntersecting)
 			}
 
-			let nf = 0,
-				s = ''
-			for (const pO5L of pO5Ls)
-				if (pO5L.IsVisi()) {
-					if (pO5L.HasFix()) {
-						nf++
-						s += '+'
-					}
-					else
-						s += '-'
-					s += pO5L.pO5.name + ', '
-				}
-
-			wshp.escroll.ScrollAct(nf > 0, `видимость bord'ов [${s}] (+- наличие fixed)`)
+			wshp.escroll.ScrollAct(nf > 0)
 
 			if (o5debug > 2) {
 				if (wshp.aO5s.length > 0)
@@ -215,8 +199,6 @@
 
 			FindBords(aO5, aO5.owner)
 			FindBords(aO5, aO5.ofram)
-
-			AddToObserver(aO5, aO5.ofram)
 
 			aO5.act.cIndex += MaxZIndex(aO5.ofram.bords) + 1
 

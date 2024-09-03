@@ -1009,18 +1009,16 @@
 						<b>ref</b> (который м.б. 'src' или 'href') у тега <b>tag</b>.
 						При передаче массива <b>errs</b> в него будут записаны замеченные ошибки;
 					</li>
-					<li><b>ModulAdd</b>(W, pars) &mdash; информирование <code>ядра</code> о загрузке модуля с описателем <b>W</b>.
-						Необязательный параметр <b>pars</b> содержит параметры, 
-						(сразу) добавляемые в структуру модуля <span class='olga5_codeTextInline '>window.olga5[modul]</span>.
-						<p class="moecomment">
-							Данная структура содержит параметры, доступные извне <i>модуля</i>, 
-							в частности функции инициализации подмодулей (см. ниже <i>ModulAddSub</i>).
-						</p>
+					<li><b>ModulAdd</b>(W) &mdash; информирование <code>ядра</code> о загрузке модуля с описателем <b>W</b>,
+							содержащем (доступные извне) параметры  <i>модуля</i>, 
+							в частности функцию инициализации.
 					</li>
-					<li><b>ModulAddSub</b>(modul, sub, Fun) &mdash; информирование <code>модуля</code> 
-						о загрузке его подмодуля <b>sub</b> с обязательной (впрочем, м.б. и заглушкой) функцией инициализации <b>Fun</b>,
-						которая доступна извне <i>модуля</i> как 
-						<span class='olga5_codeTextInline '>window.olga5[modul][sub]</span>. 
+					<li><b>ModulAddSub</b>(modul, sub, Fun) или <b>ModulAddSub</b>(modul, Fun) &mdash; информирование <code>модуля</code> 
+						о загрузке (подключении) функцией <b>Fun</b>, которая доступна извне <i>модуля</i> как 
+						<span class='olga5_codeTextInline '>window.olga5[modul][<i><b>sub</b></i>]</span>. 
+						Если указан параметр <b>sub</b> (т.е. первая форма), то <b>Fun</b> м.б. анонимной функцией. Если же
+						он не задан, то вызов <b>ModulAddSub</b>(modul, Fun)  преобразуется в <b>ModulAddSub</b>(modul, Fun.name, Fun).
+						Обычно так подключаются функции из <i>подмодулей</i>. Возвращает ссылку на сам <b>модуль</b>. 
 						Подробнее - см. примеры в папках <i>_url_olga5+/o5shp</i>, <i>_url_olga5+/o5dbg</i>, <i>_url_olga5+/o5snd></i>.
 					</li>
 				</ul>

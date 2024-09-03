@@ -91,25 +91,26 @@ function shpX_BordNames() {
             for (const aO5 of aO5s) {
                 const ps = aO5.shp.getElementsByTagName('p'),
                     cls = aO5.cls,
-                    o = aO5.located, //.botNam,
-                    f = aO5.hovered, //.botNam,
+                    o = aO5.owner, //.botNam,
+                    f = aO5.ofram, //.botNam,
                     // s1 = ' к.=' + (cls.alive ? ':<b>A</b>live' : '') + (cls.level > 0 ? ':<b>' + cls.level + '</b>' : '0'),
                     // s2 = ':<b>' + cls.dirV + '</b>' + dirput[cls.dirV],
                     // s3 = ':<b>' + cls.putV + '</b>' + dirput[cls.putV],
-                    s = '[<b><u>' + aO5.id + '</u></b>]/' + aO5.cls.nest +
+                    s = '[<b><u>' + aO5.id + '</u></b>]/' + 
+                        aO5.cls.level +
                         ' к.=' + (cls.alive ? ':<b>A</b>live' : '') +
                         (cls.level > 0 ? ':<b>' + cls.level + '</b>' : '0') +
                         ':<b>' + cls.dirV + '</b>' + dirput[cls.dirV] +
                         ':<b>' + cls.putV + '</b>' + dirput[cls.putV] +
                         ':<b>' + cls.pitch + '</b>' + pitches[cls.pitch] +
-                        '<br/>&nbsp;olga5_oframs= ' + aO5.hovered.attr +
-                        '<br/>&nbsp;olga5_owners= ' + aO5.located.attr +
+                        '<br/>&nbsp;olga5_oframs= ' + aO5.ofram.attr +
+                        '<br/>&nbsp;olga5_owners= ' + aO5.owner.attr +
                         '<br/>f: ' + Sid('t', f.to) + Sid('b', f.bo) + Sid('l', f.le) + Sid('r', f.ri) +
                         '<br/>o: ' + Sid('t', o.to) + Sid('b', o.bo) + Sid('l', o.le) + Sid('r', o.ri)
 
                 if (ps && ps.length > 0)
                     ps[0].innerHTML = s
-                if (aO5.aO5s.length > 0) FillDescription(aO5.aO5s)
+                // if (aO5.aO5s.length > 0) FillDescription(aO5.aO5s)
             }
         }
 
@@ -372,7 +373,7 @@ function CC3(cb) {
                 const n = parseInt(aO5.id.substr(3))
 
                 for (const b of ['f', 'o']) {
-                    const blng = b == 'f' ? aO5.hovered : aO5.located
+                    const blng = b == 'f' ? aO5.ofram : aO5.owner
                     for (const ask of blng.asks) {
                         const div = document.getElementById(b + ask.cod + n)
                         if (div)

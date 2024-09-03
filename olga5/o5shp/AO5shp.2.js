@@ -78,32 +78,18 @@
                 console.log(`----------------- клонирую '${aO5.name}' -----------`)
 
             const style = aO5.shp.style
-            Object.assign(aO5.orig, {
-                display: style.display, position: style.position, zIndex: style.zIndex,
-                top: style.top, left: style.left, height: style.height, width: style.width,
-            })
+            Object.assign(aO5.orig, { display: style.display, position: style.position, zIndex: style.zIndex })
 
             const clon = aO5.clon = aO5.shp.cloneNode(true)
-            clon.classList.add('olga5-clon')
-            if (clon.id) clon.id += '_clon'
             clon.aO5shp = aO5
-            Object.assign(aO5.clon.style, {
-                display: 'none',
-                opacity: 0,
-            })
+            clon.classList.add('olga5-clon')
+
+            if (clon.id) clon.id += '_clon'
             aO5.shp.parentNode.insertBefore(clon, aO5.shp)
 
             const cart = aO5.cart = document.createElement('div')
-            cart.classList.add('olga5-cart')                        // нужно ля тестов - CC()
-            if (cart.id) cart.id += '_cart'
-            cart.aO5shp = aO5
-            Object.assign(aO5.cart.style, {
-                display: 'none',
-                zIndex: aO5.act.cIndex,
-				cursor: pointer,
-                position: fixed,
-				overflow: hidden,
-            })
+            cart.classList.add('olga5-cart')    // нужно ля тестов - CC()
+            if (clon.id) cart.id += '_clon'
             aO5.shp.parentNode.insertBefore(cart, aO5.shp)
 
             const nst = window.getComputedStyle(aO5.shp),
@@ -127,7 +113,121 @@
                 c: nst.getPropertyValue('outline-color'),
                 o: nst.getPropertyValue('outline-offset')
             })
-            aO5.SetMargOutls(aO5.cart.style, aO5.margs, aO5.outln)
+        },
+        DoFixV = (aO5, xO5) => {
+            if (!aO5.clon)
+                Clone(aO5)
+
+            Object.assign(aO5.shp.style, {
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                marginTop: 0,
+                marginLeft: 0,
+                marginRight: 0,
+                marginBottom: 0,
+                outline: 'none'
+            })
+
+            const margs = aO5.margs,
+                outln = aO5.outln
+
+            Object.assign(aO5.cart.style, {
+                display: '',
+                zIndex: aO5.act.cIndex,
+                marginTop: margs.t,
+                marginLeft: margs.l,
+                marginRight: margs.r,
+                marginBottom: margs.b,
+                outlineWidth: outln.w,
+                outlineStyle: outln.s,
+                outlineColor: outln.c,
+                outlineOffset: outln.o
+            })
+            Object.assign(aO5.clon.style, {
+                display: aO5.shp.style.display,
+                opacity: 0,
+            })
+
+            aO5.node.removeChild(aO5.shp)
+            aO5.cart.appendChild(aO5.shp)
+
+            aO5.shdw = aO5.clon
+            aO5.act.xFixed = xO5
+            aO5.ShowFix()
+
+            const main = aO5.shp.pO5
+            window.dispatchEvent(new CustomEvent('olga5_fix-act',
+                { detail: { name: aO5.name, act: 'DoFix', xO5: xO5, nested: !main } }))
+
+            if (o5debug > 0)
+                console.log(`DoFixV - ${aO5.name}: ${xO5 === true ? 'на какой-то границе' : ('под объектом ' + xO5.name)}`)
+        },
+        UnFixV = (aO5, nested) => {
+            const posW = aO5.posW
+
+            Object.assign(aO5.shp.style, {
+                position: aO5.orig.position,
+                zIndex: aO5.cls.zIndex,
+                top: posW.top + 'px',
+                left: posW.left + 'px',
+                marginTop: aO5.margs.t,
+                marginLeft: aO5.margs.l,
+                marginRight: aO5.margs.r,
+                marginBottom: aO5.margs.b,
+                outlineWidth: aO5.outln.w,
+                outlineStyle: aO5.outln.s,
+                outlineColor: aO5.outln.c,
+                outlineOffset: aO5.outln.o
+            })
+            Object.assign(aO5.cart.style, {
+                display: 'none',
+            })
+            Object.assign(aO5.clon.style, {
+                display: 'none',
+            })
+
+            aO5.cart.style.display = 'none'
+            aO5.cart.removeChild(aO5.shp)
+            aO5.node.insertBefore(aO5.shp, aO5.cart)
+
+            aO5.shdw = aO5.shp
+
+            const
+                xO5 = aO5.act.xFixed
+
+            if (o5debug > 0)
+                console.log(`UnFixV - ${aO5.name} на '${xO5 === true ? "на границе bord'а" : ('под ' + xO5.name)}'`)
+
+            aO5.act.xFixed = null
+            aO5.ShowFix()
+
+            for (const iO5 of wshp.aO5s)
+                if (iO5.act.xFixed === aO5)
+                    iO5.UnFixV(true)
+
+            if (!nested) { // сообщаем 1 раз - только для основного
+                window.dispatchEvent(new CustomEvent('olga5_fix-act', { detail: { name: aO5.name, act: 'UnFix', xO5: xO5 } }))
+            }
+        },
+        ShowFix = aO5 => {
+            const
+                posC = aO5.posC,
+                posS = aO5.posS
+
+            if (posC.width <= 0 || posC.height <= 0)
+                aO5.cart.style.display = 'none'
+            else
+                Object.assign(aO5.cart.style, {
+                    top: posC.top + 'px',
+                    left: posC.left + 'px',
+                    width: posC.width + 'px',
+                    height: posC.height + 'px',
+                })
+            Object.assign(aO5.shp.style, {
+                top: posS.top + 'px',
+                left: posS.left + 'px',
+            })
         },
         DblClick = e => {
             const aO5 = e.target.aO5shp
@@ -175,72 +275,8 @@
         orig = {}
         padds = {}
 
-        SetMargOutls = (style, margs, outln) => {
-            Object.assign(style, {
-                marginTop: margs.t,
-                marginLeft: margs.l,
-                marginRight: margs.r,
-                marginBottom: margs.b,
-                outlineWidth: outln.w,
-                outlineStyle: outln.s,
-                outlineColor: outln.c,
-                outlineOffset: outln.o
-            })
-        }
-        DoFixV = xO5 => {
-            const aO5 = this,
-                shp = aO5.shp
-
-            if (!aO5.clon)
-                Clone(aO5)
-
-            Object.assign(shp.style, {                position: 'absolute',                top: 0,                left: 0            })
-            aO5.SetMargOutls(shp.style, { t: 0, l: 0, r: 0, b: 0 }, { w: 0, s: 0, c: 0, o: 0 })
-            
-            aO5.cart.style.display = ''
-            aO5.clon.style.display = aO5.orig.display
-
-            aO5.node.removeChild(shp)
-            aO5.cart.appendChild(shp)
-
-            aO5.act.xFixed = xO5
-            aO5.shdw = aO5.clon
-            aO5.ShowFix()
-
-            if (o5debug > 0)
-                console.log(`DoFixV - ${aO5.name}: ${xO5 === true ? 'на какой-то границе' : ('под объектом ' + xO5.name)}`)
-            
-            if (aO5.act.xFixed === true)  // сообщаем 1 раз - только для основного
-            window.dispatchEvent(new CustomEvent('olga5_fix-act',                { detail: { name: aO5.name, act: 'DoFix', xO5: xO5, } }))
-
-        }
-        UnFixV = () => {
-            const aO5 = this,
-                shp = aO5.shp
-
-            Object.assign(shp.style,aO5.orig)
-            aO5.SetMargOutls(shp.style, aO5.margs, aO5.outln)
-
-            aO5.cart.style.display = 'none'
-            aO5.clon.style.display = 'none'
-
-            aO5.cart.removeChild(shp)
-            aO5.node.insertBefore(shp, aO5.cart)
-
-            aO5.act.xFixed = null
-            aO5.shdw = shp
-            aO5.ShowFix()
-
-            if (o5debug > 0)
-                console.log(`UnFixV - ${aO5.name} на '${aO5.act.xFixed === true ? "на границе bord'а" : ('под ' + aO5.act.xFixed.name)}'`)
-
-            for (const iO5 of wshp.aO5s)
-                if (iO5.act.xFixed === aO5)
-                    iO5.UnFixV(true)
-
-            if (aO5.act.xFixed === true)  // сообщаем 1 раз - только для основного
-                window.dispatchEvent(new CustomEvent('olga5_fix-act', { detail: { name: aO5.name, act: 'UnFix', xO5: aO5.act.xFixed } }))
-        }
+        DoFixV = xO5 => DoFixV(this, xO5)
+        UnFixV = () => UnFixV(this)
         ShowFix = () => {
             const aO5 = this,
                 posC = aO5.posC,
@@ -260,9 +296,9 @@
                 left: posS.left + 'px',
             })
         }
-        StrtObs = fix => {
+        StrtObs = act => {
             if (o5debug > 1)
-                console.log("%c%s", fmtOK, '--:  StrtObs', this.name, fix, ' (' + (fix ? 'зафиксировано' : 'отпущено') + ')')
+                console.log("%c%s", fmtOK, '--:  StrtObs', aO5.name, fix, ' (' + (fix ? 'зафиксировано' : 'отпущено') + ')')
 
             const aO5 = this,
                 o = aO5.ofram.pO5L.observP
@@ -281,7 +317,7 @@
             } else {
                 if (aO5.clon)
                     o.unobserve(aO5.clon)
-                o.observe(aO5.shp)
+                o.unobserve(aO5.shp)
             }
         }
     }
