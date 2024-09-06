@@ -112,7 +112,8 @@
 				}
 			}
 			// сортировка по вложенности от внутреннего к внешнему
-			blng.bords.sort((b1, b2) => { return b1.itag - b2.itag })
+			//   НЕ нужна, т.к. всё равно надо по всем проерять
+			// blng.bords.sort((b1, b2) => { return b1.itag - b2.itag })
 
 
 			if (o5debug > 1) {

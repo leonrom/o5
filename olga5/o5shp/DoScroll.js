@@ -6,7 +6,8 @@
 (function () {              // ---------------------------------------------- o5shp/DoScroll ---
 	"use strict"
 
-	let isScroll = false
+	let timeStamp = 0
+
 	const
 		olga5_modul = "o5shp",
 		modulname = 'DoScroll',
@@ -15,114 +16,99 @@
 		fmtOK = "background: cornsilk; color: black;",
 		fmtErr = "background: lightgoldenrodyellow; color: black;",
 		doc = document.documentElement,
-		PrepareBords = (bords, isf, timeStamp) => {
-			const
-				bO5 = document.body.pO5,
-				a = { to: bO5, le: bO5, ri: bO5, bo: bO5 },
-				CalcParentLocate = pO5 => {
-					if (pO5.isBody)
-						Object.assign(pO5.pos,
-							{ tim: timeStamp, top: 0, bottom: doc.clientHeight, left: 0, right: doc.clientWidth })
-					else {
-						const current = pO5.current,
-							isO5 = current.aO5shp,
-							p = isO5 ? current.aO5shp.posC :
-								current.getBoundingClientRect()
+		CalcParentLocate = (pO5, timeStamp) => {
+			pO5.pos.tim = timeStamp
 
-						// console.log(`--:  CalcParentLocate(${pO5.name}) - p.top=${p.top}, pO5.add.top=${pO5.add.top}`)
-						Object.assign(pO5.pos, {
-							tim: timeStamp,
-							top: p.top + pO5.add.top,
-							left: p.left + pO5.add.left,
-							bottom: isO5 ? p.top + p.height : p.top + current.clientHeight + pO5.add.top,
-							right: isO5 ? p.left + p.width : p.left + current.clientWidth + pO5.add.left,
-						})
-					}
-				}
+			if (pO5.isBody)
+				Object.assign(pO5.pos,
+					{ tim: timeStamp, top: 0, bottom: doc.clientHeight, left: 0, right: doc.clientWidth })
+			else {
+				const current = pO5.current,
+					isO5 = current.aO5shp,
+					p = isO5 ? current.aO5shp.posC :
+						current.getBoundingClientRect()
+
+				// console.log(`--:  CalcParentLocate(${pO5.name}) - p.top=${p.top}, pO5.add.top=${pO5.add.top}`)
+				Object.assign(pO5.pos, {
+					tim: timeStamp,
+					top: p.top + pO5.add.top,
+					left: p.left + pO5.add.left,
+					bottom: isO5 ? p.top + p.height : p.top + current.clientHeight + pO5.add.top,
+					right: isO5 ? p.left + p.width : p.left + current.clientWidth + pO5.add.left,
+				})
+			}
+		},
+		SetFixedsPosC = aO5 => {
+			const
+				posC = aO5.posC,
+				bords = aO5.ofram.bords,
+				dirup = aO5.cls.dirV === 'U'
+
+			Object.assign(posC, aO5.posW) // д.б. ОТДЕЛЬНО - текущее положение объекта или его клона
 
 			for (const bord of bords) {
 				const pO5 = bord.tag.pO5,
 					pos = pO5.pos
 
-				if (pos.tim !== timeStamp) {
-					pos.tim = timeStamp
-					CalcParentLocate(pO5)
-				}
-				// делать проверки на overflowX / Y и соотв.включать
-				if (pos.top !== pos.bottom && pO5.scroll.ovfY !== 'visible') {
-					if (a.to === null || a.to == bO5 ||
-						(isf && a.to.pos.top < pos.top) ||
-						(!isf && a.to.pos.top > pos.top)
-					) a.to = pO5
-					if (a.bo === null || a.bo == bO5 ||
-						(isf && a.bo.pos.bottom > pos.bottom) ||
-						(!isf && a.bo.pos.bottom < pos.bottom)
-					) a.bo = pO5
-				}
-				if (pos.left != pos.right && pO5.scroll.ovfX !== 'visible') {
-					if (a.le === null || a.le == bO5 ||
-						(isf && a.le.pos.left < pos.left) ||
-						(!isf && a.le.pos.left > pos.left)
-					) a.le = pO5
-					if (a.ri === null || a.ri == bO5 ||
-						(isf && a.ri.pos.right > pos.right) ||
-						(!isf && a.ri.pos.right < pos.right)
-					) a.ri = pO5
+				if (pos.tim !== timeStamp)
+					CalcParentLocate(pO5, timeStamp)
+
+				if (
+					(posC.top < pos.top && dirup) ||
+					(posC.top + posC.hehight > pos.bottom && !dirup)
+				) {
+					posC.top = dirup ? pO5.pos.top : pO5.pos.bottom - posC.height
 				}
 			}
-
-			// console.log(`--:  a.to=${a.to.name}, a.to.pos.top=${a.to.pos.top}`)
-			return a
 		},
-		CutBounds = aO5 => {
+		CutFixeds = aO5 => {
 			const
-				// putV = aO5.cls.putV,
-				// act = aO5.act,
-				posC = aO5.posC
+				posC = aO5.posC,
+				posS = aO5.posS,
+				bords = aO5.owner.bords,
+				putop = aO5.cls.putV === 'T'
 
-			const owner = aO5.owner,
-				b = owner.bo.pos.bottom,
-				t = owner.to.pos.top,
-				l = owner.le.pos.left,
-				r = owner.ri.pos.right
+			let d = 0
 
-			let d = posC.top + posC.height - b
-			if (d > 0) {
-				posC.height -= d
+			for (const bord of bords) {
+				const
+					pO5 = bord.tag.pO5
+
+				if (pO5.pos.tim !== timeStamp)
+					CalcParentLocate(pO5, timeStamp)
+
+				// вертикальное обрезание зафиксированных
+				if ((putop)) {
+					d = posC.top + posC.height - pO5.pos.bottom
+					if (d > 0) {
+						posC.height -= d
+					}
+				} else {
+					d = pO5.pos.top - posC.top
+					if (d > 0) {
+						posC.top = pO5.pos.top
+						posC.height -= d
+						posS.top -= d
+					}
+				}
+
+				// горизонтальное обрезание СЛЕВА зафиксированных
+
+				d = pO5.pos.left - posC.left
+				if (d > 0) {
+					posC.left = pO5.pos.left
+					posC.width -= d
+					posS.left -= d
+				}
+				d = posC.left + posC.width - pO5.pos.right
+				if (d > 0) {
+					posC.width -= d
+				}
 			}
-			d = t - posC.top
-			if (d > 0) {
-				posC.top = t
-				posC.height -= d
-				aO5.posS.top -= d
-			}
-			d = posC.left + posC.width - r
-			if (d > 0) {
-				posC.width -= d
-			}
-			d = l - posC.left
-			if (d > 0) {
-				posC.left = l
-				posC.width -= d
-				aO5.posS.left -= d
-			}
-			if (posC.height <= 0)
-				aO5.act.readyFix = false
+
 		},
-		Adhereds = timeStamp => {
-			// const
-			// 	IsAbove = (l1, r1, l2, r2) => {
-			// 		return (l2 >= l1 && l2 <= r1) || (r2 >= l1 && r2 <= r1) ||
-			// 			(l1 >= l2 && l1 <= r2) || (r1 >= l2 && r1 <= r2)
-			// 	},
-			// 	Missed = (l1, r1, l2, r2) => {
-			// 		return r1 < l2 || l1 > r2  // || r2 < l1 || l2 > r1
-			// 	}
+		Adhereds = () => {
 			let foundAdh = false
-			// posC = null,
-			// posS = null,
-			// level = 0,
-			// pitch = ''
 
 			const
 				FixV = (aO5, fO5, b, top) => {
@@ -166,80 +152,79 @@
 							break
 						default: // case 'O' - просто наезжает
 					}
-				}
+				},
+				AdhAonF = (aO5, fO5) => {
+					const
+						posC = fO5.posC,
+						b = aO5.posW
 
-			for (const fO5 of wshp.aO5s) {
-				if (fO5.act.xFixed) {
-					const posC = fO5.posC
-					// posS = fO5.posS
-					// level = fO5.act.level
-					// pitch = fO5.cls.pitch
+					if (!(b.lef + b.width < posC.left || b.left > posC.left + posC.width))
+						if (fO5.cls.putV === 'T') {
+							const d = posC.top + posC.height - b.top
 
-					for (const aO5 of wshp.aO5s) {
-						if (aO5.act.xFixed)
-							continue
-
-						const b = aO5.shdw.getBoundingClientRect()
-						if (!(b.lef + b.width < posC.left || b.left > posC.left + posC.width))
-							if (fO5.cls.putV === 'T') {
-								const d = posC.top + posC.height - b.top
-
-								if (posC.top < b.top && d > 0) {
-									if (fO5.act.level > aO5.act.level)  // прижимаюсь и фиксируюсь
-										FixV(aO5, fO5, b, posC.top + posC.height)
-									else
-										ActOnTop(fO5.cls.pitch, posC, fO5.posS, d)
-								}
+							if (posC.top < b.top && d > 0) {
+								if (fO5.act.level > aO5.act.level)  // прижимаюсь и фиксируюсь
+									FixV(aO5, fO5, b, posC.top + posC.height)
 								else
-									if (aO5.act.xFixed === fO5)
-										aO5.UnFixV()
-							} else {
-								const d = b.top + b.height - posC.top
-
-								if (posC.top > b.top && b > 0) {
-									if (fO5.act.level > aO5.act.level)  // прижимаюсь и фиксируюсь
-										FixV(aO5, fO5, b, posC.top - aO5.posC.height)
-									else
-										ActOnBottom(fO5.cls.pitch, posC, fO5.posS, d)
-								}
-								else
-									if (aO5.act.xFixed === fO5)
-										aO5.UnFixV()
+									ActOnTop(fO5.cls.pitch, posC, fO5.posS, d)
 							}
-					}
+							else
+								if (aO5.act.xFixed === fO5)
+									aO5.UnFixV()
+						} else {
+							const d = b.top + b.height - posC.top
+
+							if (posC.top > b.top && b > 0) {
+								if (fO5.act.level > aO5.act.level)  // прижимаюсь и фиксируюсь
+									FixV(aO5, fO5, b, posC.top - aO5.posC.height)
+								else
+									ActOnBottom(fO5.cls.pitch, posC, fO5.posS, d)
+							}
+							else
+								if (aO5.act.xFixed === fO5)
+									aO5.UnFixV()
+						}
 				}
-			}
+
+			for (const fO5 of wshp.aO5s)
+				if (fO5.act.xFixed) {
+					const tagL = fO5.ofram.bordL.tag
+					for (const aO5 of wshp.aO5s)
+						if (!aO5.act.xFixed)		// && aO5.ofram.bordL.tag == tagL)
+							AdhAonF(aO5, fO5)
+				}
+
 			if (foundAdh)
-				Adhereds(timeStamp)
+				Adhereds()
 		},
 		DoScroll = e => {
-			for (const aO5 of wshp.aO5s) {    // делаю для всех, т.к. могут понадобиться в Adhereds()
-				const
-					b = aO5.shdw.getBoundingClientRect() // д.б. ОТДЕЛЬНО - текущее положение объекта или его клона
-				Object.assign(aO5.posW, { top: b.top, left: b.left, height: b.height, width: b.width, })
+			timeStamp = e.timeStamp
+
+			for (const aO5 of wshp.aO5s) {
+				const b = aO5.shdw.getBoundingClientRect()
+				Object.assign(aO5.posW, { top: b.top, left: b.left, height: b.height, width: b.width }) // нелья сразу - 'лишние' поля
+				Object.assign(aO5.posS, { top: 0, left: 0, })
 			}
 
 			for (const aO5 of wshp.aO5s)
-				if (aO5.act.xFixed === true) {
-					// итоговые внутренние  рамки подвисания
-					Object.assign(aO5.ofram, PrepareBords(aO5.ofram.bords, true, e.timeStamp))
+				if (aO5.act.xFixed === true || aO5 === e.aO5) {
+					SetFixedsPosC(aO5)
 
-					// положение зафиксированного
-					Object.assign(aO5.posS, { top: 0, left: 0, })
-					Object.assign(aO5.posC, aO5.posW)
-					aO5.posC.top = aO5.cls.putV === 'T' ?
-						aO5.ofram.to.pos.top :
-						aO5.ofram.bo.pos.bottom - posC.height
+					if (aO5 === e.aO5) {
+						aO5.DoFixV(true)
+						aO5.StrtObs(true)
+					}
+
 				}
+
+			Adhereds() 	// прилипнувшие
+
+			for (const aO5 of wshp.aO5s)
+				if (aO5.act.xFixed)
+					CutFixeds(aO5)
 
 			for (const aO5 of wshp.aO5s)
 				if (aO5.act.xFixed) {
-					// итоговые  внешние рамки обрезания
-					Object.assign(aO5.owner, PrepareBords(aO5.owner.bords, false, e.timeStamp))
-
-					CutBounds(aO5)			// обрезание зафиксированных
-					Adhereds(e.timeStamp) 	// прилипнувшие
-
 					aO5.ShowFix()			// отображение зафиксированного
 				}
 		},

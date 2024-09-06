@@ -116,6 +116,12 @@ audio {
     font-size: 80%;
 }
 
+.docheck {
+    background-color: yellow;
+
+    line-height: 0.985em;
+}
+
 .moeattention {
     background-color: bisque;
     border: 1px solid lightgreen;

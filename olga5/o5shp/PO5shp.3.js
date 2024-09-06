@@ -82,13 +82,13 @@
         },
         ObserveP = (entries, observP) => {
             const
-            timeStamp= Date.now() + Math.random() ,
                 bordnam = observP.root ? observP.root.pO5.name : 'окно',
                 IsFixetOnBord = (aO5) => {
                     for (const xO5 of wshp.aO5s)
                         if (xO5.act.xFixed && xO5.shp.pO5 && aO5 !== xO5)
                             return true
                 }
+            // FindFrame=(br, dirV)=>{}
 
             if (o5debug > 1) {
                 let s = ''
@@ -122,7 +122,7 @@
                             aO5.UnFixV()
                             
                             aO5.StrtObs(false)      //scroll.Stop(aO5)
-                            aO5.ofram.pO5L.MarkFix(aO5, false)
+                            aO5.ofram.pO5L.FixO5(aO5, false)
                             if (!IsFixetOnBord(aO5))
                                 wshp.escroll.ScrollAct(false, `возврат ${aO5.name}`)
                         }
@@ -131,18 +131,24 @@
                         if (isr < 1 && !act.xFixed && act.readyFix) {
                             const
                                 br = entry.boundingClientRect,
-                                pos=entry.intersectionRect,
-                                // top = entry.intersectionRect.top,
-                                // bottom = entry.intersectionRect.bottom,
+                                top = entry.intersectionRect.top,
+                                bottom = entry.intersectionRect.bottom,
                                 dirV = aO5.cls.dirV
 
                             if (
-                                (br.top < pos.top && dirV === 'U') ||
-                                (br.bottom > pos.bottom && dirV === 'D')
+                                (br.top < top && dirV === 'U') ||
+                                (br.bottom > bottom && dirV === 'D')
                             ) {
-                                wshp.DoScroll({ aO5:aO5, timeStamp:timeStamp })
-   
-                                aO5.ofram.pO5L.MarkFix(aO5, true)
+                                const
+                                    posC = aO5.posC,
+                                    b = aO5.shdw.getBoundingClientRect() // д.б. ОТДЕЛЬНО - текущее положение объекта или его клона
+                                Object.assign(posC, { top: b.top, left: b.left, height: b.height, width: b.width, })
+                                Object.assign(aO5.posW, { height: b.height, width: b.width, })
+                                posC.top = aO5.cls.dirV === 'U' ? top : bottom - posC.height
+
+                                aO5.DoFixV(true)
+                                aO5.StrtObs(true)      //scroll.Start(aO5)
+                                aO5.ofram.pO5L.FixO5(aO5, true)
                                 if (!IsFixetOnBord(aO5))
                                     wshp.escroll.ScrollAct(true, `подвисание ${aO5.name}`)
                             }
@@ -156,6 +162,7 @@
             this.#isVisi = false
             this.pO5 = pO5
             this.paO5s = []
+            this.observP = null
 
             this.observP = new IntersectionObserver(ObserveP, {
                 root: pO5.current === document.body ? null : pO5.current,
@@ -184,7 +191,7 @@
             this.paO5s.push({ aO5: aO5, act: false, fix: false })
             this.observP.observe(aO5.shp)
         }
-        MarkFix = (aO5, fix) => {
+        FixO5 = (aO5, fix) => {
             const paO5 = this.paO5s.find(paO5 => paO5.aO5 === aO5),
                 thesame = paO5.fix === fix
 

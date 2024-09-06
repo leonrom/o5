@@ -114,7 +114,7 @@
         owner = Object.assign({ akey: 'owners', bords: [], }, AO5.Tbelong)
 
         posC = Object.assign({}, { top: 0, left: 0, height: 0, width: 0, })
-        posW = Object.assign({}, {  top: 0, left: 0, height: 0, width: 0,})
+        posW = Object.assign({}, { height: 0, width: 0, })
         posS = { top: 0, left: 0, }
 
         clon = null
@@ -123,6 +123,12 @@
         padds = {}
 
         static SetMargOutls = (style, margs, outln) => {
+            // if (margs)
+            //     Object.assign(style, { marginTop: margs.t, marginLeft: margs.l, marginRight: margs.r, marginBottom: margs.b })
+            // if (outln)
+            //     Object.assign(style, {
+            //         outlineWidth: outln.w, outlineStyle: outln.s, outlineColor: outln.c, outlineOffset: outln.o
+            //     })
             Object.assign(style,
                 { marginTop: margs.t, marginLeft: margs.l, marginRight: margs.r, marginBottom: margs.b },
                 { outlineWidth: outln.w, outlineStyle: outln.s, outlineColor: outln.c, outlineOffset: outln.o }
