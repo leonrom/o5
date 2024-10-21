@@ -1,7 +1,8 @@
-/* -global document, window*/
+/* global  window*/
 /* exported olga5_menuPopDn_Click*/
 /*jshint asi:true  */
 /*jshint esversion: 6*/
+/* eslint-disable no-prototype-builtins */
 (function () {              // ---------------------------------------------- o5com/CEncode ---
 	'use strict'
 	const olga5_modul = 'o5com',
@@ -13,11 +14,15 @@
 			const mrkN = '\n',
 				mrk2 = '..'
 			do {
-				let l = s0.length,
-					m = s0.match(/\.\.[^\/]/)
-				if (m) s0 = s0.substr(0, m.index + 2) + '/' + s0.substr(m.index + 2)
-				m = s0.match(/[^\/]\.\./)
-				if (m) s0 = s0.substr(0, m.index + 1) + '/' + s0.substr(m.index + 1)
+				const l = s0.length,
+				// eslint-disable-next-line no-useless-escape
+					m1 = s0.match(/\.\.[^\/]/)
+				if (m1) s0 = s0.substr(0, m1.index + 2) + '/' + s0.substr(m1.index + 2)
+				
+				const 
+				// eslint-disable-next-line no-useless-escape
+					m2 = s0.match(/[^\/]\.\./)
+				if (m2) s0 = s0.substr(0, m2.index + 1) + '/' + s0.substr(m2.index + 1)
 				if (l == s0.length) break
 			} while (n++ < 99)
 
@@ -39,11 +44,12 @@
 				if (s2s[i] == mrkN || (i > 0 && s2s[i] == '' && s2s[i - 1] == ''))
 					s2s.splice(i, 1)
 
-			let s = s2s.join('/').replaceAll(/\/\.\//g, '/')
+			const s = s2s.join('/').replaceAll(/\/\.\//g, '/')
 			return s.replaceAll(/[^:]\/\/+/g, (u) => { return u.substr(0, 2) })
 		},
 		// IsUrlNam = u => { return !!(u.trim() && !u.match(/[\/.\\#]/)) },
 		IsUrlNam = u => {
+			// eslint-disable-next-line no-useless-escape
 			const isurl = !!(u && u.trim() && !u.match(/[\/.\\#]/))
 			return isurl
 		},

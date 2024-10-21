@@ -1,4 +1,4 @@
-/* -global window, document, console */
+/* global window, document, console, CustomEvent, alert */
 /*jshint asi:true  */
 /*jshint strict:true  */
 /*jshint esversion: 6 */
@@ -137,8 +137,7 @@
                 Object.freeze(aO5.parms)
             }
 
-            // window.addEventListener('olga5_done', StopSoundOnPage)
-            C.E.AddEventListener('olga5_done', StopSoundOnPage)
+            C.E.AddEventListener('o5_isHidden', StopSoundOnPage)
             for (const eve of ['blur', 'pagehide', 'dblclick'])
                 document.addEventListener(eve, StopSoundOnPage)
 
@@ -148,7 +147,7 @@
             const audios = C.GetTagsByTagNames('audio', wshp.W.modul),
                 efirsts = ['mouseenter', 'focusin'],
                 OnPlay = (audio) => {                    
-					window.dispatchEvent(new CustomEvent('olga5_stopPlay', { detail: { tag: audio, type: 'audio(тег)', } }))
+					window.dispatchEvent(new CustomEvent('o5snd_stopSound', { detail: { tag: audio, type: 'audio(тег)', } }))
                     const a = wshp.actaudio
                     if (a && a != audio)
                         wshp.StopSound(a.aO5snd)
@@ -245,7 +244,7 @@
         StopSound: aO5 => {
             if (o5debug > 1) console.log(`${lognam}  StopSound (${aO5.name})`)
 
-			// тут его НИЗЗЯ ! window.dispatchEvent(new CustomEvent('olga5_stopPlay', { detail: { tag: aO5.audio, type: 'audio', } }))
+			// тут его НИЗЗЯ ! window.dispatchEvent(new CustomEvent('o5snd_stopSound', { detail: { tag: aO5.audio, type: 'audio', } }))
 
             wshp.actaudio = null
 
@@ -266,7 +265,7 @@
         },
     })
 
-    window.addEventListener('olga5_stopPlay', e => {
+    window.addEventListener('o5snd_stopSound', e => {
         if (wshp.actaudio && wshp.actaudio != e.detail.tag)
             wshp.StopSound(wshp.actaudio.aO5snd)
         // console.log(act.id, 5, e.detail)

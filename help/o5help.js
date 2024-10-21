@@ -237,7 +237,7 @@ ol.${olga5_class} li>div pre {
     name="${nam}"
     sandbox="allow-scripts allow-same-origin"
 >
-<h1>браузер не поддерживает отображение &lt;<b>iframe</b>&gt;</h1>
+<h2>браузер не поддерживает отображение &lt;<b>iframe</b>&gt;</h2>
 </iframe>
 `
                     if (li.$o5.div)
@@ -411,7 +411,7 @@ ol.${olga5_class} li>div pre {
         if (window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/))
             console.log(`}---< ${document.currentScript.src.indexOf(`/${W.modul}.`) > 0 ? 'загружен  ' : 'включён   '}:  ${W.modul}.js`)
         window.olga5.push(W)
-        window.dispatchEvent(new CustomEvent('olga5_sload', { detail: { modul: W.modul } }))
+        window.dispatchEvent(new CustomEvent('o5_scriptLoad', { detail: { modul: W.modul } }))
     } else
         console.error('%c%s', "background: yellow; color: black;border: solid 2px red;", `}---< Повтор загрузки '${W.modul}`)
 })();

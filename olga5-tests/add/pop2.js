@@ -22,4 +22,4 @@ function Init() {
 	}
 }
 window.addEventListener("DOMContentLoaded", Init)
-window.addEventListener("olga5-incls", Init)
+window.addEventListener("o5inc_ready", Init)

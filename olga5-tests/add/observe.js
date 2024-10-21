@@ -56,6 +56,33 @@ function Inito() {
     obs_main.observe(shp3)
     obs_root.observe(shp3)
 
+
+    function ObserveP(){
+
+    }
+    class PO5L {
+        #isVisi
+        constructor(pO5) {
+            this.#isVisi = false
+            this.pO5 = pO5
+            this.paO5s = []
+
+            this.observP = new IntersectionObserver(ObserveP, {
+                // root: pO5.current === document.body ? null : pO5.current,
+                rootMargin: '0px',
+                threshold: [0.001, 1],
+                trackVisibility: false,
+            })
+
+        }
+        IsVisi = () => this.#isVisi
+        HasFix = () => this.paO5s.find(paO5 => paO5.fix)
+
+    }
+
+    obs_root.observP={}
+    Object.assign(obs_root.observP, new PO5L())
+    console.log('111')
     //    obs_main.observe(shp2)
     //    obs_root.observe(shp2)
 

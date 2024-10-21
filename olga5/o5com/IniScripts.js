@@ -1,4 +1,4 @@
-/* -global document, window, console*/
+/* global document, window, console*/
 /* exported olga5_menuPopDn_Click*/
 /*jshint asi:true  */
 /*jshint esversion: 6*/
@@ -8,43 +8,61 @@
 //
 (function () {              // ---------------------------------------------- o5com/IniScripts ---
 	'use strict'
-	const olga5_modul = 'o5com',
-		modulname = 'IniScripts',
+	const
 		C = window.olga5.C,
-		myclr = "background: blue; color: white;border: none;"
+		olga5_modul = 'o5com',
+		modulname = 'IniScripts',
+		clrPage = "background: green;color:white;",
+		clrMy = "background: blue; color: white;border: none;"
+
 	class MyEvents {
-		doceves = ['DOMContentLoaded', 'readystatechange', 'visibilitychange', 'blur']
-		meves = []
+		static doceves = ['DOMContentLoaded', 'readystatechange', 'visibilitychange', 'blur']
+
 		constructor(list) {
-			const meves = list.trim().split(/\s*[,;]\s*/) || []
-			for (const meve of meves) {
-				const ss = meve.trim().split(/\s*[:]\s*/)
+			const
+				eves = list.trim().split(/\s*[,;]\s*/) || [],
+				errs = []
+
+			this.meves = []
+			for (const eve of eves) {
+				const ss = eve.trim().split(/\s*[:]\s*/)
 				if (ss[0].length > 0) {
 					const eve = ss[0],
-						su = ss[1] ? ss[1].toUpperCase() : '',
-						isd = su == 'D' ? true : (su == 'W' ? false : this.doceves.includes(eve))
-					this.meves.push({ eve: eve, isd: isd })
+						ers = []
+					let isd = MyEvents.doceves.includes(eve),
+						isu = false
+
+					// isd = su == 'D' ? true : (su == 'W' ? false : this.doceves.includes(eve))
+					for (let i = 1; i < ss.length; i++)
+						if (ss[i])
+							switch (ss[i][0].toUpperCase()) {
+								case 'W': isd = 'W'
+									break
+								case 'D': isd = 'D'
+									break
+								case 'U': isu = true
+									break
+								default: "'" + ers.push(ss[i]) + "'"
+							}
+					this.meves.push({ eve: eve, isd: isd, isu: isu })
+					if (ers.length > 0)
+						errs.push(`${eve}: ${ers.join(', ')}`)
 				}
-				// this.meves.push({ eve: ss[0], isd: ss[1] && ss[1].toUpperCase() == 'D' })
+				if (errs.length > 0)
+					C.ConsoleError(`Недопустимые ('W','D','U') квалификаторы событий`, errs.length, errs)
 			}
 			Object.freeze(this)
 		}
-		AddEvents = (Fun) => { // addEventListener
+		AddEvents = Fun => {
 			for (const meve of this.meves)
-				if (meve.isd) document.addEventListener(meve.eve, Fun, true)
-				else
-					window.addEventListener(meve.eve, Fun)
-			// C.E.AddEventListener(meve.eve, Fun)
+				(meve.isd ? document : window).addEventListener(meve.eve, Fun, true)
 		}
-		RemEvents = (Fun) => { // addEventListener
+		RemEvents = Fun => {
 			for (const meve of this.meves)
-				if (meve.isd) document.removeEventListener(meve.eve, Fun, true)
-				else {
-					window.removeEventListener(meve.eve, Fun)
-					// C.E.RemoveEventListener(meve.eve, Fun)
-				}
+				(meve.isd ? document : window).removeEventListener(meve.eve, Fun, true)
 		}
 	}
+
 	class MyTimer {
 		constructor(text) {
 			this.text = text
@@ -52,7 +70,7 @@
 			Object.seal(this.act)
 			Object.freeze(this)
 		}
-		Stop = (add) => {
+		Stop = add => {
 			// console.log('...=', this.act.time,  this.act.name)
 			if (this.act.time) {
 				const dt = (' ' + (Number(new Date()) - this.act.time)).padStart(8) + ' ms',
@@ -61,13 +79,13 @@
 					console.error('%c%s', "background: yellow; color: black;border: none;",
 						this.text + name + ' [' + add + ']')
 				else {
-					console.log('%c%s', myclr, this.text + name)
+					console.log('%c%s', clrMy, this.text, name)
 					this.act.time = 0
 				}
 			}
 		}
-		Start = (name) => {
-			if (this.act.time)
+		Start = (name, iso5inc) => {
+			if (this.act.time && !iso5inc)
 				this.Stop('не закончено')
 
 			this.act.time = Number(new Date())
@@ -75,8 +93,9 @@
 			// console.log('...+', this.act.time,  this.act.name)
 		}
 	}
+
 	const
-		DocURL = () => document.URL.match(/[^?&#]*/)[0].trim(),
+		// DocURL = () => document.URL.match(/[^?&#]*/)[0].trim(),
 		/**
 		 * InitScripts(nam) - выполнение очередного требуемого скрипта
 		 * 			ВЫЗЫВАЕТСЯ: 
@@ -89,27 +108,29 @@
 		 * @param {isok}  необязательный признак готовности документа (наименование события)
 		 */
 		InitScripts = nam => {
-			if (!(C.page && C.page.pact && C.page.pact.ready)) {
-				if (C.consts.o5debug > 1)
-					console.log(`--->>>     ______ InitScripts _____     ${nam} -- return`)
-				return
-			}
+			const ready = C.page && C.page.pact && C.page.pact.ready,
+				start = C.page.pact.start,
+				head = ' ______ InitScripts _____   '
 
 			if (C.consts.o5debug > 1)
-				console.log(`--->>>     ______ InitScripts _____     ${nam} `)
-			const start = C.page.pact.start
-			for (const scrpt of C.scrpts) {
+				console.log(`${head} ${nam} ${ready ? '' : ' не готово - выход'}`)
+
+			if (!ready)
+				return
+			for (const scrpt of C.scrpts)
+			// if (!act.finish)
+			{
 				const act = scrpt.act
 				// if (act.W.modul=='o5inc')				
 				// act.timera =0
 				if (!act.timera)
-					act.timera = new MyTimer(`---<<<             инициирован `)
+					act.timera = new MyTimer(` инициирован `)
 				if (start != act.start && act.W && !act.incls)
 					if (act.need && act.W.Init) {
 						const depend = scrpt.depends.find(depend => (depend.act.need && depend.act.done != start))
 						if (!depend) {
 							if (C.consts.o5debug > 1)
-								console.log(`--->>>     ______ начало нинициализации _____     ${act.W.modul} `)
+								console.log(`${head} начало нинициализации  ${act.W.modul} `)
 							act.start = start
 							act.timera.Start(act.W.modul)
 							act.W.Init()
@@ -118,7 +139,7 @@
 						Object.assign(act, { start: start, done: start })
 			}
 		},
-		OnInit = e => {	//  завершение инициализации очередного скрипта
+		ScriptDone = e => {	//  завершение инициализации очередного скрипта
 			if (!e.detail || !e.detail.modul) {
 				C.page.errs.push({ modul: '?', err: `для события '${e.type}' НЕ указан 'detail' или 'detail.modul'` })
 				return
@@ -140,21 +161,26 @@
 				const act = scrpt.act
 				act.timera.Stop('')
 				act.done = act.start
-				if (lefts.length > 0)
-					InitScripts(`инициирован '${modul}'`)
+
+				// if (act.W.modul === 'o5inc') {
+				// 	// // 1. почистить в scrpt.depends
+				// 	// // 2. на новых страницах - обновляь, что ли???
+				// 	// 					act.finish = true
+				// }
+				if (lefts.length > 0) InitScripts(`инициирован '${modul}'`)
 				else
-					C.page.PageFinish(0)
+					ScriptsFinish(C.page, 0)
 			} else
 				C.page.errs.push({ modul: modul, err: `для события '${e.type}' указан несуществующий модуль` })
 		},
-		OnLoad = e => {	// завершение загрузки очередного скрипта
+		ScriptLoad = e => {	// завершение загрузки очередного скрипта
 			const start = C.page.pact.start,
 				newloads = [],
 				Included = modul => {
 					const nam = `загружены включения для '${modul}'`,
 						scrpt = C.scrpts.find(scrpt => scrpt.modul == modul)
 					if (C.consts.o5debug > 0)
-						console.log(`OnLoad: '${nam}'`)
+						console.log(`ScriptLoad: '${nam}'`)
 
 					scrpt.act.incls = ''
 					// const debug = window.open("", "", "width=200,height=100");
@@ -187,12 +213,107 @@
 
 			if (newloads.length > 0)
 				InitScripts(`загрузка [${newloads.join(', ')}]`)
+		},
+		ScriptsStart = () => {  // начало обработки страницы
+
+			for (const scrpt of C.scrpts) { // делаем при каждой инициализации
+				if (C.owners.length == 0) scrpt.act.need = true
+				else {
+					scrpt.act.need = false
+					for (const owner of C.owners) {
+						if (owner.modules.length == 0) scrpt.act.need = true
+						else
+							scrpt.act.need = !!owner.modules.find(modul => modul == scrpt.modul)
+						if (scrpt.act.need) break
+					}
+				}
+			}
+			if (C.consts.o5debug > 0) {
+				const asknoneed = []
+				for (const scrpt of C.scrpts)
+					if (!scrpt.act.need)
+						asknoneed.push(scrpt.modul)
+				const l = asknoneed.length
+				if (l > 0)
+					C.ConsoleError(`В скриптах заданы ${l} 'ненужн${l > 1 ? 'ых' : 'ый'}' модул${l > 3 ? 'ей' : (l > 1 ? 'я' : 'ь')}: `, asknoneed.join(', '))
+			}
+
+			if (C.consts.o5doscr) {  // запуск встроенных cкриптоав
+				const scrs = C.GetTagsByTagNames('script'),
+					o5doscr = C.consts.o5doscr,
+					m = new RegExp('\\bdocument\\.currentScript\\.setAttribute\\s*\\(\\s*[\'`"]' + o5doscr + '.*?(;|\\n|$)', 'i')
+
+				for (const scr of scrs) {
+					const matchs = scr.innerText.match(m)
+					if (matchs) {
+						const atr = scr.attributes[o5doscr]
+						if (!atr || atr.value != 1) {
+							const s = scr.innerText.replace(matchs[0], '')
+							if (C.consts.o5debug > 0)
+								console.log(`Выполняется скрипт: \n${s}`)
+							eval(s)
+							scr.setAttribute(o5doscr, 1)
+						}
+					}
+				}
+				C.page.scriptLoad.AddEvents(ScriptLoad)
+				C.page.scriptDone.AddEvents(ScriptDone)
+
+				ScriptLoad()  // проверка - а вдруг чё уже загружно
+			}
+		},
+		ScriptsFinish = (page, bytimer) => { // конец инициализации страницы
+			const pact = page.pact
+
+			pact.timerp.Stop(bytimer ? 'таймер' : '')
+			if (pact.timer > 0) {
+				window.clearTimeout(pact.timer)
+				pact.timer = 0
+			}
+			if (document.body.classList.contains(page.cls))
+				document.body.classList.remove(page.cls)
+
+			// console.log('%c%s', clrPage,
+			// 	` Обработана страниица`, pact.url)
+
+			if (bytimer) {
+				for (const scrpt of C.scrpts) {
+					const act = scrpt.act
+					let err = ''
+					if (!err) {
+						if (!act.W) err = "не загружен файл "
+						else if (act.start == 0) err = "инициализация не начиналась?"
+						else if (act.start != act.done) err = "инициализация не закончилась"
+					}
+					if (err) page.errs.push({ modul: scrpt.modul, err: err })
+				}
+			}
+			else {
+				if (pact.mos) {
+					const mos = page.pact.mos
+					for (const mo of mos)
+						mo.disconnect()
+					// mo = null
+					mos.splice(0, mos.length)
+					// mos = null
+				}
+				page.scriptDone.RemEvents(ScriptDone)
+				page.scriptLoad.RemEvents(ScriptLoad)
+				window.olga5.C.o5_isInited = true
+				C.E.DispatchEvent('o5_isInited')
+			}
+
+			const errs = page.errs
+			if (errs.length > 0) {
+				C.ConsoleError(`Скрипты ${bytimer ? 'НЕ' : ''} завершились (есть ошибки)`, errs.length, errs)
+				errs.splice(0, errs.length) //  могут еще завершиться и без ошибок
+			}
 		}
 
 	class Page {
-		pact = { url: '', ready: false, start: 0, timerp: new MyTimer("}==  КОНЕЦ  обработки  страницы"), timer: 0, mos: [] }
+		pact = { url: '', ready: false, start: 0, timerp: new MyTimer(" КОНЕЦ  обработки  страницы"), timer: 0, mos: [] }
 		errs = []
-		ScriptsFinish = e => { // закрытие всех новых элементов страницы
+		PageHidden = e => { // закрытие всех новых элементов страницы
 
 			const pact = this.pact
 			if (!pact.ready) return
@@ -200,7 +321,7 @@
 			pact.ready = false
 
 			const n0 = this.childs.length
-			if (C.consts.o5debug > 0) console.log('%c%s', myclr,
+			if (C.consts.o5debug > 0) console.log('%c%s', clrMy,
 				`}=====< закрытие по '${e.type}' (n= ${n0}) страницы "${pact.url}"`)
 
 			let n = n0
@@ -223,152 +344,64 @@
 					act.W.Done()
 			})
 
-			this.donePage.RemEvents(this.ScriptsFinish)
-			// window.dispatchEvent(new window.Event('olga5_done'))
-			C.E.DispatchEvent('olga5_done')
+			this.pageDones.RemEvents(this.PageHidden)
+			// window.dispatchEvent(new window.Event('o5_isHidden'))
+			C.E.DispatchEvent('o5_isHidden')
 		}
-		ScriptsStart = () => {  // начало обработки страницы
-
-			C.QuerySelectorInit(this.starts, this.olga5Start) //  чтобы пересчитало область определения
-
-			for (const scrpt of C.scrpts) { // делаем при каждой инициализации
-				if (C.owners.length == 0) scrpt.act.need = true
-				else {
-					scrpt.act.need = false
-					for (const owner of C.owners) {
-						if (owner.modules.length == 0) scrpt.act.need = true
-						else
-							scrpt.act.need = !!owner.modules.find(modul => modul == scrpt.modul)
-						if (scrpt.act.need) break
-					}
-				}
-			}
-			if (C.consts.o5debug > 0) {
-				let asknoneed = []
-				for (const scrpt of C.scrpts)
-					if (!scrpt.act.need)
-						asknoneed.push(scrpt.modul)
-				const l = asknoneed.length
-				if (l > 0)
-					C.ConsoleError(`В скриптах заданы ${l} 'ненужн${l > 1 ? 'ых' : 'ый'}' модул${l > 3 ? 'ей' : (l > 1 ? 'я' : 'ь')}: `, asknoneed.join(', '))
-			}
-
-			if (C.consts.o5doscr) {  // запуск встроенных cкриптоав
-				const scrs = C.GetTagsByTagNames('script'),
-					scriptDone = C.consts.o5doscr,
-					m = new RegExp('\\bdocument\\.currentScript\\.setAttribute\\s*\\(\\s*[\'`"]' + scriptDone + '.*?(;|\\n|$)', 'i')
-
-				for (const scr of scrs) {
-					const matchs = scr.innerText.match(m)
-					if (matchs) {
-						const atr = scr.attributes[scriptDone]
-						if (!atr || atr.value != 1) {
-							const s = scr.innerText.replace(matchs[0], '')
-							if (C.consts.o5debug > 0)
-								console.log(`Выполняется скрипт: \n${s}`)
-							eval(s)
-							scr.setAttribute(scriptDone, 1)
-						}
-					}
-				}
-			}
-		}
-		PageFinish = bytimer => { // конец инициалзации страницы
-			const pact = this.pact
-			pact.timerp.Stop(bytimer ? 'таймер' : '')
-			if (pact.timer > 0) {
-				window.clearTimeout(pact.timer)
-				pact.timer = 0
-			}
-			if (document.body.classList.contains(this.cls))
-				document.body.classList.remove(this.cls)
-
-			if (bytimer) {
-				for (const scrpt of C.scrpts) {
-					const act = scrpt.act
-					let err = ''
-					if (!err) {
-						if (!act.W) err = "не загружен файл "
-						else if (act.start == 0) err = "инициализация не начиналась?"
-						else if (act.start != act.done) err = "инициализация не закончилась"
-					}
-					if (err) this.errs.push({ modul: scrpt.modul, err: err })
-				}
-			}
-
-			const errs = this.errs
-			if (errs.length > 0) {
-				C.ConsoleError(`Скрипты ${bytimer ? 'НЕ' : ''} завершились (есть ошибки)`, errs.length, errs)
-				errs.splice(0, errs.length) //  могут еще завершиться и без ошибок
-			}
-			if (pact.mos) {
-				const mos = this.pact.mos
-				for (const mo of mos)
-					mo.disconnect()
-				// mo = null
-				mos.splice(0, mos.length)
-				// mos = null
-			}
-			this.loadDone.RemEvents(OnLoad)
-			this.initDone.RemEvents(OnInit)
-			// window.dispatchEvent(new window.Event('olga5_ready'))
-			C.E.DispatchEvent('olga5_ready')
-		}
-		PageStart = (url) => {
-			if (C.consts.o5debug > 0)
-				console.log('%c%s', myclr, "----- старт обработки страницы ", url)
-
-			if (!document.body.classList.contains(this.cls))
-				document.body.classList.add(this.cls) // это если есть такой класс
-
-			const pact = this.pact
-			pact.timerp.Start(url)
-			if (C.consts.o5timload) {
-				if (pact.timer > 0) window.clearTimeout(pact.timer)
-				pact.timer = window.setTimeout(this.PageFinish, 1000 * C.consts.o5timload, true)
-			}
-
-			this.loadDone.AddEvents(OnLoad)
-			this.initDone.AddEvents(OnInit)
-			this.donePage.AddEvents(this.ScriptsFinish)
-
-			this.errs.splice(0, this.errs.length)
-			this.ScriptsStart()
-			// InitScripts(`загружена страница '${url}'`)
-
-			OnLoad()  // после InitScripts
-		}
-		clr = "background: green;color:white;"
-		CheckInit = (e, second) => { // проверка и начало инициализации страницы !
-			const o5inc = 'o5inc',
+		PageLoad = e => { 				// проверки и начало инициализации страницы !
+			const
+				iso5inc = e.type === 'o5inc_ready',
+				url = document.URL.match(/[^?&#]*/)[0].trim(),
 				pact = this.pact,
-				url = DocURL(),
-				starts = document.querySelectorAll("[class *= '" + this.olga5Start + "']"),
-				isolga5 = starts && starts.length,
-				isloaded = document.readyState == 'complete' ||
-					(url.match(/\bolga5-tests\b/i) && document.readyState == 'interactive'),
-				isnew = pact.url != url || !pact.ready
+				isnew = pact.url != url || !pact.ready,
+				head = ` PageLoad (${isnew ? 'новая' : 'повтор'}):  `
 
-			if (C.consts.o5debug > 1 && e) {
-				console.groupCollapsed('%c%s', this.clr, '____>  ' + e.type.padEnd(22) +
-					(isolga5 ? 'ДА ' : '  ') + (isnew ? 'новая ' : 'повт. ') +
-					document.readyState[0] + ':' + url.padEnd(55))
-				for (const nam in e)
-					if (nam != 'type' && !(e[nam] instanceof Function)) console.log(nam.padEnd(24), e[nam])
-				console.groupEnd()
+			if (iso5inc && !window.olga5.C.o5_isInited) {
+				if (C.consts.o5debug)
+					console.log('%c%s', clrPage, head + ' после o5inc - игнорируется', url)
+				return
 			}
-			// if (isloaded && !C.scrpts.finish){ // уточняю конечный список скриптов - м.б. еще чего ждать
-			// 	C.scrpts.finish=true
-			// }
-			if (isnew && isloaded) {
 
-				pact.start = Number(new Date()) + Math.random()
+			const starts = document.querySelectorAll("[class *= '" + this.olga5Start + "']")
+			if (!starts || !starts.length) {
+				if (C.consts.o5debug)
+					console.log('%c%s', clrPage, head + ` нет тегов с ${this.olga5Start} - игнорируется`, url)
+				return
+			}
 
+			const
+				meve = this.pageLoads.meves.find(meve => meve.eve == e.type),
+				isU = meve.isu,
+				isloaded = document.readyState == 'complete' ||
+					(url.match(/\bolga5-tests\b/i) && document.readyState == 'interactive')
+
+			if (!isU || (isnew && isloaded)) {
+				if (C.consts.o5debug > 0) {
+					console.groupCollapsed('%c%s', clrPage,
+						head + ` (${document.readyState})` + ` e= '${e.type}'`.padEnd(22),
+						url)
+					for (const nam in e)
+						if (nam != 'type' && !(e[nam] instanceof Function)) console.log(nam.padEnd(24), e[nam])
+					console.groupEnd()
+				}
+
+				const
+					o5inc = 'o5inc',
+					start = Number(new Date()) + Math.random()
 				let w = null,
 					o5include = null
-				if (!second) {
+
+				pact.start = start
+
+				if (iso5inc) {
+					const scrpt = C.scrpts.find(scrpt => scrpt.modul === o5inc),
+						act = scrpt.act
+
+					act.start = start
+					act.done = start
+				} else {
 					o5include = document.querySelector('[o5include]')
-					w = window.olga5.find(modul => modul.modul == o5inc)
+					w = window.olga5.find(modul => modul.modul === o5inc)
 
 					if (!w && o5include) C.ConsoleError(`Имеется тег с атрибутом 'o5include' но отсутствует модуль '${o5inc}'`)
 					else
@@ -376,49 +409,37 @@
 							C.ConsoleInfo(`¿ Задан модуль '${o5inc}' но отсутствует тег с атрибутом 'o5include' ?`)
 				}
 
-
-				// забрать в общую обработку
-				// проверить, чтобы в очерёдности обработки o5inc  всегда было первым!				
-				// 				if (w && o5include) {
-				// 					const
-				// 						scrpt = C.scrpts.find(scrpt => scrpt.modul == o5inc)
-				// 					if (scrpt)
-				// 						Object.assign(scrpt.act, { W: w, start: pact.start, done: pact.start, need:false })
-				// 					else
-				// 						C.ConsoleError(`Не найден scrpt для modul='${o5inc}'`)
-
-				// 					// window.addEventListener('olga5-incls', e => this.CheckInit(e, true))	//1
-				// 					C.E.AddEventListener('olga5-incls', e => this.CheckInit(e, true))	//1
-				// 					w.Init()
-				// 				}
-				// 				else
+				Object.assign(pact, { url: url, ready: true })
 
 
-				if (isolga5) {
-					this.ScriptsFinish(e)
-					Object.assign(pact, { url: url, ready: true })
+				pact.mos.splice(0, pact.mos.length)
 
-					pact.mos.splice(0, pact.mos.length)
+				this.starts.splice(0, this.starts.length, ...starts);
 
-					this.starts.splice(0, this.starts.length)
-					for (let i = 0; i < starts.length; i++)
-						this.starts[i] = starts[i]
+				if (C.consts.o5debug > 0)
+					console.log('%c%s', clrMy, " СТАРТ обработки страницы ", url)
 
-					this.PageStart(url)
+				if (!document.body.classList.contains(this.cls))
+					document.body.classList.add(this.cls) // это если есть такой класс
+
+				pact.timerp.Start(url, iso5inc)
+				if (C.consts.o5timload) {
+					if (pact.timer > 0)
+						window.clearTimeout(pact.timer)
+					pact.timer = window.setTimeout(ScriptsFinish, 1000 * C.consts.o5timload, this, true)
 				}
-				else
-					C.ConsoleError(`Отсутствует тег с класом '${this.olga5Start}'`) // или атрибутом 'o5include'`)
-			}
-		}
-		CheckHide = e => { // проверка и начало инициализации страницы
-			const pact = this.pact,
-				url = DocURL()
 
-			if (pact.url != url && pact.ready) {
-				console.log('%c%s', this.clr, '____<  ' + e.type.padEnd(22) + ' закрыл: ' + url.padEnd(55))
+				this.pageDones.AddEvents(this.PageHidden)
 
-				this.ScriptsFinish(e)
-				pact.url = url
+				this.errs.splice(0, this.errs.length)
+
+				C.QuerySelectorInit(this.starts, this.olga5Start) //  чтобы пересчитало область определения
+
+				// сброс событий
+				window.olga5.C.o5_isInited = false
+				C.E.Clear()
+
+				ScriptsStart()	// e.type == 'o5inc_ready'
 			}
 		}
 		AppendChild = (owner, child) => {
@@ -438,23 +459,23 @@
 			this.childs = []
 			this.starts = []
 
-			const initEvents = new MyEvents(C.consts.o5init_events)
-			initEvents.AddEvents(this.CheckInit)	//{ capture: true }
+			this.pageLoads = new MyEvents(C.consts.o5_pageLoads)
+			this.pageDones = new MyEvents(C.consts.o5_pageDones)
 
-			const closeEvents = new MyEvents(C.consts.o5hide_events)
-			closeEvents.AddEvents(this.CheckHide)	//{ capture: true }
+			this.scriptLoad = new MyEvents('o5_scriptLoad')
+			this.scriptDone = new MyEvents('o5_scriptDone')
 
-			this.donePage = new MyEvents(C.consts.o5done_events)
-			this.loadDone = new MyEvents('olga5_sload')
-			this.initDone = new MyEvents('olga5_sinit')
+			this.pageLoads.AddEvents(this.PageLoad)	//{ capture: true }
+
 			Object.seal(this.pact)
 			Object.freeze(this)
 		}
 	}
 
-	let wshp = C.ModulAddSub(olga5_modul, modulname, () => {
-		if (C.consts.o5debug > 0) console.log(` ===  инициализация ${olga5_modul}/${modulname}.js`)
-
+	const wshp = C.ModulAddSub(olga5_modul, modulname, () => {
+		console.log('%c%s', "background: aqua; color: black;border: none;",
+			` инициализация `,
+			`${olga5_modul}/${modulname}.js`)
 		if (C.consts.o5nomnu > 0)
 			document.body.classList.add('o5nomnu')
 
@@ -467,12 +488,12 @@
 			Object.assign(C, {
 				page: new Page(),
 			})
-			C.E.Init()  // сброс событий
+			C.E.Clear()  // сброс событий
 		}
 		else {
 			C.ConsoleInfo(`IniScripts.js: вообще нет скриптов для обработки`)
-			// window.dispatchEvent(new window.Event('olga5_ready'))
-			C.E.DispatchEvent('olga5_ready')
+			// window.dispatchEvent(new window.Event('o5_isInited'))
+			C.E.DispatchEvent('o5_isInited')
 		}
 
 		return true

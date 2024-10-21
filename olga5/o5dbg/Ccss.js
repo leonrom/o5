@@ -1,4 +1,4 @@
-/* -global window, document, console */
+/* global window, document, console */
 /*jshint asi:true  */
 /*jshint esversion: 6*/
 (function () {              // ---------------------------------------------- o5dbg/Ccss ---

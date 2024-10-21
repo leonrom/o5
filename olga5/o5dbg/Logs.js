@@ -1,4 +1,4 @@
-/* -global window, console, document */
+/* global window, console */
 /*jshint asi:true  */
 /*jshint esversion: 6*/
 (function () {              // ---------------------------------------------- o5dbg/Logs ---

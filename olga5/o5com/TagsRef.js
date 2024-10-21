@@ -1,4 +1,4 @@
-/* -global document, window, console, Map*/
+/* global document, window, console,*/
 /* exported olga5_menuPopDn_Click*/
 /*jshint asi:true  */
 /*jshint esversion: 6*/
@@ -38,8 +38,6 @@
 			return addnew
 		},
 		ConvertScripts = () => {
-			// if (!(Symbol.iterator in Object(window.olga5))) return		//?
-
 			const errs = [],
 				scrs = [],
 				preloads = [],
@@ -47,9 +45,11 @@
 				Orig = (obj) => {
 					const origs = obj.outerHTML.match(/\s(data-)?src\s*=\s*["*'][^"']*["*']/g)
 					if (origs && origs.length > 0) {
-						origs.forEach(orig => {
-							orig = orig.replaceAll(/["'s*]/g, '')
-						})
+						for (let i = 0; i < origs.length; i++)
+							origs[i] = origs[i].replaceAll(/["'s*]/g, '')
+						// origs.forEach(orig => {
+						// 	orig = orig.replaceAll(/["'s*]/g, '')
+						// })
 						return origs.join(', ')
 					} else
 						return '-нету-'
@@ -95,8 +95,11 @@
 				load_snm[td.modul] = td.orig // перезаписываю!
 
 				const w = window.olga5.find(w => w.modul == td.modul),
-					scrpt = { modul: td.modul, orig: td.orig, act: { W: w, need: false }, script: script, }
+					scrpt = { modul: td.modul, orig: td.orig, script: script, 
+						act: { W: w, need: false }, }
+			
 				let dochg = ''
+				
 				if (!w || td.code == '_' || (td.trans && td.code != 'data-')) {
 					dochg = !w ? 'новый  ' : 'замена '
 					if (C.consts.o5debug > 1) console.log(`тег <script>: id= '${script.id}' -> в обработку (${dochg}): orig=${td.orig}`)
@@ -173,12 +176,14 @@
 			/* -"- тепер для остальны */
 			const sdeps = [],
 				cdeps = []
+			/* eslint-disable no-prototype-builtins */
 			for (const scrpt of C.scrpts) {
 				if (!scrpt.depends)
 					scrpt.depends = scrpt.script.attributes.hasOwnProperty('async') ? [] : cdeps.concat(sdeps)
 				if (scrpt.orig) sdeps.push(scrpt)
 				else cdeps.push(scrpt)
 			}
+			/* eslint-enable no-prototype-builtins */
 			/* в отладочном режиме - делаю проверку*/
 			if (C.consts.o5debug > 0) {
 				let scrpt = null
@@ -221,6 +226,7 @@
 					const errs = []
 					for (const scrpt of C.scrpts)
 						for (const attr of scrpt.script.attributes)
+					// eslint-disable-next-line no-useless-escape
 							if (!attr.name || attr.name.match(/['"`\+\.,;]/))
 								errs.push({ 'атрибут': attr.name, 'скрипт': scrpt.script.src, })
 					if (errs.length > 0)
@@ -231,8 +237,9 @@
 				C.ConsoleError(`Ошибки в преобразовании SCRIPT `, errs.length, errs)
 
 			for (const scrpt of C.scrpts) {
-				Object.assign(scrpt.act, { done: 0, start: 0, timeout: 0, timera: null, incls: null, })
+				Object.assign(scrpt.act, { done: 0, start: 0, timeout: 0, timera: null, incls: null, })  // finish:false, 
 				Object.seal(scrpt.act)
+				Object.freeze(scrpt.depends)
 				Object.freeze(scrpt)
 			}
 			Object.freeze(C.scrpts)

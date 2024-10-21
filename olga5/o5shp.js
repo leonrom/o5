@@ -1,4 +1,4 @@
-﻿/* -global document, window */
+﻿/* global document, window */
 /*jshint asi:true  */
 /*jshint strict:true  */
 /*jshint esversion: 6 */
@@ -12,9 +12,9 @@
 			Init: ShpInit,
 			class: 'olga5_shp',
 			consts: `		
-				o5shp_dummy=0.123 //  просто так, для проверок в all0_.html;
-                olga5_frames='b';
-                olga5_owners='b';
+                o5oframs='s';
+                o5owners='b';
+                o5zindex=999;
 			`,
 			incls: {
 				names: ['DoScroll', 'Boards', 'DoResize', 'AO5shp', 'PO5shp', 'DoInit'],
@@ -23,12 +23,12 @@
 		},
 		LastDoResize = () => {
 			if (wshp && wshp.DoResize)
-				wshp.DoResize('по olga5_ready')
+				wshp.DoResize('по o5_isInited')
 		},
 		wshp = C.ModulAdd(W)
 
 		function ShpInit  () {
-			C.E.AddEventListener('olga5_ready', () => {
+			C.E.AddEventListener('o5_isInited', () => {
 				window.setTimeout(LastDoResize, 1)
 			})
 
@@ -43,7 +43,7 @@
 
 			wshp.DoInit()
 
-			C.E.DispatchEvent('olga5_sinit', W.modul)
+			C.E.DispatchEvent('o5_scriptDone', W.modul)
 
 			wshp.activated = false 	// признак, что было одно из activateEvents 
 			const activateEvents = ['click', 'keyup', 'resize'],

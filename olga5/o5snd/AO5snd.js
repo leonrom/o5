@@ -1,4 +1,4 @@
-/* -global window, document, console */
+/* global window, console, HTMLMediaElement, CustomEvent, Audio */
 /*jshint asi:true  */
 /*jshint strict:true  */
 /*jshint esversion: 6 */
@@ -111,7 +111,7 @@
                     if (wshp.actaudio && wshp.actaudio != audio)
                         wshp.StopSound(wshp.actaudio.aO5snd)
 
-                    window.dispatchEvent(new CustomEvent('olga5_stopPlay', { detail: { tag: wshp.actaudio, type: 'audio(moe)', } }))
+                    window.dispatchEvent(new CustomEvent('o5snd_stopSound', { detail: { tag: wshp.actaudio, type: 'audio(moe)', } }))
 
                     if (audio.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA)
                         Play(aO5)
@@ -236,7 +236,7 @@
                                             break
                                         case ss.stop: if (aO5.modis.over) StartSound(aO5)
                                             break
-                                        default: return
+                                        // default: return
                                     }
                         },
                         CallStopSound = e => {

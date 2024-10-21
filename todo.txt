@@ -1,6 +1,16 @@
-что-то я  напутал с ShowBounds
+					ScriptsStart()
+					// InitScripts(`загружена страница '${url}'`)
+
+					ScriptLoad()  // после InitScripts	
 
 
+почему IniScripts.js: вообще нет скриптов для обработк
+
+обработка событий (стр. 1111 и далее), квалификатор :u
+olga5-incls
+o5include
+
+проверить и отладить инициализацию псл еinclude  (напр. как из shp2_.html)
 
 убрать allbords
 в doScroll (Located = (bords, a) => {) изменить принадлежность bords

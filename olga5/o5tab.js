@@ -1,4 +1,4 @@
-/* -global document, window, console, Object*/
+/* global document, window, console, */
 /*jshint asi:true  */
 /*jshint esversion: 6*/
 /*eslint no-useless-escape: 0*/
@@ -292,7 +292,7 @@
 					const head = tds.isth ? 'th' : 'td'
 					if (!tds.isth && !isbody) {
 						isbody = true
-						html += '</thead>\n' + '<tbody>\n'
+						html += '</thead>\n  <tbody>\n'
 					}
 
 					let k = 0
@@ -320,7 +320,7 @@
 				if (isbody) html += '</tbody>\n'
 				else html += '</thead>\n'
 
-				html += '<tfoot>' + '</tfoot>\n'
+				html += '<tfoot>  </tfoot>\n'
 
 				table.innerHTML = html
 
@@ -356,13 +356,16 @@
 		if (!C.avtonom)
 			C.ParamsFill(W)
 
-		if (o5debug > 0) console.log(`========  инициализация '${W.modul}'   ------` +
-			`${C.avtonom ? ('автономно по ' + e.type) : 'из библиотеки'}`)
-
+		if (o5debug > 0) 
+			console.log('%c%s', "background: aqua; color: black;border: none;",
+				` инициализация `, 
+				`${W.modul}.js`,
+				` ${C.avtonom ? ('автономно по ' + e.type) : 'из библиотеки'} `)
+		
 		PrepTables()
 
 		if (!C.avtonom)
-			C.E.DispatchEvent('olga5_sinit', W.modul)
+			C.E.DispatchEvent('o5_scriptDone', W.modul)
 	}
 
 	if (C.avtonom) {
@@ -376,7 +379,7 @@
 			}
 		}
 		if (Find(document.scripts, 'o5inc.js'))
-			window.addEventListener('olga5-incls', W.Init)
+			window.addEventListener('o5inc_ready', W.Init)
 		else
 			document.addEventListener('DOMContentLoaded', W.Init)
 

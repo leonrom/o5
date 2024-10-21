@@ -3,6 +3,10 @@
 /*jshint asi:true  */
 /*jshint strict:true  */
 /*jshint esversion: 6 */
+
+const fmtErr = "background: yellow; color: black;",
+markout = '     --------------    '
+
 function IsInitEvents() { // дублирование ядра
     "use strict"
     const curScript = document.currentScript || document.scripts[document.scripts.length - 1],
@@ -16,12 +20,12 @@ function IsInitEvents() { // дублирование ядра
             return params
         },
         params = CurScriptParams(curScript),
-        s_events = params.o5init_events
+        s_events = params.o5_pageLoads
 
     if (typeof s_events === 'undefined') return true
     else if (s_events.trim().length > 0) return true
     else {
-        window.alert("не задан 'o5init_events'")
+        window.alert("не задан 'o5_pageLoads'")
         return false
     }
 }
@@ -38,7 +42,7 @@ function shpX_SetWindow(w0, h0) {
 
     window.resizeTo(w, h)
     window.moveTo(aw - w - 5, 5)
-    console.log(`PopUp: w0=${w0}, aw=${aw}, w=${w}, aw - w=${aw - w}`)
+    console.log(markout+`PopUp: w0=${w0}, aw=${aw}, w=${w}, aw - w=${aw - w}`)
 
     window.olga5.C.E.AddEventListener('beforeunload', function () {
         window.opener.postMessage(window.name, '*');
@@ -53,7 +57,7 @@ function shpX_SetWindow(w0, h0) {
             try {
                 window.document.title = (window.document.title == show1) ? nam : show1
             } catch (e) {
-                console.log('Прекращено `focusTimer`, причина: ' + e.message);
+                console.log(markout+'Прекращено `focusTimer`, причина: ' + e.message);
                 window.clearInterval(focusTimer);
             }
         }, 888)
@@ -87,7 +91,7 @@ function shpX_BordNames() {
         },
         FillDescription = (aO5s) => {
             if (!aO5s)
-                console.log("aO5s не опр.? в FillDescription")
+                console.log(markout+"aO5s не опр.? в FillDescription")
             for (const aO5 of aO5s) {
                 const ps = aO5.shp.getElementsByTagName('p'),
                     cls = aO5.cls,
@@ -103,21 +107,23 @@ function shpX_BordNames() {
                         ':<b>' + cls.dirV + '</b>' + dirput[cls.dirV] +
                         ':<b>' + cls.putV + '</b>' + dirput[cls.putV] +
                         ':<b>' + cls.pitch + '</b>' + pitches[cls.pitch] +
-                        '<br/>&nbsp;olga5_oframs= ' + aO5.ofram.attr +
-                        '<br/>&nbsp;olga5_owners= ' + aO5.owner.attr +
+                        '<br/>&nbsp;o5oframs= ' + aO5.ofram.attr +
+                        '<br/>&nbsp;o5owners= ' + aO5.owner.attr +
                         '<br/>f: ' + Sid('t', f.to) + Sid('b', f.bo) + Sid('l', f.le) + Sid('r', f.ri) +
                         '<br/>o: ' + Sid('t', o.to) + Sid('b', o.bo) + Sid('l', o.le) + Sid('r', o.ri)
 
                 if (ps && ps.length > 0)
                     ps[0].innerHTML = s
+                else                
+                    console.log(markout+"%c%s", fmtErr, `alltst.js->shpX_BordNames(): объект ${aO5.name} `, ` не содержит тег <p>`)
                 // if (aO5.aO5s.length > 0) FillDescription(aO5.aO5s)
             }
         }
 
     FillDescription(wshp.aO5s)
-    if (tshpsp) {
-        tshpsp.innerHTML = wshp.aO5str
-    }
+    // if (tshpsp) {        // когда-то показывал вложенность
+    //     tshpsp.innerHTML = wshp.aO5str
+    // }
 }
 
 function ShowCarcCB() {
@@ -179,7 +185,7 @@ function OL(cb) {
         for (const shp of shps) {
 
             const nst1 = window.getComputedStyle(shp)
-            console.log(shp.id + "  outlineWidth='" + nst1.outlineWidth + "' outline='" + nst1.outline + "'")
+            console.log(markout+shp.id + "  outlineWidth='" + nst1.outlineWidth + "' outline='" + nst1.outline + "'")
 
             const nst = window.getComputedStyle(shp)
             if (parseFloat(nst.outlineWidth) > 0.1) {
@@ -271,7 +277,7 @@ function CC1(cb) {
     else {
         (function ConcatAll(aO5s) {
             if (!aO5s)
-                console.log("aO5s не опр.? в CC1")
+                console.log(markout+"aO5s не опр.? в CC1")
             for (const aO5 of aO5s) {
                 shps.push(aO5.shp)
                 if (aO5.aO5s.length > 0) ConcatAll(aO5.aO5s)
@@ -310,8 +316,8 @@ function CC1(cb) {
             // if (pitch) {
             //     pitch.checked = cls.pitch != 'O'
             //     pitch.indeterminate = cls.pitch == 'S'
-            //     pitch.max = cls.pitch == 'S' ? 1 : (cls.pitch == 'P' ? 2 : 0)
-            //     // console.log();
+            //     pitch.max = cls.pitch ==  'S' ? 1 : (cls.pitch == 'P' ? 2 : 0)
+            //     // console.log(markout+);
             // }
         }
     }
@@ -330,7 +336,7 @@ function CC2(cb, namshp) {
         frams = shpX_GetFrams(t, ''),
         atr = frams.length > 0 ? frams : (t == 'f' ? 's' : 'b')
 
-    shp.setAttribute(t == 'f' ? 'olga5_oframs' : 'olga5_owners', atr)
+    shp.setAttribute(t == 'f' ? 'o5oframs' : 'o5owners', atr)
     window.olga5.o5shp.DoResize(`CC2(${cb}, ${namshp})`)
 }
 
@@ -351,9 +357,9 @@ function CC3(cb) {
             shp = document.getElementById('shp' + n)
 
         if (errs.length > 0)
-            console.log("Ошибка в задании '" + u + "' для " + aO5.nam + ": " + errs[0].err)
+            console.log(markout+"Ошибка в задании '" + u + "' для " + aO5.nam + ": " + errs[0].err)
         else {
-            shp.setAttribute(t == 'f' ? 'olga5_oframs' : 'olga5_owners', atr)
+            shp.setAttribute(t == 'f' ? 'o5oframs' : 'o5owners', atr)
             wshp.DoResize()
         }
     } else {
@@ -368,7 +374,7 @@ function CC3(cb) {
         }
         (function SetStartChecks(aO5s) {
             if (!aO5s)
-                console.log("aO5s не опр. в SetStartChecks?")
+                console.log(markout+"aO5s не опр. в SetStartChecks?")
             for (const aO5 of aO5s) {
                 const n = parseInt(aO5.id.substr(3))
 
@@ -404,7 +410,7 @@ function CC3a(cb, txt) {
     s += " border-width: " + (!cb1w.checked ? 0 : 3) + 'px;'
     s += " border-color: " + (!cb1c.checked ? 'greenyellow' : (cb1c.indeterminate ? 'transparent' : 'red')) + ';'
     s += " background-color: " + (!cb1b.checked ? 'greenyellow' : (cb1b.indeterminate ? 'transparent' : 'lightgreen')) + ';'
-    console.log(s)
+    console.log(markout+s)
 
     tab1.setAttribute('style', styleCC3a + s)
 
@@ -423,7 +429,7 @@ function Init0() {
     "use strict";
     if (!IsInitEvents()) return
     const Init0i = () => {
-        console.log('Init0() --------------')
+        console.log(markout+'Init0() --------------')
 
         const shp1 = document.getElementById('shp1')
         if (shp1) {
@@ -438,15 +444,15 @@ function Init0() {
         StartBordNames()
         ShowCarcCB()
     }
-    window.olga5.C.E.AddEventListener('olga5_ready', Init0i)
-    window.olga5.C.E.AddEventListener('olga5_fix-act', ShowCarcCB)
+    window.olga5.C.E.AddEventListener('o5_isInited', Init0i)
+    window.olga5.C.E.AddEventListener('o5shp_chgFix', ShowCarcCB)
 }
 
 function Init1() {
     "use strict";
     if (!IsInitEvents()) return
     const Init1i = () => {
-        console.log('Init1() --------------')
+        console.log(markout+'Init1() --------------')
 
         for (let i = 0; i < 3; i++) {
             const cb = document.getElementById('pshp' + (i + 1))
@@ -467,9 +473,9 @@ function Init1() {
 // const observer = new IntersectionObserver(entries => {
 //     entries.forEach(entry => {
 //         if (entry.isIntersecting) {
-//             console.log('Элемент видимый');
+//             console.log(markout+'Элемент видимый');
 //         } else {
-//             console.log('Элемент не видимый');
+//             console.log(markout+'Элемент не видимый');
 //         }
 //     });
 // });
@@ -480,17 +486,17 @@ function Init1() {
 // // -------------------------------------------------------
 
     }
-    // window.aaddEventListener('olga5_ready', Init)
-    window.olga5.C.E.AddEventListener('olga5_ready', Init1i)
-    window.olga5.C.E.AddEventListener('olga5_fix-act', ShowCarcCB)
+    // window.aaddEventListener('o5_isInited', Init)
+    window.olga5.C.E.AddEventListener('o5_isInited', Init1i)
+    window.olga5.C.E.AddEventListener('o5shp_chgFix', ShowCarcCB)
 }
 
 function Init2() {
     "use strict";
     const isi = IsInitEvents()
     if (!isi) return
-    const Init2i = () => {
-        console.log('Init2() --------------')
+    // const Init2i = () => {
+        console.log(markout+'Init2() --------------')
 
         const wshp = window.olga5.o5shp,
             div1 = document.getElementById('div1'),
@@ -507,13 +513,13 @@ function Init2() {
         if (div2) div2.scrollTo(0, 333)
         if (div1) div1.scrollTo(0, 188)
 
-        // shpX_BordNames()
+        shpX_BordNames()
         shpX_SetWindow(822, 422) //444)
         window.scrollTo(0, 333)
 
         StartBordNames()
-    }
-    window.olga5.C.E.AddEventListener('olga5_ready', Init2i)
+    // }
+    // window.olga5.C.E.AddEventListener('o5_isInited', Init2i)
 }
 
 function Init3() {
@@ -521,7 +527,7 @@ function Init3() {
     const isi = IsInitEvents()
     if (!isi) return
     const Init3i = () => {
-        console.log('Init3() --------------')
+        console.log(markout+'Init3() --------------')
 
         const wshp = window.olga5.o5shp,
             div1 = document.getElementById('div1'),
@@ -556,14 +562,14 @@ function Init3() {
 
         StartBordNames()
     }
-    window.olga5.C.E.AddEventListener('olga5_ready', Init3i)
+    window.olga5.C.E.AddEventListener('o5_isInited', Init3i)
 }
 
 function Init4() {
     "use strict"
     if (!IsInitEvents()) return
     const Init4i = () => {
-        console.log('Init4() --------------')
+        console.log(markout+'Init4() --------------')
 
         const wshp = window.olga5.o5shp,
             div1 = document.getElementById('div1'),
@@ -584,14 +590,14 @@ function Init4() {
 
         StartBordNames()
     }
-    window.olga5.C.E.AddEventListener('olga5_ready', Init4i)
+    window.olga5.C.E.AddEventListener('o5_isInited', Init4i)
 }
 
 function Init4_test() {
     "use strict"
     const div = document.getElementById('div4'),
         div1 = document.getElementById('div1'),
-        timera = '}-------->>    ИНИЦИАЛИЗАЦИЯ Init4'
+        timera = markout + 'ИНИЦИАЛИЗАЦИЯ Init4'
     console.time(timera)
     for (let i = 0; i < 5000; i++) {
         div.getBoundingClientRect()

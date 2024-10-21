@@ -1,4 +1,4 @@
-/* -global document, window, console*/
+/* global document, window, console*/
 /* exported olga5_menuPopDn_Click*/
 /*jshint asi:true  */
 /*jshint esversion: 6*/
@@ -390,8 +390,7 @@
 					InitByText(tag.innerText.trim())	//, tag)
 				})
 		}
-		// window.dispatchEvent(new CustomEvent('olga5_sinit', { detail: { modul: W.modul } }))
-		C.E.DispatchEvent('olga5_sinit', W.modul)
+		C.E.DispatchEvent('o5_scriptDone', W.modul)
 	}
 
 	C.ModulAdd(W)

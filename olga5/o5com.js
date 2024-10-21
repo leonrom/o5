@@ -1,4 +1,4 @@
-/* -global document, window, console*/
+/* global document, window, console, CustomEvent */
 /* exported olga5_menuPopDn_Click*/
 /*jshint asi:true  */
 /*jshint esversion: 6*/
@@ -8,6 +8,7 @@
 **/
 // 
 (function () {              // ---------------------------------------------- o5com ---
+	// let n3=0
 	const
 		E = { // тут везде tag===window.  Д.б. перед 'use strict'
 			Err: err => {
@@ -77,7 +78,6 @@
 					console.trace()
 					console.groupEnd()
 				}
-
 				const
 					modul = modulx ? modulx : '',
 					donet = E.donets.find(donet => donet.eve == eve && donet.modul == modul)
@@ -93,15 +93,22 @@
 					E.donets.push({ eve: eve, modul: modul, callers: [], e: e2, })
 					e = e2
 				}
+				// console.log('---n3= '+n3)
+				// if (n3===8) // 4,6
+				// 				console.log(eve, '----------------------------------------------------')
+				// 				console.log(eve, e)
+				// 		n3++
 				window.dispatchEvent(e)
 			},
-			Init: () => {
+			Clear: () => {
 				E.events.splice(0, E.events.length)
 				E.donets.splice(0, E.donets.length)
 			},
+			IsDone: eve => { // не используется (думал для замены проверок 'window.olga5.C.o5_isInited',- решил не менять)
+				E.donets.find(donet =>donet.eve == eve)
+			},
 		}
 
-	'use strict'
 	const olga5_modul = "o5com"
 	if (!window.olga5) window.olga5 = []
 	if (!window.olga5.C) window.olga5.C = {}
@@ -126,13 +133,13 @@
 						console.error(`Для ${modul} недозагрузились скрипты: ${s} (таймер o5timload=${C.consts.o5timload}с.)`)
 					load.timeout = 0
 				},
-				OnLoad = name => {
+				ScriptLoad = name => {
 					const lefts = []
 					nams[name] = true
 					for (const nam in nams)
 						if (!nams[nam]) lefts.push(nam)
 
-					if (C.consts.o5debug > 1)
+					if (C.consts.o5debug > 0)
 						console.log(`загружено включение '${name}' осталось [${lefts.join(', ')}]`)
 					if (lefts.length == 0) {
 						if (load.timeout > 0) {
@@ -144,7 +151,7 @@
 				},
 				OnError = (name, e) => {
 					console.error(`Для ${name} ошибка дозагрузки '${name}' (из ${e.target.src})`)
-					// OnLoad(name)
+					// ScriptLoad(name)
 				}
 
 			for (const name of names)
@@ -157,7 +164,7 @@
 					C.ConsoleError(`В скрипте, выполняющем дозагрузку скриптов, не создан объект 'window.olga5.${modul}'`)
 					continue
 				}
-				if (wshp[name]) OnLoad(name)
+				if (wshp[name]) ScriptLoad(name)
 				else {
 					if (!load.is_set)
 						Object.assign(load, {
@@ -168,8 +175,8 @@
 
 					const script = document.createElement('script')
 
-					if (script.readyState) script.onreadystatechange = () => { OnLoad(name); }
-					else script.onload = () => { OnLoad(name); }
+					if (script.readyState) script.onreadystatechange = () => { ScriptLoad(name); }
+					else script.onload = () => { ScriptLoad(name); }
 					script.onerror = function (e) { OnError(name, e); }
 
 					script.src = load.path + name + '.js'
@@ -198,38 +205,43 @@
 			// if (!load.timeout) iniFun(args)
 		},
 		RunO5com = () => {
+			'use strict'
 			const
 				DoneO5com = (e) => {
 					if (e)
 						document.removeEventListener('readystatechange', DoneO5com)
 
 					const _url_olga5 = C.o5script.src.match(/\S*\//)[0],
+						dt = ('' + (Number(new Date()) - strt_time)).padStart(4) + ' ms',
+						name = dt + `        ${olga5_modul}`,
 						errs = []
+
+					console.log('%c%s', "background: blue; color: white;border: none;",
+						' инициализировано ядро      ',
+						name)
 
 					for (const modname of modnames)
 						if (wshp[modname]) wshp[modname](_url_olga5)
 						else
 							errs.push(modname)
 
-					const dt = ('' + (Number(new Date()) - strt_time)).padStart(4) + ' ms',
-						name = dt + `        ${olga5_modul}`
-
 					if (errs.length > 0)
 						console.error('%c%s', "background: yellow; color: black;border: none;",
 							`Не найдены [${errs.join(', ')}] в ${olga5_modul}.js ( где-то синтаксическая ошибка ?)`)
-					console.log('%c%s', "background: blue; color: white;border: none;", '---<<<  инициализировано ядро      ' + name)
 				}
 
 			if (document.body) DoneO5com()
 			else
 				document.addEventListener('readystatechange', DoneO5com)
 		},
-		GetBaseHR = (root) => { // функции определения адреса текущиещей страницы и корня сайна
+		GetBaseHR = root => { // функции определения адреса текущиещей страницы и корня сайта
+			'use strict'
 			const url = new window.URL(window.location) //"http://rombase.h1n.ru/o5/2020/olga5-all.html")
 			if (root == 'root') return url.origin + '/'
 			else return url.origin + url.pathname.substring(0, url.pathname.lastIndexOf('/') + 1)
 		},
 		TryToDigit = x => {
+			'use strict'
 			// if (x.indexOf && x.indexOf('182')>=0)			
 			// console.log()
 			if (typeof x === 'undefined') return 1		// true
@@ -247,23 +259,28 @@
 			return rez.replace(/\t+/g, ' ').trim()
 		},
 		HasProperty = (foo, nam) => {
+			'use strict'
 			return Object.prototype.hasOwnProperty.call(foo, nam)
 			// return  foo.hasOwnProperty(nam)
 		},
 		GetAttribute = (attrs, name) => { // нахождение значения 'attr' в массиве атрибутов 'attrs'
+			'use strict'
 			for (const nam of [name, 'data-' + name, '_' + name, 'data_' + name])
 				if (HasProperty(attrs, nam)) return attrs[nam]
 		},
 		GetAttrs = attributes => {
+			'use strict'
 			const attrs = {}
 			for (const attribute of attributes)
 				attrs[Repname(attribute.name)] = TryToDigit(attribute.value)
 			return attrs
 		},
 		Repname = name => {
+			'use strict'
 			return name.trim().replaceAll('-', '_').toLowerCase()
 		},
 		ConstsFillFromUrl = (xs) => {  // параметры адресной строки,- м.б. (т.е. интерпретируются) только константы
+			'use strict'
 			const hash = window.location.hash
 			if (hash)
 				C.save.hash = hash ? hash.substring(1).trim() : ''
@@ -293,6 +310,7 @@
 			}
 		},
 		ParamsFillFromScript = (xs, defs, attrs, p) => {
+			'use strict'
 			const stradd = '(добавлен)'
 			for (const name in attrs) {
 				const nam = Repname(name)
@@ -361,14 +379,14 @@
 			o5doscr: 'olga5_sdone',
 			// o5depends: "pusto; o5inc; o5pop= o5snd; o5shp: o5inc, o5ref; o5ref= o5inc; o5snd:o5ref; o5shp=o5snd, o5ref; o5shp; o5inc; o5mnu",
 			o5depends: "o5inc; o5pop:o5ref,o5snd; o5ref= o5inc; o5snd:o5ref; o5shp=o5snd, o5ref; o5mnu; o5tab",
-			o5init_events: 'readystatechange:d, message',	// , transitionrun, transitionend
-			o5hide_events: 'transitionrun',	// , transitionrun, transitionend
-			o5done_events: 'beforeunload, olga5_unload',
+			o5_pageLoads: 'readystatechange:d, message:u, o5inc_ready',
+			o5_pageHides: 'transitionrun:u',
+			o5_pageDones: 'beforeunload, o5_unloadPage',
 		},
 		constsurl: {},
 		save: { hash: null, xs: null, p: '', n1: -1, urlName: 'url', libName: 'ядро', }, // сохранение для "красивой" печати - потом удалю
 		ModulAddSub: (modul, p1, p2) => {
-
+			'use strict'
 			if (!window.olga5[modul])
 				window.olga5[modul] = {}
 
@@ -377,13 +395,13 @@
 				sub = p2 ? p1 : p1.name,
 				Fun = p2 ? p2 : p1
 
-			if (C.consts.o5debug) {
-				console.log(`}===< ${document.currentScript.src.indexOf(`/${modul}.`) > 0 ? 'дозагружен' : 'подключён '}:  ${modul}/${sub}.js`)
+			if (C.consts.o5debug>1) {
+				console.log(`${document.currentScript.src.indexOf(`/${modul}.`) > 0 ? 'дозагружен' : 'подключён '}:  ${modul}/${sub}.js`)
 			}
 
 			if (wshp && wshp[sub]) {
 				console.groupCollapsed('%c%s', "background: yellow; color: black;border: solid 2px red;",
-					`}---< Повтор загрузки '${modul}/${sub}'`)
+					`Повтор подгрузки '${modul}/${sub}'`)
 				console.log(`Fun_old=${wshp[sub]})`)
 				console.log(`Fun_new=${Fun})`)
 				console.groupEnd()
@@ -394,33 +412,32 @@
 			return wshp
 		},
 
-		ModulAdd: (W) => {
+		ModulAdd: W => {
+			'use strict'
 			const modul = W.modul
 			if (window.olga5.find(w => w.modul == modul))
 				console.error('%c%s', "background: yellow; color: black;border: solid 2px red;",
-					`}---< Повтор загрузки '${modul}`)
+					`Повтор загрузки '${modul}`)
 			else {
 				if (C.consts.o5debug)
-					console.log(`}---< ${document.currentScript.src.indexOf(`/${modul}.`) > 0 ? 'загружен  ' : 'включён   '}:  ${modul}.js`)
+					console.log(`${document.currentScript.src.indexOf(`/${modul}.`) > 0 ? 'загружен  ' : 'включён   '}:  ${modul}.js`)
 
 				if (!window.olga5[modul])
 					window.olga5[modul] = {}
 
 				const wshp = window.olga5[modul]
 
-				// if (pars)
-				// 	Object.assign(window.olga5[modul], pars)
-
 				wshp.W = W
 				wshp.name = W.modul // просто для облегченияидентификации
 				window.olga5.push(W)
 
-				C.E.DispatchEvent('olga5_sload', W.modul)
+				C.E.DispatchEvent('o5_scriptLoad', W.modul)
 
 				return wshp
 			}
 		},
 		MyJoinO5s: aO5s => {
+			'use strict'
 			let s = ''
 			for (const aO5 of aO5s) s += (s ? ', ' : '') + aO5.name
 			return s
@@ -466,5 +483,5 @@
 		}
 	}
 
-	console.log(`}+++< загружено ядро библиотеки`)
+	console.log(`=======  загружено ядро библиотеки  =======`)
 })();

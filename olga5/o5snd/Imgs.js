@@ -1,4 +1,4 @@
-/* -global window, document, console */
+/* global window, document, console, alert, Promise, Map */
 /*jshint asi:true  */
 /*jshint strict:true  */
 /*jshint esversion: 6 */
@@ -56,7 +56,7 @@
                         }, { once: true })
                     }
                 }),
-                RegiBySrc = (maps, img) => new Promise((Resolve, Reject) => {
+                RegiBySrc = (maps, img) => new Promise(() => {  // Resolve, Reject) => {
                     if (img && img.src) {
                         const src = img.src,
                             url = FullUrl(src),

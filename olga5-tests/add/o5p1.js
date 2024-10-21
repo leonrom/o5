@@ -22,8 +22,8 @@
 		WndInit = function () { // Модуль инициализации скрипта
 			C.ParamsFill(W, olga5_CSS)
 			// ...  другие функции инициализации
-			// window.dispatchEvent(new CustomEvent('olga5_sinit', { detail: { modul: W.modul } }))
-			C.E.DispatchEvent('olga5_sinit', W.modul)
+			// window.dispatchEvent(new CustomEvent('o5_scriptDone', { detail: { modul: W.modul } }))
+			C.E.DispatchEvent('o5_scriptDone', W.modul)
 		}
 
 	const W = {
@@ -36,6 +36,6 @@
 	window.olga5.push(W)
 
 	console.log(`}---< загружен:  ${olga5_modul}.js`)
-	// window.dispatchEvent(new CustomEvent('olga5_sload', { detail: { modul: W.modul } }))
-	C.E.DispatchEvent('olga5_sload', W.modul)
+	// window.dispatchEvent(new CustomEvent('o5_scriptLoad', { detail: { modul: W.modul } }))
+	C.E.DispatchEvent('o5_scriptLoad', W.modul)
 })();

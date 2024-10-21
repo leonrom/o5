@@ -186,7 +186,7 @@
 					<span title="Иконки и ссылки в примерах - интерактивны - кликайте по ним">примеры</span> их
 					использования:
 				</p>
-				<div id='div1' class="olga5_shp:Up:Top" olga5_oframs="i:olga5-Start_hr,n" olga5_owners="id:ks1"
+				<div id='div1' class="olga5_shp:Up:Top" o5oframs="i:olga5-Start_hr,n" o5owners="id:ks1"
 					style="height:255px;    padding-top: 3px;">
 					<style>
 						td>img {
@@ -723,10 +723,10 @@ img.olga5_shp:not(.<b>olga5-freeimg</b>) {
 				Двойной клик на странице или переход на другую страницу прекращают звучание.
 			</p>
 			<p>
-				Чтобы прервать звучание из другого модуля необходимо сгенерировать событие '<b>olga5_stopPlay</b>', например:
+				Чтобы прервать звучание из другого модуля необходимо сгенерировать событие '<b>o5snd_stopSound</b>', например:
 			</p>
 		<p class="olga5_codeTextSeparate">
-			window.dispatchEvent(new CustomEvent('olga5_stopPlay', { detail: { tag: null, type: '', } }))
+			window.dispatchEvent(new CustomEvent('o5snd_stopSound', { detail: { tag: null, type: '', } }))
 		</p>
 		</div>
 

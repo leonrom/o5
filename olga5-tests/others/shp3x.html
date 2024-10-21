@@ -16,9 +16,9 @@
 <body id="body">
 	<div class='example olga5_Start'>
 		<script>
-			const eve = document.head.querySelector("script[src*='o5inc.js']") ? 'olga5-incls' : 'olga5_ready' 
+			const eve = document.head.querySelector("script[src*='o5inc.js']") ? 'o5inc_ready' : 'o5_isInited' 
 			window.addEventListener(eve, Init3, { once: true })
-			// window.addEventListener('olga5_ready', function () { Init3(), { once: true } })
+			// window.addEventListener('o5_isInited', function () { Init3(), { once: true } })
 		</script>
 		<!-- <div class='cboxed'>
 			<span>видимость</span><br />
@@ -87,7 +87,7 @@
 				<li>в первой строке, после "к.=" значения квалификаторов класса <b>olga5_shp</b> согласно заданным
 					<b>Где</b> и <b>Когда</b>;
 				</li>
-				<li>во 2-й и 3-й строках значения <b>olga5_oframs</b> и <b>olga5_owners</b> тега <b>id='shp1'</b></li>
+				<li>во 2-й и 3-й строках значения <b>o5oframs</b> и <b>o5owners</b> тега <b>id='shp1'</b></li>
 				<li>в строке '<b>f:</b>' перечислены фреймы (<b>t</b><i>op</i>, <b>b</b><i>ottom</i>, <b>l</b><i>eft</i>
 					и <b>r</b><i>ight</i> )
 					к котоым предполагается зависание объекта</li>
@@ -124,10 +124,10 @@
 						<tr>
 							<td id="td1" style="width: 100%;">
 								<span style="float: left;"><b><u>[tab1]</u></b></span>
-								<div id="shp1" class="olga5_shp:Up:Top:P1" olga5_oframs="" olga5_owners=""
+								<div id="shp1" class="olga5_shp:Up:Top:P1" o5oframs="" o5owners=""
 									style="float:right;margin-top: 22px;">
-									<!-- <div id="shp1" class="olga5_shp:Up:Top:P1" olga5_oframs="" olga5_owners="" style="float:right;zoom:0.7"> -->
-									<!-- <div id="shp1" class="olga5_shp:Up:Top:P1" olga5_oframs="" olga5_owners="" style="float:right;transform: scale(0.7)"> -->
+									<!-- <div id="shp1" class="olga5_shp:Up:Top:P1" o5oframs="" o5owners="" style="float:right;zoom:0.7"> -->
+									<!-- <div id="shp1" class="olga5_shp:Up:Top:P1" o5oframs="" o5owners="" style="float:right;transform: scale(0.7)"> -->
 	
 									<!-- <p id='p-shp1'>название объекта</p> -->
 									<p  id='p-shp1'>1 <br />3 <br />3 <br />4 </p>

@@ -1,4 +1,4 @@
-/* global document, window, console, Map*/
+/* global document, window, console, alert */
 /* exported olga5_menuPopDn_Click*/
 /*jshint asi:true  */
 /*jshint esversion: 6*/
@@ -18,13 +18,13 @@
 		SplitParams = (s, parnam, dlms = ';') => {
 			const errs = [],
 				params = {},
-				regexp = new RegExp('\\s*[' + dlms + ']\\s*', 'g'),
+				// regexp = new RegExp('\\s*[' + dlms + ']\\s*', 'g'),
 
 				regcomments = /(\s+\/\/|#).*?(\n|$|;)/g,
 
 				x = s.replace(/\/\*(.|\n)*?\*\//g, '').
-					replace(regcomments, ';'),		 // убрал оба типа коментов
-				sspairs = x.trim().split(regexp)
+					replace(regcomments, ';')		 // убрал оба типа коментов
+				// sspairs = x.trim().split(regexp)
 
 			const
 				d0 = dlms[0],
@@ -102,13 +102,13 @@
 			if (urlerrs.length > 0)
 				C.ConsoleError(`${modul}: недоопределённые ссылки`, urlerrs.length, urlerrs)
 		},
-		CopyVals = (xs, c, type) => {
-			for (const nam in c) {
-				const x = xs.find(x => x.nam == nam)
-				if (x) Object.assign(x, { val: c[nam], source: type })
-				else xs.push({ nam: nam, val: c[nam], source: type })
-			}
-		},
+		// CopyVals = (xs, c, type) => {
+		// 	for (const nam in c) {
+		// 		const x = xs.find(x => x.nam == nam)
+		// 		if (x) Object.assign(x, { val: c[nam], source: type })
+		// 		else xs.push({ nam: nam, val: c[nam], source: type })
+		// 	}
+		// },
 		InitCSS = (W, o5css) => {
 			const chs = document.head.children,
 				id = W.class + '_internal',
@@ -142,8 +142,9 @@
 			}
 		},
 		PrintParams = (modul, xs, p, n1) => {
-			let n2 = 0
-			for (const nam in xs) n2++
+			// let n2 = 0
+			// for (const nam in xs) n2++
+			const n2=xs.length
 			C.ConsoleInfo(`${modul}: все константы '${p}' `, `${('' + n2).padStart(2)} (своих=${('' + n1).padStart(2)})`, xs)
 		},
 		ParamsFill = function (W, o5css) {
@@ -173,8 +174,11 @@
 				const xs = {} // временное хранилилище для считываемых параметров
 
 				for (const nam in C[p]) {
-					const source = C.constsurl.hasOwnProperty(nam) ? C.save.urlName : `ядро`
-					if (!xs.hasOwnProperty(nam))
+					const source = Object.prototype.hasOwnProperty.call(C.constsurl, nam)?
+						C.save.urlName : `ядро`
+					// const source = C.constsurl.hasOwnProperty(nam) ? 
+					// if (!xs.hasOwnProperty(nam))
+					if (!Object.prototype.hasOwnProperty.call(xs, nam))
 						xs[nam] = { val: C[p][nam], source: source }
 				}
 				if (isnew) {

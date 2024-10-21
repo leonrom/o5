@@ -1,4 +1,4 @@
-/* -global document, window*/
+/* global document, window*/
 /*jshint asi:true  */
 /*jshint esversion: 6*/
 (function () {              // ---------------------------------------------- o5snd ---
@@ -71,6 +71,7 @@
 			75% {transform: rotateZ(-33deg);}
 		}
 	`,
+	// eslint-disable-next-line no-mixed-spaces-and-tabs
 	 SndInit=() =>{
 
 		wshp.css = css
@@ -88,8 +89,7 @@
 		const mtags = C.SelectByClassName(W.class, W.modul)
 		wshp.Prep(mtags)
 
-		// window.dispatchEvent(new CustomEvent('olga5_sinit', { detail: { modul: W.modul } }))
-		C.E.DispatchEvent('olga5_sinit', W.modul)
+		C.E.DispatchEvent('o5_scriptDone', W.modul)
 	},
 	wshp = C.ModulAdd(W)
 

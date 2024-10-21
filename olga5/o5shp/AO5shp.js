@@ -1,4 +1,4 @@
-/* -global window, document, console */
+/* global window, document, console, CustomEvent */
 /*jshint asi:true  */
 /*jshint strict:true  */
 /*jshint esversion: 6 */
@@ -13,7 +13,7 @@
         C = window.olga5.C,
         o5debug = C.consts.o5debug,
         fmtOK = "background: cornsilk; color: black;",
-        fmtErr = "background: lightgoldenrodyellow; color: black;",
+        // fmtErr = "background: lightgoldenrodyellow; color: black;",
         DecodeType = (aO5, quals) => {
             const
                 cls = aO5.cls
@@ -24,7 +24,7 @@
                     t0 = tt[0],
                     c = t0.substr(0, 1).toUpperCase()
 
-                if (c !== '' && !isNaN(t0)) aO5.act.level = Number(t0)
+                if (c !== '' && !isNaN(t0)) cls.level = Number(t0)
                 else if (c === 'N') cls.cnone = true
                 else if (c === 'C') cls.pitch = 'C' // сжимает предыдущий
                 else if (c === 'P') cls.pitch = 'P' // сталкивает предыдущий
@@ -42,7 +42,7 @@
         ReadAttrs = (aO5, blng, def) => { // определение вложенностей shp's друг в друга
             const
                 shp = aO5.shp,
-                atr = 'olga5_' + blng.akey,
+                atr = 'o5' + blng.akey,
                 str = shp.getAttribute(atr)
 
             blng.attr = str     // сохранить для alltst.js
@@ -61,14 +61,14 @@
                             const cod = cc.length > 1 ? cc[1].trim() : '',
                                 num = cc.length > 2 ? C.MyRound(cc[2]) : 0
 
-                            blng.bords.push({ tag: null, itag: -1, typ: t, cod: cod, num: num, err: '', })
+                            blng.bords.push({ tag: null, out: false, itag: -1, typ: t, cod: cod, num: num, err: '', })
                         }
                         else
-                            errs.push({ name: aO5.name, str: str, err: "тип ссылки не начинается одним из '" + typs + "'" })
+                            errs.push({ name: aO5.name, str: str, err: `тип ссылки '${t}' не начинается одним из '${typs}'` })
                     }
             }
             if (blng.bords.length === 0) {
-                blng.bords.push({ tag: null, itag: -1, typ: def, cod: '', num: 0, err: '', })
+                blng.bords.push({ tag: null, out: false, itag: -1, typ: def, cod: '', num: 0, err: '', })
                 if (str)
                     errs.push({ name: aO5.name, str: str, err: `дал умолчание '${def}' для '${blng.akey}'` })
             }
@@ -76,16 +76,26 @@
         DblClick = e => {
             const aO5 = e.target.aO5shp
             if (aO5.act.xFixed)
-                UnFixV(aO5)
+                aO5.UnFixV()
         },
         errs = []
 
     class AO5 {
-        static Tbelong = { to: null, le: null, ri: null, bo: null, attr: '', bordL: null, }
+        #isVisi
+        #outOfBords
+        IsVisi = () => this.#isVisi
+        CheckIsVisi = () => {       // запускается только при изменении видимости контейнера
+            this.#isVisi = this.#outOfBords.find(bord => bord.tag.pO5.observ.IsVisi())
+        }
+
+        static Tbelong = { to: null, le: null, ri: null, bo: null, attr: '',}
         static Margs = { t: 0, l: 0, r: 0, b: 0 }
         static Outln = { w: 0, s: 0, c: 0, o: 0 }
 
         constructor(shp) {
+            this.#isVisi = false
+            this.#outOfBords = [] // список bord'ов, из которых вылезло (и зафиксировалось) для подвисания
+
             const aO5 = this
             aO5.name = window.olga5.C.MakeObjName(shp)
             aO5.id = shp.id
@@ -93,6 +103,7 @@
             aO5.shdw = shp
             aO5.prev = shp.parentElement
             aO5.node = shp.parentNode
+
             shp.aO5shp = aO5
 
             for (const nam of ['cls', 'old', 'act', 'visi', 'margs', 'outln', 'posW', 'posC', 'posS', 'ofram', 'owner'])
@@ -103,18 +114,17 @@
         }
         name = '' // повтор - чтобы было 1-м в отладчике
 
-        cls = { dirV: 'U', putV: 'T', alive: false, none: false, pitch: 'S', zIndex: 0, top: 0, }
-
-        act = { xFixed: null, isCloned: false, readyFix: true, level: 0, cIndex: 1 } //  bordFix: false,
+        cls = { dirV: 'U', putV: 'T', alive: false, none: false, pitch: 'S', level: 0, }  // zIndex: 0, 
+        act = { xFixed: null, isCloned: false } //  bordFix: false, readyFix: true, 
 
         margs = { t: '', l: '', r: '', b: '', }
         outln = { w: '', s: '', c: '', o: '', }
 
-        ofram = Object.assign({ akey: 'oframs', bords: [], pO5L: null }, AO5.Tbelong)
+        ofram = Object.assign({ akey: 'oframs', bords: [], }, AO5.Tbelong)
         owner = Object.assign({ akey: 'owners', bords: [], }, AO5.Tbelong)
 
         posC = Object.assign({}, { top: 0, left: 0, height: 0, width: 0, })
-        posW = Object.assign({}, {  top: 0, left: 0, height: 0, width: 0,})
+        posW = Object.assign({}, { top: 0, left: 0, height: 0, width: 0, })
         posS = { top: 0, left: 0, }
 
         clon = null
@@ -128,7 +138,7 @@
                 { outlineWidth: outln.w, outlineStyle: outln.s, outlineColor: outln.c, outlineOffset: outln.o }
             )
         }
-        DoFixV = xO5 => {
+        DoFixV = target => {
             const aO5 = this,
                 shp = aO5.shp
 
@@ -144,21 +154,29 @@
 
             aO5.clon.style.display = aO5.orig.display
 
-            aO5.act.xFixed = xO5
+            aO5.act.xFixed = target
             aO5.shdw = aO5.clon
             aO5.ShowFix()
 
+            if (target.tag) {
+                const bord = target
+                if (aO5.#outOfBords.indexOf(bord) < 0)
+                    aO5.#outOfBords.push(bord)
+            }
+
             if (o5debug > 0)
-                console.log(`DoFixV - ${aO5.name}: ${xO5 === true ? 'на какой-то границе' : ('под объектом ' + xO5.name)}`)
+                console.log(`DoFixV - ${aO5.name}: ${target.tag ? 'на границе ' + target.tag.pO5.name : ('под объектом ' + target.name)}`)
 
-            if (aO5.act.xFixed === true)  // сообщаем 1 раз - только для основного
-                window.dispatchEvent(new CustomEvent('olga5_fix-act', { detail: { name: aO5.name, act: 'DoFix', xO5: xO5, } }))
+            aO5.ChgObserve(true)
 
+            if (aO5.act.xFixed.tag)  // признак, что на bord'е: сообщаем 1 раз - только для основного 
+                window.dispatchEvent(new CustomEvent('o5shp_chgFix', { detail: { name: aO5.name, act: 'DoFix', target: target, } }))
         }
-        UnFixV = () => {
-            const aO5 = this,
+        static UnFix = aO5 => {
+            const
                 shp = aO5.shp,
-                bordname = aO5.act.xFixed === true ? "на границе bord'а" : ('под ' + aO5.act.xFixed.name)
+                tag = aO5.act.xFixed.tag,
+                bordname = tag ? `на границе ${tag.pO5.name}` : `под  ${aO5.act.xFixed.name}`
 
             Object.assign(shp.style, aO5.orig)
             AO5.SetMargOutls(shp.style, aO5.margs, aO5.outln)
@@ -175,56 +193,65 @@
             aO5.ShowFix()
 
             if (o5debug > 0)
-                console.log(`UnFixV - ${aO5.name} на '${bordname}'`)
+                console.log(`UnFix - ${aO5.name} на '${bordname}'`)
 
             for (const iO5 of wshp.aO5s)
                 if (iO5.act.xFixed === aO5)
-                    iO5.UnFixV(true)
+                    iO5.UnFix(true)
 
-            if (aO5.act.xFixed === true)  // сообщаем 1 раз - только для основного
-                window.dispatchEvent(new CustomEvent('olga5_fix-act', { detail: { name: aO5.name, act: 'UnFix', xO5: aO5.act.xFixed } }))
+            aO5.ChgObserve(false)
+
+            if (tag)  // сообщаем 1 раз - только для основного
+                window.dispatchEvent(new CustomEvent('o5shp_chgFix', { detail: { name: aO5.name, act: 'UnFix', target: tag } }))
+        }
+        UnFixV = bord => {
+            const aO5 = this
+            if (bord)
+                aO5.#outOfBords.splice(aO5.#outOfBords.indexOf(bord), 1)
+
+            AO5.UnFix(aO5)
+            window.dispatchEvent(new CustomEvent('o5shp_chgFix', { detail: { name: aO5.name, act: 'UnFix', target: bord?bord.tag:null } }))
         }
         ShowFix = () => {
             const aO5 = this,
                 posC = aO5.posC,
-                posS = aO5.posS
+                posS = aO5.posS,
+                pw = (posC.width <= 0) ? 0 : posC.width,
+                ph = (posC.height <= 0) ? 0 : posC.height,
+                display = (pw === 0 || ph === 0 || !aO5.act.xFixed) ? 'none' : ''
 
-            if (posC.width <= 0 || posC.height <= 0)
-                aO5.cart.style.display = 'none'
-            else
-                Object.assign(aO5.cart.style, {
-                    top: posC.top + 'px',
-                    left: posC.left + 'px',
-                    width: posC.width + 'px',
-                    height: posC.height + 'px',
-                })
+            Object.assign(aO5.cart.style, {
+                display: display,
+                top: posC.top + 'px',
+                left: posC.left + 'px',
+                width: pw + 'px',
+                height: ph + 'px',
+            })
+
             Object.assign(aO5.shp.style, {
                 top: posS.top + 'px',
                 left: posS.left + 'px',
             })
         }
-        StrtObs = fix => {
+        ChgObserve = fix => {
             if (o5debug > 1)
-                console.log("%c%s", fmtOK, '--:  StrtObs', this.name, fix, ' (' + (fix ? 'зафиксировано' : 'отпущено') + ')')
+                console.log("%c%s", fmtOK, '--:  ChgObserve', this.name, fix, ' (' + (fix ? 'зафиксировано' : 'отпущено') + ')')
 
-            const aO5 = this,
-                o = aO5.ofram.pO5L.observP
+            for (const bord of this.ofram.bords) {
+                const
+                    o = bord.tag.pO5.observ,
+                    aO5 = o.aO5s.find(aO5 => aO5 === this)
 
-            if (fix) {
-                if (aO5.act.xFixed) {
+                if (fix) {
+                    o.unobserve(aO5.shp)
                     if (aO5.clon)
                         o.observe(aO5.clon)
-                    o.unobserve(aO5.shp)
                 }
                 else {
                     if (aO5.clon)
                         o.unobserve(aO5.clon)
                     o.observe(aO5.shp)
                 }
-            } else {
-                if (aO5.clon)
-                    o.unobserve(aO5.clon)
-                o.observe(aO5.shp)
             }
         }
         Clone = () => {
@@ -235,7 +262,7 @@
                 style = aO5.shp.style
 
             Object.assign(aO5.orig, {
-                display: style.display, position: style.position, zIndex: style.zIndex,
+                display: style.display, position: style.position,
                 top: style.top, left: style.left, height: style.height, width: style.width,
             })
 
@@ -259,7 +286,7 @@
                 position: 'fixed',
                 overflow: 'hidden',
                 background: 'none',
-                zIndex: aO5.act.cIndex,
+                zIndex: aO5.shp.style.zIndex,
             })
             aO5.shp.parentNode.insertBefore(cart, aO5.shp)
 
@@ -295,12 +322,17 @@
 
         const aO5 = new AO5(shp)
 
+        if (!aO5.prev.mO5s)
+            aO5.prev.mO5s = []
+
         DecodeType(aO5, shp.aO5shp2.quals)
-        aO5.cls.top = shp.aO5shp2.top
+
+        // aO5.cls.top = shp.aO5shp2.top
+
         Object.freeze(aO5.cls)
 
-        ReadAttrs(aO5, aO5.ofram, 'S')     // S - screen
-        ReadAttrs(aO5, aO5.owner, 'B')     // B - блок с выделенной границей
+        ReadAttrs(aO5, aO5.ofram, wshp.W.consts.o5oframs)     // S - screen
+        ReadAttrs(aO5, aO5.owner, wshp.W.consts.o5owners)     // B - блок с выделенной границей
 
         if (errs.length > 0)
             C.ConsoleError("Ошибки в атрибутах  для тегов", errs.length, errs)

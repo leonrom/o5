@@ -1,4 +1,4 @@
-/* -global document, window, console, Map*/
+/* global  window, console, Map, NamedNodeMap*/
 /* exported olga5_menuPopDn_Click*/
 /*jshint asi:true  */
 /*jshint esversion: 6*/
@@ -98,10 +98,12 @@
 					console.table(tt)
 				}
 			}
-			console.table()	
-			console.groupCollapsed(`трассировка вызова`)
-			console.trace()
-			console.groupEnd()
+			console.table()
+			{
+				console.groupCollapsed(`трассировка вызова`)
+				console.trace()
+				console.groupEnd()
+			}
 			console.groupEnd()
 		}
 

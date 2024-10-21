@@ -3,45 +3,33 @@
 
 <head>
 	<!-- <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-	<title>shp2</title>
+	<title>shp2c</title>
 	<link rel="shortcut icon" href="./add/favicon.svg" type="image/x-icon">
 
 	<link href='./add/alltst.css' media='screen' rel='stylesheet' />
 	<script src='./add/alltst.js'></script>
 
-	<script src='../olga5/o5com!.js' o5debug=0></script>
-	<script src='../olga5/o5shp!.js'></script> -->
+	<script src='../olga5/o5com.js' o5debug=0 o5incls="o5inc, o5shp, o5dbg,"></script>
+	<!-- <script data-src='+ o5inc.js'></script> -->
+	<script data-src='../olga5/o5shp.js'></script>
+	<script data-src='+./o5dbg.js' o5load="u"></script> -->
 </head>
 
 <body id="body">
-
+	<!-- <script>
+		if (window.olga5.C.o5_isInited) Init2()
+			else window.addEventListener('o5_isInited', Init2, {
+				once: true
+			})
+	</script> -->
 	<div id="div0" class='example olga5_Start'>
 
-		<script>
-			const eve = document.head.querySelector("script[src*='o5inc.js']") ? 'olga5-incls' : 'olga5_ready' 
-			window.addEventListener(eve, Init2, { once: true })
-		</script>
-		<!-- <style>
-			#shp1 {
-				zoom: 1.1;
-				transform: matrix(0.7, 0.7, 0, 1, 0, 0);
-			}
-
-			#cshp1 {
-				zoom: 1.21;
-			}
-
-			ccshp1 {
-				zoom: 1.02;
-			}
-		</style> -->
 		<div class='cboxed'>
 			<span>видимость</span><br />
-			<input type="checkbox" id="shdwcb" onclick="CC()" checked
-				title="видимость исходников для объектов 'shp'"> видимость
+			<input type="checkbox" id="shdwcb" onclick="CC()" checked title="видимость исходников для объектов 'shp'">
+			видимость
 			shdw<br>
-			<input type="checkbox" id="cartcb" onclick="CC()" 
-				title="видимость подвисабельных объектов 'shp'">
+			<input type="checkbox" id="cartcb" onclick="CC()" title="видимость подвисабельных объектов 'shp'">
 			видимость cart<br>
 			<input type="checkbox" id="cartol" onclick="OL(this, 'shp1')" checked
 				title="наличие синих рамок 'outline' вокруг всех 'shp'">с <i>outline</i><br>
@@ -55,13 +43,11 @@
 			<input type="checkbox" id="fdiv1" onclick="CC2(this, 'shp1')"> фикс. div1<br>
 			<input type="checkbox" id="fdiv2" onclick="CC2(this, 'shp1')"> фикс. div2<br>
 			<input type="checkbox" id="fdiv3" onclick="CC2(this, 'shp1')"> фикс. div3<br>
-			<input type="checkbox" id="fdiv4" onclick="CC2(this, 'shp1')"> фикс. div4<br>
 			<span>обрезать - <b>owners</b></span><br />
 			<input type="checkbox" id="obody" onclick="CC2(this, 'shp1')"> окно. body<br>
 			<input type="checkbox" id="odiv1" onclick="CC2(this, 'shp1')"> окно. div1<br>
 			<input type="checkbox" id="odiv2" onclick="CC2(this, 'shp1')"> окно. div2<br>
 			<input type="checkbox" id="odiv3" onclick="CC2(this, 'shp1')"> окно. div3<br>
-			<input type="checkbox" id="odiv4" onclick="CC2(this, 'shp1')"> окно. div4<br>
 		</div>
 
 		<pre class="pre-head"><b>Дополнительные атрибуты <i>olga5_shp</i></b>
@@ -69,14 +55,14 @@
 		<div class="thetext" style="height: 227px;">
 			<p>
 				Тестирование/иллюстрация дополнительных
-				атрибутов <b>olga5_oframs</b> и <b>olga5_owners</b> тега <i>подвисабельного</i> объекта.
+				атрибутов <b>o5oframs</b> и <b>o5owners</b> тега <i>подвисабельного</i> объекта.
 				Объект <b>shp1</b> вложен в четыре контейнера
 				(<b>div1</b> &divide; <b>div4</b> выделенные рамками), три из которых м.б. скроллируемые.
 			</p>
 			<p>
 				Скроллируемость контейнеров может изменяться <b>div1</b>, <b>div2</b> и <b>div3</b> при изменении
 				размеров окна.
-				Следовательно, если для <b>shp1</b> не указан конкретный <b>olga5_oframs</b>, то может меняться его
+				Следовательно, если для <b>shp1</b> не указан конкретный <b>o5oframs</b>, то может меняться его
 				контейнер подвисания.
 			</p>
 			<p>
@@ -125,7 +111,7 @@
 				<li>в первой строке, после "к.=" значения квалификаторов класса <b>olga5_shp</b> согласно заданным
 					<b>Где</b> и <b>Когда</b>;
 				</li>
-				<li>во 2-й и 3-й строках значения <b>olga5_oframs</b> и <b>olga5_owners</b> тега <b>id='shp1'</b>,
+				<li>во 2-й и 3-й строках значения <b>o5oframs</b> и <b>o5owners</b> тега <b>id='shp1'</b>,
 					соответственно <b>CheckBox</b>'ам <b>oframs</b> и <b>owners</b></li>
 				<li>в строке '<b>f:</b>' перечислены фреймы (<b>t</b><i>op</i>, <b>b</b><i>ottom</i> и другие )
 					к котоым предполагается зависание объекта</li>
@@ -170,22 +156,25 @@
 								</td>
 								<td id="cshp1" class="ccshp1">
 									<div id="shp1" class="olga5_shp:Up:Top" 
-										olga5_oframs='i:div2,i:div3'
-										olga5_owners='i:div1,i:div3'
+											_o5oframs='i:div2,i:div3x'
+											o5oframs='i:div22'
+											o5owners='i:div1,i:div3'
 									>
-									<b>shp1</b>
+										<b>shp1</b>
 									</div>
 								</td>
 							</tr>
 						</tbody>
 					</table>
+					<!-- <div class="divSmall">пустышка</div>
 					<div class="divSmall">пустышка</div>
 					<div class="divSmall">пустышка</div>
-					<div class="divSmall">пустышка</div>
-					<div class="divSmall olga5_shp" id='k1'>
+					<div class="divSmall olga5_shp:-1" id='k1' 
+							o5oframs='i:div2'
+					>
 						<p style="height: 74px;"><b>Kill:0</b><br />контейнер
 						</p>
-					</div>
+					</div> -->
 					<div class="divSmall">пустышка</div>
 					<div class="divSmall">пустышка</div>
 					<div class="divSmall">пустышка</div>

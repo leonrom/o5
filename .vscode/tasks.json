@@ -1,0 +1,25 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "lint-all",
+      "type": "shell",
+      "command": "eslint . -f visualstudio",
+      "options": {
+        "cwd": "${workspaceFolder}/olga5"
+      },
+      "problemMatcher": ["$eslint-stylish"]
+    }
+
+    {
+      "label": "lint-o5shp",
+      "type": "shell",
+      "command": "eslint . -f visualstudio",
+      "options": {
+        "cwd": "${workspaceFolder}/olga5/o5shp"
+      },
+      "problemMatcher": ["$eslint-stylish"]
+    }
+  ]
+}
+

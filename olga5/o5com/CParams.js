@@ -1,4 +1,4 @@
-/* -global document, window, console,*/
+/* global document, window, console, alert*/
 /* exported olga5_menuPopDn_Click*/
 /*jshint asi:true  */
 /*jshint esversion: 6*/
@@ -139,8 +139,9 @@
 		},
 		PrintParams = (modul, xs, p, n1) => {
 			let n2 = 0
+			// eslint-disable-next-line no-unused-vars
 			for (const nam in xs) n2++
-			C.ConsoleInfo(`${modul}: все константы '${p}' `, `${('' + n2).padStart(2)} (своих=${('' + n1).padStart(2)})`, xs)
+			C.ConsoleInfo(`${modul}: все '${p}' `, `${('' + n2).padStart(2)} (своих=${('' + n1).padStart(2)})`, xs)
 		},
 		ParamsFill = function (W, o5css) {
 			if (W.isReady)
@@ -168,11 +169,14 @@
 			for (const p of ['consts', 'urlrfs']) {
 				const xs = {} // временное хранилилище для считываемых параметров
 
+				/* eslint-disable no-prototype-builtins */
 				for (const nam in C[p]) {
 					const source = C.constsurl.hasOwnProperty(nam) ? C.save.urlName : `ядро`
 					if (!xs.hasOwnProperty(nam))
 						xs[nam] = { val: C[p][nam], source: source }
 				}
+				/* eslint-enable no-prototype-builtins */
+
 				if (isnew) {
 					const askps = SplitParams(W.origs[p], p, ';'),
 						n1 = C.ParamsFillFromScript(xs, askps, attrs, p)

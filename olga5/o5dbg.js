@@ -15,8 +15,8 @@
 				actscript: document.currentScript,
 			}
 		},
-		actscript = document.currentScript,
-		timera = '<-}   инициирован ' + W.modul
+		actscript = document.currentScript
+		// timera = '<-}   инициирован ' + W.modul
 
 	function DbgInit() {
 		if (wshp.Pos) wshp.Pos()
@@ -25,9 +25,9 @@
 		if (wshp.Utils) wshp.Utils()
 		if (wshp.Events) wshp.Events()
 
-		window.dispatchEvent(new CustomEvent('olga5_sinit', { detail: { modul: W.modul } }))
-
+		C.E.DispatchEvent('o5_scriptDone', W.modul)
 	}
+	
 	if (C.consts.o5nomnu || C.consts.o5noact)
 		console.error(`DbgInit не выполняется, т.к. задано:` +
 			C.consts.o5nomnu ? `  o5nomnu=${C.consts.o5nomnu}` : '' +

@@ -2,10 +2,13 @@
 /* exported olga5_menuPopDn_Click    */
 /* jshint asi:true                   */
 /* jshint esversion: 6               */
+/* eslint-disable no-prototype-builtins */
 (function () { // ---------------------------------------------- o5pop ---
+    'use strict'
     let focusTime = 0
 
     const // phases = ['NONE', 'CAPTURING_PHASE', 'AT_TARGET', 'BUBBLING_PHASE'],                
+        // eslint-disable-next-line no-useless-escape
         pard = window.location.search.match(/(\&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/),
         o5debug = (pard ? (pard[0].match(/=/) ? parseInt(pard[0].match(/\s*\d+/) || 1) : 1) : 2),
         eclr = 'background: yellow; color: black;',
@@ -126,7 +129,7 @@
         }
 
     function GetPops(e, args) {
-        'use strict'
+        // 'use strict'
         const tag = e.currentTarget,
             eve = e.type,
             CalcTagPars = (eve, tag, args, errs) => {
@@ -192,6 +195,7 @@
                 if (C.DeCodeUrl) {
                     const o5attrs = tag ? C.GetAttrs(tag.attributes) : '',
                         ori = (pops.url || '').replace(C.repQuotes, ''),
+                        // eslint-disable-next-line no-useless-escape
                         url = (ori.trim() && !ori.match(/[\/.\\#]/)) ? (document.URL + '?o5nomnu#' + ori) : ori,
                         wref = C.DeCodeUrl(W.urlrfs, url, o5attrs)
 
@@ -443,7 +447,7 @@ img.${thisClass} {
             css.innerHTML = o5css.replace(/(\/\/.*($|\n))|(\s*($|\n))/g, '\n')
         },
         ClosePops = grp => { // закрыть все с такой группой и анонимные ('группа' типа 0)
-            'use strict'
+            // 'use strict'
             if (wopens.length === 0) return
             let n = 0,
                 i = wopens.length
@@ -460,7 +464,7 @@ img.${thisClass} {
                 console.log(`${W.modul}: закрыты ${n} окон группы '${grp === null ? 'всё' : grp}'`)
         },
         CalcSizes = (sizs, errs, tagname) => {
-            'use strict'
+            // 'use strict'
             const screen = window.screen,
                 she = screen.height,
                 swi = screen.width,
@@ -479,9 +483,7 @@ img.${thisClass} {
                         }
                     }
                 }
-            let ss = [],
-                wi = 0,
-                he = 0,
+            const ss = [],
                 dtps = {
                     w: false,
                     h: false,
@@ -495,6 +497,9 @@ img.${thisClass} {
                     }
                 }
 
+            let wi = 0,
+                he = 0
+
             for (const nam of ['width', 'height', 'innerwidth', 'innerheight']) {
                 const z = GetVal(nam)
                 if (z) {
@@ -504,8 +509,8 @@ img.${thisClass} {
                     else he = val
                     ss.push(nam + '=' + parseInt(val))
                     if (errs) {
-                        CheckDubl = (nam, /width/, /innerwidth/, 'w', 'ширины окна')
-                        CheckDubl = (nam, /height/, /innerheight/, 'h', 'высоты окна')
+                        CheckDubl(nam, /width/, /innerwidth/, 'w', 'ширины окна')
+                        CheckDubl(nam, /height/, /innerheight/, 'h', 'высоты окна')
                         if (val < 100) errs.push(`для  '${tagname}' значение '${nam}' меньше 100`)
                     }
                 }
@@ -529,8 +534,8 @@ img.${thisClass} {
 
                     ss.push(nam + '=' + parseInt(val))
                     if (errs) {
-                        CheckDubl = (nam, /left/, /screenx/, 'l', 'левой позиции')
-                        CheckDubl = (nam, /top/, /screeny/, 't', 'верхней позиции')
+                        CheckDubl(nam, /left/, /screenx/, 'l', 'левой позиции')
+                        CheckDubl(nam, /top/, /screeny/, 't', 'верхней позиции')
                     }
                 }
             }
@@ -561,9 +566,7 @@ img.${thisClass} {
             if (url[0] == '#') {
                 const id = url.substring(1),
                     tag = document.getElementById(id)
-                if (tag) {
-
-                } else {
+                if (!tag) {
                     C.ConsoleError(`PopUp: ссылка на отсутствующие внутренний тег:`, id)
                     return
                 }
@@ -573,7 +576,7 @@ img.${thisClass} {
     }
 
     function ShowWin(pops) {
-        'use strict'
+        // 'use strict'
         if (o5debug > 1) console.log(`${W.modul}: ShowWin`.padEnd(22) +
             `${C.MakeObjName(pops.tag)}`.padEnd(22) +
             `${C.MakeObjName(pops.act)}, '${pops.eve}') `)
@@ -663,15 +666,18 @@ img.${thisClass} {
     }
 
     function Popups(e) {
-        'use strict'
+        // 'use strict'
         if (!C.avtonom)
             if (o5nocss || GetCSS()) C.ParamsFill(W) // CSS сохранилось после автономного создания
             else // иначе - никак, т.к. не известно, кто раньше загрузится
                 C.ParamsFill(W, o5css) // CSS пересоздаётся (для Blogger'а)
 
-        if (o5debug > 0) console.log(`========  инициализация '${W.modul}'   ------` +
-            `${C.avtonom ? ('автономно по ' + e.type) : 'из библиотеки'}`)
-
+        if (o5debug > 0) 
+			console.log('%c%s', "background: aqua; color: black;border: none;",
+				` инициализация `, 
+				`${W.modul}.js`,
+				` ${C.avtonom ? ('автономно по ' + e.type) : 'из библиотеки'} `)
+		
         focusTime = 0
 
         let o5c = null
@@ -744,7 +750,7 @@ img.${thisClass} {
                 tag.setAttribute(doneattr, 'OK')
                 const params = tag.attributes.o5popup.nodeValue.split(/[;,]/)
                 if (params.length > 0) {
-                    let err = AskRefTag(tag, params)
+                    const err = AskRefTag(tag, params)
                     if (err) {
                         console.error('%c%s', eclr, err + ` (для id='${tag.id}')`)
                         continue
@@ -777,37 +783,31 @@ img.${thisClass} {
         if (errs.length > 0)
             C.ConsoleError(`Ошибки формирования параметров окна (из url'а):`, errs.length, errs)
 
-        window.dispatchEvent(new CustomEvent('olga5_sinit', {
-            detail: {
-                modul: W.modul
-            }
-        }))
-        // C.E.DispatchEvent('olga5_sinit')
+        if (C.E)  // если не автономно
+            C.E.DispatchEvent('o5_scriptDone', W.modul)
     }
 
     if (C.avtonom) {
-		const Find = (scripts, nam) => {
-			const mnam = new RegExp('\\b' + nam + '\\b')
-			for (const script of scripts) {
-				const attributes = script.attributes
-				for (const attribute of attributes) {
-					if (attribute.value.match(mnam)) return true
-				}
-			}
-		}
-		if (Find(document.scripts, 'o5inc.js'))
-			window.addEventListener('olga5-incls', W.Init)
-		else
-			document.addEventListener('DOMContentLoaded', W.Init)
+        const Find = (scripts, nam) => {
+            const mnam = new RegExp('\\b' + nam + '\\b')
+            for (const script of scripts) {
+                const attributes = script.attributes
+                for (const attribute of attributes) {
+                    if (attribute.value.match(mnam)) return true
+                }
+            }
+        }
+        if (Find(document.scripts, 'o5inc.js'))
+            window.addEventListener('o5inc_ready', W.Init)
+        else
+            document.addEventListener('DOMContentLoaded', W.Init)
 
-        // document.addEventListener('DOMContentLoaded', W.Init)
-        // document.addEventListener('olga5-incls', W.Init)
         if (!window.olga5) window.olga5 = []
 
         if (o5debug)
             console.log(`}---< ${document.currentScript.src.indexOf(`/${W.modul}.`) > 0 ? 'загружен  ' : 'включён   '}:  ${W.modul}.js`)
-    } else 
-        C.ModulAdd(W)   
+    } else
+        C.ModulAdd(W)
 
     Object.assign(window.olga5, {
         PopUp: PopUp,

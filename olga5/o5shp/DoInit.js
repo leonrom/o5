@@ -1,4 +1,4 @@
-/* -global window, document, console */
+/* global window, document, console, IntersectionObserver */
 /*jshint asi:true  */
 /*jshint strict:true  */
 /*jshint esversion: 6 */
@@ -8,7 +8,7 @@
 
     const
         olga5_modul = "o5shp",
-        modulname = 'DoInit',
+        // modulname = 'DoInit',
         C = window.olga5.C,
         o5debug = C.consts.o5debug,
         Observe0 = (entries, obsrv0) => {
@@ -16,38 +16,44 @@
             инициализация подвисабельных обектов по мере их ПОЛНОГО появления на экране
             когда все буду инициализированы - отключаем
             */
-            const 
-            fmt = "background: aquamarine; color: black;",
-				CalcLevel = (aO5, level) => {
-					const bords = aO5.ofram.bords,
-						xO5 = bords[bords.length - 1].aO5shp
-					if (xO5)
-						CalcLevel(xO5, ++level)
-					return level
-				}
+            const
+                fmt = "background: aquamarine; color: black;"
+            // CalcLevel = (aO5, level) => {
+            //     const bords = aO5.ofram.bords,
+            //         xO5 = bords[bords.length - 1].aO5shp
+            //     if (xO5)
+            //         CalcLevel(xO5, ++level)
+            //     return level
+            // }
 
             for (const entry of entries) {
                 if (entry.isIntersecting) {
                     const
                         shp = entry.target
-                        
+
                     shp.aO5shp2.top = entry.boundingClientRect.top
 
                     const
                         aO5 = wshp.AO5shp(shp),
-                        top = aO5.cls.top
+                        top = shp.aO5shp2.top // aO5.cls.top
 
-                        aO5.act.level = CalcLevel(aO5, 0)
+                    // aO5.act.level = CalcLevel(aO5, 0)
 
                     let i = wshp.aO5s.length
                     while (i-- > 0)
-                        if (wshp.aO5s[i].cls.top < top)
+                        if (wshp.aO5s[i].shp.aO5shp2.top < top)
                             break
 
                     wshp.aO5s.splice(i + 1, 0, ...[aO5]) // aO5s.push()
-                    
-                    if (!aO5.prev.pO5)  // сделать цепочку контейнеров 
-                        wshp.PO5shp(aO5)
+                    const zIndex = wshp.W.consts.o5zindex + 1
+                    for (let i = 0; i < wshp.aO5s.length; i++) {
+                        const aO5 = wshp.aO5s[i]
+                        // aO5.cls.zIndex = zIndex + i
+                        if (!aO5.shp.style.zIndex)
+                            aO5.shp.style.zIndex = zIndex + i
+                    }
+
+                    wshp.PO5shp(aO5) // найти контейнерах ofram  и  owner     
 
                     wshp.Boards(aO5) // найти в контейнерах ofram  и  owner       
 
@@ -59,10 +65,11 @@
 
                     if (o5debug > 0) {
                         console.log("%c%s", fmt,
-                            `обработал '${aO5.name}' (видно ${parseFloat(entry.intersectionRatio).toFixed(2)}) `
-                            // `  включено в ${aO5.owner.bord.pO5.name}, виснет на ${aO5.ofram.bord.pO5.name} `
+                            `обработал`,
+                            ` '${aO5.name.padEnd(12)}' (видно ${parseFloat(entry.intersectionRatio).toFixed(2)}) `
                         )
-                        C.Debug.ShowShpBords()
+                        if (o5debug > 1)
+                            C.Debug.ShowShpBords()
 
                         if (!noact)
                             console.log("%c%s", fmt, `конец первичного обосрения: obsrv0.disconnected (все shp обработаны)!`)
@@ -80,6 +87,7 @@
                 })
 
             // obsrv0.pO5 = { n: mtags.length }
+
             for (const mtag of mtags) {
                 const shp = mtag.tag
 

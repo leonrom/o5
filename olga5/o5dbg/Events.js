@@ -1,4 +1,4 @@
-/* -global document, window, console*/
+/* global document, window, console*/
 /* exported olga5_menuPopDn_Click*/
 /*jshint asi:true  */
 /*jshint esversion: 6*/
@@ -31,6 +31,7 @@
 						ep0 = e.target,
 						id = (ep0 && ep0.id) ? ('#' + ep0.id) : '',
 						name = (!ep0 || o != 'load') ? o : (o + ` (${ep0.nodeName + id})`),
+						// eslint-disable-next-line no-useless-escape
 						doc = document.URL.match(/\/[^\/]*$/)[0].substring(1);
 					(window.opener ? window.opener : window).
 						console.log('%c%s', myclr, `${lognam} ---> ` + name.padEnd(20) +

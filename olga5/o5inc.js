@@ -1,4 +1,4 @@
-/* -global document, window, console */
+/* global document, window, console, CustomEvent, XMLHttpRequest */
 /*jshint asi:true  */
 /*jshint esversion: 6*/
 (function () {              // ---------------------------------------------- o5inc ---	
@@ -8,27 +8,37 @@
 	const
 		pard = window.location.search.match(/(&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/),
 		o5debug = (pard ? (pard[0].match(/=/) ? parseInt(pard[0].match(/\s*\d+/) || 1) : 1) : 2),
-		clrs = {	//	копия из CConsole
-			'E': "background: yellow; color: black;border: solid 1px gold;",
-			'I': "background: beige;  color: black;border: solid 1px bisque;",
+		msg = {
+			clrs: {	//	копия из CConsole
+				'E': "background: yellow; color: black;border: solid 1px gold;",
+				'I': "background: beige;  color: black;border: solid 1px bisque;",
+			},
+			Head: src => `${W.modul}:  '${src}'`,
+			Msg: (fmt, head, txt, rezs) => {
+				if (rezs) {
+					console.groupCollapsed("%c%s", fmt, head, txt)
+					console.table(rezs)
+					{
+						console.groupCollapsed('')
+						console.trace()
+						console.groupEnd()
+					}
+					console.groupEnd()
+				}
+				else {
+					console.groupCollapsed("%c%s", fmt, head, txt)
+					console.trace()
+					console.groupEnd()
+				}
+			},
+			Info: (src, txt, rezs) => msg.Msg(msg.clrs['I'], msg.Head(src), txt, rezs),
+			Error: (src, txt, rezs) => msg.Msg(msg.clrs['E'], msg.Head(src), txt, rezs),
 		},
 		C = window.olga5 ? window.olga5.C : {
 			consts: {
 				o5debug: o5debug
 			},
 			avtonom: true,
-			ConsoleInfo: (head, txt, rezs) => {
-				console.groupCollapsed('%c%s', clrs['I'], head + ' - ' + txt)
-				console.table(rezs)
-				console.trace()
-				console.groupEnd()
-			},
-			ConsoleError: (head, ne, rezs) => {
-				console.groupCollapsed('%c%s', clrs['E'], head + ` - есть ${ne} ошибок!`)
-				console.table(rezs)
-				console.trace()
-				console.groupEnd()
-			},
 		},
 		_div = document.createElement('div'),
 		W = {
@@ -45,7 +55,7 @@
 					break
 				}
 			if (!ok || C.consts.o5debug > 0) {
-				const head = `${W.modul}:  обработка 'CInclude'`,
+				const src = `обработка 'CInclude'`,
 					rezs = []
 
 				for (const url in incls) {
@@ -53,21 +63,21 @@
 					rezs.push({ ori: incl.ori, url: incl.url, err: incl.err || 'OK', })
 				}
 
-				if (ok) C.ConsoleInfo(head, 'OK', rezs)
+				if (ok) msg.Info(src, 'всё загружено', rezs)
 				else
-					C.ConsoleError(head + ' - есть ошибки:', rezs.length, rezs)
+					msg.Error(src, 'есть ошибки:', rezs)
 			}
 
-			// window.dispatchEvent(new CustomEvent('olga5_sinit', { detail: { modul: W.modul } }))
-			// window.dispatchEvent(new CustomEvent('olga5-incls', { detail: { modul: W.modul } }))
-			if (W.consts.o5isfinal)
-				C.E.DispatchEvent('olga5_sinit', W.modul)
 			if (C.avtonom) {
-				const e = new CustomEvent('olga5-incls', {modul:W.modul})
+				const e = new CustomEvent('o5inc_ready', { modul: W.modul })
 				window.dispatchEvent(e)
 			}
 			else
-				C.E.DispatchEvent('olga5-incls', W.modul)
+				// передавать имя "источника"			
+				C.E.DispatchEvent('o5inc_ready', W.modul + "-источник")
+
+			if (C.E && W.consts.o5isfinal)	// гененрировать ли сообщение 'o5_scriptDone'
+				C.E.DispatchEvent('o5_scriptDone', W.modul)
 		},
 		AddIncls = (tags) => {
 			// console.log(`INC_1 `)
@@ -85,7 +95,7 @@
 					return true
 				}
 			for (const tag of tags) // группировка по url'ам, чтобы не грузить лишнее
-				if (W.consts.o5getall || IsDisplay(tag)) {
+				if (W.consts.o5getall || IsDisplay(tag)) {    // загружать со стиль "displa = 'none'"
 					const ref = tag.getAttribute(o5include)
 
 					tag.removeAttribute(o5include)
@@ -115,7 +125,7 @@
 
 						Object.assign(incl.xhr, {
 							incl: incl,
-							onload: OnLoad,
+							onload: PageLoad,
 							onerror: OnError,
 							timeout: 10000,
 							responseType: 'text',
@@ -142,16 +152,25 @@
 			return n
 		},
 		AskFinish = (incl, ok) => {
-
-			if (!ok) console.log(`========  o5inc.OnLoad(${incl.xhr.status})   ${incl.xhr.responseURL}`)
-			else
-				if (C.consts.o5debug > 0) console.log(`========  o5inc.OnLoad(${incl.xhr.status})  ------ ${incl.xhr.responseURL}`)
+			let done = true
 
 			for (const url in incls)
-				if (!incls[url].done)
-					return
+				if (!incls[url].done) {
+					done = false
+					break
+				}
 
-			InclFinish()
+			if (!ok)
+				msg.Error('AskFinish', `ошибка загрузки ${incl.xhr.status}   ${incl.xhr.responseURL}`)
+			else
+				if (C.consts.o5debug > 1)
+					msg.Info('AskFinish', `вставлен URL ${done ? '(последний!)' : ''}  ${incl.xhr.responseURL}`)
+
+			// for (const url in incls)
+			// 	if (!incls[url].done)
+			// 		return
+			if (done)
+				InclFinish()
 		},
 		DoLoad = incl => {
 			// const errs = [],
@@ -170,15 +189,18 @@
 			// const _div = _DIV.children[0]
 			_div.innerHTML = incl.xhr.responseText.substring(i)
 
-			if (C.consts.o5debug > 1) {
-				console.groupCollapsed(`${W.modul} : Обрабатывается`)
-				console.log(_div.innerHTML)
-				console.groupEnd()
-			}
+			// if (C.consts.o5debug > 1) {
+			// 	console.groupCollapsed(`${W.modul}: Обрабатывается`)
+			// 	console.log(_div.innerHTML)
+			// 	console.groupEnd()
+			// }
+
+			msg.Info('DoLoad  ', `обрабатывается фрагмент ${i}`, _div.innerHTML)
+
 			const tags = []
 			for (const mtag of incl.mtags)
 				if (!mtag.done) {
-					mtag.done - true
+					mtag.done = true
 					const
 						sel = mtag.sel,
 						tag = mtag.tag
@@ -245,17 +267,6 @@
 						tag.innerHTML += s.trimRight() + '\n' // тут '\n' надо для "красоты" в тестах
 					}
 					tags.concat(tag.querySelectorAll("div[" + o5include + "]") || [])
-
-					// const scrpts = tag.getElementsByTagName('script')
-					// // for (const scrpt of scrpts){
-					// if (scrpts.length > 0) {
-					// 	const scrpt = scrpts[0],
-					// 		script = document.createElement('script')
-					// 	script.innerHTML = "console.log('-234-')"
-					// 	// tag.appendChild(script)
-					// 	scrpt.parentNode.insertBefore(script, scrpt)
-					// }
-
 				}
 			if (errs.length > 0)
 				incl.err = `не опр. '${errs.join(', ')}'`
@@ -263,23 +274,25 @@
 			if (tags && tags.length > 0)
 				AddIncls(tags)
 		},
-		OnLoad = function () {
+		PageLoad = function () {
 			const
 				xhr = this,
 				incl = xhr.incl
 
-			if (C.consts.o5debug > 0) {
-				console.groupCollapsed(`${W.modul} : прочитан (${xhr.status}) url='${xhr.responseURL}'`)
-				console.log(xhr.responseText)
-				console.groupEnd()
-			}
+			if (C.consts.o5debug > 1)
+				msg.Info('PageLoad', `загружена страница  (с рез.=${xhr.status})  ${incl.xhr.responseURL}`, xhr.responseText)
+			// 	{
+			// 	console.groupCollapsed(`${W.modul} : прочитан ((рез.=${xhr.status})) url='${xhr.responseURL}'`)
+			// 	console.log(xhr.responseText)
+			// 	console.groupEnd()
+			// }
 			incl.done = true
 
 
 			if (xhr.status == 200)
 				DoLoad(incl)
 			else
-				incl.err = `статус загрузки = ${xhr.status}`
+				incl.err = `статус загрузки = (рез.=${xhr.status})`
 
 			// delete incl.xhr  надо бы удалять, ео не получается
 
@@ -294,8 +307,11 @@
 
 	function InclStart(e) {
 		if (C.consts.o5debug > 0) {
-			console.log(`========  инициализация '${W.modul}'   ------` +
+			console.log('%c%s', "background: aqua; color: black;border: none;",
+				` инициализация `,
+				`${W.modul}.js`,
 				` ${C.avtonom ? ('автономно по ' + e.type) : 'из библиотеки'} `)
+
 			_div.style.display = 'none'
 			_div.id = 'moe'
 			// if (C.consts.o5debug > 1) {

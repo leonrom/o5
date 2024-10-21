@@ -46,11 +46,9 @@ function shp_WinOpen(nam) {
 		window.addEventListener('beforeunload', function () {
 			shp_DelWnd('window -> beforeunload', '')
 		})
-		// window.document.addEventListener('visibilitychange', function () {
-		// 	shp_DelWnd('document -> visibilitychange', '')
-		// })
-		window.addEventListener('olga5_done', function () {
-			shp_DelWnd('window -> olga5_done', '')
+
+		window.addEventListener('o5_isHidden', function () {
+			shp_DelWnd('window -> o5_isHidden', '')
 		})
 		window.addEventListener('pageshow', function () {
 			shp_DelWnd('window -> pageshow', '')

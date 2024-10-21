@@ -1,4 +1,4 @@
-/* -global document, window*/
+/* global document, window, console, CustomEvent*/
 /*jshint asi:true  */
 /*jshint esversion: 6*/
 /*eslint no-useless-escape: 0*/
@@ -130,7 +130,7 @@
 						console.log(aO5.tag.id, 2, act, s)
 					}
 					if (act == 1) {
-						window.dispatchEvent(new CustomEvent('olga5_stopPlay', { detail: { tag: aO5.tag, type: 'yt', } }))
+						window.dispatchEvent(new CustomEvent('o5ref_stopVideo', { detail: { tag: aO5.tag, type: 'yt', } }))
 					}
 				},
 				onYtReady = () => {	//	
@@ -180,11 +180,7 @@
 						aO5.iframe = aO5.player.getIframe()
 						aO5.iframe.aO5 = aO5
 
-						// tag.addEventListener('olga5_stopPlay', e => {
-						// 	// console.log(aO5.tag.id, 5)
-						// 	e.target.aO5yt.player.playVideo()
-						// })
-						window.addEventListener('olga5_stopPlay', e => {
+						window.addEventListener('o5ref_stopVideo', e => {
 							const act = e.detail.tag
 							for (const tag of tags)
 								if (tag !== act && tag.aO5yt.player)
@@ -209,11 +205,6 @@
 				tag.aO5yt = { player: null, videoId: videoId, chkmove: 'ask', tag: tag, style: style, ready: false }
 
 				tag.addEventListener('mouseover', AddFrame, { once: true })
-				// tag.addEventListener('olga5_stopPlay', e => {
-				// 	if (this !== e.detail.tag)
-				// 		this.aO5yt.player.stopVideo()
-				// 	// console.log(act.id, 5, e.detail)
-				// })
 			}
 		}
 
@@ -234,8 +225,7 @@
 		PrepTubes()
 		// PrepTables()
 
-		// window.dispatchEvent(new CustomEvent('olga5_sinit', { detail: { modul: W.modul } }))
-		C.E.DispatchEvent('olga5_sinit', W.modul)
+		C.E.DispatchEvent('o5_scriptDone', W.modul)
 
 		// InitRPos()
 	}

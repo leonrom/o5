@@ -1,4 +1,4 @@
-/* -global document, window */
+/* global document, window, console */
 /*jshint asi:true  */
 /*jshint esversion: 6*/
 (function () {              // ---------------------------------------------- o5dbg/pos ---

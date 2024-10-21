@@ -1,0 +1,6 @@
+{
+  "devDependencies": {
+    "@nicolo-ribaudo/eslint-scope-5-internals": "^5.1.1-v1",
+    "eslint": "^9.10.0"
+  }
+}

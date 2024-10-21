@@ -76,8 +76,8 @@
         const BloggerAuto =e => {
             const url = document.URL,
                 xhr = new XMLHttpRequest(),
-                OnLoad = function () {
-                    console.log(`========  o5inc.OnLoad(${xhr.status})  ------ ${xhr._url}`)
+                ScriptLoad = function () {
+                    console.log(`========  o5inc.ScriptLoad(${xhr.status})  ------ ${xhr._url}`)
                     if (xhr.status == 200) {
                         // const ss = xhr.responseText.match(/<\/title>(.|\n)*<\/head>/uimg)
                         // Опережающая и Ретроспективная проверки
@@ -93,10 +93,10 @@
                     }
                 },
                 OnError = function (e) {
-                    console.error(`}========  o5inc.OnLoad(${xhr.status})  ------ ${xhr._url}`)
+                    console.error(`}========  o5inc.ScriptLoad(${xhr.status})  ------ ${xhr._url}`)
                 }
 
-            Object.assign(xhr, { _url: url, onload: OnLoad, onerror: OnError, timeout: 10000, responseType: 'text', withCredentials: true, })
+            Object.assign(xhr, { _url: url, onload: ScriptLoad, onerror: OnError, timeout: 10000, responseType: 'text', withCredentials: true, })
             xhr.open("get", url, true)
             xhr.send()
         }
