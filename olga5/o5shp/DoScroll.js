@@ -219,9 +219,11 @@
 			for (const aO5 of wshp.aO5s)   //  расчет положения - только при наличии видимых bord'ов для вылезших aO5
 				if (aO5.IsVisi() || aO5 === e.aO5) {
 					const
-						b = aO5.shdw.getBoundingClientRect()
+						// p=aO5.cls.posInPage
+						p = aO5.shdw.getBoundingClientRect()
 
 					Object.assign(aO5.posW, { top: b.top, left: b.left, height: b.height, width: b.width }) // нелья сразу - 'лишние' поля
+					// Object.assign(aO5.posW, { top: p.top-window.scrollY, left: p.left-window.scrollx, height: p.height, width: p.width }) // нелья сразу - 'лишние' поля
 					Object.assign(aO5.posS, { top: 0, left: 0, })
 					Object.assign(aO5.posC, aO5.posW)
 

@@ -23,10 +23,10 @@
 
             if (o5debug > 1) {
                 let s = ''
-                for (const entry of entries) 
+                for (const entry of entries)
                     s += (s ? ', ' : '') +
                         `${entry.isIntersecting ? '+' : '-'}${entry.target.aO5shp.name}/` +
-                        ` ${entry.intersectionRatio.toFixed(2)}${(entry.target.classList.contains('olga5-clon') ? '-clon' : '')}`                
+                        ` ${entry.intersectionRatio.toFixed(2)}${(entry.target.classList.contains('olga5-clon') ? '-clon' : '')}`
 
                 console.log("%c%s", fmtOK, '--:  Observe bord=', pO5.name, '[' + s + ']')
             }
@@ -73,7 +73,7 @@
                             pos = observ.pO5.pos,
                             dirV = aO5.cls.dirV
 
-                            wshp.escroll.ScrollAct(true, `подвисло ${aO5.name}`)
+                        wshp.escroll.ScrollAct(true, `подвисло ${aO5.name}`)
                         // if (
                         //     (br.top < pos.top && dirV === 'U') ||
                         //     (br.bottom > pos.bottom && dirV === 'D')
@@ -219,17 +219,20 @@
             // }
 
             for (const bord of blng.bords) {
-                const ask = {
-                    c: (bord.cod || '').trim().toUpperCase(),
-                    t: bord.typ.toUpperCase(),
-                    n: bord.num
-                }
+                const
+                    cod = (bord.cod || '').trim(),
+                    ask = {
+                        c: cod.toUpperCase(),
+                        t: bord.typ.toUpperCase(),
+                        n: bord.num
+                    }
 
                 const xO5 = { itag: 9999, tag: document.body },
                     mO5 = aO5.prev.mO5s.find(m => m.c === ask.c && m.t === ask.t && m.n === ask.n) || {}
 
                 if (!mO5.tag) {
                     let err = '',
+                        n = ask.n,
                         found = false
 
                     Object.assign(mO5, { c: ask.c, t: ask.t, n: ask.n, itag: -1, tag: null })
@@ -241,7 +244,6 @@
                         if (ask.t === 'S') Object.assign(mO5, xO5)
                         else {
                             let i = -1,
-                                n = ask.n,
                                 prev = aO5.prev
 
                             while (prev) {
@@ -270,15 +272,15 @@
                                 else
                                     break
                             }
-                            if (!mO5.tag)
-                                if (found) err = ` контейнер '${ask.t}:${ask.c}:${ask.n}' - найдено лишь ${ask.n - n}`
-                                else err = ` контейнер '${ask.t}:${ask.c}:${ask.n}' - не найден`
                         }
 
-                    if (err) {
+                    if (!mO5.tag) {
+                        if (!err && ask.c !== 'OLGA5-START_HR') {
+                            bord.err = ` контейнер '${ask.t}:${cod}:${ask.n}' - ` +
+                                (found ? `найдено лишь ${ask.n - n}` : `не найден`)
+                            errs.push(bord.err)
+                        }
                         Object.assign(mO5, xO5)
-                        bord.err = err
-                        errs.push(bord.err)
                     }
                     aO5.prev.mO5s.push(mO5)
                 }
@@ -292,8 +294,8 @@
                 if (!bord.tag.pO5) {
                     try {
                         bord.tag.pO5 = new PO5(bord.tag)
-                    } catch (err) {
-                        C.ConsoleAlert(`В ModulAddSub Для объекта '${aO5.name}' ошибка при определении prev='${C.MakeObjName(aO5.prev)}':\n\t  "${err.message}"`)
+                    } catch (e) {
+                        C.ConsoleAlert(`В ModulAddSub Для объекта '${aO5.name}' ошибка при определении prev='${C.MakeObjName(aO5.prev)}':\n\t  "${e.message}"`)
                         return
                     }
 

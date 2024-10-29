@@ -284,7 +284,7 @@
 			const hash = window.location.hash
 			if (hash)
 				C.save.hash = hash ? hash.substring(1).trim() : ''
-
+			
 			const smatchs = window.location.search.match(/[?&]\S+?(#|$)/) || []
 			for (const smatch of smatchs) {
 				const match = smatch.replaceAll(/(%20|\s)/g, '').trim()

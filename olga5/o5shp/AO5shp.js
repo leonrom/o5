@@ -14,31 +14,7 @@
         o5debug = C.consts.o5debug,
         fmtOK = "background: cornsilk; color: black;",
         // fmtErr = "background: lightgoldenrodyellow; color: black;",
-        DecodeType = (aO5, quals) => {
-            const
-                cls = aO5.cls
-            let err = ''
-
-            for (const qual of quals) {
-                const tt = qual.replaceAll(/-/g, '=').split('='),
-                    t0 = tt[0],
-                    c = t0.substr(0, 1).toUpperCase()
-
-                if (c !== '' && !isNaN(t0)) cls.level = Number(t0)
-                else if (c === 'N') cls.cnone = true
-                else if (c === 'C') cls.pitch = 'C' // сжимает предыдущий
-                else if (c === 'P') cls.pitch = 'P' // сталкивает предыдущий
-                else if (c === 'S') cls.pitch = 'S' // сдвигает предыдущий
-                else if (c === 'O') cls.pitch = 'O' // наезжает на предыдущий
-                else if (c === 'A') cls.alive = true
-                else if (c === 'D' || c === 'U') cls.dirV = c
-                else if (c === 'B' || c === 'T') cls.putV = c
-                else err += (err ? ', ' : '') + t0
-            }
-
-            if (err)
-                C.ConsoleError(`Для тега ${aO5.name} не определены квалификаторы: `, err)
-        },
+        errs = [],
         ReadAttrs = (aO5, blng, def) => { // определение вложенностей shp's друг в друга
             const
                 shp = aO5.shp,
@@ -77,8 +53,7 @@
             const aO5 = e.target.aO5shp
             if (aO5.act.xFixed)
                 aO5.UnFixV()
-        },
-        errs = []
+        }
 
     class AO5 {
         #isVisi
@@ -88,7 +63,7 @@
             this.#isVisi = this.#outOfBords.find(bord => bord.tag.pO5.observ.IsVisi())
         }
 
-        static Tbelong = { to: null, le: null, ri: null, bo: null, attr: '',}
+        static Tbelong = { to: null, le: null, ri: null, bo: null, attr: '', }
         static Margs = { t: 0, l: 0, r: 0, b: 0 }
         static Outln = { w: 0, s: 0, c: 0, o: 0 }
 
@@ -97,6 +72,7 @@
             this.#outOfBords = [] // список bord'ов, из которых вылезло (и зафиксировалось) для подвисания
 
             const aO5 = this
+
             aO5.name = window.olga5.C.MakeObjName(shp)
             aO5.id = shp.id
             aO5.shp = shp
@@ -106,16 +82,20 @@
 
             shp.aO5shp = aO5
 
-            for (const nam of ['cls', 'old', 'act', 'visi', 'margs', 'outln', 'posW', 'posC', 'posS', 'ofram', 'owner'])
+            aO5.DecodeType(shp.aO5quals)
+            delete shp.aO5quals
+            
+            for (const nam of ['old', 'act', 'visi', 'margs', 'outln', 'posW', 'posC', 'posS', 'ofram', 'owner'])
                 Object.seal(this[nam])
-            Object.seal(this)
 
+            Object.freeze(aO5.cls)
+            Object.freeze(aO5)
+            
             shp.addEventListener('dblclick', DblClick)
         }
         name = '' // повтор - чтобы было 1-м в отладчике
 
-        cls = { dirV: 'U', putV: 'T', alive: false, none: false, pitch: 'S', level: 0, }  // zIndex: 0, 
-        act = { xFixed: null, isCloned: false } //  bordFix: false, readyFix: true, 
+        act = { xFixed: null, uScroll:false, canFix:false }
 
         margs = { t: '', l: '', r: '', b: '', }
         outln = { w: '', s: '', c: '', o: '', }
@@ -137,6 +117,38 @@
                 { marginTop: margs.t, marginLeft: margs.l, marginRight: margs.r, marginBottom: margs.b },
                 { outlineWidth: outln.w, outlineStyle: outln.s, outlineColor: outln.c, outlineOffset: outln.o }
             )
+        }
+        static UnFix = aO5 => {
+            const
+                shp = aO5.shp,
+                tag = aO5.act.xFixed.tag,
+                bordname = tag ? `на границе ${tag.pO5.name}` : `под  ${aO5.act.xFixed.name}`
+
+            Object.assign(shp.style, aO5.orig)
+            AO5.SetMargOutls(shp.style, aO5.margs, aO5.outln)
+            // AO5.SetMargOutls(aO5.cart.style, AO5.Outln)
+
+            aO5.cart.style.display = 'none'
+            aO5.clon.style.display = 'none'
+
+            aO5.cart.removeChild(shp)
+            aO5.node.insertBefore(shp, aO5.cart)
+
+            aO5.act.xFixed = null
+            aO5.shdw = shp
+            aO5.ShowFix()
+
+            if (o5debug > 0)
+                console.log(`UnFix - ${aO5.name} на '${bordname}'`)
+
+            for (const iO5 of wshp.aO5s)
+                if (iO5.act.xFixed === aO5)
+                    iO5.UnFix(true)
+
+            aO5.ChgObserve(false)
+
+            if (tag)  // сообщаем 1 раз - только для основного
+                window.dispatchEvent(new CustomEvent('o5shp_chgFix', { detail: { name: aO5.name, act: 'UnFix', target: tag } }))
         }
         DoFixV = target => {
             const aO5 = this,
@@ -172,45 +184,13 @@
             if (aO5.act.xFixed.tag)  // признак, что на bord'е: сообщаем 1 раз - только для основного 
                 window.dispatchEvent(new CustomEvent('o5shp_chgFix', { detail: { name: aO5.name, act: 'DoFix', target: target, } }))
         }
-        static UnFix = aO5 => {
-            const
-                shp = aO5.shp,
-                tag = aO5.act.xFixed.tag,
-                bordname = tag ? `на границе ${tag.pO5.name}` : `под  ${aO5.act.xFixed.name}`
-
-            Object.assign(shp.style, aO5.orig)
-            AO5.SetMargOutls(shp.style, aO5.margs, aO5.outln)
-            // AO5.SetMargOutls(aO5.cart.style, AO5.Outln)
-
-            aO5.cart.style.display = 'none'
-            aO5.clon.style.display = 'none'
-
-            aO5.cart.removeChild(shp)
-            aO5.node.insertBefore(shp, aO5.cart)
-
-            aO5.act.xFixed = null
-            aO5.shdw = shp
-            aO5.ShowFix()
-
-            if (o5debug > 0)
-                console.log(`UnFix - ${aO5.name} на '${bordname}'`)
-
-            for (const iO5 of wshp.aO5s)
-                if (iO5.act.xFixed === aO5)
-                    iO5.UnFix(true)
-
-            aO5.ChgObserve(false)
-
-            if (tag)  // сообщаем 1 раз - только для основного
-                window.dispatchEvent(new CustomEvent('o5shp_chgFix', { detail: { name: aO5.name, act: 'UnFix', target: tag } }))
-        }
         UnFixV = bord => {
             const aO5 = this
             if (bord)
                 aO5.#outOfBords.splice(aO5.#outOfBords.indexOf(bord), 1)
 
             AO5.UnFix(aO5)
-            window.dispatchEvent(new CustomEvent('o5shp_chgFix', { detail: { name: aO5.name, act: 'UnFix', target: bord?bord.tag:null } }))
+            window.dispatchEvent(new CustomEvent('o5shp_chgFix', { detail: { name: aO5.name, act: 'UnFix', target: bord ? bord.tag : null } }))
         }
         ShowFix = () => {
             const aO5 = this,
@@ -314,6 +294,34 @@
 
             AO5.SetMargOutls(aO5.cart.style, AO5.Margs, aO5.outln)
         }
+        DecodeType = quals => {
+            const aO5 = this
+            let err = ''
+
+            aO5.cls = {                 level: 0, pitch: 'S', alive: false, dirV: 'U', putV: 'T',             }
+            Object.seal(aO5.cls)
+
+            for (const qual of quals) {
+                const tt = qual.replaceAll(/-/g, '=').split('='),
+                    t0 = tt[0],
+                    c = t0.substr(0, 1).toUpperCase()
+
+                if (c !== '' && !isNaN(t0)) aO5.cls.level = Number(t0)
+                else if (c === 'C') aO5.cls.pitch = 'C' // сжимает предыдущий
+                else if (c === 'P') aO5.cls.pitch = 'P' // сталкивает предыдущий
+                else if (c === 'S') aO5.cls.pitch = 'S' // сдвигает предыдущий
+                else if (c === 'O') aO5.cls.pitch = 'O' // наезжает на предыдущий
+                else if (c === 'A') aO5.cls.alive = true
+                else if (c === 'D' || c === 'U') aO5.cls.dirV = c
+                else if (c === 'B' || c === 'T') aO5.cls.putV = c
+                else err += (err ? ', ' : '') + t0
+            }
+
+            if (err)
+                C.ConsoleError(`Для тега ${aO5.name} не определены квалификаторы: `, err)
+        }
+        Resize=()=>{         
+        }
     }
 
     // --------------------------------------------------------------------- //    
@@ -324,12 +332,6 @@
 
         if (!aO5.prev.mO5s)
             aO5.prev.mO5s = []
-
-        DecodeType(aO5, shp.aO5shp2.quals)
-
-        // aO5.cls.top = shp.aO5shp2.top
-
-        Object.freeze(aO5.cls)
 
         ReadAttrs(aO5, aO5.ofram, wshp.W.consts.o5oframs)     // S - screen
         ReadAttrs(aO5, aO5.owner, wshp.W.consts.o5owners)     // B - блок с выделенной границей

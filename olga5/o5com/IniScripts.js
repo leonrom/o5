@@ -348,7 +348,7 @@
 			// window.dispatchEvent(new window.Event('o5_isHidden'))
 			C.E.DispatchEvent('o5_isHidden')
 		}
-		PageLoad = e => { 				// проверки и начало инициализации страницы !
+		PageLoad = e => { 	// проверки и начало инициализации страницы !
 			const
 				iso5inc = e.type === 'o5inc_ready',
 				url = document.URL.match(/[^?&#]*/)[0].trim(),
@@ -356,10 +356,19 @@
 				isnew = pact.url != url || !pact.ready,
 				head = ` PageLoad (${isnew ? 'новая' : 'повтор'}):  `
 
-			if (iso5inc && !window.olga5.C.o5_isInited) {
-				if (C.consts.o5debug)
-					console.log('%c%s', clrPage, head + ' после o5inc - игнорируется', url)
-				return
+			if (iso5inc) {
+				const hash=C.save.hash
+				if (hash) { // делать именно после дозагрузок документа 
+					const tag = document.getElementById(hash)
+					if (tag) tag.scrollIntoView({ alignToTop: true, block: 'start', behavior: "auto" })
+					else
+						this.errs.push({ modul: '?', err: `при событии '${e.type}' НЕ определён hash= '${hash}' в адресной строке` })
+				}
+				if (!window.olga5.C.o5_isInited) {
+					if (C.consts.o5debug)
+						console.log('%c%s', clrPage, head + ' после o5inc - игнорируется', url)
+					return
+				}
 			}
 
 			const starts = document.querySelectorAll("[class *= '" + this.olga5Start + "']")

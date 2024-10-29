@@ -5,17 +5,14 @@
 //!
 (function () {              // ---------------------------------------------- o5shp/DoResize ---
     "use strict"
-    // let wshp = {}
 
     const
         olga5_modul = "o5shp",
         // modulname = 'DoResize',
         C = window.olga5.C,
-        DoResize=()=>{  
-            // console.log(wshp)
-        }    
-
-    // wshp = 
-    C.ModulAddSub(olga5_modul, DoResize        )
-
+        DoResize = () => {
+            for (const aO5 of wshp.aO5s)
+                aO5.Resize()
+        },
+        wshp = C.ModulAddSub(olga5_modul, DoResize)
 })();

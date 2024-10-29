@@ -54,10 +54,13 @@
 	</pre>
 		<div class="thetext" style="height: 227px;">
 			<p>
-				Тестирование/иллюстрация дополнительных
-				атрибутов <b>o5oframs</b> и <b>o5owners</b> тега <i>подвисабельного</i> объекта.
-				Объект <b>shp1</b> вложен в четыре контейнера
-				(<b>div1</b> &divide; <b>div4</b> выделенные рамками), три из которых м.б. скроллируемые.
+				Проверка формирования очередности обрабатываемых тегов: 
+				<br/>
+				При любом порядке скроллирования теги (и их zIndex'ы) должны 'ложиться' 
+				(в сообщении "все обработанные теги") в последовательность:
+				<br/>
+				<pre>shp1-> k1-1-> shp2-> k1-2</pre>
+				.
 			</p>
 			<p>
 				Скроллируемость контейнеров может изменяться <b>div1</b>, <b>div2</b> и <b>div3</b> при изменении
@@ -137,14 +140,11 @@
 				<span style="color:blue;">div2</span>
 				<div class="divSmall">пустышка</div>
 				<div class="divSmall">пустышка</div>
-				<div class="divSmall">пустышка</div>
-				<div class="divSmall">пустышка</div>
-				<div class="divSmall">пустышка</div>
-				<div class="divSmall">пустышка</div>
-				<div id="div3" class="container" style="border-color: red;height: 300px;">
+
+				<div id="div1" class="container" style="border-color: red;height: 300px;">
 					<span style="color:red;">div3</span>
 					<div class="divSmall">пустышка</div>
-					<table id="div4" class="container" style="border-width: thin;
+					<table id="tab1" class="container" style="border-width: thin;
 						background-color: bisque;  background-color: aqua;						
 						height: 177px; padding-top: 8px; width: 888px;">
 						<tbody id='tbody1'>
@@ -168,7 +168,50 @@
 					<div class="divSmall">пустышка</div>
 					<div class="divSmall">пустышка</div>
 					<div class="divSmall">пустышка</div>
-					<div class="divSmall olga5_shp:-1" id='k1' 
+					<div class="divSmall olga5_shp:-1" id='k1-1' 
+							o5oframs='i:div1'
+					>
+						<p style="height: 74px;"><b>Kill:0</b><br />контейнер
+						</p>
+					</div>
+					<div class="divSmall">пустышка</div>
+					<div class="divSmall">пустышка</div>
+					<div class="divSmall">пустышка</div>
+					<div class="divSmall">пустышка</div>
+					<div class="divSmall">КОНЕЦ div3</div>
+				</div>
+				<div class="divSmall">пустышка</div>
+				<div class="divSmall">пустышка</div>
+				<div class="divSmall">пустышка</div>
+				<div class="divSmall">пустышка</div>
+				<div id="div2" class="container" style="border-color: red;height: 300px;">
+					<span style="color:red;">div3</span>
+					<div class="divSmall">пустышка</div>
+					<table id="tab2" class="container" style="border-width: thin;
+						background-color: bisque;  background-color: aqua;						
+						height: 177px; padding-top: 8px; width: 888px;">
+						<tbody id='tbody2'>
+							<tr>
+								<td style="min-width: 33px;">
+									<p style="height: 74px;"><b>div4</b>
+										<br />контейнт-1 <br />2<br />3<br />4
+									</p>
+								</td>
+								<td id="cshp2" class="ccshp1">
+									<div id="shp2" class="olga5_shp:Up:Top" 
+											o5oframs='i:div2,i:div3x'
+											o5owners='i:div1,i:div3'
+									>
+										<b>shp2</b>
+									</div>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<div class="divSmall">пустышка</div>
+					<div class="divSmall">пустышка</div>
+					<div class="divSmall">пустышка</div>
+					<div class="divSmall olga5_shp:-1" id='k1-2' 
 							o5oframs='i:div2'
 					>
 						<p style="height: 74px;"><b>Kill:0</b><br />контейнер

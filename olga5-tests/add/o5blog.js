@@ -21,7 +21,6 @@
         },
         attrs = document.currentScript.attributes,
         navbarName = 'navbar-iframe-container',
-        hr_id = 'olga5-Start_hr',
         canvasH = 29,
         o5css = `
 aside,
@@ -120,7 +119,7 @@ canvas{
 .${W.class}_dsbl:hover{
 	color:gray !important;
 }
-#${hr_id}{
+#olga5-Start_hr {
     position: fixed;
     top: ${canvasH}px;
     width: 100%;
@@ -173,7 +172,7 @@ canvas{
 
             const hr = document.createElement('hr')
             hr.pO5ext = true
-            hr.id = hr_id
+            hr.id = 'olga5-Start_hr'
             C.page.AppendChild(document.body, hr)
 
             const div = document.createElement('div'),
