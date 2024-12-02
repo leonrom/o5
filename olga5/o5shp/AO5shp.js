@@ -32,7 +32,7 @@
             if (str) {
                 const ss = str ? str.split(/\s*[,;]\s*/g) : [''],
                     typs = 'CINSB'
-                    // продолжение см. PO5shp.FindBords()
+                // продолжение см. PO5shp.FindBords()
 
                 for (const s of ss) // ss оставил для контроля устаревших заданий контейнеров
                     if (s.length > 0) {
@@ -43,7 +43,7 @@
 
                         if (typs.includes(t)) {
                             blng.bords.push(Object.assign({}, bord, {
-                                s:s,
+                                s: s,
                                 typ: t,
                                 cod: cc.length > 1 ? cc[1].trim() : '',
                                 num: cc.length > 2 ? C.MyRound(cc[2]) : 0,
@@ -84,6 +84,7 @@
             aO5.id = shp.id
             aO5.shp = shp
             aO5.act.shdw = shp
+            aO5.parent = shp.parentElement
 
             shp.aO5shp = aO5
 
@@ -114,23 +115,21 @@
                 C.ConsoleError(`Для тега ${aO5.name} c квалификаторами "${shp.aO5quals.join(':')}" не определены: `, errs.join(', '))
 
             delete shp.aO5quals
-            
+
+            wshp.PO5shp(aO5)
             // Object.freeze(aO5.ads) -> будет в Clone
             Object.freeze(aO5.cls)
             Object.freeze(aO5)
-            
+
             wshp.aO5s.push(aO5)
         }
-        name = '' // повтор - чтобы было 1-м в отладчике
 
         act = {
             shdw: null,
+            isFix: false,
             pO5fix: null,   // тег на границе которого подвис этот aO5
-            aO5fix: null,   // тег на котором прификсирован этот aO5
-            iO5hid: null,   // ссылка на aO5 объекта, "который сдвинул этот aO5 до "нулевой высоты"
-            // canFix: false,  // observer заметил уменшениея размера - м.б. подвис уже?
-            // wasFull: false, // был полностью виден
-            // oldIR: 0,       // старое значение entry.intersectionRatio
+            // aO5fix: null,   // тег на котором прификсирован этот aO5
+            // iO5hid: null,   // ссылка на aO5 объекта, "который сдвинул этот aO5 до "нулевой высоты"
             uScroll: false, // тег или его клон видны на экране
         }
 
@@ -155,7 +154,7 @@
                 { outlineWidth: outln.w, outlineStyle: outln.s, outlineColor: outln.c, outlineOffset: outln.o }
             )
         }
-        DoFixV = (xO5, onBoard) => {
+        DoFixV = () => {
             const aO5 = this
 
             if (!aO5.ads.clon)
@@ -164,53 +163,49 @@
             const
                 clon = aO5.ads.clon,
                 cart = aO5.ads.cart,
-                shp = aO5.shp,
-                act = aO5.act
+                shp = aO5.shp
 
-            act.shdw = clon
+            Object.assign(aO5.act, { shdw: clon, isFix: true,  })
 
             cart.style.display = ''
             clon.style.display = aO5.orig.display
 
-            aO5.parents[0].removeChild(shp)
+            aO5.parent.removeChild(shp)
             cart.appendChild(shp)
+
             AO5.SetMargOutls(shp.style, AO5.Margs, AO5.Outln)
             Object.assign(shp.style, { position: 'absolute', top: 0, left: 0 })
 
             wshp.observ.unobserve(aO5.shp)
             wshp.observ.observe(aO5.ads.clon)
 
-            if (onBoard)
-                Object.assign(act, { pO5fix: xO5, }) // oldIR: 1 })
-            else
-                Object.assign(act, { aO5fix: xO5, }) // oldIR: 1 })
-
             shp.addEventListener('dblclick', DblClick)
 
-            if (act.pO5fix && act.aO5fix)
-                C.ConsoleError(`Одновременное подвисание на границе '${act.pO5fix.name}' и под '${act.aO5fix.name}' `)
+            // if (onBoard)
+            //     Object.assign(act, { pO5fix: xO5, }) // oldIR: 1 })
+            // else
+            //     Object.assign(act, { aO5fix: xO5, }) // oldIR: 1 })
 
-            if (o5debug > 0)
-                console.log(`DoFixV - ${aO5.name}: ` +
-                    `${(onBoard ? 'на границе ' : 'под объектом ') + xO5.name}`)
+            // if (act.pO5fix && act.aO5fix)
+            //     C.ConsoleError(`Одновременное подвисание на границе '${act.pO5fix.name}' и под '${act.aO5fix.name}' `)
 
-            // if (onBoard)  // признак, что на bord'е: сообщаем 1 раз - только для основного 
-            //     window.dispatchEvent(new CustomEvent('o5shp_chgFix', { detail: { name: aO5.name, act: 'DoFixV', } }))
+            // if (o5debug > 0)
+            //     console.log(`DoFixV - ${aO5.name}: ` +
+            //         `${(onBoard ? 'на границе ' : 'под объектом ') + xO5.name}`)
         }
-        UnFixV = xO5 => {
+        UnFixV = () => {
             const aO5 = this,
                 clon = aO5.ads.clon,
                 cart = aO5.ads.cart,
-                shp = aO5.shp,
-                act = aO5.act
+                shp = aO5.shp
 
-            if (o5debug > 0) {
-                const oname = (typeof xO5 === 'string')?xO5:
-                    `${act.pO5fix ? 'на границе ' : 'под объектом ' + xO5.name}`
-                console.log(`UnFixV - ${aO5.name} ${oname} `)
-            }
-            if (xO5 !== (act.pO5fix || act.aO5fix))
-                C.ConsoleError(`Расфиксация на ином объекте ??`)
+            // if (o5debug > 0) {
+            //     const oname = (typeof xO5 === 'string')?xO5:
+            //         `${act.pO5fix ? 'на границе ' : 'под объектом ' + xO5.name}`
+            //     console.log(`UnFixV - ${aO5.name} ${oname} `)
+            // }
+            // if (xO5 !== (act.pO5fix || act.aO5fix))
+            //     C.ConsoleError(`Расфиксация на ином объекте ??`)
 
             Object.assign(shp.style, aO5.orig)
             AO5.SetMargOutls(shp.style, aO5.margs, aO5.outln)
@@ -219,24 +214,24 @@
             cart.style.display = 'none'
 
             cart.removeChild(shp)
-            aO5.parents[0].insertBefore(shp, cart)
+            aO5.parent.insertBefore(shp, cart)
 
-            act.shdw = shp
+            Object.assign(aO5.act, { shdw: shp, isFix: false,})
+
             shp.removeEventListener('dblclick', DblClick)
 
             wshp.observ.unobserve(clon)
             wshp.observ.observe(aO5.shp)
-            Object.assign(act, {
-                // oldIR: 1,
-                pO5fix: null,
-                aO5fix: null,
-                uScroll: false,
-            })
+
+            // Object.assign(act, {
+            //     // oldIR: 1,
+            //     pO5fix: null,
+            //     aO5fix: null,
+            //     uScroll: false,
+            // })
 
             if (!wshp.aO5s.find(iO5 => iO5 !== aO5 && iO5.act.uScroll))
                 wshp.DoScroll(false, `Observe: ${aO5.name}`)
-
-            // window.dispatchEvent(new CustomEvent('o5shp_chgFix', { detail: { name: aO5.name, act: 'UnFixV', } }))
         }
         ShowFix = () => {
             const aO5 = this,
@@ -324,7 +319,7 @@
 
             AO5.SetMargOutls(cart.style, AO5.Margs, aO5.outln)
         }
-        Resize=()=>{            
+        Resize = () => {
         }
     }
 

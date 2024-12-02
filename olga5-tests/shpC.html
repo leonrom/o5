@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<title>shpC</title>
+	<link rel="shortcut icon" href="./add/favicon.svg" type="image/x-icon">
+	<!-- 
+	<link href='./add/alltst.css' media='screen' rel='stylesheet' />
+	<script src='./add/alltst.js'></script> -->
+
+	<script src='../olga5/o5com.js' o5debug=0></script>
+	<script data-src='+./o5dbg.js' o5load="u"></script>
+	<script data-src='+./o5shp.js'></script>
+</head>
+
+<body id="body" class='olga5_Start' style="margin: 0;">
+	<script>
+		let oldname = '',
+			oldakey = ''
+		const
+			List = e => {
+				const log = document.getElementById('log'),
+					aO5 = e.detail.aO5,
+					akey = e.detail.akey.substring(0, 5),
+					blngs = aO5[akey],
+					ClassName = clss => {
+						let s = ''
+						for (const cls of clss) {
+							const u = (cls === 'olga5-oframs' || cls === 'o5owner') ? `<i>${cls}</i>` : cls
+							s += (s ? ', ' : '') + u
+						}
+						return s
+					}
+
+				if (oldname !== aO5.name) {
+					oldname = aO5.name
+					log.innerHTML += '<span class="span1">' +
+						`<b>${aO5.name.padEnd(3, ' ')}</b>` +
+						'</span><br/>'
+				}
+				for (const bord of blngs.bords) {
+					let u = ''
+					if (oldakey !== akey) {
+						oldakey = akey
+						u = akey
+					}
+					if (bord.typ === 'N')
+						console.log()
+					log.innerHTML += '<span class="span2">' +
+						`${u.padEnd(8, '.')} ::  ` +
+						`${bord.typ.substring(0, 1)}:` +
+						`${bord.cod.padEnd(9, '.')}:` +
+						('' + bord.num).padStart(3, '.') +
+						` --> ` +
+						bord.tag.pO5.name.padEnd(6, '.') + ' [' + ClassName(bord.tag.classList) + '] ' +
+						`</span> ` +
+						(bord.err ? '<span class="span3"> (' + bord.err + `)</span>` : '') +
+						'<br/>'
+				}
+			},
+			Init = () => {
+				const divs = document.getElementsByTagName('div')
+				for (const div of divs) {
+					if (div.classList.contains('shp')) {
+						const oframs = div.getAttribute('o5ofram'),
+							owners = div.getAttribute('o5owner')
+						let s = ''
+						if (owners) s += `<u>owners</u>= ${owners}, `
+						if (oframs) s += `<u>oframs</u>= ${oframs}, `
+						div.innerHTML = '#<b>' + div.id + '</b>:  ' + s +
+							div.innerHTML
+					} else
+					if (div.id !== 'strt')
+						div.innerHTML = '#' + div.id + ' &nbsp; [' + div.className + ']' +
+						div.innerHTML
+				}
+				// document.body.style.transform = 'scale(0.85)';
+			}
+			
+		window.addEventListener('olga5-containers', List)
+		window.addEventListener('DOMContentLoaded', Init)
+	</script>
+
+	<style>
+		table td {
+			align-content: baseline;
+			font-size: small;
+		}
+
+		table td:first-child {
+			max-width: 300px;
+			display: block;
+		}
+
+		table td:last-child {
+			overflow: auto;
+			background-color: cornsilk;
+			white-space: nowrap;
+		}
+
+		.span1 {
+			margin-left: 2em;
+		}
+
+		span>i {
+			font-size: 8px;
+		}
+
+		.span2 {
+			font-family: monospace;
+			margin-left: 1em;
+		}
+
+		.span3 {
+			font-size: small;
+		}
+
+		.shp {
+			background-color: yellow;
+			border: 2px solid blue;
+			width: 329px;
+			height: 18px;
+			font-size: small;
+			padding: 5px;
+			margin: 3px;
+		}
+
+		div {
+			border: 1px dashed gray;
+			padding: 5px;
+			margin: 5px;
+		}
+
+		.inner {
+			margin-left: 32px;
+			margin-right: 32px;
+		}
+
+		#strt {
+			height: 211px;
+			overflow-y: scroll;
+			overflow-x: hidden;
+			position: sticky;
+			background-color: white;
+			top: 0;
+			margin-top: 0;
+		}
+
+		.comment {
+			font-style: italic;
+			color: blue;
+			font-size: small;
+		}
+	</style>
+
+	<div id="strt">
+		<h4 style="margin: 1px;		display: grid;		place-items: center; font-size: small;">
+			Тестирование определения вложенности контейнеров.
+		</h4>
+		<table>
+			<tr>
+				<td>
+					Для каждого <i>подвисабельного</i> объекта определяются (по мере их появления на экране)
+					его контейнеры согласно <b>o5ofram</b> и/или <b>o5owner</b>. <br />
+					<br />
+					Результат протоколируется в окне справа. <br />
+					<br />
+					В квадратных скобках - заданные классы, в круглых - замеченные ошибки определения контейнеров
+					<br />
+					PS В протоколе теги даны не порядке размещения, а в порядки их видимости на экрание
+				</td>
+				<td id="log"></td>
+			</tr>
+		</table>
+	</div>
+
+	<div id="main" class="">
+		<div id="pos" class="pos1 clsX clsA clsB">
+			<div id="pos" class="pos2 clsX">
+				<div id="divX" class="">
+					<div id="pos" class="pos3 clsX inner">
+						<div id="6" class=" clsA clsB">
+							<div id="7" class="">
+								<br /><span class='comment'>различные способы выбора для '<b>oframs</b>' контейнера
+									"#pos [pos2 clsX]", а для '<b>owners</b>' - "#main []"</span>
+								<div id='shp1-1' class="olga5_shp shp" o5ofram="n:div:5" o5owner="n:div:99">
+								</div>
+								<div id='shp1-2' class="olga5_shp shp" o5ofram="i:pos:2" o5owner="i:main">
+								</div>
+								<div id='shp1-3' class="olga5_shp shp" o5ofram="c:clsX:2" o5owner="c::3">
+								</div>
+							</div>
+						</div>
+					</div>
+					<div id="moe1">
+						<div id="moe2">
+							<div id="moe3">
+								<br /><span class='comment'>задание граничных клнтейнеров квалификаторами '<b>S</b>' или
+									'<b>B</b>' а также знач. по умолчанию</span>
+								<div id='shp2-1' class="olga5_shp shp" o5ofram="s" o5owner="b"></div>
+								<div id='shp2-2' class="olga5_shp shp"></div>
+								<div id='shp2-3' class="olga5_shp shp" o5ofram="s::2,s::3" o5owner="b::2,b::3"></div>
+							</div>
+						</div>
+					</div>
+					<div id="moe4" class="moe1 olga5_shp">
+						<div id="moe5">
+							<div id="moe6">
+								<span class='comment'>
+									<br />задание нескольких контейнеров. Тут <b
+										style="background-color: yellow;">контейнер 'moe4'</b> содержит класс
+									<b>olga5_shp</b>, т.е. есть 'верхним' <i>см. ошибки в протоколе</i>
+								</span>
+								<div id='shp3-1' class="olga5_shp shp" o5ofram="i:moe5,s" o5owner="b,i:moe3,">
+								</div>
+								<div id='shp3-2' class="olga5_shp shp" o5ofram="i:moe5,i:moe6,"
+									o5owner="i:moe4,i:divX"></div>
+							</div>
+						</div>
+					</div>
+					<div id="moe7">
+						<div id="moe8">
+							<span class='comment'>
+								<br />Вложенные контейнеы <b>moe81</b> и <b>moe82</b> не содержат рамку, однако в
+								<b>moe82</b> отличающийся фон
+								(<i>а вот между <b>moe8</b> и <b>moe81</b> граница не видна</i>)
+							</span>
+							<div id="moe81" class="moe3" style="border: none">
+								<div id='shp4-1' class="olga5_shp shp" o5ofram="b::2" o5owner="b::3"></div>
+							</div>
+							<div id="moe82" class="moe3" style="border: none; background: aliceblue;">
+								<div id='shp4-2' class="olga5_shp shp" o5ofram="b::2" o5owner="b::3"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+
+</html>

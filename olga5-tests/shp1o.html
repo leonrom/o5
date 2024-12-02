@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<title>shp1o</title>
+	<link rel="shortcut icon" href="./add/favicon.svg" type="image/x-icon">
+
+	<link href='./add/alltst.css' media='screen' rel='stylesheet' />
+
+	<script src='./add/observes.js'></script>
+	<!-- <script src='./add/observe.js'></script> -->
+</head>
+
+<body id="body">
+	<div class='example olga5_Start' id="example-1">
+
+		<div class="divSmall"> пустышка_2 </div>
+		<div class="divSmall"> пустышка_3 </div>
+		<div class="divSmall"> пустышка_4 </div>
+		<div class="divSmall"> пустышка_5 </div>
+
+		<style>
+			div.olga5_shp {
+				float: none;
+				outline-offset: 2px;
+				min-height: 111px;
+				background-color: greenyellow;
+				width: 333px;
+			}
+			#stat {
+				position: fixed;
+				top: 22px;
+				left: 55px;
+				background: chartreuse;
+				width: 333px;
+				height: 222px;
+				opacity: 0.9;
+			}
+		</style>
+		<div id="stat">
+			111
+		</div>
+		<div id='main'>
+
+			<div class="divSmall"> пустышка_2 </div>
+			<div class="divSmall"> пустышка_3 </div>
+			<div class="divSmall"> пустышка_4 </div>
+			<div class="divSmall"> пустышка_5 </div>
+
+			<div id="shp1" class="olga5_shp" o5owner="n" style="float: right;height: 111px;">
+				<p>название shp<b>1</b></p>
+			</div>
+
+			<div class="divSmall"> пустышка_2 </div>
+			<div class="divSmall"> пустышка_3 </div>
+			<div class="divSmall"> пустышка_4 </div>
+			<div class="divSmall"> пустышка_5 </div>
+
+			<table id="tab2" class="container">
+				<tbody id="tbody2">
+					<tr id="tr2">
+						<td style="min-width: 222px;">
+							<span style="color: gray;">tab2</span>
+							<p>
+								По умолчанию будет<br />
+								плавно сдвигать <b>shp1</b><br />
+								если наткнётся на него<br />
+								(зависит от ширины окна)<br />
+								и его <i><b>level</b></i> не превышает <i><b>level</b></i> у <b>shp1</b>
+							</p>
+						</td>
+						<td id="td2" style="width: 100%;">
+							<div id="shp2" class="olga5_shp" o5owner="n" style="float: right;height: 111px;">
+								<p>название shp<b>2</b></p>
+							</div>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+
+			<div class="divSmall">пустышка</div>
+			<table id="tab3" class="container">
+				<tbody id="tbody3">
+					<tr id="tr3">
+						<td style="min-width:200px;">
+							<span style="color: gray;">tab3</span>
+							<p>
+								Виден лишь внутри <b>tab3</b>, по умолчанию будет<br />
+								выталкивать <b>shp2</b> (и/или <b>shp1</b>)<br />
+								если наткнётся на них<br />
+								и его <i><b>level</b></i> не будет превышать их <i><b>level</b></i>'ы
+							</p>
+						</td>
+						<td id="td3" style="width: 100%;">
+							<div id="shp3" class="olga5_shp" style="float: right;margin-right: 5px;width: 400px;">
+								<p>название shp<b>3</b>а</p>
+							</div>
+						</td>
+						<td style="min-width:200px;">
+							<span style="color: gray;">tab3</span>
+							<p>
+								Виден лишь внутри <b>tab3</b>, по умолчанию будет<br />
+								выталкивать <b>shp2</b> (и/или <b>shp1</b>)<br />
+								если наткнётся на них<br />
+								и его <i><b>level</b></i> не будет превышать их <i><b>level</b></i>'ы
+							</p>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<div class="divSmall"> пустышка_1 </div>
+			<div class="divSmall" style="color: blue;width: 77%;"> будет &lt;<b>hr</b>&gt; REMO (т.е. 0)</div>
+			<hr class="olga5_shp:Remo" id='remo_0' />
+
+
+			<div class="divSmall"> пустышка_2 </div>
+			<div class="divSmall"> пустышка_3 </div>
+			<div class="divSmall"> пустышка_4 </div>
+			<div class="divSmall"> пустышка_5 </div>
+		</div>
+	</div>
+
+</body>
+
+</html>

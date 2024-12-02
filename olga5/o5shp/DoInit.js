@@ -30,20 +30,19 @@
                     aO5 = shp.aO5shp
 
                 if (entry.isIntersecting) {
-                    if (!aO5) {
+                    if (!aO5) 
                         aO5 = wshp.AO5shp(shp)
-                        wshp.PO5shp(aO5)
-                    }
+                    
                     n += AscScroll(aO5, true)
                 }
                 else
-                    if (aO5 && !aO5.act.pO5fix)
+                    if (aO5 && !aO5.act.isFix)
                         n += AscScroll(aO5, false)
             }
 
             if (n > 0) {
                 const
-                    isScroll = wshp.aO5s.find(aO5 => aO5.act.uScroll || aO5.act.pO5fix)
+                    isScroll = wshp.aO5s.find(aO5 => aO5.act.uScroll || aO5.act.isFix)
 
                 if (o5debug > 0 && aO5names.length > 0)
                     console.log("%c%s", fmt, `EventListener` +
@@ -52,58 +51,6 @@
 
                 wshp.DoScroll(isScroll)
             }
-
-
-            // if (ir < oldIR) {
-            //     if (act.wasFull) {
-            //         const
-            //             br = entry.boundingClientRect,
-            //             ir = entry.intersectionRect,
-            //             dirV = aO5.cls.dirV
-
-            //         if (
-            //             (br.top < ir.top && dirV === 'U') ||
-            //             (br.bottom > ir.bottom && dirV === 'D')
-            //         ) {
-            //             act.canFix = true
-
-            //             if (!wshp.isScroll)
-            //                 wshp.DoScroll(true, `Observe: ${aO5.name}`)
-            //         }
-            //     }
-            //     else
-            //         if (ir === 0)
-            //             Object.assign(act, { canFix: false, uScroll: false, wasFull: false, })
-            // }
-            // else
-            //     if (ir > 0) {
-            //         act.uScroll = true
-
-            //         if (ir === 1)
-            //             Object.assign(act, { canFix: false, wasFull: true })
-
-            //         if (aO5.parents.length == 0)
-            //             wshp.PO5shp(aO5)
-            //     }
-
-            // if (act) act.oldIR = ir
-
-            // if (o5debug > 0)
-            //     obsrvs.push(shp.id + '/' + parseFloat(entry.intersectionRatio).toFixed(2))
-
-
-            // if (o5debug > 0) {
-            //     console.groupCollapsed("%c%s", fmt, `Observe`, `обработано: `, obsrvs.join(', '))
-
-            //     console.table(wshp.aO5s.map(aO5 => {
-            //         return {
-            //             name: aO5.name,
-            //             canFix: aO5.act.canFix,
-            //             uScroll: aO5.act.uScroll,
-            //         }
-            //     }))
-            //     console.groupEnd()
-            // }
         },
         DoInit = () => {
             const

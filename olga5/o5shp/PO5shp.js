@@ -22,7 +22,7 @@
 
             for (const pO5 of wshp.pO5s)
                 if (pO5.scope.isVisi) {
-                    hasFix = pO5.aO5s.find(aO5 => aO5.act.pO5fix)
+                    hasFix = pO5.aO5s.find(aO5 => aO5.act.isFix)
                     // if (hasFix) {
                     //     wshp.DoScroll(true, `Pbserve: ${pO5.name}`)
                     //     break
@@ -120,7 +120,7 @@
 
     const
         FindBords = (aO5, blng) => {
-            const
+            const            
                 errs = [],
                 IsInClass = (classorigs, clss) => {
                     if (classorigs.length > 0) {
@@ -128,8 +128,7 @@
                             if (cls && classorigs.indexOf(cls) >= 0)
                                 return true
                     }
-                },
-                prev = aO5.parents[0]
+                }
 
             for (const bord of blng.bords) {
                 const
@@ -143,7 +142,7 @@
                     c = ask.c,
                     clss = (t === 'C') ? c.split(/\s*[.,]\s*/) : null,
                     xO5 = { itag: 9999, tag: document.body },
-                    mO5 = prev.pO5.mO5s.find(m => m.c === c && m.t === t && m.n === ask.n) || {}
+                    mO5 = aO5.parent.pO5.mO5s.find(m => m.c === c && m.t === t && m.n === ask.n) || {}
 
                 if (!mO5.tag) {
                     let err = '',
@@ -179,7 +178,7 @@
                         Object.assign(mO5, xO5)
                     }
 
-                    prev.pO5.mO5s.push(mO5)
+                    aO5.parent.pO5.mO5s.push(mO5)
                 }
                 else
                     if (o5debug > 1)
@@ -242,19 +241,17 @@
             // для тестирования в shpC.html
             window.dispatchEvent(new CustomEvent('olga5-containers', { detail: { aO5: aO5, akey: blng.akey } }))
         },
-        PO5shp = aO5 => {
-            const parent = aO5.shp.parentElement
-            let pO5 = parent.pO5
+        PO5shp = aO5 => {            
+            let pO5 = aO5.parent.pO5
             if (!pO5)
-                pO5 = parent.pO5 = new PO5(parent)
+                pO5 = aO5.parent.pO5 = new PO5(aO5.parent)
 
-            aO5.parents.push(parent)
-            Array.prototype.push.apply(aO5.parents, pO5.parents)
+			aO5.parents=[aO5.parent, ...aO5.parent.pO5.parents]
 
             FindBords(aO5, aO5.ofram)
             FindBords(aO5, aO5.owner)
-
-            aO5.ofram.bords.forEach(bord => {
+            
+            for (const bord of aO5.ofram.bords) {
                 const pO5 = bord.tag.pO5
                 if (wshp.pO5s.indexOf(pO5) < 0) {
                     wshp.pO5s.push(pO5)
@@ -268,7 +265,7 @@
                     pbserv.observe(pO5.current)
                 }
                 pO5.AddtO5s(aO5)
-            })
+            }
 
             if (o5debug > 0)
                 console.log("%c%s", fmtOK, `${aO5.name.padEnd(12)} инициировал`,
