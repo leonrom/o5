@@ -5,7 +5,7 @@
 //!
 (function () {              // ---------------------------------------------- o5shp/DoScroll ---
 	"use strict"
-
+	let timeStamp = 0
 	const
 		olga5_modul = "o5shp",
 		// modulname = 'DoScroll',
@@ -16,28 +16,33 @@
 		doc = document.documentElement,
 		onScroll = new CustomEvent('o5_onScroll', { detail: { isScroll: false } }),
 		CalcParentsLocates = (aO5, type) => {
-			// if (o5debug > 1)
-			// 	console.log("%c%s", fmtOK, `CalcParentsLocates - '${aO5.name}' ${type}  ${wshp.timeStamp.toFixed(1).padStart(8)}`)
+			if (o5debug > 2)
+				console.log("%c%s", fmtOK, `CalcParentsLocates - '${aO5.name}' ${type}  ${timeStamp.toFixed(1).padStart(8)}`)
 
-			const bords = aO5[type].bords
+			// const bords = aO5[type].bords
 
-			for (const bord of bords) {
-				// if (!bord.tag)				
-				// alert('!')
-				const pO5 = bord.tag.pO5,
+			// for (const bord of bords) {
+			// 	// if (!bord.tag)				
+			// 	// alert('!')
+			// 	const pO5 = bord.tag.pO5,
+			// 		scope = pO5.scope
+
+			for (const parent of aO5.parents) {
+				const pO5 = parent.pO5,
 					scope = pO5.scope
 
-				if (scope.pos.tim !== wshp.timeStamp) {
+				if (scope.pos.tim !== timeStamp) {
 					if (pO5.isBody)
 						Object.assign(scope.pos,
-							{ tim: wshp.timeStamp, top: 0, left: 0, right: doc.clientWidth, bottom: doc.clientHeight, })
+							{ tim: timeStamp, top: 0, left: 0, right: doc.clientWidth, bottom: doc.clientHeight, })
 					else {
-						const current = pO5.current,
-							isO5 = current.aO5shp,
-							p = isO5 ? isO5.posC : current.getBoundingClientRect()
+						// const current = pO5.current,
+						// 	isO5 = current.aO5shp,
+						// 	p = isO5 ? isO5.posC : current.getBoundingClientRect()
+						const p = parent.getBoundingClientRect()
 
 						Object.assign(scope.pos, {
-							tim: wshp.timeStamp,
+							tim: timeStamp,
 							top: p.top + scope.add.top,
 							left: p.left + scope.add.left,
 							right: isO5 ? p.left + p.width : p.left + current.clientWidth + scope.add.left,
@@ -51,41 +56,95 @@
 		},
 		CheckOnBords = aO5 => {
 			const
-				posC = aO5.posC,
 				bords = aO5.ofram.bords,
-				dirup = aO5.cls.dirV === 'U'
+				dirup = aO5.cls.dirV === 'U',
+				found = { xO5: null, tofix: false },
+				// btag = { tag: null, posC: aO5.posC },
+				IsOver = (posC, pos) => {		// тут д.б. <=  и >= иначе м.б. дребезг
+					return (dirup && posC.top <= pos.top) ||
+						(!dirup && posC.top + posC.height >= pos.bottom)
+				},
+				parents = aO5.parents.slice().sort(
+					(posC, pos) => {
+						(IsOver(posC, pos)) ? 1 : -1
+					}
+				)
 
-			// поиск,- на ком бы подвиснуть
-			let xO5 = null
-			for (const bord of bords) { // тут не надо пытаться запоминать "аналогичные"
-				const pO5 = bord.tag.pO5,
-					pos = pO5.scope.pos
-
-				if (		// тут д.б. <=  и >= иначе м.б. дребезг
-					(dirup && posC.top <= pos.top) ||
-					(!dirup && posC.top + posC.height >= pos.bottom)
-				) {
-					posC.top = dirup ? pO5.scope.pos.top : pO5.scope.pos.bottom - posC.height
-					xO5 = pO5
+			for (const parent of parents)  // тут не надо пытаться запоминать "аналогичные"
+				if (IsOver(aO5.posC, parent.pO5.scope.pos)) {
+					found.tofix = true
+					if (bords.find(bord => bord.tag === parent)) {
+						found.xO5 = parent.pO5
+						break
+					}
 				}
-			}
-			// проверка,- а надо ли подвисать
-			const act = aO5.act
-			if (xO5) {
-				if (!act.pO5fix) {
+				else
+					break
+
+			if (found.tofix) {
+				if (!aO5.act.isFix) {
 					if (o5debug > 0)
-						console.log("%c%s", fmtOK, `CheckOnBords ` +
-							`${!act.pO5fix ? '    ' : 'пере'}фиксация '${aO5.name}' на bord'е: '${xO5.name}'`)
-					aO5.DoFixV(xO5, true)
+						console.log("%c%s", fmtOK, `CheckOnBords фиксация    '${aO5.name}'`,
+							found.xO5 ? `на bord'е: '${xO5.name}` : ``)
+					aO5.DoFixV()
 				}
+				if (found.xO5)
+					if (dirup) aO5.posC.top = xO5.pos.top
+					else
+						aO5.posC.top = xO5.pos.bottom - aO5.posC.height
+
+				aO5.act.pO5fix = found.xO5
 			}
 			else
-				if (act.pO5fix) {
+				if (aO5.act.isFix) {
 					if (o5debug > 0)
-						console.log("%c%s", fmtOK, `CheckOnBords '${aO5.name}' ` +
-							`расфиксировано на bord'е: ${act.pO5fix.name}`)
-					aO5.UnFixV(act.pO5fix)
+						console.log("%c%s", fmtOK, `CheckOnBords расфиксация '${aO5.name}'`)
+					aO5.UnFixV()
+					aO5.act.pO5fix = null
 				}
+
+
+
+			// for (const bord of bords)  		//	 ищем ближайший bord
+			// 	if (IsOver(btag.posC, bord.tag.pO5.scope.pos))
+			// 		Object.assign(btag, { tag: bord.tag, posC: bord.tag.pO5.scope.pos, })
+
+			// if (IsOver(posC, btag.posC))  	// проверка - а не подвиснуть ли на нём
+			// 	Object.assign(found, { tofix: true, xO5: btag.tag.pO5, })
+
+			// if (!found.xO5)					// если не подвиснул, то поиск,- не вышел ли за границы
+			// 	for (const parent of aO5.parents)  // тут не надо пытаться запоминать "аналогичные"
+			// 		if (IsOver(posC, parent.pO5.scope.pos)) {
+			// 			Object.assign(found, { tofix: true, })
+			// 			break
+			// 		}
+			// 		else
+			// 			if (IsOver(parent.pO5.scope.pos, btag.posC))
+			// 				break
+
+			// проверка,- а надо ли подвисать
+
+
+			// if (found.isfram) {
+			// 	posC.top = dirup ? pO5.scope.pos.top : pO5.scope.pos.bottom - posC.height
+			// }
+
+			// const act = aO5.act
+			// if (xO5) {
+			// 	if (!act.pO5fix) {
+			// 		if (o5debug > 0)
+			// 			console.log("%c%s", fmtOK, `CheckOnBords ` +
+			// 				`${!act.pO5fix ? '    ' : 'пере'}фиксация '${aO5.name}' на bord'е: '${xO5.name}'`)
+			// 		aO5.DoFixV(xO5, true)
+			// 	}
+			// }
+			// else
+			// 	if (act.pO5fix) {
+			// 		if (o5debug > 0)
+			// 			console.log("%c%s", fmtOK, `CheckOnBords '${aO5.name}' ` +
+			// 				`расфиксировано на bord'е: ${act.pO5fix.name}`)
+			// 		aO5.UnFixV(act.pO5fix)
+			// 	}
 		},
 		CutFixed = aO5 => {
 			/*
@@ -161,7 +220,7 @@
 					iO5 = aO5s[totop ? i : n - i - 1],
 					iO5act = iO5.act
 
-				if (!iO5act.uScroll || iO5act.pO5fix || iO5act.aO5fix)
+				if (!iO5act.uScroll || iO5act.isFix)
 					return
 
 				const
@@ -172,7 +231,7 @@
 				if (
 					d <= 0 ||
 					dlevel === 0 ||
-					iO5act.pO5fix || iO5act.aO5fix ||
+					iO5act.isFix ||
 					iO5posW.left > posC.left + posC.width ||
 					iO5posW.lef + iO5posW.width < posC.left
 				)
@@ -221,14 +280,14 @@
 					if (aO5.cls.alive)
 						aO5.act.iO5hid = iO5
 					else
-						aO5.UnFixV(aO5.act.pO5fix)
+						aO5.UnFixV()
 				}
 
 				break
 			}
 		},
 		Scroll = e => {
-			if (e) wshp.timeStamp = e.timeStamp
+			if (e) timeStamp = e.timeStamp
 			const
 				aO5s = wshp.aO5s
 
@@ -249,10 +308,10 @@
 						p = aO5.act.shdw.getBoundingClientRect()
 
 					if (o5debug > 2)
-						console.log("%c%s", fmtOK, `Scroll ${wshp.timeStamp.toFixed(1).padStart(8)} ` +
+						console.log("%c%s", fmtOK, `Scroll ${timeStamp.toFixed(1).padStart(8)} ` +
 							`'${aO5.name}' : top=${p.top}`)
 
-					Object.assign(aO5.act, { aO5fix: null })
+					// Object.assign(aO5.act, { aO5fix: null })
 					Object.assign(aO5.posW, { top: p.top, left: p.left, height: p.height, width: p.width }) // нелья сразу - 'лишние' поля
 					Object.assign(aO5.posS, { top: 0, left: 0, })
 					Object.assign(aO5.posC, aO5.posW)
@@ -261,17 +320,11 @@
 			for (const aO5 of aO5s) { // д.б. отдельно, после пересчета всех
 				const act = aO5.act
 				if (act.uScroll) {
-					// const wasFix = act.pO5fix
 
 					CalcParentsLocates(aO5, 'ofram') // пересчитываются размеры всех предков-контейнеров        
 					CheckOnBords(aO5)
 
-					if (act.pO5fix && !act.iO5hid) {
-						// if (!wasFix) // только что завиксирован на границе
-						// 	Object.assign(aO5.posC, aO5.posW)
-
-						// aO5.ads.cart.style.display = ''  // восстанавливаю после Adhereds
-
+					if (act.isFix && !act.iO5hid) {
 						CalcParentsLocates(aO5, 'owner')	// обрезаем которые на bord'ах
 						CutFixed(aO5)
 						Adhereds(aO5, act.pO5fix) 	 // с передачей ссылки на общий для всех контейнер
@@ -280,7 +333,7 @@
 			}
 
 			for (const aO5 of wshp.aO5s)
-				if (aO5.act.pO5fix || aO5.act.aO5fix)
+				if (aO5.act.isFix)
 					aO5.ShowFix()			// отображение зафиксированного				
 
 			onScroll.DispatchEvent({})
