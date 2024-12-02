@@ -2,21 +2,23 @@
 <html lang="ru">
 
 <head>
-	<!-- <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-	<title>shp1</title>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<title>2shp</title>
 	<link rel="shortcut icon" href="./add/favicon.svg" type="image/x-icon">
 
-	<link href='./add/alltst.css' media='screen' rel='stylesheet' />
-	<script src='./add/alltst.js'></script>
+	<link href='./alltst.css' media='screen' rel='stylesheet' />
+	<script src='./alltst.js'></script>
 
 	<script src='../olga5/o5com.js' o5debug=0></script>
-	<script data-src='+./o5shp.js'></script> -->
+	<script data-src='+./o5shp.js'></script>
 </head>
 
-<body id="body">
+<body id="body_" ono5incReady="Init1()" 
+onblur="window.focus()""
+style="height:300px"
+>
 	<script>
-		const eve = document.head.querySelector("script[src*='o5inc.js']") ? 'o5inc_ready' : 'o5_isInited'
-		window.addEventListener(eve, Init1)
+		window.addEventListener('o5inc_ready', Init1)
 	</script>
 	<div class='example olga5_Start' id="example-1">
 		<div class='cboxed'>
@@ -73,7 +75,7 @@
 				Показаны три <i>подвисабельных</i> объекта, разделённых пустыми промежутками.
 				При измененнии размеров окна объект <b>shp3</b> обрезается своим контейнером <b>tab3</b>,
 				(в отличие от <b>shp2</b>) потому,
-				что не указанный для <b>shp3</b> аттрибут <b>o5owners</b> имеет подразумеваемым значением
+				что не указанный для <b>shp3</b> аттрибут <b>o5owner</b> имеет подразумеваемым значением
 				<b>'b'</b>.
 				И, кстати, поэтому же здесь <b>shp3</b> будет просто 'исчезать' в момент залипания,
 				если поменять (<i>ChrckBox</i>'ом '<b>Где</b>') его положение на низ экрана.
@@ -163,7 +165,7 @@
 							</p>
 						</td>
 						<td id="td2" style="width: 100%;">
-							<div id="shp2" class="olga5_shp" o5owners="n" style="float: right;height: 111px;">
+							<div id="shp2" class="olga5_shp" o5owner="n" style="float: right;height: 111px;">
 								<p>название объекта</p>
 							</div>
 						</td>

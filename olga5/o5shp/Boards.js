@@ -14,11 +14,23 @@
 		o5debug = C.consts.o5debug,
 		fmtOK = "background: cornsilk; color: black;",
 		// fmtErr = "background: lightgoldenrodyellow; color: black;",
+		MarkVisible = (pO5, visi) => {
+            if (pO5.scope.isVisi !== visi) {
+                pO5.scope.isVisi = visi
+                for (const aO5 of pO5.observ.aO5s) {
+                    if (visi)
+                        pO5.observ.observe(aO5.shp)
+                    else
+                        pO5.observ.unobserve(aO5.shp)
+                    aO5.CheckIsVisi()
+                }
+            }
+        },
 		ObserveM = entries => {
 			/*
 			запуск-останов скроллинга 
 			Запуск делаем если 
-				  - хоть один (из видимых) oframes содержит aO5.cat.xFixed и aO5.cart.style.display !== 'none'
+				  - хоть один (из видимых) oframes содержит aO5.cat.xFixed и aO5.ads.cart.style.display !== 'none'
 				- хоть один (из видимых) owners имеет  pO5.IsCuts()
 			иначе - делаем останов
 			*/
@@ -26,7 +38,7 @@
 				console.log("%c%s", fmtOK, `ObserveM - задание скроллинга`)
 
 			for (const entry of entries) 	// вкл-откл обсервации на невидимих контейнерах
-				entry.target.pO5.MarkVisible(entry.isIntersecting)			
+				MarkVisible(entry.target.pO5, entry.isIntersecting)			
 
 			let
 				nc = 0,
@@ -34,7 +46,7 @@
 				s = ''
 			for (const pO5 of wshp.pO5s)
 				if (pO5.IsVisi()) {
-					if (pO5.observ.HasVisibleFixed()) {
+					if (pO5.scope.observ.HasVisibleFixed()) {
 						nf++
 						s += '+'
 					}
@@ -48,7 +60,7 @@
 					s += pO5.name + ', '
 				}
 
-			wshp.escroll.ScrollAct(nf > 0 || nc > 0, `видимость bord'ов [${s}] (+- наличие fixed)`)
+			wshp.DoScroll(nf > 0 || nc > 0, `видимость bord'ов [${s}] (+- наличие fixed)`)
 
 			if (o5debug > 2) {
 				if (wshp.aO5s.length > 0)
@@ -64,17 +76,17 @@
 			// 		let cIndex = 1
 			// 		for (const bord of bords) {
 			// 			const pO5 = bord.tag.pO5
-			// 			if (pO5.scroll.zIndex < 0) {
+			// 			if (pO5.scope.scroll.zIndex < 0) {
 			// 				let maxZIndex = 0
 			// 				for (const child of pO5.current.children) {
 			// 					const zIndex = parseInt(child.style.zIndex) || 0
 			// 					if (!isNaN(zIndex) && zIndex >= maxZIndex)
 			// 						maxZIndex = zIndex
 			// 				}
-			// 				pO5.scroll.zIndex = maxZIndex
+			// 				pO5.scope.scroll.zIndex = maxZIndex
 			// 			}
-			// 			if (cIndex < pO5.scroll.zIndex)
-			// 				cIndex = pO5.scroll.zIndex
+			// 			if (cIndex < pO5.scope.scroll.zIndex)
+			// 				cIndex = pO5.scope.scroll.zIndex
 			// 		}
 			// 		return cIndex
 			// 	}

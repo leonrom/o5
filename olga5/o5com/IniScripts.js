@@ -235,7 +235,7 @@
 						asknoneed.push(scrpt.modul)
 				const l = asknoneed.length
 				if (l > 0)
-					C.ConsoleError(`В скриптах заданы ${l} 'ненужн${l > 1 ? 'ых' : 'ый'}' модул${l > 3 ? 'ей' : (l > 1 ? 'я' : 'ь')}: `, asknoneed.join(', '))
+					C.ConsoleError(`В скриптах заданы ${l} 'ненужн${l > 1 ? 'ых' : 'ый'}' (см. квалиф. 'olga5_Start') модул${l > 3 ? 'ей' : (l > 1 ? 'я' : 'ь')}: `, asknoneed.join(', '))
 			}
 
 			if (C.consts.o5doscr) {  // запуск встроенных cкриптоав
@@ -282,7 +282,7 @@
 					let err = ''
 					if (!err) {
 						if (!act.W) err = "не загружен файл "
-						else if (act.start == 0) err = "инициализация не начиналась?"
+						else if (act.start == 0) err = "инициализация не НАЧАТА ?"
 						else if (act.start != act.done) err = "инициализация не закончилась"
 					}
 					if (err) page.errs.push({ modul: scrpt.modul, err: err })
@@ -299,7 +299,7 @@
 				}
 				page.scriptDone.RemEvents(ScriptDone)
 				page.scriptLoad.RemEvents(ScriptLoad)
-				window.olga5.C.o5_isInited = true
+				window.olga5.C.o5Inited = true
 				C.E.DispatchEvent('o5_isInited')
 			}
 
@@ -364,7 +364,7 @@
 					else
 						this.errs.push({ modul: '?', err: `при событии '${e.type}' НЕ определён hash= '${hash}' в адресной строке` })
 				}
-				if (!window.olga5.C.o5_isInited) {
+				if (!window.olga5.C.o5Inited) {
 					if (C.consts.o5debug)
 						console.log('%c%s', clrPage, head + ' после o5inc - игнорируется', url)
 					return
@@ -445,7 +445,7 @@
 				C.QuerySelectorInit(this.starts, this.olga5Start) //  чтобы пересчитало область определения
 
 				// сброс событий
-				window.olga5.C.o5_isInited = false
+				window.olga5.C.o5Inited = false
 				C.E.Clear()
 
 				ScriptsStart()	// e.type == 'o5inc_ready'
@@ -501,7 +501,6 @@
 		}
 		else {
 			C.ConsoleInfo(`IniScripts.js: вообще нет скриптов для обработки`)
-			// window.dispatchEvent(new window.Event('o5_isInited'))
 			C.E.DispatchEvent('o5_isInited')
 		}
 

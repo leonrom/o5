@@ -5,410 +5,58 @@
 
 (function () {              // ---------------------------------------------- o5shp/PO5shp ---11
     "use strict"
-    let wshp = {}
-
+    let pbserv = null
     const
         olga5_modul = "o5shp",
         modulname = 'PO5shp',
         C = window.olga5.C,
         o5debug = C.consts.o5debug,
-        fmtOK = "background: aquamarine; color: black;",
-        // fmtErr = "background: lightgoldenrodyellow; color: black;",
+        fmtOK = "background: aquamarine; color: black;"
 
-        Observe = (entries, observ) => {
-            const
-                pO5 = observ.pO5,
-                timeStamp = Date.now() + Math.random()
-            // bordnam = observ.root ? pO5.name : 'окно'
+    const Pbserve = entries => {
+        for (const entry of entries) {
+            const current = entry.target
+            let hasFix = null
 
-            if (o5debug > 1) {
-                let s = ''
-                for (const entry of entries)
-                    s += (s ? ', ' : '') +
-                        `${entry.isIntersecting ? '+' : '-'}${entry.target.aO5shp.name}/` +
-                        ` ${entry.intersectionRatio.toFixed(2)}${(entry.target.classList.contains('olga5-clon') ? '-clon' : '')}`
+            current.pO5.scope.isVisi = entry.isIntersecting
 
-                console.log("%c%s", fmtOK, '--:  Observe bord=', pO5.name, '[' + s + ']')
-            }
-
-            for (const entry of entries)
-                if (entry.isIntersecting) {
-                    const shp = entry.target,
-                        aO5 = shp.aO5shp,
-                        bord = aO5.ofram.bords.find(bord => bord.tag.pO5 === pO5)
-
-                    if (shp.classList.contains('olga5-clon')) { // т.е. это есть клон) 
-                        if (entry.intersectionRatio === 1 && aO5.act.xFixed.tag) {
-                            bord.out = false
-                            const allIn = !aO5.ofram.bords.find(bord => bord.out)
-                            if (allIn) {
-                                aO5.UnFixV(bord)
-
-                                let areFixed = false
-                                for (const pO5x of wshp.pO5s)
-                                    if (pO5x.IsVisi() &&
-                                        pO5x.observ.aO5s.find(xO5 => xO5.act.xFixed)
-                                    ) {
-                                        areFixed = true
-                                        break
-                                    }
-
-                                // if (!areFixed && observ.IsVisi())
-                                //     for (const xO5 of observ.aO5s)
-                                //         if (xO5.act.xFixed) {
-                                //             areFixed = true
-                                //             break
-                                //         }
-
-                                if (!areFixed)
-                                    wshp.escroll.ScrollAct(false, `свободно ${aO5.name} ${allIn}?' (все свободны)':''`)
-                            }
-                        }
-                    }
-                    else {   // if (isr < 1 && !act.xFixed && act.readyFix) 
-                        const
-                            // br = entry.boundingClientRect,
-                            // pos = entry.intersectionRect,
-                            br = entry.intersectionRect,
-                            pos = observ.pO5.pos,
-                            dirV = aO5.cls.dirV
-
-                        wshp.escroll.ScrollAct(true, `подвисло ${aO5.name}`)
-                        // if (
-                        //     (br.top < pos.top && dirV === 'U') ||
-                        //     (br.bottom > pos.bottom && dirV === 'D')
-                        // ) {
-                        //     wshp.DoScroll({ aO5: aO5, bord: bord, timeStamp: timeStamp })
-
-                        //     wshp.escroll.ScrollAct(true, `подвисло ${aO5.name}`)
-                        //     bord.out = true
-                        // }
-                    }
-                }
-        },
-        FindBords = (aO5, blng) => {
-            const
-                errs = [],
-                IsInClass = (tag, cc) => {
-                    const
-                        cs = cc.split(/[.,]/),
-                        cls = tag.classList.map(s => s.toUpperCase())
-
-                    for (const c of cs)
-                        if (c !== '' && !cls.find(c))
-                            return false
-                    return true
-                },
-                CheckNST = prev => {
-                    if (!prev.mO5s) prev.mO5s = []
-                    if (!prev.mO5s.nst)
-                        prev.mO5s.nst = window.getComputedStyle(prev)
-                    return prev.mO5s.nst
-                },
-                CalcDiff = (prev, parent) => {
-                    const
-                        nst = CheckNST(prev),
-                        IsFloat001 = s => { return Math.abs(parseFloat(s)) > 0.01 },
-                        CN = (nst, nam) => {
-                            const color = nst.getPropertyValue(nam + '-color'),
-                                rgb = color.match(/^rgba?[\s+]?\([\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?/i),
-                                GRGB = (i) => { return ("0" + parseInt(rgb[i], 10).toString(16)).slice(-2) }
-                            return (rgb && rgb.length === 4) ? "#" + GRGB(1) + GRGB(2) + GRGB(3) : ''
-                        }
-
-                    if (parent) {
-                        CheckNST(parent)
-
-                        const diff = CN(nst, 'background') !== CN(parent.mO5s.nst, 'background') &&
-                            prev.style.backgroundColor
-
-                        prev.mO5s.diffT = diff || IsFloat001(nst.borderTopWidth)
-                        prev.mO5s.diffB = diff || IsFloat001(nst.borderBottomWidth)
-                    }
-                    else {
-                        prev.mO5s.diffT = true
-                        prev.mO5s.diffB = true
-                    }
-                },
-                CalcScroll = pO5 => {
-                    const
-                        nst = CheckNST(pO5.current),
-                        minScrollW = 3
-
-                    Object.assign(pO5.scroll, {
-                        dw: minScrollW + C.MyRound(nst.borderLeftWidth) + C.MyRound(nst.borderRightWidth) + C.MyRound(nst.paddingLeft) + C.MyRound(nst.paddingRight),
-                        dh: C.MyRound(nst.borderTopWidth) + C.MyRound(nst.borderBottomWidth) + C.MyRound(nst.paddingTop) + C.MyRound(nst.paddingBottom),
-                        ovfX: nst.overflowX,
-                        ovfY: nst.overflowY,
-                    })
-
-                    for (const bord of ['top', 'left', 'right', 'bottom'])
-                        pO5.add[bord] = parseFloat(nst.getPropertyValue('border-' + bord + '-width'))
-                }
-            // Ask = bord => {
-            //     const c = (bord.cod || '').trim()
-            //     return {
-            //         c: c.toUpperCase(),
-            //         t: bord.typ.toUpperCase(),
-            //         n: bord.num
-            //     }
-            // },
-            // Find = (aO5, ask) => {
-            //     return aO5.prev.mO5s.find(m => m.c === ask.c && m.t === ask.t && m.n === ask.n)
-            // },
-            // GetmO5 = (aO5, bords, ask) => { // заодно выполняю поиск всех из ask
-            //     let
-            //         i = -1,
-            //         itag = -1,
-            //         tag = null,
-            //         prev = aO5.prev,
-            //         mO5 = null
-
-            //     while (prev) {
-            //         const parent = prev.nodeName == 'BODY' ? null : prev.parentNode
-            //         i++
-            //         for (const bord of bords) {
-            //             const
-            //                 x = Ask(bord),
-            //                 t = ask.t
-
-            //             let n = x.n
-
-            //             if (t === 'B') {
-            //                 CalcDiff(prev, parent)
-            //             }
-            //             if (
-            //                 (t === 'B' && (prev.mO5s.diffT || prev.mO5s.diffB)) ||
-            //                 (t === 'I' && prev.id.toUpperCase() == x.c) ||
-            //                 (t === 'N' && prev.nodeName == x.c) ||
-            //                 (t === 'C' && IsInClass(prev, x.c))
-            //             ) {
-            //                 itag = i
-            //                 tag = prev
-            //                 if (--n <= 0 || bord.num <= 1) {// именно в такой очередности
-            //                     const xO5 = { c: x.c, t: x.t, n: x.n, itag: itag, tag: tag }
-
-            //                     if (!Find(aO5, ask, xO5))
-            //                         aO5.prev.mO5s.push(xO5)
-
-            //                     if (ask.c === x.c && ask.t === x.t && ask.n === x.n)
-            //                         mO5 = xO5
-
-            //                     break
-            //                 }
-            //             }
-            //         }
-
-            //         if (!bords.find(bord => !bord.tag) || !parent)
-            //             break
-
-            //         prev = parent
-            //     }
-
-            //     if (itag < 0) {
-            //         itag = i
-            //         tag = prev
-            //         if (ask.t !== 'S')
-            //             errs.push(`'${ask.t}:${ask.c}' - не найден`)
-            //     }
-            //     else
-            //         if (ask.n > 0)
-            //             errs.push(` контейнер '${ask.t}:${ask.c}:${bord.num}' - найдено ${bord.num - n} из ${bord.num}`)
-
-            //     return mO5
-            // }
-
-            for (const bord of blng.bords) {
-                const
-                    cod = (bord.cod || '').trim(),
-                    ask = {
-                        c: cod.toUpperCase(),
-                        t: bord.typ.toUpperCase(),
-                        n: bord.num
-                    }
-
-                const xO5 = { itag: 9999, tag: document.body },
-                    mO5 = aO5.prev.mO5s.find(m => m.c === ask.c && m.t === ask.t && m.n === ask.n) || {}
-
-                if (!mO5.tag) {
-                    let err = '',
-                        n = ask.n,
-                        found = false
-
-                    Object.assign(mO5, { c: ask.c, t: ask.t, n: ask.n, itag: -1, tag: null })
-                    Object.seal(mO5)
-
-                    if ('SIBNC'.indexOf(ask.t) < 0)
-                        err = `Селектор '${ask.t}:${ask.c}:${ask.n}':  недопустимый тип '${ask.t}'`
-                    else
-                        if (ask.t === 'S') Object.assign(mO5, xO5)
-                        else {
-                            let i = -1,
-                                prev = aO5.prev
-
-                            while (prev) {
-                                i++
-                                const parent = prev.nodeName == 'BODY' ? null : prev.parentNode
-                                let ok = true
-
-                                switch (ask.t) {
-                                    case 'I': ok = prev.id.toUpperCase() == ask.c; break
-                                    case 'N': ok = prev.nodeName == ask.c; break
-                                    case 'C': ok = IsInClass(prev, ask.c); break
-                                    default:  // case 'B'
-                                        CalcDiff(prev, parent)
-                                        ok = (prev.mO5s.diffT || prev.mO5s.diffB)
-                                }
-                                if (ok) {
-                                    Object.assign(xO5, { itag: i, tag: prev })
-                                    found = true
-                                    if (--n <= 0 || ask.n <= 1) {   // именно в такой очередности                                        
-                                        Object.assign(mO5, xO5)
-                                        break
-                                    }
-                                }
-
-                                if (parent) prev = parent
-                                else
-                                    break
-                            }
-                        }
-
-                    if (!mO5.tag) {
-                        if (!err && ask.c !== 'OLGA5-START_HR') {
-                            bord.err = ` контейнер '${ask.t}:${cod}:${ask.n}' - ` +
-                                (found ? `найдено лишь ${ask.n - n}` : `не найден`)
-                            errs.push(bord.err)
-                        }
-                        Object.assign(mO5, xO5)
-                    }
-                    aO5.prev.mO5s.push(mO5)
-                }
-                bord.tag = mO5.tag
-                bord.itag = mO5.itag
-
-                const cls = 'olga5-' + blng.akey
-                if (!bord.tag.classList.contains(cls))
-                    bord.tag.classList.add(cls)
-
-                if (!bord.tag.pO5) {
-                    try {
-                        bord.tag.pO5 = new PO5(bord.tag)
-                    } catch (e) {
-                        C.ConsoleAlert(`В ModulAddSub Для объекта '${aO5.name}' ошибка при определении prev='${C.MakeObjName(aO5.prev)}':\n\t  "${e.message}"`)
-                        return
-                    }
-
-                    CalcScroll(bord.tag.pO5)
+            for (const pO5 of wshp.pO5s)
+                if (pO5.scope.isVisi) {
+                    hasFix = pO5.aO5s.find(aO5 => aO5.act.pO5fix)
+                    // if (hasFix) {
+                    //     wshp.DoScroll(true, `Pbserve: ${pO5.name}`)
+                    //     break
+                    // }
                 }
 
-                const pO5 = bord.tag.pO5
-                if (blng.akey === 'oframs') {
-                    if (!pO5.observ) {
-                        pO5.observ = new Observ(pO5)
-                        wshp.pO5s.push(pO5)
-                    }
-                    pO5.observ.AddO5(aO5)
-                }
-            }
-
-
-            // // устранение дублирования
-            // const pO5s = []
-
-            // let err = '',
-            //     i = blng.bords.length
-
-            // while (i-- > 0) {
-            //     const bord = blng.bords[i],
-            //         pO5 = bord.tag.pO5
-
-            //     // !!вот здесь создавать pO5  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-
-            //     if (pO5s.includes(pO5)) {
-            //         blng.bords.splice(i, 1)
-            //         err += (err ? ', ' : '') + pO5.name + ' (' + bord.typ + ':' + bord.cod + ':' + bord.num + ')'
-            //     }
-            // }
-            // сортировка по вложенности от внутреннего к внешнему
-            //   ?? нужна, т.к. всё равно надо по всем проерять
-            blng.bords.sort((b1, b2) => { return b1.itag - b2.itag })
-
-            if (o5debug > 1) {
-                let s = ''
-                for (const bord of blng.bords) {
-                    const u = (bord && bord.tag) ? bord.tag.pO5.name : '?'
-                    s += (s ? ', ' : '') + u
-                }
-                console.log("%c%s", fmtOK, aO5.name, blng.akey, '[ ' + s + ' ]')
-            }
-            // if (err)
-            //     C.ConsoleError(`Тег '${aO5.name}' - устранил дублирующие контейнеры:`, err)
-
-            if (errs.length > 0)
-                C.ConsoleError(`Тег '${aO5.name}' - ошибки определения контейеров`, errs.length, errs)
-
-            if (o5debug > 1) // для тестирования в shpC.html
-                window.dispatchEvent(new CustomEvent('olga5-containers', { detail: { aO5: aO5, akey: blng.akey } }))
-
-        }
-
-    class Observ extends IntersectionObserver {
-        constructor(pO5) {
-            super(Observe, {
-                root: pO5.current === document.body ? null : pO5.current,
-                rootMargin: '0px',
-                threshold: [0.001, 1],
-                trackVisibility: false,
-            })
-            this.pO5 = pO5
-            this.aO5s = []  // которые контролируются (observer'ом)
+            // if (!hasFix)
+            //     wshp.DoScroll(false, `Pbserve: нет зависших`)
 
             if (o5debug > 1)
                 console.log("%c%s", fmtOK,
-                    `создал 'observ' на ${pO5.name.padEnd(6)}  [${pO5.current.className}]`)
+                    `PO5 ${current.pO5.name.padEnd(16)} - ${current.pO5.scope.isVisi ? 'ПОЯВИЛОСЬ' : 'исчезло'} на экране`)
         }
-        AddO5 = aO5 => {
-            this.aO5s.push(aO5)
-            this.observe(aO5.shp)
-        }
-        HasVisibleFixed = () => this.aO5s.find(aO5 =>
-            aO5.act.xFixed &&
-            aO5.cart.style.display !== 'none'
-        )
     }
 
     class PO5 {
-        #cutts
-        #isVisi
-        IsVisi = () => this.#isVisi
-        AddCut = aO5 => {
-            // console.log("%c%s", fmtErr, `PO5shp повторное 'обрезание' объекта `, aO5.name)
-            if (!this.#cutts.includes(aO5))
-                this.#cutts.push(aO5)
+        FindParents = current => {
+            // parent = current.parentElement   // так не делать, т.к. 'теряет'
+            if (!current.parentElement)
+                return
+
+            current.pO5.parents.push(current.parentElement)
+
+            if (!current.parentElement.pO5)
+                current.parentElement.pO5 = new PO5(current.parentElement)
+
+            Array.prototype.push.apply(current.pO5.parents, current.parentElement.pO5.parents)
         }
-        DelCut = aO5 => {
-            const i = this.#cutts.indexOf(aO5)
-            if (i >= 0)
-                this.#cutts.splice(i, 1)
-        }
-        IsCuts = () => this.#cutts.length > 0
-        MarkVisible = visi => {
-            if (this.#isVisi !== visi) {
-                this.#isVisi = visi
-                for (const aO5 of this.observ.aO5s) {
-                    if (visi)
-                        this.observ.observe(aO5.shp)
-                    else
-                        this.observ.unobserve(aO5.shp)
-                    aO5.CheckIsVisi()
-                }
-            }
-        }
+
         constructor(current) {
-            this.#cutts = []
-            this.#isVisi = false
+            if (current.pO5) {
+                C.ConsoleError(`Повтор создания 'pO5' для контейнера id='${current.id}'`)
+                return
+            }
 
             const pO5 = this
 
@@ -422,33 +70,213 @@
                 ['overview-content', 'viewitem-panel'].find(cls => current.classList.contains(cls)) ||
                 false
 
-            // pO5.pO5L = new PO5L(pO5)        // используется для крайних ofram.bords
-            pO5.add = { top: 0, left: 0, right: 0, bottom: 0 }
-            pO5.pos = { top: 0, left: 0, right: 0, bottom: 0, tim: 0, } // пересчитывается при DoScroll
-            pO5.scroll = { dw: 0, dh: 0, ovfX: false, ovfY: false, }    // zIndex: -1, 
+            pO5.parents = []
+            pO5.mO5s = []  // сохранение типов поиска bord'а
+            pO5.aO5s = []  // все, которые могут подвисать на его границе, упорядочены  по 'top'            
 
-            pO5.classOrig = [].concat(current.classList) // для поиск контейнеров 'c:'
-            pO5.observ = null
+            pO5.classOrigs = Array.from(current.classList).map(s => s.toUpperCase())
 
-            for (const nam of ['add', 'pos', 'scroll', 'po'])
-                Object.seal(this[nam])
+            pO5.scope = {
+                pos: { top: 0, left: 0, right: 0, bottom: 0, tim: 0, }, // пересчитывается при DoScroll
+                isVisi: true,
+                ready: false,
+                scroll: {},
+                add: {},
+            } // структура создается только для контейнеров
 
+            if (!pO5.isFinal)
+                this.FindParents(current)
 
-            Object.seal(this)
+            // for (const nam of ['add', 'pos', 'scroll', 'po'])
+            Object.seal(this.scope)
+
+            Object.freeze(this.parents)
+            Object.freeze(this)
+
+            if (o5debug > 1)
+                console.log(`PO5 создано для ${pO5.name.padEnd(16)}`,
+                    ` [${pO5.parents.map(parent => parent.pO5 ? parent.pO5.name : ' - ').join(', ')}]`)
+        }
+
+        AddtO5s = aO5 => {  // вставка в порядке возрастания posC.top  - xO5.AddtO5s  (aO5)
+            const
+                pO5 = this,
+                aO5s = pO5.aO5s,
+                top = aO5.posC.top
+
+            let i = aO5s.length
+
+            if (o5debug) {
+                if (pO5.aO5s.indexOf(aO5) >= 0)
+                    C.ConsoleError(`повтор добавления тега '${aO5.name}' в контейнер '${pO5.name}' `)
+            }
+            while (i-- > 0)
+                if (aO5s[i].posC.top <= top)
+                    break
+
+            aO5s.splice(i + 1, 0, aO5);
         }
     }
 
-    // --------------------------------------------------------------------- //    
-    wshp = C.ModulAddSub(olga5_modul, modulname, aO5 => {
-        // let pO5 = aO5.prev.pO5
-        // if (!pO5) {
+    const
+        FindBords = (aO5, blng) => {
+            const
+                errs = [],
+                IsInClass = (classorigs, clss) => {
+                    if (classorigs.length > 0) {
+                        for (const cls of clss)
+                            if (cls && classorigs.indexOf(cls) >= 0)
+                                return true
+                    }
+                },
+                prev = aO5.parents[0]
 
-        FindBords(aO5, aO5.ofram)
-        FindBords(aO5, aO5.owner)
+            for (const bord of blng.bords) {
+                const
+                    cod = (bord.cod || '').trim(),
+                    ask = {
+                        c: cod.toUpperCase(),
+                        t: bord.typ.toUpperCase(),
+                        n: bord.num
+                    },
+                    t = ask.t,
+                    c = ask.c,
+                    clss = (t === 'C') ? c.split(/\s*[.,]\s*/) : null,
+                    xO5 = { itag: 9999, tag: document.body },
+                    mO5 = prev.pO5.mO5s.find(m => m.c === c && m.t === t && m.n === ask.n) || {}
 
-        if (o5debug > 1)
-            console.log("%c%s", fmtOK, "созданы bord'ы  для '" + aO5.name + "'")
-    })
+                if (!mO5.tag) {
+                    let err = '',
+                        n = ask.n
+
+                    Object.assign(mO5, { c: c, t: t, n: ask.n, itag: -1, tag: null })
+                    Object.seal(mO5)
+
+                    if ('SINC'.indexOf(t) < 0)
+                        err = `Селектор '${t}:${c}:${ask.n}':  недопустимый тип '${t}'`
+                    else
+                        if (t === 'S') Object.assign(mO5, xO5)
+                        else
+                            for (const [i, parent] of aO5.parents.entries())
+                                if (
+                                    (t === 'I' && parent.id.toUpperCase() == c) ||
+                                    (t === 'N' && parent.nodeName == c) ||
+                                    (t === 'C' && IsInClass(parent.pO5.classOrigs, clss))
+                                )
+                                    if (--n <= 0 || ask.n <= 1) {   // именно в такой очередности                                        
+                                        Object.assign(mO5, { itag: i, tag: parent })
+                                        break
+                                    }
+                                    else
+                                        Object.assign(xO5, { itag: i, tag: parent })
+
+                    if (!mO5.tag) {
+                        if (!err && c !== 'OLGA5-START_HR') {
+                            bord.err = ` контейнер '${ask.t}:${cod}:${ask.n}' - ` +
+                                ((ask.n > 0 && ask.n > n) ? `найдено лишь ${ask.n - n} из ${ask.n}` : `не найден (ни одного)`)
+                            errs.push(bord.err)
+                        }
+                        Object.assign(mO5, xO5)
+                    }
+
+                    prev.pO5.mO5s.push(mO5)
+                }
+                else
+                    if (o5debug > 1)
+                        console.log(`для ${aO5.name} (${blng.akey}) взял готовенький mO5(${c + ':' + t + ':' + ask.n})`, mO5.tag.id)
+
+                const cls = 'olga5-' + blng.akey,
+                    tag = mO5.tag,
+                    pO5 = tag.pO5,
+                    scope = pO5.scope,
+                    b = blng.bords.find(b => b.tag === tag)
+
+                if (b && !b.err)
+                    C.ConsoleError(`FindBords - в ${blng.akey} повтор контейнера '${pO5.name}' ` +
+                        `для атрибутов "${b.s}" и "${bord.s}" ` +
+                        `(т.е. соотв. "${b.typ}:${b.cod}:${b.num}" и "${ask.t}:${cod}:${ask.n}")`)
+
+                Object.assign(bord, { itag: mO5.itag, tag: tag })
+
+                if (!tag.classList.contains(cls))
+                    tag.classList.add(cls)
+
+                if (!scope.ready) {
+                    scope.ready = true
+
+                    const
+                        minScrollW = 3,
+                        add = scope.add,
+                        nst = window.getComputedStyle(pO5.current)
+
+                    add.top = C.MyRound(nst.borderTopWidth)
+                    add.left = C.MyRound(nst.borderLeftWidth)
+                    add.right = C.MyRound(nst.borderRightWidth)
+                    add.bottom = C.MyRound(nst.borderBottomWidth)
+
+                    Object.assign(scope.scroll, {
+                        dw: add.left + add.right + C.MyRound(nst.paddingLeft) + C.MyRound(nst.paddingRight) + minScrollW,
+                        dh: add.top + add.bottom + C.MyRound(nst.paddingTop) + C.MyRound(nst.paddingBottom),
+                        ovfX: nst.overflowX,
+                        ovfY: nst.overflowY,
+                    })
+
+                    Object.freeze(scope.scroll)
+                    Object.freeze(scope.add)
+
+                    if (o5debug > 1)
+                        console.log(`PO5 инициирован контейнер ${pO5.name.padEnd(16)}`,
+                            ` [${pO5.parents.map(parent => parent.pO5 ? parent.pO5.name : ' - ').join(', ')}]`)
+                }
+            }
+
+            blng.bords.sort((b1, b2) => { return b1.itag - b2.itag })
+
+            if (errs.length > 0)
+                C.ConsoleError(`${aO5.name} для ${blng.akey} - ошибки определения контейеров`, errs.length, errs)
+
+            if (o5debug > 1)
+                console.log("%c%s", fmtOK, `${aO5.name.padEnd(12)} `,
+                    `${blng.akey}: ${blng.bords.map(bord => bord.tag.pO5.name).join(', ')}`
+                )
+            // для тестирования в shpC.html
+            window.dispatchEvent(new CustomEvent('olga5-containers', { detail: { aO5: aO5, akey: blng.akey } }))
+        },
+        PO5shp = aO5 => {
+            const parent = aO5.shp.parentElement
+            let pO5 = parent.pO5
+            if (!pO5)
+                pO5 = parent.pO5 = new PO5(parent)
+
+            aO5.parents.push(parent)
+            Array.prototype.push.apply(aO5.parents, pO5.parents)
+
+            FindBords(aO5, aO5.ofram)
+            FindBords(aO5, aO5.owner)
+
+            aO5.ofram.bords.forEach(bord => {
+                const pO5 = bord.tag.pO5
+                if (wshp.pO5s.indexOf(pO5) < 0) {
+                    wshp.pO5s.push(pO5)
+                    if (!pbserv)
+                        pbserv = new IntersectionObserver(Pbserve, {
+                            root: null,
+                            rootMargin: '0px',
+                            threshold: 0,
+                            trackVisibility: false,
+                        })
+                    pbserv.observe(pO5.current)
+                }
+                pO5.AddtO5s(aO5)
+            })
+
+            if (o5debug > 0)
+                console.log("%c%s", fmtOK, `${aO5.name.padEnd(12)} инициировал`,
+                    `${aO5.parents.map(p => p.pO5.name).join(', ')}`
+                )
+        },
+        wshp = C.ModulAddSub(olga5_modul, PO5shp)
+
     wshp.pO5s = []
 
 })();

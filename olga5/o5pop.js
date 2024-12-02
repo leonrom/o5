@@ -4,6 +4,129 @@
 /* jshint esversion: 6               */
 /* eslint-disable no-prototype-builtins */
 (function () { // ---------------------------------------------- o5pop ---
+
+    function Popups(e) {
+        // 'use strict'
+        if (!C.avtonom)
+            if (o5nocss || GetCSS()) C.ParamsFill(W) // CSS сохранилось после автономного создания
+            else // иначе - никак, т.к. не известно, кто раньше загрузится
+                C.ParamsFill(W, o5css) // CSS пересоздаётся (для Blogger'а)
+
+        if (o5debug > 0) 
+			console.log('%c%s', "background: aqua; color: black;border: none;",
+				` инициализация `, 
+				`${W.modul}.js`,
+				` ${C.avtonom ? ('автономно по ' + e.type) : 'из библиотеки'} `)
+		
+        focusTime = 0
+
+        let o5c = null
+        const tags = C.GetTagsByQueryes('[' + o5popup + ']'),
+            mids = [],
+            o5contents = 'o5contents',
+            AskRefTag = (tag0, params) => {
+                const mcc = params[0].match(/^\s*id=\s*\w+\b/i)
+                if (!mcc) return
+
+                const ss = mcc[0],
+                    id = ss.split('=')[1].trim(),
+                    mid = mids.find(mid => mid.mtag && mid.mtag.id == id),
+                    errid = `========  ссылочный id='${id}'`
+
+                if (!o5c) o5c = document.getElementById(o5contents)
+                if (!o5c)
+                    return `${errid} не найден контент=${o5contents} <li>`
+
+                let mtag = mid ? mid.mtag : null
+
+                if (!mtag) {
+                    for (let i = 0; i < o5c.children.length; i++) {
+                        const child = o5c.children[i]
+                        let tag = null
+                        if (child.id == id) tag = child
+                        else tag = child.querySelector('#' + id)
+                        if (tag) {
+                            mtag = { i: i + 1, tag: tag, id: id }
+                            break
+                        }
+                    }
+                    if (!mtag)
+                        return `${errid} отсутствует в '${o5contents}'`
+
+                    mids.push(mtag)
+                }
+
+                const tag = mtag.tag
+
+                //     mpopup = tag.attributes.o5popup
+                // if (!mpopup)
+                //     return `${errid} не содержит 'o5popup'`
+
+                // const mparams = mpopup.nodeValue.split(/[;,]/)
+                // let mli = tag.parentNode
+
+                // while (mli.nodeName != 'LI')
+                //     mli = mli.parentNode
+
+                // if (!mli)
+                //     return `${errid} не принадлежит <li>`
+
+                tag0.classList.add(o5contents)
+                tag0.title = tag0.title + (tag0.title ? ' ' : '') + tag.innerText
+                // let s1 = tag0.innerText,
+                //     s2 = (tag0.innerText ? '+' : ''),
+                //     s3 = tag0.innerText + (tag0.innerText ? ' ' : '') + `[  ${mtag.i} ]`
+                tag0.innerHTML = tag0.innerText + (tag0.innerText ? ' ' : '') + `[&#8202;${mtag.i}&#8202;]`
+                tag0.a5pop = { mtag: mtag }
+                // tag.attributes.o5popup+=',' + id
+            }
+
+        if (tags)
+            for (const tag of tags) {
+                if (tag.getAttribute(doneattr)) {
+                    console.error('%c%s', eclr, `(========  повтор инициализации для id='${tag.id}'`)
+                    continue
+                }
+                tag.setAttribute(doneattr, 'OK')
+                const params = tag.attributes.o5popup.nodeValue.split(/[;,]/)
+                if (params.length > 0) {
+                    const err = AskRefTag(tag, params)
+                    if (err) {
+                        console.error('%c%s', eclr, err + ` (для id='${tag.id}')`)
+                        continue
+                    }
+
+                    if (!o5nocss && !tag.classList.contains(thisClass) && !params.find(param => param.match(/\bnocss\b/i)))
+                        tag.classList.add(thisClass)
+
+                    tag.addEventListener(click, PopUp)
+                }
+            }
+
+        for (const eve of ['focus', 'click'])
+            window.addEventListener(eve, Focus, optsFocus) // т.е. e.eventPhase ==1
+
+        window.addEventListener(click, ClosePops)
+
+        document.addEventListener('visibilitychange', DClosePops) // для автономной работы
+
+        if (!o5nocss) // т.е. если явно НЕ запрещено    
+            IncludeCSS()
+
+        const errs = []
+        if (attrs && attrs.o5params) {
+            const pars = {},
+                refs = {} // тут - refs не нуже
+            SplitPars(attrs.o5params, pars, refs, errs)
+            AddPars(pars, dflts, errs, false, 'конфиг.')
+        }
+        if (errs.length > 0)
+            C.ConsoleError(`Ошибки формирования параметров окна (из url'а):`, errs.length, errs)
+
+        if (C.E)  // если не автономно
+            C.E.DispatchEvent('o5_scriptDone', W.modul)
+    }
+
     'use strict'
     let focusTime = 0
 
@@ -197,7 +320,7 @@
                         ori = (pops.url || '').replace(C.repQuotes, ''),
                         // eslint-disable-next-line no-useless-escape
                         url = (ori.trim() && !ori.match(/[\/.\\#]/)) ? (document.URL + '?o5nomnu#' + ori) : ori,
-                        wref = C.DeCodeUrl(W.urlrfs, url, o5attrs)
+                        wref = C.DeCodeUrl(W.urlrfs ||C.urlrfs, url, o5attrs)
 
                     if (wref.err)
                         errs.push(`Ошибка перекодирования url='${pops.url}':  ${wref.err}`)
@@ -663,128 +786,6 @@ img.${thisClass} {
             C.ConsoleError(`PopShow: ошибочно к-во или тип аргументов [${arguments.join(', ')}]`)
             return '?'
         }
-    }
-
-    function Popups(e) {
-        // 'use strict'
-        if (!C.avtonom)
-            if (o5nocss || GetCSS()) C.ParamsFill(W) // CSS сохранилось после автономного создания
-            else // иначе - никак, т.к. не известно, кто раньше загрузится
-                C.ParamsFill(W, o5css) // CSS пересоздаётся (для Blogger'а)
-
-        if (o5debug > 0) 
-			console.log('%c%s', "background: aqua; color: black;border: none;",
-				` инициализация `, 
-				`${W.modul}.js`,
-				` ${C.avtonom ? ('автономно по ' + e.type) : 'из библиотеки'} `)
-		
-        focusTime = 0
-
-        let o5c = null
-        const tags = C.GetTagsByQueryes('[' + o5popup + ']'),
-            mids = [],
-            o5contents = 'o5contents',
-            AskRefTag = (tag0, params) => {
-                const mcc = params[0].match(/^\s*id=\s*\w+\b/i)
-                if (!mcc) return
-
-                const ss = mcc[0],
-                    id = ss.split('=')[1].trim(),
-                    mid = mids.find(mid => mid.mtag && mid.mtag.id == id),
-                    errid = `========  ссылочный id='${id}'`
-
-                if (!o5c) o5c = document.getElementById(o5contents)
-                if (!o5c)
-                    return `${errid} не найден контент=${o5contents} <li>`
-
-                let mtag = mid ? mid.mtag : null
-
-                if (!mtag) {
-                    for (let i = 0; i < o5c.children.length; i++) {
-                        const child = o5c.children[i]
-                        let tag = null
-                        if (child.id == id) tag = child
-                        else tag = child.querySelector('#' + id)
-                        if (tag) {
-                            mtag = { i: i + 1, tag: tag, id: id }
-                            break
-                        }
-                    }
-                    if (!mtag)
-                        return `${errid} отсутствует в '${o5contents}'`
-
-                    mids.push(mtag)
-                }
-
-                const tag = mtag.tag
-
-                //     mpopup = tag.attributes.o5popup
-                // if (!mpopup)
-                //     return `${errid} не содержит 'o5popup'`
-
-                // const mparams = mpopup.nodeValue.split(/[;,]/)
-                // let mli = tag.parentNode
-
-                // while (mli.nodeName != 'LI')
-                //     mli = mli.parentNode
-
-                // if (!mli)
-                //     return `${errid} не принадлежит <li>`
-
-                tag0.classList.add(o5contents)
-                tag0.title = tag0.title + (tag0.title ? ' ' : '') + tag.innerText
-                // let s1 = tag0.innerText,
-                //     s2 = (tag0.innerText ? '+' : ''),
-                //     s3 = tag0.innerText + (tag0.innerText ? ' ' : '') + `[  ${mtag.i} ]`
-                tag0.innerHTML = tag0.innerText + (tag0.innerText ? ' ' : '') + `[&#8202;${mtag.i}&#8202;]`
-                tag0.a5pop = { mtag: mtag }
-                // tag.attributes.o5popup+=',' + id
-            }
-
-        if (tags)
-            for (const tag of tags) {
-                if (tag.getAttribute(doneattr)) {
-                    console.error('%c%s', eclr, `(========  повтор инициализации для id='${tag.id}'`)
-                    continue
-                }
-                tag.setAttribute(doneattr, 'OK')
-                const params = tag.attributes.o5popup.nodeValue.split(/[;,]/)
-                if (params.length > 0) {
-                    const err = AskRefTag(tag, params)
-                    if (err) {
-                        console.error('%c%s', eclr, err + ` (для id='${tag.id}')`)
-                        continue
-                    }
-
-                    if (!o5nocss && !tag.classList.contains(thisClass) && !params.find(param => param.match(/\bnocss\b/i)))
-                        tag.classList.add(thisClass)
-
-                    tag.addEventListener(click, PopUp)
-                }
-            }
-
-        for (const eve of ['focus', 'click'])
-            window.addEventListener(eve, Focus, optsFocus) // т.е. e.eventPhase ==1
-
-        window.addEventListener(click, ClosePops)
-
-        document.addEventListener('visibilitychange', DClosePops) // для автономной работы
-
-        if (!o5nocss) // т.е. если явно НЕ запрещено    
-            IncludeCSS()
-
-        const errs = []
-        if (attrs && attrs.o5params) {
-            const pars = {},
-                refs = {} // тут - refs не нуже
-            SplitPars(attrs.o5params, pars, refs, errs)
-            AddPars(pars, dflts, errs, false, 'конфиг.')
-        }
-        if (errs.length > 0)
-            C.ConsoleError(`Ошибки формирования параметров окна (из url'а):`, errs.length, errs)
-
-        if (C.E)  // если не автономно
-            C.E.DispatchEvent('o5_scriptDone', W.modul)
     }
 
     if (C.avtonom) {

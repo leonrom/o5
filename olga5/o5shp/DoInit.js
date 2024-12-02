@@ -12,87 +12,124 @@
         C = window.olga5.C,
         o5debug = C.consts.o5debug,
         fmt = "background: aquamarine; color: black;",
-        Observe0 = (entries, obsrv0) => {
-            const obsrvs = []
+        Observe = (entries) => {
+            const
+                aO5names = [],
+                AscScroll = (aO5, act) => {
+                    aO5.act.uScroll = act
+                    if (o5debug > 0)
+                        aO5names.push((act ? '+' : '-') + aO5.name)
+                    return 1
+                }
+            let n = 0
 
             for (const entry of entries) {
-                const shp = entry.target
-                let aO5 = shp.aO5shp
+                const
+                    shp = entry.target
+                let
+                    aO5 = shp.aO5shp
 
                 if (entry.isIntersecting) {
                     if (!aO5) {
-                        aO5 = wshp.AO5shp(entry.target)
-                        aO5.Resize()
-
-                        wshp.aO5s.push(aO5)
+                        aO5 = wshp.AO5shp(shp)
+                        wshp.PO5shp(aO5)
                     }
-                    aO5.act.uScroll = true
-                    if (entry.intersectionRatio === 1)
-                        aO5.act.canFix = true
-                    else
-                        if (aO5.act.canFix) {
-                            const
-                                br = entry.boundingClientRect,
-                                ir = entry.intersectionRect
-
-                            // wshp.escroll.ScrollAct(true, `подвисло ${aO5.name}`)
-                            if (
-                                (br.top < ir.top && aO5.cls.dirV === 'U') ||
-                                (br.bottom > ir.bottom && aO5.cls.dirV === 'D')
-                            ) {
-                                wshp.escroll.ScrollAct(true, `подвисаний ${aO5.name}`)
-                            }
-                        }
+                    n += AscScroll(aO5, true)
                 }
                 else
-                    if (aO5) {
-                        aO5.act.uScroll = false
-                        aO5.act.canFix = false
-                    }
-
-                if (o5debug > 0)
-                    obsrvs.push(shp.id + '/' + parseFloat(entry.intersectionRatio).toFixed(2))
-
+                    if (aO5 && !aO5.act.pO5fix)
+                        n += AscScroll(aO5, false)
             }
-            if (o5debug > 0) {
-                console.groupCollapsed("%c%s", fmt, `Observe0`, `обработано: `, obsrvs.join(', '))
 
-                console.table(wshp.aO5s.map(aO5 => {
-                    return {
-                        name: aO5.name,
-                        uScroll: aO5.act.uScroll,
-                        canFix: aO5.act.canFix,
-                    }
-                }))
-                console.groupEnd()
+            if (n > 0) {
+                const
+                    isScroll = wshp.aO5s.find(aO5 => aO5.act.uScroll || aO5.act.pO5fix)
+
+                if (o5debug > 0 && aO5names.length > 0)
+                    console.log("%c%s", fmt, `EventListener` +
+                        ` ${wshp.isScroll === isScroll ? ' (повт) ' : '        '}: ${isScroll ? 'START' : 'stop '} `,
+                        `для ${aO5names.join(', ')}`)
+
+                wshp.DoScroll(isScroll)
             }
+
+
+            // if (ir < oldIR) {
+            //     if (act.wasFull) {
+            //         const
+            //             br = entry.boundingClientRect,
+            //             ir = entry.intersectionRect,
+            //             dirV = aO5.cls.dirV
+
+            //         if (
+            //             (br.top < ir.top && dirV === 'U') ||
+            //             (br.bottom > ir.bottom && dirV === 'D')
+            //         ) {
+            //             act.canFix = true
+
+            //             if (!wshp.isScroll)
+            //                 wshp.DoScroll(true, `Observe: ${aO5.name}`)
+            //         }
+            //     }
+            //     else
+            //         if (ir === 0)
+            //             Object.assign(act, { canFix: false, uScroll: false, wasFull: false, })
+            // }
+            // else
+            //     if (ir > 0) {
+            //         act.uScroll = true
+
+            //         if (ir === 1)
+            //             Object.assign(act, { canFix: false, wasFull: true })
+
+            //         if (aO5.parents.length == 0)
+            //             wshp.PO5shp(aO5)
+            //     }
+
+            // if (act) act.oldIR = ir
+
+            // if (o5debug > 0)
+            //     obsrvs.push(shp.id + '/' + parseFloat(entry.intersectionRatio).toFixed(2))
+
+
+            // if (o5debug > 0) {
+            //     console.groupCollapsed("%c%s", fmt, `Observe`, `обработано: `, obsrvs.join(', '))
+
+            //     console.table(wshp.aO5s.map(aO5 => {
+            //         return {
+            //             name: aO5.name,
+            //             canFix: aO5.act.canFix,
+            //             uScroll: aO5.act.uScroll,
+            //         }
+            //     }))
+            //     console.groupEnd()
+            // }
         },
         DoInit = () => {
             const
                 mtags = C.SelectByClassName(wshp.W.class, olga5_modul),
-                obsrv0 = new IntersectionObserver(Observe0, {
+                observ = new IntersectionObserver(Observe, {
                     root: null,
+                    threshold: 0,
                     rootMargin: '0px',
-                    threshold: [0.01, 0.99, 1],
                     trackVisibility: false,
                 })
-<b>canFix</b>
+
             for (const mtag of mtags)
                 if (!mtag.quals.find(qual => qual.match(/\bN/i))) {
                     const shp = mtag.tag
 
                     shp.aO5quals = mtag.quals.slice()
-                    obsrv0.observe(shp)
+                    observ.observe(shp)
                     if (o5debug > 1)
-                        console.log(`obsrv0: добавлен ${shp.id.padEnd(12)} quals='${mtag.quals.join(', ')}'`)
+                        console.log(`observ: добавлен ${shp.id.padEnd(12)} quals='${mtag.quals.join(', ')}'`)
                     // wshp.shps.push(shp)
                 }
 
             mtags.splice(0, mtags.length)
+            wshp.observ = observ
         },
         wshp = C.ModulAddSub(olga5_modul, DoInit)
 
-    // wshp.shps = [] // это ВСЕ подвисабельные
-    wshp.aO5s = [] // это инициированные подвисабельные
 })();
 

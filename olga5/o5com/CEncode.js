@@ -15,19 +15,19 @@
 				mrk2 = '..'
 			do {
 				const l = s0.length,
-				// eslint-disable-next-line no-useless-escape
+					// eslint-disable-next-line no-useless-escape
 					m1 = s0.match(/\.\.[^\/]/)
 				if (m1) s0 = s0.substr(0, m1.index + 2) + '/' + s0.substr(m1.index + 2)
-				
-				const 
-				// eslint-disable-next-line no-useless-escape
+
+				const
+					// eslint-disable-next-line no-useless-escape
 					m2 = s0.match(/[^\/]\.\./)
 				if (m2) s0 = s0.substr(0, m2.index + 1) + '/' + s0.substr(m2.index + 1)
 				if (l == s0.length) break
 			} while (n++ < 99)
 
 			const s2s = s0.split('/')
-				// tt = []
+			// tt = []
 			for (let i = 0; i < s2s.length; i++)
 				if (s2s[i] == mrk2) {
 					let j = i
@@ -69,7 +69,8 @@
 					u.replaceAll(/(&#43;)/g, '+').replaceAll(/(%20|&nbsp;)/g, ' ').trim(), // давать в такой очерёдностии, иначе снова вернёт %20 !,
 				IsCompaund = orig => orig && (orig.includes('+') || IsUrlNam(orig)),
 				SplitRefs = (s, refs = null) => {
-					s.split('+').forEach(sprt => {
+					const sprts = s.split('+')
+					for (const sprt of sprts) {
 						const prt = sprt.replace(C.repQuotes, ''),	// trim(),
 							isnam = IsUrlNam(prt),
 							ref = isnam ? C.Repname(prt) : prt
@@ -93,7 +94,7 @@
 							else
 								parts.push(ref)
 						}
-					})
+					}
 				},
 				ss = url.split('?'),
 				orig = Replace4320(ss[0].trim()),

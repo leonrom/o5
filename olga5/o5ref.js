@@ -72,7 +72,7 @@
 						const tagattr = tag.attributes[attr]
 						if (tagattr) {
 							const ori = tagattr.nodeValue,
-								wref = C.DeCodeUrl(W.urlrfs, ori, o5attrs),
+								wref = C.DeCodeUrl(W.urlrfs ||C.urlrfs, ori, o5attrs),
 								anew = attr.replace(/(data-)|(_)/, '')
 							// anew = (attr[0] == '_') ? attr.substring(1) : attr
 

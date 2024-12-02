@@ -35,8 +35,8 @@
 				// 				const bord = ask.bords[b]
 				// 				if (!aa[a].bb[b]) aa[a].bb[b] = []
 				// 				if (bord) {
-				// 					aa[a].bb[b][2] = bord.pO5.name
-				// 					aa[a].bb[b][3] = '=' + MyRound4(bord.pO5.pos.top) + '..' + MyRound4(bord.pO5.pos.bottom)
+				// 					aa[a].bb[b][2] = bord.tag.pO5.name
+				// 					aa[a].bb[b][3] = '=' + MyRound4(bord.tag.pO5.scope.pos.top) + '..' + MyRound4(bord.tag.pO5.scope.pos.bottom)
 				// 				}
 				// 			}
 				// 		}
@@ -97,7 +97,7 @@
 			ShowShpBords: () => {
 
 				const
-					owners = document.getElementsByClassName('olga5-owners'),
+					owners = document.getElementsByClassName('o5owner'),
 					oframs = document.getElementsByClassName('olga5-oframs'),
 					sowns = [],
 					sfrms = []
@@ -106,7 +106,7 @@
 					const pO5 = ofram.pO5
 
 						let s = ''
-						for (const aO5 of pO5.observ.aO5s) // {aO5: AO5, act: false}
+						for (const aO5 of pO5.scope.observ.aO5s) // {aO5: AO5, act: false}
 							s += (s ? ', ' : '') + aO5.name
 					
 

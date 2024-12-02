@@ -12,8 +12,8 @@
 			Init: ShpInit,
 			class: 'olga5_shp',
 			consts: `		
-                o5oframs='s';
-                o5owners='b';
+                o5ofram='s';
+                o5owner='b';
                 o5zindex=999;
 			`,
 			incls: {

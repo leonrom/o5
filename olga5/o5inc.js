@@ -6,6 +6,7 @@
 	let
 		incls = null
 	const
+		errs = [],
 		pard = window.location.search.match(/(&|\?|\s)(is|o5)?(-|_)?debug\s*(\s|$|\?|#|&|=\s*\d*)/),
 		o5debug = (pard ? (pard[0].match(/=/) ? parseInt(pard[0].match(/\s*\d+/) || 1) : 1) : 2),
 		msg = {
@@ -79,9 +80,9 @@
 			if (C.E && W.consts.o5isfinal)	// гененрировать ли сообщение 'o5_scriptDone'
 				C.E.DispatchEvent('o5_scriptDone', W.modul)
 		},
-		AddIncls = (tags) => {
+		AddIncls = tags => {
 			// console.log(`INC_1 `)
-			const errs = [],
+			const
 				IsDisplay = tag => {
 					let div = tag
 					while (div.tagName.match(/div/i)) {
@@ -106,7 +107,7 @@
 						ori = ss[0].trim(),
 						wref = (C.DeCodeUrl) ? C.DeCodeUrl(C.urlrfs, ori, '') : { url: ori, err: '' }
 					if (wref.err) {
-						if (!errs.contains(ori)) errs.push(ori)
+						if (!errs.includes(ori)) errs.push(`Перекодир. url='${ori}' - ${wref.err}`)
 						continue
 					}
 
@@ -179,7 +180,7 @@
 			// 	m2 = u.match(/<\/\s*body\s*>/)
 			// _div.innerHTML = u.substring(m1.index, m2.index)+'</body>' // incl.xhr.responseText.substring(i)
 
-			const errs = [],
+			const es = [],
 				mm = incl.xhr.responseText.match(/<body[^>]*>/),
 				i = mm.index
 
@@ -248,7 +249,7 @@
 							default: srcs = _div.getElementsByTagName(sel)
 						}
 						if (!srcs || srcs.length == 0) {
-							errs.push(sel)
+							es.push(sel)
 							continue
 						}
 					}
@@ -268,9 +269,10 @@
 					}
 					tags.concat(tag.querySelectorAll("div[" + o5include + "]") || [])
 				}
-			if (errs.length > 0)
-				incl.err = `не опр. '${errs.join(', ')}'`
-
+			if (es.length > 0) {
+				incl.err = `не опр. '${es.join(', ')}'`
+				errs.push(incl.err)
+			}
 			if (tags && tags.length > 0)
 				AddIncls(tags)
 		},
@@ -330,8 +332,11 @@
 			n = AddIncls(tags)
 		}
 
-		if (n == 0)
+		if (n == 0) {
+			if (errs.length > 0)
+				C.ConsoleError(`o5inc - ошибки`, errs.length, errs)
 			InclFinish()
+		}
 	}
 
 	window.addEventListener(o5include, InclStart)

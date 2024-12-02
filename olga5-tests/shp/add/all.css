@@ -67,24 +67,6 @@
     font-family: monospace;
 }
 
-.cboxed span.span-mark {
-    background-color: lavender;
-    border: 1px solid gray;
-    border-color: lightblue;
-    border-radius: 3px;
-    line-height: 14px;
-    font-size: 10px;
-    cursor: pointer;
-    width: 10px;
-    padding-left: 0px;
-    font-family: monospace;
-    padding-right: 1px;
-    text-align: center;
-    padding-left: 4px;
-    padding-right: 4px;
-    font-weight: bold;
-}
-
 .container span:first-child {
     position: sticky;
     float: right;
@@ -153,6 +135,7 @@ div.olga5_shp.olga5-ignore.container,
 
 .moved,
 .divSmall {
+    width: 122px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -252,8 +235,8 @@ div.olga5_shp {
 }
 
 .divSmall {
-    height: 44px;
-    width: 111px;
+    height: 55px;
+    width: 222px;
     position: relative;
     color: darkgray;
     background: aliceblue;
@@ -291,3 +274,25 @@ div.olga5_shp {
     width: 260px;
     padding-left: 4px;
 }
+
+.ccshp1{
+    display: flex;
+}
+
+.cboxed span.span-mark {
+    background-color: white;
+    border: 1px solid gray;
+    border-radius: 3px;
+    line-height: 14px;
+    font-size: 10px;
+    cursor: pointer;
+    width: 10px;
+    padding-left: 0px;
+    font-family: monospace;
+    padding-right: 1px;
+    text-align: center;
+    padding-left: 4px;
+    padding-right: 4px;
+    font-weight: bold;
+}
+
