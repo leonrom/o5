@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>r2</title>
+</head>
+
+<body>
+    <style>
+        #div1 {
+            border: 3px green dashed;
+            height: 555px;
+            width: calc(96% - 111px);
+            position: relative;
+            overflow: hidden;
+            background-color: aliceblue;
+        }
+
+        #int1 {
+            position: relative;
+            height: 100%;
+            width: 100%;
+            top: -10px;
+            overflow: scroll;
+            background-color: transparent;
+        }
+
+        #cbo1 {
+            position: relative;
+            height: 777px;
+            width: 1222px;
+            background-image:
+                linear-gradient(90deg, gray 1px, transparent 1px),
+                linear-gradient(0deg, gray 1px, transparent 1px);
+            background-size: 30px 30px;
+            background-color: transparent;
+            padding-top: 44px;
+            padding-left: 88px;
+        }
+
+        #div2 {
+            border: 3px green dashed;
+            height: 555px;
+            width: calc(90% - 122px);
+            position: relative;
+            overflow: hidden;
+            background-color: azure;
+        }
+
+        #int2 {
+            position: relative;
+            height: 100%;
+            width: 100%;
+            top: -10px;
+            overflow: scroll;
+            background-color: transparent;
+        }
+
+        #cbo2 {
+            position: relative;
+            height: 777px;
+            width: 1222px;
+            background-image:
+                linear-gradient(90deg, gray 1px, transparent 1px),
+                linear-gradient(0deg, gray 1px, transparent 1px);
+            background-size: 20px 20px;
+            background-color: transparent;
+            padding-top: 44px;
+        }
+
+        div span:first-child {
+            position: sticky;
+            top: 6px;
+            right: 18px;
+            float: right;
+            background-color: yellow;
+            color: black;
+            line-height: 10px;
+        }
+    </style>
+
+    <div>111</div>
+    <div id="div1">
+        <span>div1</span>
+        <div id="int1">
+            <div id="cbo1">
+
+    <div id="div2">
+        <span>div2</span>
+        <div id="int2">
+            <div id="cbo2">
+            </div>
+        </div>
+    </div>
+
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

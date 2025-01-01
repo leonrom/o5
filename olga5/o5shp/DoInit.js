@@ -11,7 +11,7 @@
         // modulname = 'DoInit',
         C = window.olga5.C,
         o5debug = C.consts.o5debug,
-        fmt = "background: aquamarine; color: black;",
+        // fmtOK = "background: aquamarine; color: black;",
         Observe = (entries) => {
             const
                 aO5names = [],
@@ -24,33 +24,26 @@
             let n = 0
 
             for (const entry of entries) {
-                const
-                    shp = entry.target
-                let
-                    aO5 = shp.aO5shp
+                const shp = entry.target
+                let aO5 = shp.aO5shp
 
                 if (entry.isIntersecting) {
-                    if (!aO5) 
+                    if (!aO5)
                         aO5 = wshp.AO5shp(shp)
-                    
+
                     n += AscScroll(aO5, true)
                 }
                 else
-                    if (aO5 && !aO5.act.isFix)
+                    if (aO5 && !aO5.IsFix()) // act.isFix)
                         n += AscScroll(aO5, false)
             }
 
-            if (n > 0) {
-                const
-                    isScroll = wshp.aO5s.find(aO5 => aO5.act.uScroll || aO5.act.isFix)
+            if (n > 0)
+                wshp.DoScroll(
+                    wshp.aO5s.find(aO5 => aO5.act.uScroll || aO5.IsFix()), // act.isFix),
+                    `AO5.Observe для "${aO5names.join(', ')}"`
+                )
 
-                if (o5debug > 0 && aO5names.length > 0)
-                    console.log("%c%s", fmt, `EventListener` +
-                        ` ${wshp.isScroll === isScroll ? ' (повт) ' : '        '}: ${isScroll ? 'START' : 'stop '} `,
-                        `для ${aO5names.join(', ')}`)
-
-                wshp.DoScroll(isScroll)
-            }
         },
         DoInit = () => {
             const
@@ -60,23 +53,33 @@
                     threshold: 0,
                     rootMargin: '0px',
                     trackVisibility: false,
-                })
+                }),
+                found={n:0,ok:false}
 
-            for (const mtag of mtags)
-                if (!mtag.quals.find(qual => qual.match(/\bN/i))) {
+            for (const mtag of mtags){
+                found.n++
+                // if (!mtag.quals.find(qual => qual.match(/\bN/))) {
+                if (!mtag.tag.classList.contains('olga5_shpNone')){
                     const shp = mtag.tag
 
                     shp.aO5quals = mtag.quals.slice()
                     observ.observe(shp)
-                    if (o5debug > 1)
+                    wshp.shps.push(shp)
+
+                    found.ok=true
+                    if (o5debug > 0)
                         console.log(`observ: добавлен ${shp.id.padEnd(12)} quals='${mtag.quals.join(', ')}'`)
-                    // wshp.shps.push(shp)
-                }
+                 }
+            }
 
             mtags.splice(0, mtags.length)
             wshp.observ = observ
+
+            if (!found.ok)
+                C.ConsoleError(`В тегах с классом 'olga5_Start' нет объектов '${wshp.W.class}' без квалификатора ':N'`, `найдено: ${found.n}`)
         },
         wshp = C.ModulAddSub(olga5_modul, DoInit)
 
+    wshp.shps = []
 })();
 

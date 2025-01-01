@@ -93,29 +93,6 @@
 				// 		s += (s ? ', ' : '') + aO5.name
 				// 	console.error(`Не могу определить names в ShowBounds для "${s}"`)
 				// }
-			},
-			ShowShpBords: () => {
-
-				const
-					owners = document.getElementsByClassName('o5owner'),
-					oframs = document.getElementsByClassName('olga5-oframs'),
-					sowns = [],
-					sfrms = []
-			
-				for (const ofram of oframs) {
-					const pO5 = ofram.pO5
-
-						let s = ''
-						for (const aO5 of pO5.scope.observ.aO5s) // {aO5: AO5, act: false}
-							s += (s ? ', ' : '') + aO5.name
-					
-
-					sfrms.push({ name: ofram.pO5.name, aO5s: s })
-				}
-
-				// C.ConsoleInfo(`Контейнеры-владельцы  (owner)`, sowns.length, sowns)
-				C.ConsoleInfo(`Контейнеры подвисания (ofram)`, sfrms.length, sfrms)
-
 			}
 		},
 		Utils = () => {

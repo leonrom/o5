@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>r4</title>
+</head>
+
+<body>
+    <style>
+        .div {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .int {
+            position: relative;
+            height: 100%;
+            width: 100%;
+            top: -10px;
+            overflow: scroll;
+            background-color: transparent;
+        }
+
+        .cbo {
+            position: relative;
+            height: 777px;
+            width: 1222px;
+            background-image:
+                linear-gradient(90deg, gray 1px, transparent 1px),
+                linear-gradient(0deg, gray 1px, transparent 1px);
+            background-color: transparent;
+            padding-top: 44px;
+            padding-left: 88px;
+        }
+
+        .div span:first-child {
+            position: sticky;
+            top: 6px;
+            right: 18px;
+            float: right;
+            background-color: yellow;
+            color: black;
+            line-height: 10px;
+        }
+
+        #div1 {
+            border: 3px green dashed;
+            height: 555px;
+            width: calc(96% - 111px);
+            background-color: lightgreen;
+        }
+
+        #cbo1 {
+            background-size: 30px 30px;
+        }
+
+        #div2 {
+            border: 3px blue dashed;
+            height: 555px;
+            width: calc(90% - 122px);
+            background-color: lightblue;
+        }
+
+        #cbo2 {
+            background-size: 22px 22px;
+        }
+
+        #div3 {
+            border: 3px red dashed;
+            height: 555px;
+            width: calc(85% - 133px);
+            background-color: lightpink;
+        }
+
+        #cbo3 {
+            background-size: 16px 16px;
+        }
+
+        #div4 {
+            border: 2px lightgray dashed;
+            height: 333px;
+            width: calc(80% - 144px);
+            background-color: azure;
+        }
+
+        #cbo4 {
+            background-size: 12px 12px;
+        }
+    </style>
+
+    <div>111</div>
+    <div id="div1" class="div">
+        <span>div1</span>
+        <div id="int1" class="int">
+            <div id="cbo1" class="cbo">
+
+                <div id="div2" class="div">
+                    <span>div2</span>
+                    <div id="int2" class="int">
+                        <div id="cbo2" class="cbo">
+
+                            <div id="div3" class="div">
+                                <span>div3</span>
+                                <div id="int3" class="int">
+                                    <div id="cbo3" class="cbo">
+
+                                        <div id="div4" class="div">
+                                            <span>div4</span>
+                                            <div id="int4" class="int">
+                                                <div id="cbo4" class="cbo">
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

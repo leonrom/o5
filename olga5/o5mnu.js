@@ -167,7 +167,7 @@
     background-color: aqua ! important;
 }
 
-.olga5-menuhidden{
+.olga5-menuHidden{
 	display:none;
 }
 `,
@@ -384,7 +384,7 @@
 			if (menu)	// если есть такой атрибут}
 				InitByText(menu)
 
-			const tags = C.GetTagsByClassNames('olga5-menuhidden', W.modul)
+			const tags = C.GetTagsByClassNames('olga5-menuHidden', W.modul)
 			if (tags)
 				tags.forEach(tag => {
 					InitByText(tag.innerText.trim())	//, tag)

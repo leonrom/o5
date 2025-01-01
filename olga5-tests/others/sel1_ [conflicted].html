@@ -43,18 +43,20 @@ pre {
                 td2 = document.getElementById('td2'),
                 PrtS = mtags => {
                     for (const mtag of mtags)
-                        mtag.tag.innerHTML += (mtag.tag.innerHTML.trim() ? '<br\>' : '') +
-                            `<b>${C.MakeObjName(mtag.tag)}</b>: className=${mtag.origcls}<br\>` +
+                        mtag.tag.insertAdjacentHTML('beforend', 
+                    (mtag.tag.innerHTML.trim() ? ': ' : '') +
+                            `<b>${C.MakeObjName(mtag.tag)}</b>: className=${mtag.origcls} ` +
                             `<span style="margin-left: 30px;"> className=${mtag.tag.className}</span>`+
                             `<span style="margin-left: 30px;"> квалиф.: ${mtag.quals.length > 0 ? mtag.quals.join(', ') : ' -'}</span>`
+                )
                 },
                 Prt = (fun, query) => {
                     const tags = C[fun](query, ''),
                         ss = [],
                         add = td1.innerHTML ? '<br/>  ' : '  '
                     tags.forEach(tag => { ss.push(C.MakeObjName(tag)) })
-                    td1.innerHTML += add + `C.<b>${fun}</b> ( '${query}',  '' )`
-                    td2.innerHTML += add + `${ss.join(', ')}`
+                    td1.insertAdjacentHTML('beforend', add + `C.<b>${fun}</b> ( '${query}',  '' )`)
+                    td2.insertAdjacentHTML('beforend', add + `${ss.join(', ')}`)
                 }
 
             C.QuerySelectorInit(document.querySelectorAll("[class *= 'olga5_Start']"))

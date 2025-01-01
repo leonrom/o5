@@ -8,10 +8,8 @@
 		C = window.olga5.C,
 		olga5_modul = 'o5com',
 		modulname = 'CApi',
-		// Match = scls => new RegExp(`\\b` + scls + `(\\s*[,:+]\\s*((([\`'"\\(\[])(.*?)\\4)|[^\\s\`'":,+]*))*(\\s*|$)`),
-		// Match = scls => new RegExp(`\\b` + scls + `\\b(\\s*:\\s*\\w*|([\`'"\\([])(.*?)\\3)*`),
-		Match = scls => new RegExp(`\\b` + scls + `\\b(\\s*[,:+]\\s*[^\\s:\`'"]*|([\`'"\\([])(.*?)\\2)*`),
-		mquals = /\s*[:,]\s*/,
+		Match = scls => new RegExp(`\\b` + scls + `\\b(\\s*[:;+]\\s*[^\\s:\`'"]*|([\`'"\\([])(.*?)\\2)*`),
+		mquals = /\s*[:;]\s*/,
 		GetTagsBy = (modul, fun, ask) => {
 			const list = [],
 				errs = [],

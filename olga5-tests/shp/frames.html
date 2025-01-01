@@ -3,21 +3,253 @@
 
 <head>
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
-	<title>shp2c</title>
-    <link rel="shortcut icon" href="./add/favicon.svg" type="image/x-icon">
+	<title>frames</title>
+	<link rel="shortcut icon" href="./add/favicon.svg" type="image/x-icon">
 
-	<link href='./add/alltst.css' media='screen' rel='stylesheet' />
-	<script src='./add/alltst.js'></script>
-                                               
-	<script data-src='../olga5/o5shp.js'></script>
-	<script src='../olga5/o5.js' o5debug=0 o5incls="o5inc, o5shp,"></script>
+	<script src='../../olga5/o5com.js' o5debug=0 data-o5urlrfs="
+      тесты='+ ../olga5-tests';
+    "></script>
+	<script data-src='+./o5dbg.js' o5load="u"></script>
+	<script data-src='+./o5shp.js'></script>
+
+	<style>
+		table td {
+			align-content: baseline;
+			font-size: small;
+		}
+
+		table td:first-child {
+			width: 300px;
+			display: block;
+		}
+
+		table td:last-child {
+			overflow: auto;
+			background-color: cornsilk;
+			white-space: nowrap;
+			width: 100%;
+		}
+
+		.span1 {
+			margin-left: 2em;
+		}
+
+		span>i {
+			font-size: 8px;
+		}
+
+		.span2 {
+			font-family: monospace;
+			margin-left: 1em;
+		}
+
+		.span3 {
+			font-size: small;
+		}
+
+		.olga5_shp {
+			background-color: yellow;
+			border: 2px solid blue;
+			width: 444px;
+			height: fit-content;
+			min-height: 12px;
+			font-size: small;
+			padding-left: 3px;
+			padding: 0px;
+			margin: 2px;
+			font-family: monospace;
+		}
+
+		.moe1.olga5_shp {
+			background-color: lightyellow;
+			width: 555px;
+			height: 270px;
+		}
+
+		div {
+			border: 1px dashed gray;
+			padding: 5px;
+			margin: 5px;
+		}
+
+		.inner {
+			margin-left: 32px;
+			margin-right: 32px;
+		}
+
+		#log {
+			overflow-y: scroll;
+			height: 100%;
+			margin: 0;
+			height: 144px;
+			padding: 0;
+		}
+
+		#strt {
+			height: 154px;
+			overflow-y: scroll;
+			overflow-x: hidden;
+			position: sticky;
+			background-color: white;
+			top: 0;
+			/* margin: 0; */
+			z-index: 9999;
+			padding: 0;
+			margin-bottom: 0;
+			margin-top: 0;
+			overflow-y: hidden;
+			border: none;
+		}
+
+		.comment {
+			font-style: italic;
+			color: blue;
+			font-size: small;
+		}
+	</style>
+
 </head>
 
-<body id="body">
-<script>
-	const eve = document.head.querySelector("script[src*='o5inc.js']") ? 'o5inc_ready' : 'o5_isInited' 
-	window.addEventListener(eve, Init2, { once: true })
-</script>
-	<div o5include='./shp2.html?.example'></div></body>
+<body id="body" class='olga5_Start' style="margin: 0;">
+	<script>
+		let oldname = '',
+			oldakey = '',
+			log = null
+		const
+			List = e => {
+				const
+					aO5 = e.detail.aO5
+				let onam = ''
+
+				let s = `&nbsp; ${aO5.name.padEnd(12)}: "` + aO5.frames.map(f => f.s).join(',') + `"`
+				for (const f of aO5.frames) {
+					const fc = f.fix && f.cut ? '/fix/cut' : (f.fix ? '/fix' : (f.cut ? '/cut' : '')),
+						nam = f.pO5 ? f.pO5.name : `null`
+					// nam = f.pO5 === true ? 'ближний' : (f.pO5 ? f.pO5.name : `null`)
+					// nam = (f.pO5 ? `<b>${f.pO5.name}</b> ` : `null `).padEnd(9, '\u00A0')
+					s += '<br> ' +
+						`${f.typ}:${f.cod}/${f.num}${fc}; `.padEnd(18, '\u00A0') +
+						`<b>${nam.padEnd(6, '\u00A0')}</b>` +
+						(f.pO5 ? ` [${f.pO5.classOrigs}]` : ``)
+					if (f.err) {
+						if (onam !== aO5.name) {
+							onam = aO5.name
+							log.insertAdjacentHTML('beforeend', `<b>${aO5.name}</b><br>`)
+						}
+						log.insertAdjacentHTML('beforeend', `&mdash; ${f.err}<br>`)
+					}
+				}
+				aO5.shp.insertAdjacentHTML('afterbegin', s)
+			},
+			Init = () => {
+				const
+					divs = document.getElementsByTagName('div') // getElementsByClassName('ccc')
+
+				log = document.getElementById('log')
+				for (const div of divs)
+					if (div.id !== 'log')
+						if (div.id !== 'strt' && (
+							div.classList.contains('ccc') || !div.classList.contains('olga5_shp')
+						))
+							div.insertAdjacentHTML('afterbegin', '#' + div.id + ' &nbsp; [' + div.className + ']')
+			}
+
+		window.addEventListener('o5_isInited', Init)
+		window.addEventListener('o5_containers', List)
+		// window.addEventListener('DOMContentLoaded', Init)
+	</script>
+
+	<div id="strt">
+		<table>
+			<tr>
+				<td>
+				</>
+					Для каждого контейнера указываюся его id и квадратных скобках - заданные классы.
+					Для каждого <i>подвисабельного</i> объекта определяются его контейнеры: <b>id</b> жирным шрифом и классы (в квадратных скобках).
+				</p>
+					<p>
+					PS для '#shp1-2' фрейм для "n=div/1c" получился <b>null</b> потому, что его тег совпал с
+					фреймовым "n=div/f", в который при этом добавился <b>cut</b>
+				</p>
+				</td>
+				<td>
+					<div id="log">
+					</div>
+				</td>
+			</tr>
+		</table>
+	</div>
+
+	<div id="main" class="">
+		<div id="pos" class=" pos1 clsX clsA clsB">
+			<div id="pos" class=" pos2 clsX">
+				<div id="divX" class=" " style="background-color: lightcyan;">
+					<div id="pos" class=" pos3 clsX inner">
+						<div id="6" class=" clsA clsB" style="overflow-y: scroll;">
+							<div id="7">
+								<div id="8" class=" clsA">
+									<br><span class='comment'>различные способы выбора для '<b>N</b>' типа
+										"#pos [pos2 clsX]", а для '<b>owners</b>' - "#main []"</span>
+									<div id='shp1-1' class="olga5_shp:n=div/5,n=div/99,n"></div>
+									<div id='shp1-2' class="olga5_shp:n=div/1c,n=div/f"> </div>
+									<div id='shp1-3' class="olga5_shp:n=/2"> </div>
+									<div id='shp1-4' class="olga5_shp:n/2"> </div>
+									<div id='shp1-5' class="olga5_shp:n"> </div>
+									<div id='shp1-6' class="olga5_shp:"> </div>
+									<div id='shp1-7' class="olga5_shp"> </div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div id="moeI1">
+						<div id="moeI2">
+							<div id="moeI3">
+								<br><span class='comment'>различные способы выбора для '<b>I</b>' типа
+									"#pos [pos2 clsX]", а для '<b>owners</b>' - "#main []"</span>
+								<div id='shp2-1' class="olga5_shp:i=moeI2/c,i=main"> </div>
+								<div id='shp2-2' class="olga5_shp:i=pos/1c,i=/2f"> </div>
+								<div id='shp2-3' class="olga5_shp:i=pos/2"></div>
+								<div id='shp2-4' class="olga5_shp:i=pos"></div>
+								<div id='shp2-5' class="olga5_shp:i"> </div>
+							</div>
+						</div>
+					</div>
+					<div id="moeC1" class=" pos2 clsX">
+						<div id="moeC2">
+							<div id="moeC3">
+								<br><span class='comment'>различные способы выбора для '<b>C</b>' типа
+									"#pos [pos2 clsX]", а для '<b>owners</b>' - "#main []"</span>
+								<div id='shp3-1' class="olga5_shp:c=clsX/2,c=clsX"> </div>
+								<div id='shp3-2' class="olga5_shp:c=clsX"></div>
+								<div id='shp3-3' class="olga5_shp:c"> </div>
+							</div>
+						</div>
+					</div>
+					<div id="pos">
+						<div id="moe4" class="moe1 olga5_shp:T:i=divX/f">
+							<div id="pos">
+								<div id="moe6" class=" pos2 clsX">
+									<span class='comment'>
+										<br>задание нескольких контейнеров. Тут <b
+											style="background-color: yellow;">контейнер 'moe4'</b> содержит класс
+										<b>olga5_shp</b>, т.е. есть 'верхним' <i>см. ошибки в протоколе</i>
+									</span>
+									<div id='shp4-1' class="olga5_shp:i=pos"></div>
+									<div id='shp4-2' class="olga5_shp:i=pos/2"></div>
+									<div id='shp4-3' class="olga5_shp:i=moe3"></div>
+									<div id='shp4-4' class="olga5_shp:c=clsX/2"></div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	для shp4- в журнале не написано, что не найдено
+	почему 
+	#moe4 : "i=dovX/f"
+i:dovX/0/fix;     null  #moe4   [ccc moe1 olga5_shp ]
+</body>
 
 </html>

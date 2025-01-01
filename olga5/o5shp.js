@@ -11,34 +11,22 @@
 			modul: 'o5shp',
 			Init: ShpInit,
 			class: 'olga5_shp',
-			consts: `		
-                o5ofram='s';
-                o5owner='b';
-                o5zindex=999;
-			`,
 			incls: {
 				names: ['DoScroll', 'Boards', 'DoResize', 'AO5shp', 'PO5shp', 'DoInit'],
 				actscript: document.currentScript,
 			},
 		},
-		LastDoResize = () => {
-			if (wshp && wshp.DoResize)
-				wshp.DoResize('по o5_isInited')
-		},
 		wshp = C.ModulAdd(W)
 
 		function ShpInit  () {
-			C.E.AddEventListener('o5_isInited', () => {
-				window.setTimeout(LastDoResize, 1)
-			})
 
 			C.ParamsFill(W)
 
-			const excls = document.getElementsByClassName('olga5_shp_none')
+			const excls = document.getElementsByClassName('olga5_shpNone')
 			for (const excl of excls) {
 				const exs = excl.querySelectorAll('[class *=olga5_shp]')
 				for (const ex of exs)
-					ex.classList.add('olga5_shp_none')
+					ex.classList.add('olga5_shpNone')
 			}
 
 			wshp.DoInit()

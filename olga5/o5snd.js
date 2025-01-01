@@ -22,7 +22,7 @@
 		},
 		css = {
 			olga5sndError: `olga5-sndError`, olga5sndLoad: `olga5-sndLoad`, olga5sndPause: `olga5-sndPause`,
-			olga5sndPlay: `olga5-sndPlay`, olga5sndNone: `olga5-sndNone`, olga5freeimg: `olga5-freeimg`,
+			olga5sndPlay: `olga5-sndPlay`, olga5sndNone: `olga5_sndNone`, olga5freeimg: `olga5-freeimg`,
 		},
 		o5css = `
 		.${W.class}:not(.${css.olga5sndNone}) {
@@ -79,11 +79,11 @@
 		C.ParamsFill(W, o5css)
 
 
-		const excls = document.getElementsByClassName('olga5_snd_none') 
+		const excls = document.getElementsByClassName('olga5_sndNone') 
 		for (const excl of excls) {
 			const exs = excl.querySelectorAll('[class *=olga5_snd]')
 			for (const ex of exs)
-				ex.classList.add('olga5-sndNone')
+				ex.classList.add('olga5_sndNone')
 		}
 
 		const mtags = C.SelectByClassName(W.class, W.modul)

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagonal Grid Background Example</title>
+</head>
+
+<body>
+    <style>
+        #div1 {
+            border: 3px green dashed;
+            height: 555px;
+            width: calc(96% - 111px);
+            overflow: scroll;
+            position: relative;
+            background-color: aliceblue;
+        }
+
+        #cbo1 {
+            position: absolute;
+            height: 777px;
+            width: 1222px;
+        }
+
+        #div2 {
+            border: 3px red dashed;
+            height: 555px;
+            width: calc(90% - 111px);
+            overflow: scroll;
+            position: relative;
+            background-color: azure;
+        }
+
+        #cbo2 {
+            position: absolute;
+            height: 777px;
+            width: 1222px;
+        }
+
+    </style>
+
+    <div>111</div>
+    <div id="div1">
+        <div id="cbo1">
+            <div id="div2">
+                <div id="cbo2">
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

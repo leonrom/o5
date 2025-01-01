@@ -108,7 +108,7 @@ function shpX_BordNames() {
                         ':<b>' + cls.putV + '</b>' + dirput[cls.putV] +
                         ':<b>' + cls.pitch + '</b>' + pitches[cls.pitch] +
                         '<br/>&nbsp;o5ofram= ' + aO5.ofram.attr +
-                        '<br/>&nbsp;o5owner= ' + aO5.owner.attr +
+                        '<br/>&nbsp;olga5_owners= ' + aO5.owner.attr +
                         '<br/>f: ' + Sid('t', f.to) + Sid('b', f.bo) + Sid('l', f.le) + Sid('r', f.ri) +
                         '<br/>o: ' + Sid('t', o.to) + Sid('b', o.bo) + Sid('l', o.le) + Sid('r', o.ri)
 
@@ -129,7 +129,7 @@ function shpX_BordNames() {
 function ShowCarcCB() {
     const
         cartcb = document.getElementById('cartcb'),
-        clons = document.getElementsByClassName('olga5-clon')
+        clons = document.getElementsByClassName('olga5_clon')
     let txt = 'невидно'
 
     cartcb.style.opacity = 0.11
@@ -158,7 +158,7 @@ function CC() {
         cartc0 = document.getElementById('cartc0'),
         cartc1 = document.getElementById('cartc1'),
         shps = document.getElementsByClassName('olga5_shp'),
-        clons = document.getElementsByClassName('olga5-clon'),
+        clons = document.getElementsByClassName('olga5_clon'),
         SetOpacity = (shps, val, o) => {
             for (const shp of shps) {
                 shp.style.opacity = val ? 1 : o
@@ -180,7 +180,7 @@ function OL(cb) {
     "use strict";
     const shps = document.getElementsByClassName('olga5_shp'),
         copys = document.getElementsByClassName('olga5_shp_copy'),
-        cntls = document.getElementsByClassName('olga5-cart')
+        cntls = document.getElementsByClassName('olga5_cart')
     if (outlin.e == '') {
         for (const shp of shps) {
 
@@ -336,7 +336,7 @@ function CC2(cb, namshp) {
         frams = shpX_GetFrams(t, ''),
         atr = frams.length > 0 ? frams : (t == 'f' ? 's' : 'b')
 
-    shp.setAttribute(t == 'f' ? 'o5ofram' : 'o5owner', atr)
+    shp.setAttribute(t == 'f' ? 'o5ofram' : 'olga5_owners', atr)
     window.olga5.o5shp.DoResize(`CC2(${cb}, ${namshp})`)
 }
 
@@ -359,7 +359,7 @@ function CC3(cb) {
         if (errs.length > 0)
             console.log(markout+"Ошибка в задании '" + u + "' для " + aO5.nam + ": " + errs[0].err)
         else {
-            shp.setAttribute(t == 'f' ? 'o5ofram' : 'o5owner', atr)
+            shp.setAttribute(t == 'f' ? 'o5ofram' : 'olga5_owners', atr)
             wshp.DoResize()
         }
     } else {

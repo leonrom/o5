@@ -174,27 +174,12 @@
 				InclFinish()
 		},
 		DoLoad = incl => {
-			// const errs = [],
-			// 	u = incl.xhr.responseText,
-			// 	m1 = u.match(/<\s*body/),
-			// 	m2 = u.match(/<\/\s*body\s*>/)
-			// _div.innerHTML = u.substring(m1.index, m2.index)+'</body>' // incl.xhr.responseText.substring(i)
 
 			const es = [],
 				mm = incl.xhr.responseText.match(/<body[^>]*>/),
 				i = mm.index
 
-			// _DIV.innerHTML = mm[0].replace(/<\bbody\b/, '<div') +
-			// 	incl.xhr.responseText.substring(i) +
-			// 	'\n</div>'
-			// const _div = _DIV.children[0]
 			_div.innerHTML = incl.xhr.responseText.substring(i)
-
-			// if (C.consts.o5debug > 1) {
-			// 	console.groupCollapsed(`${W.modul}: Обрабатывается`)
-			// 	console.log(_div.innerHTML)
-			// 	console.groupEnd()
-			// }
 
 			msg.Info('DoLoad  ', `обрабатывается фрагмент ${i}`, _div.innerHTML)
 
@@ -260,12 +245,16 @@
 
 					for (const src of srcs) {
 						const s = outer ? src.outerHTML : src.innerHTML
+						// div.insertAdjacentHTML('beforeend', 
 						if (C.consts.o5debug > 1)
-							tag.innerHTML += `\n<!-- вставка с id='${src.id}' -->`
+							tag.insertAdjacentHTML('beforeend', `\n<!-- вставка с id='${src.id}' -->`)
+							// tag.innerHTML += `\n<!-- вставка с id='${src.id}' -->`
 
-						if (outer) //!tag.innerHTML &&
-							tag.innerHTML += '\n'
-						tag.innerHTML += s.trimRight() + '\n' // тут '\n' надо для "красоты" в тестах
+						if (outer) 
+							tag.insertAdjacentHTML('beforeend', '\n')
+							// tag.innerHTML += '\n'
+						tag.insertAdjacentHTML('beforeend', s.trimRight() + '\n') // тут '\n' надо для "красоты" в тестах)
+						// tag.innerHTML += s.trimRight() + '\n' // тут '\n' надо для "красоты" в тестах
 					}
 					tags.concat(tag.querySelectorAll("div[" + o5include + "]") || [])
 				}

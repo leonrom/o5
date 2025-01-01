@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>m2</title>
+    <style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #fafafa;
+}
+
+.repeating-text {
+    width: 100%; /* Занимает всю ширину родителя */
+    height: 50px; /* Высота контейнера */
+    white-space: nowrap; /* Текст не переносится на новую строку */
+    overflow: hidden; /* Скрываем текст, выходящий за пределы div */
+    font-size: 24px; /* Размер текста */
+    background-color: #f0f0f0; /* Цвет фона div */
+    color: #333; /* Цвет текста */
+    display: flex;
+    align-items: center; /* Центровка текста по вертикали */
+    justify-content: flex-start; /* Текст выравнивается по левому краю */
+}
+
+.repeating-text::before {
+    content: 'div1 div1 div1 div1 div1 div1 div1 div1 div1 div1 ';
+    position: absolute;
+    animation: scroll-text 10s linear infinite; /* Анимация прокрутки текста */
+    display: inline-block;
+}
+
+@keyframes scroll-text {
+    0% { transform: translateX(-150px); animation-time ;}
+  50{ backgrounds captions please  colorred;}
+    </style>
+</head>
+<body>
+    <div class="repeating-text">div1 div1 div1 div1 div1 div1 div1 div1 div1 div1 div1</div>
+</body>
+</html>
+

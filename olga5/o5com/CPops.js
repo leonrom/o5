@@ -7,7 +7,7 @@
 	let diva = null
 
 	const olga5_modul = 'o5com',
-		modulname = 'CPops',		
+		modulname = 'CPops',
 		C = window.olga5.C,
 		wp = { W: 0, H: 0 },
 		divs = [],
@@ -119,7 +119,7 @@
 			div.parentNode.removeChild(div);
 			ReIndex()
 		},
-		PopO6Create = (pos, html, ShowAct, n) => { 
+		PopO6Create = (pos, html, ShowAct, n) => {
 			const
 				EmptyAct = () => {
 					// просто заглушка на случай незадани ShowAct()
@@ -202,7 +202,7 @@
 			})
 
 			div.innerHTML = html
-			div.id =  '223'
+			div.id = '223'
 
 			// ShowAct(div, true)
 

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<title>topbot</title>
+	<link rel="shortcut icon" href="../add/favicon.svg" type="image/x-icon">
+
+	<link href='./add/all.css' media='screen' rel='stylesheet' />
+	<script src='./add/all.js'></script>
+
+	<script src='../../olga5/o5com.js' o5debug=0 data-o5urlrfs="
+      тесты='+ ../olga5-tests';
+    "></script>
+	<script data-src='+/o5shp.js'></script>
+	<script data-src='+o5inc.js'></script>
+</head>
+
+<body id="body" style="height: 1500px;">
+	<div class='example olga5_Start'>
+		<div class='cboxed'>
+			<u>&nbsp;видимость&nbsp;</u>
+			<br><input type="checkbox" onclick="oo5.CbVisible(this, 'clons')" title="исходники для объектов">clon
+			<br><input type="checkbox" onclick="oo5.CbVisible(this, 'carts')" checked title="подвисшие объекты">cart
+			<br><input type="checkbox" onclick="oo5.OutLines(this )" checked title="наличие синих рамок 'outline' вокруг всех 'shp'">с <i>outline</i>
+			<br>
+			<br><u>&nbsp;места зависания:&nbsp;</u>			
+			<br><b>shp1</b>:
+			<span myinit="'shp1', 'T'" class="pmark" onclick="oo5.ChgMark(this)">T</span>
+			<span myinit="'shp1', 'B'" class="pmark" onclick="oo5.ChgMark(this)">B</span>
+			<span myinit="'shp1', 'L'" class="pmark" onclick="oo5.ChgMark(this)">L</span>
+			<span myinit="'shp1', 'R'" class="pmark" onclick="oo5.ChgMark(this)">R</span>
+			
+			<br><b>shp2</b>:
+			<span myinit="'shp2', 'T'" class="pmark" onclick="oo5.ChgMark(this)">T</span>
+			<span myinit="'shp2', 'B'" class="pmark" onclick="oo5.ChgMark(this)">B</span>
+			<span myinit="'shp2', 'L'" class="pmark" onclick="oo5.ChgMark(this)">L</span>
+			<span myinit="'shp2', 'R'" class="pmark" onclick="oo5.ChgMark(this)">R</span>
+			<br>
+			<br><u>&nbsp;контейнеры (f,c):&nbsp;</u>			
+			<br><b>shp1</b> body <span myinit="'shp1', 'body'" class="ofram" onclick="oo5.CbBord(this)">f</span>&nbsp; <span myinit="'shp1', 'body'"  class="owner" onclick="oo5.CbBord(this)">c</span>
+			<br><b>    </b> div1 <span myinit="'shp1', 'div1'" class="ofram" onclick="oo5.CbBord(this)">f</span>&nbsp; <span myinit="'shp1', 'div1'"  class="owner" onclick="oo5.CbBord(this)">c</span>
+			<br><b>    </b> div2 <span myinit="'shp1', 'div2'" class="ofram" onclick="oo5.CbBord(this)">f</span>&nbsp; <span myinit="'shp1', 'div2'"  class="owner" onclick="oo5.CbBord(this)">c</span>
+			<br><b>    </b> div3 <span myinit="'shp1', 'div3'" class="ofram" onclick="oo5.CbBord(this)">f</span>&nbsp; <span myinit="'shp1', 'div3'"  class="owner" onclick="oo5.CbBord(this)">c</span>
+			<br><b>    </b> div4 <span myinit="'shp1', 'div4'" class="ofram" onclick="oo5.CbBord(this)">f</span>&nbsp; <span myinit="'shp1', 'div4'"  class="owner" onclick="oo5.CbBord(this)">c</span>
+			<br><b>    </b> все. <span myinit="'shp1', ''    " class="ofram" onclick="oo5.CbBord(this)">f</span>&nbsp; <span myinit="'shp1', ''    "  class="owner" onclick="oo5.CbBord(this)">c</span>
+			<br>
+			<br><b>shp2</b> body <span myinit="'shp2', 'body'" class="frame" onclick="oo5.CbBord(this)"><b>f</b>&nbsp;<b>c</b></span>&nbsp; 
+			<br><b>    </b> div1 <span myinit="'shp2', 'div1'" class="ofram" onclick="oo5.CbBord(this)">f</span>&nbsp; <span myinit="'shp2', 'div1'"  class="owner" onclick="oo5.CbBord(this)">c</span>
+			<br><b>    </b> div2 <span myinit="'shp2', 'div2'" class="ofram" onclick="oo5.CbBord(this)">f</span>&nbsp; <span myinit="'shp2', 'div2'"  class="owner" onclick="oo5.CbBord(this)">c</span>
+			<br><b>    </b> div3 <span myinit="'shp2', 'div3'" class="ofram" onclick="oo5.CbBord(this)">f</span>&nbsp; <span myinit="'shp2', 'div3'"  class="owner" onclick="oo5.CbBord(this)">c</span>
+			<br><b>    </b> div4 <span myinit="'shp2', 'div4'" class="ofram" onclick="oo5.CbBord(this)">f</span>&nbsp; <span myinit="'shp2', 'div4'"  class="owner" onclick="oo5.CbBord(this)">c</span>
+			<br><b>    </b> все. <span myinit="'shp2', ''    " class="ofram" onclick="oo5.CbBord(this)">f</span>&nbsp; <span myinit="'shp2', ''    "  class="owner" onclick="oo5.CbBord(this)">c</span>
+		</div>
+
+		<pre class="pre-head"><b>Варианты подвисания <i>olga5_shp</i></b>
+	</pre>
+		<div id="div0" class="thetext" style="height: 227px;">
+			<p class="title">
+				Демонстрация вариантов <i>подвисания</i> объектов вверху или внизу контейнера в зависимости от
+				направления скроллинга.
+			</p>
+			<div>
+				<div o5include='тесты + /shp/add/all.html?.descript'></div>
+			</div>
+			<div>
+				<p class="moecomment">
+					Задайте несколько фреймов <i>зависания</i> (или <i>обрезания</i>) и посмотрите изменение значений
+					<b>t</b> и <b>b</b>
+					при изменении взаимного положения контейнеров <b>div1</b>, <b>div2</b> и <b>div3</b>.
+					Оцените зависание <b>shp1</b> на <b>div1</b> при задании <b>Где</b>=<i>внизу</i>
+					в зависимости от наличия горизонтальной полосы скроллинга.
+				</p>
+			</div>
+		</div>
+		<style>
+			#div1 {
+				position: relative;
+				height: 80vh;
+				width: calc(100% - 166px);
+
+				border: 3px green dashed;
+				background-color: lightgreen;
+				min-height: 600px;
+				min-width: 600px;
+			}
+
+			#div2 {
+				border: 3px blue dashed;
+				height: 70vh;
+				width: 66vw;
+				background-color: lightblue;
+			}
+
+			#div3 {
+				border: 3px red dashed;
+				height: 44vh;
+				width: 56vw;
+				background-color: lightpink;
+			}
+
+			#div4 {
+				border: 3px lightgray dashed;
+				height: 22vh;
+				width: 46vw;
+				background-color: bisque;
+				min-height: 144px;
+			}
+
+			#cbo4 {
+				background-image:
+					linear-gradient(90deg, lightgray 1px, transparent 1px),
+					linear-gradient(0deg, lightgray 1px, transparent 1px);
+			}
+		</style>
+		
+<span style="font-size: 12px;background: aqua; color:black;"> пояснение </span> 
+<span style="font-size: 16px;"><b>&uarr;</b></span> 
+<div id="div1" class="div" style="top:11px;left: 22px;">
+	<span>div1</span>
+	<div id="int1" class="int">
+		<div id="cbo1" class="cbo" style="background-size: 25px 25px; width: 2000px; height: 2000px;">
+
+			<div id="div2" class="div" style="top:11px;left: 22px;">
+				<span>div2</span>
+				<div id="int2" class="int">
+					<div id="cbo2" class="cbo" style="background-size: 20px 20px; width: 2000px; height: 2000px; ">
+
+						<div id="div3" class="div" style="top:11px;left: 22px;">
+							<span>div3</span>
+							<div id="int3" class="int">
+								<div id="cbo3" class="cbo" style="background-size: 15px 15px; width: 1200px; height: 1000px; ">
+
+<div id="div4" class="div" style="top:11px;left: 22px;">
+	<span>div4</span>
+	<div id="int4" class="int">
+		<div id="cbo4" class="cbo" style="background-size: 10px 10px;width: 1400px; height: 400px; ">
+
+<div id="shp1" class="olga5_shp:TrF:i=div3,i=div1/c">
+	<p>название объекта</p>
+</div>
+		</div>
+	</div>
+</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</div>
+</div>
+	</div>
+</body>
+
+</html>

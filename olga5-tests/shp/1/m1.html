@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>m1</title>
+    <style>
+        .text-background {
+            width: 100%;
+            height: 100px;
+            position: relative;
+            overflow: hidden;
+            background: white;
+            color: lightgrey;
+            font-size: 20px;
+        }
+
+        .text-background::before {
+            content: 'div1 ';
+            position: absolute;
+            white-space: nowrap;
+            overflow: hidden;
+            width: 100%;
+            height: 100%;
+            animation: scroll-text 10s linear infinite;
+        }
+
+        @keyframes scroll-text {
+            0% {
+                transform: translateX(100%);
+            }
+            100% {
+                transform: translateX(-100%);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="text-background"></div>
+</body>
+</html>
+

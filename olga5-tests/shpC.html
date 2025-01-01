@@ -27,7 +27,7 @@
 					ClassName = clss => {
 						let s = ''
 						for (const cls of clss) {
-							const u = (cls === 'olga5-oframs' || cls === 'o5owner') ? `<i>${cls}</i>` : cls
+							const u = (cls === 'olga5_oframs' || cls === 'olga5_owners') ? `<i>${cls}</i>` : cls
 							s += (s ? ', ' : '') + u
 						}
 						return s
@@ -35,9 +35,9 @@
 
 				if (oldname !== aO5.name) {
 					oldname = aO5.name
-					log.innerHTML += '<span class="span1">' +
+					log.insertAdjacentHTML('beforend', '<span class="span1">' +
 						`<b>${aO5.name.padEnd(3, ' ')}</b>` +
-						'</span><br/>'
+						'</span><br/>')
 				}
 				for (const bord of blngs.bords) {
 					let u = ''
@@ -47,7 +47,7 @@
 					}
 					if (bord.typ === 'N')
 						console.log()
-					log.innerHTML += '<span class="span2">' +
+					log.insertAdjacentHTML('beforend', '<span class="span2">' +
 						`${u.padEnd(8, '.')} ::  ` +
 						`${bord.typ.substring(0, 1)}:` +
 						`${bord.cod.padEnd(9, '.')}:` +
@@ -56,7 +56,7 @@
 						bord.tag.pO5.name.padEnd(6, '.') + ' [' + ClassName(bord.tag.classList) + '] ' +
 						`</span> ` +
 						(bord.err ? '<span class="span3"> (' + bord.err + `)</span>` : '') +
-						'<br/>'
+						'<br/>')
 				}
 			},
 			Init = () => {
@@ -64,7 +64,7 @@
 				for (const div of divs) {
 					if (div.classList.contains('shp')) {
 						const oframs = div.getAttribute('o5ofram'),
-							owners = div.getAttribute('o5owner')
+							owners = div.getAttribute('olga5_owners')
 						let s = ''
 						if (owners) s += `<u>owners</u>= ${owners}, `
 						if (oframs) s += `<u>oframs</u>= ${oframs}, `
@@ -78,7 +78,7 @@
 				// document.body.style.transform = 'scale(0.85)';
 			}
 			
-		window.addEventListener('olga5-containers', List)
+		window.addEventListener('o5_containers', List)
 		window.addEventListener('DOMContentLoaded', Init)
 	</script>
 
@@ -162,7 +162,7 @@
 			<tr>
 				<td>
 					Для каждого <i>подвисабельного</i> объекта определяются (по мере их появления на экране)
-					его контейнеры согласно <b>o5ofram</b> и/или <b>o5owner</b>. <br />
+					его контейнеры согласно <b>o5ofram</b> и/или <b>olga5_owners</b>. <br />
 					<br />
 					Результат протоколируется в окне справа. <br />
 					<br />
@@ -184,11 +184,11 @@
 							<div id="7" class="">
 								<br /><span class='comment'>различные способы выбора для '<b>oframs</b>' контейнера
 									"#pos [pos2 clsX]", а для '<b>owners</b>' - "#main []"</span>
-								<div id='shp1-1' class="olga5_shp shp" o5ofram="n:div:5" o5owner="n:div:99">
+								<div id='shp1-1' class="olga5_shp shp" o5ofram="n:div:5" olga5_owners="n:div:99">
 								</div>
-								<div id='shp1-2' class="olga5_shp shp" o5ofram="i:pos:2" o5owner="i:main">
+								<div id='shp1-2' class="olga5_shp shp" o5ofram="i:pos:2" olga5_owners="i:main">
 								</div>
-								<div id='shp1-3' class="olga5_shp shp" o5ofram="c:clsX:2" o5owner="c::3">
+								<div id='shp1-3' class="olga5_shp shp" o5ofram="c:clsX:2" olga5_owners="c::3">
 								</div>
 							</div>
 						</div>
@@ -198,9 +198,9 @@
 							<div id="moe3">
 								<br /><span class='comment'>задание граничных клнтейнеров квалификаторами '<b>S</b>' или
 									'<b>B</b>' а также знач. по умолчанию</span>
-								<div id='shp2-1' class="olga5_shp shp" o5ofram="s" o5owner="b"></div>
+								<div id='shp2-1' class="olga5_shp shp" o5ofram="s" olga5_owners="b"></div>
 								<div id='shp2-2' class="olga5_shp shp"></div>
-								<div id='shp2-3' class="olga5_shp shp" o5ofram="s::2,s::3" o5owner="b::2,b::3"></div>
+								<div id='shp2-3' class="olga5_shp shp" o5ofram="s::2,s::3" olga5_owners="b::2,b::3"></div>
 							</div>
 						</div>
 					</div>
@@ -212,10 +212,10 @@
 										style="background-color: yellow;">контейнер 'moe4'</b> содержит класс
 									<b>olga5_shp</b>, т.е. есть 'верхним' <i>см. ошибки в протоколе</i>
 								</span>
-								<div id='shp3-1' class="olga5_shp shp" o5ofram="i:moe5,s" o5owner="b,i:moe3,">
+								<div id='shp3-1' class="olga5_shp shp" o5ofram="i:moe5,s" olga5_owners="b,i:moe3,">
 								</div>
 								<div id='shp3-2' class="olga5_shp shp" o5ofram="i:moe5,i:moe6,"
-									o5owner="i:moe4,i:divX"></div>
+									olga5_owners="i:moe4,i:divX"></div>
 							</div>
 						</div>
 					</div>
@@ -227,10 +227,10 @@
 								(<i>а вот между <b>moe8</b> и <b>moe81</b> граница не видна</i>)
 							</span>
 							<div id="moe81" class="moe3" style="border: none">
-								<div id='shp4-1' class="olga5_shp shp" o5ofram="b::2" o5owner="b::3"></div>
+								<div id='shp4-1' class="olga5_shp shp" o5ofram="b::2" olga5_owners="b::3"></div>
 							</div>
 							<div id="moe82" class="moe3" style="border: none; background: aliceblue;">
-								<div id='shp4-2' class="olga5_shp shp" o5ofram="b::2" o5owner="b::3"></div>
+								<div id='shp4-2' class="olga5_shp shp" o5ofram="b::2" olga5_owners="b::3"></div>
 							</div>
 						</div>
 					</div>

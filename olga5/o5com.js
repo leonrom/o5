@@ -478,7 +478,6 @@
 
 		C.Debug = { // тут д.б.  пустышки для всех из o5dbg.Utils
 			loaded: false,
-			ShowShpBords: () => Error('ShowShpBords'),
 			ShowBounds: () => Error('ShowBounds'),
 		}
 	}

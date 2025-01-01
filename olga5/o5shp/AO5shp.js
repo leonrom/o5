@@ -13,58 +13,12 @@
         C = window.olga5.C,
         o5debug = C.consts.o5debug,
         fmtOK = "background: cornsilk; color: black;",
-        // fmtErr = "background: lightgoldenrodyellow; color: black;",
-        errs = [],
-        ReadAttrs = (aO5, blng, def) => { // определение вложенностей shp's друг в друга
-            const
-                shp = aO5.shp,
-                bords = blng.bords,
-                atr = 'o5' + blng.akey,
-                str = shp.getAttribute(atr),
-                bord = {
-                    typ: def, cod: '', num: 0,
-                    tag: null, out: false, itag: -1, err: '',
-                }
-
-            Object.seal(bord)
-            blng.attr = str     // сохранить для alltst.js
-
-            if (str) {
-                const ss = str ? str.split(/\s*[,;]\s*/g) : [''],
-                    typs = 'CINSB'
-                // продолжение см. PO5shp.FindBords()
-
-                for (const s of ss) // ss оставил для контроля устаревших заданий контейнеров
-                    if (s.length > 0) {
-                        const
-                            cc = s.split(':'),
-                            u = cc[0].trim(),
-                            t = u.length > 0 ? u[0].toUpperCase() : '?'
-
-                        if (typs.includes(t)) {
-                            blng.bords.push(Object.assign({}, bord, {
-                                s: s,
-                                typ: t,
-                                cod: cc.length > 1 ? cc[1].trim() : '',
-                                num: cc.length > 2 ? C.MyRound(cc[2]) : 0,
-                            }))
-                        }
-                        else
-                            errs.push({ name: aO5.name, str: str, err: `тип ссылки '${t}' не начинается одним из '${typs}'` })
-                    }
-
-                if (bords.length === 0)
-                    errs.push({ name: aO5.name, str: str, err: `дал умолчание '${def}' для '${blng.akey}'` })
-            }
-            if (bords.length === 0)
-                blng.bords.push(Object.assign({}, bord))
-        },
         DblClick = e => {
             e.target.aO5shp.UnFixV(`по событию '${e.type}'`)
         }
 
     class AO5 {
-        static Tbelong = { to: null, le: null, ri: null, bo: null, attr: '', }
+        // static Tbelong = { to: null, le: null, ri: null, bo: null, attr: '', }
         static Margs = { t: 0, l: 0, r: 0, b: 0 }
         static Outln = { w: 0, s: 0, c: 0, o: 0 }
 
@@ -77,73 +31,50 @@
             const
                 aO5 = this
 
-            for (const nam of ['old', 'act', 'ads', 'visi', 'margs', 'outln', 'posW', 'posC', 'posS', 'ofram', 'owner'])
+            for (const nam of ['old', 'act', 'ads', 'visi', 'margs', 'outln', 'posC', 'posS',])
                 Object.seal(aO5[nam])
 
             aO5.name = window.olga5.C.MakeObjName(shp)
+            aO5.parent = shp.parentElement
             aO5.id = shp.id
             aO5.shp = shp
+
             aO5.act.shdw = shp
-            aO5.parent = shp.parentElement
 
             shp.aO5shp = aO5
 
-            const
-                cls = aO5.cls = { level: 0, pitch: 'S', alive: false, dirV: 'U', putV: 'T', },
-                errs = []
+                wshp.ReadAttrs(aO5, shp.aO5quals||[])
 
-            for (const qual of shp.aO5quals)
-                if (!isNaN(qual))
-                    cls.level = Number(qual)
-                else {
-                    const c = qual.substr(0, 1).toUpperCase()
-                    switch (c) {
-                        case 'A': cls.alive = true; break
-                        case 'C': cls.pitch = c; break  // сжимает предыдущий
-                        case 'P': cls.pitch = c; break  // сталкивает предыдущий
-                        case 'S': cls.pitch = c; break  // сдвигает предыдущий
-                        case 'O': cls.pitch = c; break  // наезжает на предыдущий
-                        case 'D':
-                        case 'U': cls.dirV = c; break
-                        case 'B':
-                        case 'T': cls.putV = c; break
-                        default: errs.push(qual)
-                    }
-                }
+                if (shp.aO5quals) 
+                delete shp.aO5quals
+            
+            // else
+            //     C.ConsoleError(`в теге id='${shp.id}' отсутствуют квалификаторы класса для 'aO5quals'`)
 
-            if (errs.length > 0)
-                C.ConsoleError(`Для тега ${aO5.name} c квалификаторами "${shp.aO5quals.join(':')}" не определены: `, errs.join(', '))
-
-            delete shp.aO5quals
-
-            wshp.PO5shp(aO5)
-            // Object.freeze(aO5.ads) -> будет в Clone
-            Object.freeze(aO5.cls)
-            Object.freeze(aO5)
-
-            wshp.aO5s.push(aO5)
+            // Object.seal(aO5.#frame.err)
+            // Object.freeze(aO5.#cls)
+            Object.seal(aO5.cls)
         }
 
         act = {
+            p: {},   // контейнер для getBoundingClientRect()
+            time: 0,
             shdw: null,
-            isFix: false,
-            pO5fix: null,   // тег на границе которого подвис этот aO5
-            // aO5fix: null,   // тег на котором прификсирован этот aO5
-            // iO5hid: null,   // ссылка на aO5 объекта, "который сдвинул этот aO5 до "нулевой высоты"
-            uScroll: false, // тег или его клон видны на экране
+            tfixs: { T: {}, L: {}, R: {}, B: {}, },   // объекты {typ, pO5} на границах которых подвис этот aO5
+            uScroll: false, // тег или его клон видны на экране            
+            // fromTest: {},   // атрибут из моих тестов
         }
 
         margs = { t: '', l: '', r: '', b: '', }
         outln = { w: '', s: '', c: '', o: '', }
 
-        parents = []
-        ofram = Object.assign({ akey: 'ofram', bords: [], }, AO5.Tbelong)
-        owner = Object.assign({ akey: 'owner', bords: [], }, AO5.Tbelong)
+        frames = []
 
-        posC = Object.assign({}, { top: 0, left: 0, height: 0, width: 0, })
-        posW = Object.assign({}, { top: 0, left: 0, height: 0, width: 0, })
+        posC = Object.assign({}, { height: 0, width: 0, top: 0, left: 0, right: 0, bottom: 0, })
+        // posW = Object.assign({}, { height: 0, width: 0, })
         posS = { top: 0, left: 0, }
 
+        cls = {}
         ads = { clon: null, cart: null }
         orig = {}
         padds = {}
@@ -154,8 +85,15 @@
                 { outlineWidth: outln.w, outlineStyle: outln.s, outlineColor: outln.c, outlineOffset: outln.o }
             )
         }
-        DoFixV = () => {
+        IsFix = () => {
+            return this.act.shdw !== this.shp
+        }
+        DoFixV = txt => {
             const aO5 = this
+
+            if (o5debug > 0)
+                console.log("%c%s", fmtOK, `DoFixV фиксация    '${aO5.name}'`, txt)
+            // aO5.act.pO5s ? `на bord'ах: '${pO5s.map(pO5=>pO5.name).join(', ')}` : ` `)
 
             if (!aO5.ads.clon)
                 aO5.Clone()
@@ -165,7 +103,8 @@
                 cart = aO5.ads.cart,
                 shp = aO5.shp
 
-            Object.assign(aO5.act, { shdw: clon, isFix: true,  })
+            // Object.assign(aO5.act, { shdw: clon, isFix: true })
+            aO5.act.shdw = clon
 
             cart.style.display = ''
             clon.style.display = aO5.orig.display
@@ -180,32 +119,15 @@
             wshp.observ.observe(aO5.ads.clon)
 
             shp.addEventListener('dblclick', DblClick)
-
-            // if (onBoard)
-            //     Object.assign(act, { pO5fix: xO5, }) // oldIR: 1 })
-            // else
-            //     Object.assign(act, { aO5fix: xO5, }) // oldIR: 1 })
-
-            // if (act.pO5fix && act.aO5fix)
-            //     C.ConsoleError(`Одновременное подвисание на границе '${act.pO5fix.name}' и под '${act.aO5fix.name}' `)
-
-            // if (o5debug > 0)
-            //     console.log(`DoFixV - ${aO5.name}: ` +
-            //         `${(onBoard ? 'на границе ' : 'под объектом ') + xO5.name}`)
         }
         UnFixV = () => {
             const aO5 = this,
                 clon = aO5.ads.clon,
                 cart = aO5.ads.cart,
                 shp = aO5.shp
-
-            // if (o5debug > 0) {
-            //     const oname = (typeof xO5 === 'string')?xO5:
-            //         `${act.pO5fix ? 'на границе ' : 'под объектом ' + xO5.name}`
-            //     console.log(`UnFixV - ${aO5.name} ${oname} `)
-            // }
-            // if (xO5 !== (act.pO5fix || act.aO5fix))
-            //     C.ConsoleError(`Расфиксация на ином объекте ??`)
+                        
+            if (o5debug > 0)
+                console.log("%c%s", fmtOK, `UnFixV расфиксация '${aO5.name}'`)
 
             Object.assign(shp.style, aO5.orig)
             AO5.SetMargOutls(shp.style, aO5.margs, aO5.outln)
@@ -216,22 +138,16 @@
             cart.removeChild(shp)
             aO5.parent.insertBefore(shp, cart)
 
-            Object.assign(aO5.act, { shdw: shp, isFix: false,})
+            // Object.assign(aO5.act, { shdw: shp, isFix: false })
+            aO5.act.shdw = shp
 
             shp.removeEventListener('dblclick', DblClick)
 
             wshp.observ.unobserve(clon)
             wshp.observ.observe(aO5.shp)
 
-            // Object.assign(act, {
-            //     // oldIR: 1,
-            //     pO5fix: null,
-            //     aO5fix: null,
-            //     uScroll: false,
-            // })
-
-            if (!wshp.aO5s.find(iO5 => iO5 !== aO5 && iO5.act.uScroll))
-                wshp.DoScroll(false, `Observe: ${aO5.name}`)
+            if (!wshp.aO5s.find(iO5 => iO5.act.uScroll))    //  ?? iO5 !== aO5 && 
+                wshp.DoScroll(false, `AO5.UnFixV: ${aO5.name}`)
         }
         ShowFix = () => {
             const aO5 = this,
@@ -239,7 +155,7 @@
                 posS = aO5.posS,
                 pw = (posC.width <= 0) ? 0 : posC.width,
                 ph = (posC.height <= 0) ? 0 : posC.height,
-                display = (pw === 0 || ph === 0 || aO5.act.iO5hid) ? 'none' : ''  //|| !aO5.act.pO5fix 
+                display = (pw === 0 || ph === 0 || aO5.act.iO5hid) ? 'none' : ''
 
             Object.assign(aO5.ads.cart.style, {
                 display: display,
@@ -273,7 +189,7 @@
 
             Object.freeze(aO5.ads)
 
-            clon.classList.add('olga5-clon')
+            clon.classList.add('olga5_clon')
             if (id) clon.id = id + '_clon'
             clon.aO5shp = aO5
             Object.assign(clon.style, {
@@ -282,7 +198,7 @@
             })
             shp.parentNode.insertBefore(clon, shp)
 
-            cart.classList.add('olga5-cart')                        // нужно ля тестов - CC()
+            cart.classList.add('olga5_cart')                        // нужно ля тестов - CC()
             if (id) cart.id = id + '_cart'
             cart.aO5shp = aO5
             Object.assign(cart.style, {
@@ -319,21 +235,40 @@
 
             AO5.SetMargOutls(cart.style, AO5.Margs, aO5.outln)
         }
-        Resize = () => {
+        Resize = quals => {
+            const
+                aO5 = this
+
+                wshp.ReadAttrs(aO5, quals)
+                wshp.FindBords(aO5)
+                wshp.Scroll({ timeStamp: Date.now() + Math.random(), o5scroll: true }) 
+
+
+            //     ft = aO5.act.fromTest
+
+            // for (const key in ft) {
+            //     const blng = aO5[key]
+            //     if (blng) {
+            //         aO5.ReadAttrs(aO5, quals)   // , ft[key])
+            //         wshp.FindBords(aO5)
+            //     }
+            //     else
+            //         alert(`нету aO5[${key}] ?`)
+            //     delete ft[key]
+            // }
         }
     }
 
     // --------------------------------------------------------------------- //    
     wshp = C.ModulAddSub(olga5_modul, modulname, shp => {
-        errs.splice(0, errs.length)
-
         const aO5 = new AO5(shp)
 
-        ReadAttrs(aO5, aO5.ofram, wshp.W.consts.o5ofram)     // S - screen
-        ReadAttrs(aO5, aO5.owner, wshp.W.consts.o5owner)     // B - блок с выделенной границей
+        wshp.PO5shp(aO5)
 
-        if (errs.length > 0)
-            C.ConsoleError("Ошибки в атрибутах  для тегов", errs.length, errs)
+        // Object.freeze(aO5.cls)  // Object.freeze(aO5.ads) -> будет в Clone
+        Object.freeze(aO5)
+
+        wshp.aO5s.push(aO5)
 
         if (shp.tagName.match(/\b(img|iframe|svg)\b/i) && !shp.complete) {
             if (C.consts.o5debug > 0) C.ConsoleInfo(`ожидается завершение загрузки '${aO5.name}'`)
@@ -341,9 +276,22 @@
                 wshp.DoResize(`из '${modulname}'`)
             })
         }
+
         return aO5
     })
 
-    wshp.aO5s = [] // это инициированные подвисабельные
+    wshp.aO5s = [] // это инициированные подвисабельные    
+    // wshp.TT=s=>{        
+    //     const 
+    //     name='shp1-1',
+    //     shp1=olga5.o5shp.shps.find(shp=>shp.id==name ),
+    //     shp2=document.getElementById(name)
+    //     if (shp1 && shp2){
+    //         // shp2.insertAdjacentHTML('afterbegin', '<br> 2: ' + s + ' ' + shp2.className);
 
+    //         shp2.insertAdjacentHTML('afterbegin', '<br> ---------------------------------' +s)
+    //         shp1.insertAdjacentHTML('afterbegin', '<br> 1: ' + s + ' ' + shp1.className)
+    //         shp2.insertAdjacentHTML('afterbegin', '<br> 2: ' + s + ' ' + shp2.className)
+    //     }
+    // }
 })();

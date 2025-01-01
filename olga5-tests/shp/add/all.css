@@ -56,18 +56,19 @@
     overflow-x: hidden;
     padding-bottom: 3px;
     min-width: 123px;
+    line-height: 16px;
 }
 
-.cboxed span {
+/* .cboxed span {
     color: black;
     background-color: gainsboro;
     padding-left: 1px;
     padding-right: 1px;
     font-size: smaller;
     font-family: monospace;
-}
+} */
 
-.container span:first-child {
+.spanmark {
     position: sticky;
     float: right;
     margin: 3px;
@@ -77,26 +78,9 @@
     color: darkblue;
     background-color: aqua;
     padding-left: 3px;
-    padding-right: 0px;
+    padding-right: 4px;
     font-size: smaller;
     font-family: monospace;
-}
-
-div.olga5_shp.olga5-ignore.container,
-.container {
-    /* display: flow-root; */
-    display: block;
-    border: 4px dashed gray;
-    margin: 3px;
-    width: calc(99% - 33px);
-	height: calc(88% - 88px);
-    /* max-width: 733px; */
-    overflow: auto;
-}
-
-.container.main-div {
-	    height: 444px;
-    width: calc(99% - 144px);
 }
 
 .cboxed input[type="button"] {
@@ -123,6 +107,64 @@ div.olga5_shp.olga5-ignore.container,
     vertical-align: middle;
 }
 
+.cboxed b{
+    min-width: 33px;
+    display: inline-block;
+}
+
+.cboxed span b  {
+    /* line-height: 14px; */
+    font-size: 10px;
+    width: 8px;
+    padding-left: 0px;
+    font-family: monospace;
+    padding-right: 1px;
+    text-align: center;
+    padding-left: 2px;
+    padding-right: 2px;
+    font-weight: bold;
+    margin-right: 0;
+    margin-left: 0;
+
+    width: 10px;
+    display: inline;
+    border: none;
+}
+
+.cboxed b.active{
+    background-color: white;
+    border: 1px solid gray;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+/* .cboxed span.pmark,
+.cboxed span.ofram,
+.cboxed span.owner {
+    background-color: white;
+    border: 1px solid gray;
+    border-radius: 3px;
+    line-height: 14px;
+    font-size: 10px;
+    cursor: pointer;
+    width: 8px;
+    padding-left: 0px;
+    font-family: monospace;
+    padding-right: 1px;
+    text-align: center;
+    padding-left: 2px;
+    padding-right: 2px;
+    font-weight: bold;
+    margin-right: 0;
+    margin-left: 0;
+} */
+
+.cboxed u{
+font-size: smaller;
+margin-left: 4px;
+color: blue;
+display: inline-block;
+}
 .moved {
     height: 20px;
     width: 100px;
@@ -144,23 +186,15 @@ div.olga5_shp.olga5-ignore.container,
 div.olga5_shp_copy,
 div.olga5_shp {
     background-color: yellow;
-    border: 12px solid red;
-    outline-width: 9px;
+    border: 6px solid red;
+    outline-width: 5px;
     outline-style: solid;
     outline-color: blue;
     /* outline: solid 9px blue; */
-	width: 270px;
-    height: 60px;
+	width: 222px;
+    height: 44px;
     margin-left: 11px;
-}
-
-.olga5_shp.container {
-    background-color: greenyellow;
-    height: 70%;
-    width: calc(90% - 22px);
-    padding: 0;
-    /* float: left; */
-    float: none;
+    position: relative;
 }
 
 .olga5_shp_copy>p,
@@ -196,17 +230,6 @@ div.olga5_shp {
     
 }
 
-.olga5_shp.container>p {
-    top: 2px;
-    right: 1px;
-	z-index: 1;
-  color: black;
-  border: 1px solid lightgreen;
-  border-bottom-width: 2px;
-  overflow: visible;
-  margin-block-end: 0;
-}
-
 .thetext {
     overflow: auto;
     width: calc(99% - 155px);
@@ -234,19 +257,6 @@ div.olga5_shp {
     background-color: white;
 }
 
-.divSmall {
-    height: 55px;
-    width: 222px;
-    position: relative;
-    color: darkgray;
-    background: aliceblue;
-    margin: 20px;
-    margin-left: 44px;
-
-    background: lightblue;
-    border: 1px gray dotted;
-}
-
 .thetext ul {
     margin-block-start: 0.2em;
     margin-block-end: 0.3em;
@@ -267,7 +277,7 @@ div.olga5_shp {
   background-color: transparent;
   /* vertical-align: super; */
   font-size: large;
-  padding-top: 5px;
+  padding-top: 5px; 
 }
 
 #main .olga5_shp{
@@ -275,24 +285,41 @@ div.olga5_shp {
     padding-left: 4px;
 }
 
-.ccshp1{
-    display: flex;
+/* ------------------------------------ */
+.div {
+    position: relative;
+    overflow: hidden;
 }
 
-.cboxed span.span-mark {
-    background-color: white;
-    border: 1px solid gray;
-    border-radius: 3px;
-    line-height: 14px;
-    font-size: 10px;
-    cursor: pointer;
-    width: 10px;
-    padding-left: 0px;
-    font-family: monospace;
-    padding-right: 1px;
-    text-align: center;
-    padding-left: 4px;
-    padding-right: 4px;
-    font-weight: bold;
+.int {
+    position: relative;
+    height: 100%;
+    width: 100%;
+    top: -10px;
+    overflow: scroll;
+    background-color: transparent;
 }
 
+.cbo {
+    position: absolute;
+    height: 800px;
+    width: 1000px;
+    background-image:
+        linear-gradient(90deg, gray 1px, transparent 1px),
+        linear-gradient(0deg, gray 1px, transparent 1px);
+    background-color: transparent;
+
+    /* display: flex;  */
+    /* justify-content: center; Центрирование по горизонтали */ 
+    /* align-items: center;  Центрирование по вертикали */
+}
+
+.div span:first-child {
+    position: sticky;
+    top: 6px;
+    right: 18px;
+    float: right;
+    background-color: yellow;
+    color: black;
+    line-height: 10px;
+}
