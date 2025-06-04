@@ -16,7 +16,7 @@
 		m_borderColorOff = 'lightgray',
 		m_borderColorOn = 'red',
 		m_borderRadius = '3px',
-		m_cursor = 'pointer',
+		m_cursor = 'grab',
 		fmt1 = '     ',
 		fmt2 = '    ',
 		viewport = { wp: null, W: 0, H: 0 },
@@ -94,7 +94,7 @@
 			this.MoveStart = (x, y) => {
 				const mpos = this; // e.currentTarget.aO5mpos,
 				div = mpos.div;
-				div.style.cursor = 'grab';
+				div.style.cursor = 'grabbing';
 				mpos.old.L = div.offsetLeft;
 				mpos.old.T = div.offsetTop;
 				mpos.old.x = x;
@@ -135,7 +135,7 @@
 
 	C.ModulAddSub(olga5_modul, modulname, () => {
 		const isInitiated = document.getElementById(id)
-		console.log(`${olga5_modul}.${modulname} : ` + (isInitiated ? 'игнорируется' : ''))
+		// console.log(`${olga5_modul}.${modulname} : ` + (isInitiated ? 'игнорируется' : ''))
 		if (isInitiated) return
 
 		const div = document.createElement('div')

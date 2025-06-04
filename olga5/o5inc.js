@@ -245,15 +245,15 @@
 
 					for (const src of srcs) {
 						const s = outer ? src.outerHTML : src.innerHTML
-						// div.insertAdjacentHTML('beforeend', 
+						// div.insertAdjacentHTML('beforeEnd', 
 						if (C.consts.o5debug > 1)
-							tag.insertAdjacentHTML('beforeend', `\n<!-- вставка с id='${src.id}' -->`)
+							tag.insertAdjacentHTML('beforeEnd', `\n<!-- вставка с id='${src.id}' -->`)
 							// tag.innerHTML += `\n<!-- вставка с id='${src.id}' -->`
 
 						if (outer) 
-							tag.insertAdjacentHTML('beforeend', '\n')
+							tag.insertAdjacentHTML('beforeEnd', '\n')
 							// tag.innerHTML += '\n'
-						tag.insertAdjacentHTML('beforeend', s.trimRight() + '\n') // тут '\n' надо для "красоты" в тестах)
+						tag.insertAdjacentHTML('beforeEnd', s.trimRight() + '\n') // тут '\n' надо для "красоты" в тестах)
 						// tag.innerHTML += s.trimRight() + '\n' // тут '\n' надо для "красоты" в тестах
 					}
 					tags.concat(tag.querySelectorAll("div[" + o5include + "]") || [])

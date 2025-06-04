@@ -37,10 +37,12 @@
 			},
 			AddEventListener: (eve, Fun, opts) => {
 				const nFun = E.NFun(Fun)
-				E.Msg('AddEventListener', eve, nFun)
-				if (E.events.find(event => event.eve == eve && event.nFun == nFun && event.opts == opts))
-					E.Err(`повторная регистрация  '${eve}' для ф-ии "${nFun}"`)
+				if (E.events.find(event => event.eve == eve && event.nFun == nFun && event.opts == opts)){
+					if (!opts.couldRepeat)
+					E.Err(`повторная регистрация  '${eve}' для ф-ии "${nFun}"`)}
 				else {
+					E.Msg('AddEventListener', eve, nFun)
+
 					const
 						caller = arguments.callee
 					for (const donet of E.donets)
@@ -105,7 +107,7 @@
 				E.donets.splice(0, E.donets.length)
 			},
 			IsDone: eve => { // не используется (думал для замены проверок 'window.olga5.C.o5_isInited',- решил не менять)
-				E.donets.find(donet =>donet.eve == eve)
+				E.donets.find(donet => donet.eve == eve)
 			},
 		}
 
@@ -115,7 +117,10 @@
 	if (!window.olga5[olga5_modul]) window.olga5[olga5_modul] = {}
 
 	const
-		modnames = ['CConsole', 'CEncode', 'CApi', 'CParams', 'TagsRef', 'IniScripts', 'CPops'], // 'IniScripts' д.б. ПОСЛЕДНИМ
+		modnames = ['CConsole', 'CEncode', 'CApi', 'CParams', 'TagsRef', 'IniScripts'], // 'IniScripts' д.б. ПОСЛЕДНИМ
+		/*
+		нафига тут был , 'CPops' ?????????????????????????????????????????????
+		*/
 		wshp = window.olga5[olga5_modul],
 		C = window.olga5.C,
 		strt_time = Number(new Date()),
@@ -284,7 +289,7 @@
 			const hash = window.location.hash
 			if (hash)
 				C.save.hash = hash ? hash.substring(1).trim() : ''
-			
+
 			const smatchs = window.location.search.match(/[?&]\S+?(#|$)/) || []
 			for (const smatch of smatchs) {
 				const match = smatch.replaceAll(/(%20|\s)/g, '').trim()
@@ -351,7 +356,7 @@
 
 	Object.assign(C, {
 		repQuotes: /^\s*((\\')|(\\")|(\\`)|'|"|`)?\s*|\s*((\\')|(\\")|(\\`)|'|"|`)?\s*$/g,
-		olga5ignore: 'olga5-ignore',
+		// olga5ignore: 'olga5-ignore',
 		TryToDigit: TryToDigit,
 		ParamsFillFromScript,
 		GetAttrs: GetAttrs,
@@ -385,7 +390,7 @@
 		},
 		constsurl: {},
 		save: { hash: null, xs: null, p: '', n1: -1, urlName: 'url', libName: 'ядро', }, // сохранение для "красивой" печати - потом удалю
-		ModulAddSub: (modul, p1, p2) => {
+		ModulAddSub: (modul, p1, p2, funcs) => {
 			'use strict'
 			if (!window.olga5[modul])
 				window.olga5[modul] = {}
@@ -395,7 +400,7 @@
 				sub = p2 ? p1 : p1.name,
 				Fun = p2 ? p2 : p1
 
-			if (C.consts.o5debug>1) {
+			if (C.consts.o5debug > 1) {
 				console.log(`${document.currentScript.src.indexOf(`/${modul}.`) > 0 ? 'дозагружен' : 'подключён '}:  ${modul}/${sub}.js`)
 			}
 
@@ -409,9 +414,33 @@
 
 			wshp[sub] = Fun
 
+			if (funcs)
+				for (const func of funcs)
+					wshp[sub][func.name] = func
+
 			return wshp
 		},
+		AddModuleSub: (modul, sub, funcs) => {
+			'use strict'
+			if (!window.olga5[modul])
+				window.olga5[modul] = {}
 
+			const
+				wshp = window.olga5[modul]
+
+			if (wshp && wshp[sub]) C.ConsoleError(`Повтор подгрузки '${modul}/${sub}'`)
+			else
+				if (C.consts.o5debug > 1)
+					console.log(`${document.currentScript.src.indexOf(`/${modul}.`) > 0 ? 'дозагружен' : 'подключён '}:  ${modul}/${sub}.js`)
+
+			wshp[sub] = {}
+
+			if (funcs)
+				for (const func of funcs)
+					wshp[sub][func.name] = func
+
+			return wshp
+		},
 		ModulAdd: W => {
 			'use strict'
 			const modul = W.modul

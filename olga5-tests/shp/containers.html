@@ -4,8 +4,8 @@
 <head>
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 	<title>containers</title>
-	<link rel="shortcut icon" href="./add/favicon.svg" type="image/x-icon">
-	
+	<link rel="shortcut icon" href="../add/favicon.svg" type="image/x-icon">
+
 	<script src='../../olga5/o5com.js' o5debug=0></script>
 	<script data-src='+./o5dbg.js' o5load="u"></script>
 	<script data-src='+./o5shp.js'></script>
@@ -14,13 +14,12 @@
 <body id="body" class='olga5_Start' style="margin: 0;">
 	<script>
 		let oldname = '',
-			oldakey = ''
+			oldakey = '',
+			wshp = null
 		const
 			List = e => {
 				const log = document.getElementById('log'),
 					aO5 = e.detail.aO5,
-					akey = e.detail.akey.substring(0, 5),
-					blngs = aO5[akey],
 					ClassName = clss => {
 						let s = ''
 						for (const cls of clss) {
@@ -28,31 +27,49 @@
 							s += (s ? ', ' : '') + u
 						}
 						return s
-					}
+					},
+					cls = aO5.cls,
+					ss = []
 
 				if (oldname !== aO5.name) {
 					oldname = aO5.name
-					log.insertAdjacentHTML('beforend', '<span class="span1">' +
-						`<b>${aO5.name.padEnd(3, ' ')}</b>` +
+					log.insertAdjacentHTML('beforeEnd', '<span class="span1">' +
+						`<b>${aO5.name.padEnd(3, '&nbsp;')}</b>` +
 						'</span><br/>')
 				}
-				for (const bord of blngs.bords) {
+
+				let s = `<b>${aO5.name.padEnd(3, '&nbsp;')}</b>`
+				for (const frame of aO5.frames) {
+					const
+						u1 = (frame.fix && frame.cut) ? 'fc' : (frame.fix ? 'f' : (frame.cut ? 'c' : '')),
+						u2 = frame.num ? frame.num : '',
+						u = u1 + u2
+					ss.push(frame.cod + (u ? ('/' + u) : ''))
+				}
+				s += ss.join(', ')
+
+
+
+
+
+				for (const frame of aO5.frames) {
+
 					let u = ''
 					if (oldakey !== akey) {
 						oldakey = akey
 						u = akey
 					}
-					if (bord.typ === 'N')
+					if (frame.typ === 'N')
 						console.log()
-					log.insertAdjacentHTML('beforend', '<span class="span2">' +
+					log.insertAdjacentHTML('beforeEnd', '<span class="span2">' +
 						`${u.padEnd(8, '.')} ::  ` +
-						`${bord.typ.substring(0, 1)}:` +
-						`${bord.cod.padEnd(9, '.')}:` +
-						('' + bord.num).padStart(3, '.') +
+						`${frame.typ.substring(0, 1)}:` +
+						`${frame.cod.padEnd(9, '.')}:` +
+						('' + frame.num).padStart(3, '.') +
 						` --> ` +
-						bord.tag.pO5.name.padEnd(6, '.') + ' [' + ClassName(bord.tag.classList) + '] ' +
+						frame.act.pO5.name.padEnd(6, '.') + ' [' + ClassName(frame.act.pO5.tag.classList) + '] ' +
 						`</span> ` +
-						(bord.err ? '<span class="span3"> (' + bord.err + `)</span>` : '') +
+						(frame.err ? '<span class="span3"> (' + frame.err + `)</span>` : '') +
 						'<br/>')
 				}
 			},
@@ -68,14 +85,23 @@
 						div.innerHTML = '#<b>' + div.id + '</b>:  ' + s +
 							div.innerHTML
 					} else
-					if (div.id !== 'strt')
-						div.innerHTML = '#' + div.id + ' &nbsp; [' + div.className + ']' +
-						div.innerHTML
+						if (div.id !== 'strt')
+							div.innerHTML = '#' + div.id + ' &nbsp; [' + div.className + ']' +
+								div.innerHTML
 				}
 				// document.body.style.transform = 'scale(0.85)';
+			},
+			InitShps = () => {        // активирую все, не дожидаясь появления (напр. в тестах)
+				for (const shp of olga5.o5shp.shps)
+					if (!shp.aO5shp)
+						olga5.o5shp.AO5shp(shp)
+
+				wshp = window.olga5.o5shp
+				wshp.Boards.InitAllBords()
 			}
-			
+
 		window.addEventListener('o5_containers', List)
+		window.addEventListener('o5_isInited', InitShps)
 		window.addEventListener('DOMContentLoaded', Init)
 	</script>
 
@@ -152,7 +178,7 @@
 	</style>
 
 	<div id="strt">
-		<h4 style="margin: 1px;		display: grid;		place-items: center; font-size: small;">
+		<h4 style="margin: 1px;	display: grid;	place-items: center; font-size: small;">
 			Тестирование определения вложенности контейнеров.
 		</h4>
 		<table>
@@ -179,25 +205,26 @@
 					<div id="pos" class="pos3 clsX inner">
 						<div id="6" class=" clsA clsB">
 							<div id="7" class="">
-								<br /><span class='comment'>различные способы выбора для '<b>oframs</b>' контейнера
+								<br /><span class='comment'>различные способы выбора контейнеров
 									"#pos [pos2 clsX]", а для '<b>owners</b>' - "#main []"</span>
-								<div id='shp1-1' class="olga5_shp shp" o5ofram="n:div:5" olga5_owners="n:div:99">
-								</div>
-								<div id='shp1-2' class="olga5_shp shp" o5ofram="i:pos:2" olga5_owners="i:main">
-								</div>
-								<div id='shp1-3' class="olga5_shp shp" o5ofram="c:clsX:2" olga5_owners="c::3">
-								</div>
+								<div id='shp1-1' class=" shp olga5_shp:n=div/f5:n=div/c99"> </div>
+								<div id='shp1-2' class=" shp olga5_shp:i=pos/f2:i=main/c"> </div>
+								<div id='shp1-3' class=" shp olga5_shp:c=clsX/f2:c=/c3"> </div>
+								<div id='shp1-4' class="olga5_shp:c=clsX/f2:c=/c3 shp "> </div>
+								<div id='shp1-5' class="olga5_shp:c=clsX/f2,c=/c3 shp "> </div>
 							</div>
 						</div>
 					</div>
 					<div id="moe1">
 						<div id="moe2">
 							<div id="moe3">
-								<br /><span class='comment'>задание граничных клнтейнеров квалификаторами '<b>S</b>' или
+								<br /><span class='comment'>задание граничных контейнеров квалификаторами '<b>s</b>' или
 									'<b>B</b>' а также знач. по умолчанию</span>
-								<div id='shp2-1' class="olga5_shp shp" o5ofram="s" olga5_owners="b"></div>
-								<div id='shp2-2' class="olga5_shp shp"></div>
-								<div id='shp2-3' class="olga5_shp shp" o5ofram="s::2,s::3" olga5_owners="b::2,b::3"></div>
+								<div id='shp2-1' class=" shp olga5_shp"></div>
+								<div id='shp2-2' class=" shp olga5_shp:s"></div>
+								<div id='shp2-3' class=" shp olga5_shp:s="></div>
+								<div id='shp2-4' class=" shp olga5_shp:s=/2,s=/3:i=/2,n=/3"> </div>
+								<div id='shp2-4' class=" shp olga5_shp:s=/2:s=/3,i=/2:n=/3"> </div>
 							</div>
 						</div>
 					</div>
@@ -209,10 +236,8 @@
 										style="background-color: yellow;">контейнер 'moe4'</b> содержит класс
 									<b>olga5_shp</b>, т.е. есть 'верхним' <i>см. ошибки в протоколе</i>
 								</span>
-								<div id='shp3-1' class="olga5_shp shp" o5ofram="i:moe5,s" olga5_owners="b,i:moe3,">
-								</div>
-								<div id='shp3-2' class="olga5_shp shp" o5ofram="i:moe5,i:moe6,"
-									olga5_owners="i:moe4,i:divX"></div>
+								<div id='shp3-1' class=" shp olga5_shp:i=moe5,s/f,i=moe3/c,"> </div>
+								<div id='shp3-2' class=" shp olga5_shp:i=moe5/f,i=moe6/f,i:moe4/c,i=divX/c"></div>
 							</div>
 						</div>
 					</div>
@@ -224,10 +249,10 @@
 								(<i>а вот между <b>moe8</b> и <b>moe81</b> граница не видна</i>)
 							</span>
 							<div id="moe81" class="moe3" style="border: none">
-								<div id='shp4-1' class="olga5_shp shp" o5ofram="b::2" olga5_owners="b::3"></div>
+								<div id='shp4-1' class="olga5_shp shp:s/2f:s=/3c"></div>
 							</div>
 							<div id="moe82" class="moe3" style="border: none; background: aliceblue;">
-								<div id='shp4-2' class="olga5_shp shp" o5ofram="b::2" olga5_owners="b::3"></div>
+								<div id='shp4-2' class="olga5_shp shp:s/2f,s/3c"></div>
 							</div>
 						</div>
 					</div>

@@ -3,10 +3,12 @@
 /*jshint strict:true  */
 /*jshint esversion: 6 */
 //!
+// Configure desktop -> Mouse Action -> Right-Button
 (function () {              // ---------------------------------------------- o5shp/DoScroll ---
 	"use strict"
 
-	let wshp, nPxs, aO5xs, timeStamp = 0, oldScroll = false
+	// let wshp, timeStamp = 0;
+	let tstO5, tstId = 'shp4', tstNam = 'bottom', tstVal = 481;
 
 	const
 		olga5_modul = "o5shp",
@@ -14,493 +16,432 @@
 		C = window.olga5.C,
 		o5debug = C.consts.o5debug,
 		fmtOK = "background: cornsilk; color: black;",
-
-		// исправить попадание вниз
-		// перед ChFixeds проверять видимость для вытолкнутых
-
-		ReorderFrames = (pO5base, x) => {
-			/*
-			упорядочиваю контейнеры по вложенности
-			*/
-			const
-				pO5s = pO5base.pO5s,
-				nPs = [],
-				Push = (nP, z) => {
-					let left = 0,
-						right = nPs.length
-
-					while (left < right) {  // Бинарный поиск правильной позиции
-						const
-							mid = Math.floor((left + right) / 2),
-							d = nPs[mid].val - nP.val
-
-						if (d < 0 && !z || d >= 0 && z)
-							left = mid + 1
-						else
-							right = mid
-					}
-
-					nPs.splice(left, 0, nP)
+		fmtErr = "background: yellow; color: black;",
+		coords = { T: 'top', L: 'left', R: 'right', B: 'bottom' },
+		Тестирование = txt => {
+			if (tstId && !tstO5) {
+				const tst = document.getElementById(tstId)
+				if (tst)
+					tstO5 = tst.aO5shp
+				else {
+					console.error(`Тестирование: неправильно задан testId=${tstId} `)
+					tstId = ''
 				}
-
-			const
-				de = document.documentElement,
-				w = de.clientWidth,
-				h = de.clientHeight
-
-			for (const pO5 of pO5s) {
-				const val =
-					x === 'T' ? pO5.scope.top : (
-						x === 'L' ? pO5.scope.left : (
-							x === 'R' ? pO5.scope.right :
-								pO5.scope.bottom
-						)
-					)
-				// вношу только те, что в пределах экрана
-				if (((x === 'T' || x === 'L') && val >= 0) ||
-					(x === 'R' && val <= w) ||
-					(x === 'B' && val <= h)
-				)
-					Push({ val: val, pO5: pO5 }, (x === 'T' || x === 'L'))
 			}
-
-			return nPs
-		},
-		ChFixeds = (aO5, x) => {
-			/*
-			ищу первый (для aO5) фиксирующий контейнер
-			*/
-			const
-				pO5base = aO5.act.pO5base,
-				aC = aO5.posC
-//  сортирую границы в nPs, котрые сохраняю в nPxs
-			let nPs = nPxs.get([pO5base.name, x])
-			if (!nPs) {
-				nPs = ReorderFrames(pO5base, x)
-				nPxs.set([pO5base.name, x], nPs)
-
-				if (o5debug > 0)
-					console.log("%c%s", fmtOK, `ChFixeds ${aO5.name}`, ` контейнеры (${x}):`,
-						nPs.map(nP => nP.pO5.name + '/' + nP.val).join('; '))
+			if (tstO5 && tstO5.posC.height > 0) {
+				// console.log(txt ? txt : '+', tstO5.posC.top)
+				return true
 			}
-			for (const nP of nPs)
-				for (const frame of aO5.frames)
-					if (frame.fix && frame.pO5 === nP.pO5) {
-						// сначала пробую снять hiddet
-						// для тех, который
-						switch (x) {
-							case 'T': if (aC.top <= nP.val) Object.assign(aC, { top: nP.val, bottom: nP.val + aC.height }); break
-							case 'L': if (aC.left <= nP.val) Object.assign(aC, { left: nP.val, right: nP.val - aC.width, }); break
-							case 'R': if (aC.right >= nP.val) Object.assign(aC, { right: nP.val, left: nP.val - aC.width, }); break
-							case 'B': if (aC.bottom >= nP.val) 
-								Object.assign(aC, { bottom: nP.val, top: nP.val - aC.height }); 
-							break
-						}
-
-						// if (o5debug > 0)
-						// 	console.log(`ChFixeds на границе ${nP.pO5.name} :  ${x}= ${nP.val.toFixed().padStart(5)}`)
-
-						return nP.pO5
-					}
-
-
-			// for (const frame of aO5.frames) {
-			// 	if (!frame.fix || !frame.pO5)
-			// 		continue
-
-			// 	const
-			// 		nP = { val: 0, pO5: null },
-			// 		pO5 = frame.pO5,
-			// 		pos = pO5.scope
-
-			// 	switch (x) {
-			// 		case 'T': if (aC.top <= pos.top) Object.assign(nP, { val: pos.top, pO5: pO5 }); break
-			// 		case 'L': if (aC.left <= pos.left) Object.assign(nP, { val: pos.left, pO5: pO5 }); break
-			// 		case 'R': if (aC.right >= pos.right) Object.assign(nP, { val: pos.right, pO5: pO5 }); break
-			// 		case 'B': if (aC.bottom >= pos.bottom) Object.assign(nP, { val: pos.bottom, pO5: pO5 }); break
-			// 	}
-			// 	if (nP.pO5) {
-			// 		switch (x) {
-			// 			case 'T': Object.assign(aC, { top: nP.val, bottom: nP.val + aC.height }); break
-			// 			case 'L': Object.assign(aC, { left: nP.val, right: nP.val - aC.width, }); break
-			// 			case 'R': Object.assign(aC, { right: nP.val, left: nP.val - aC.width, }); break
-			// 			case 'B': Object.assign(aC, { bottom: nP.val, top: nP.val - aC.height }); break
-			// 		}
-			// 		if (o5debug > 0)
-			// 			console.log("%c%s", fmtOK, `ChFixeds`, ` ${aO5.name}`, ` на границе ${nP.pO5.name} :  ${x}= ${nP.val.toFixed().padStart(5)}`)
-
-			// 		return true
-			// 	}
-			// }
 		},
-		ChSticks = (aO5, x) => {
-			/* 
-				проверяю на прилипания к предыдущим fO5
-				выборка делается по обратной упорядоченности
-			*/
+		xp = { V: 'TB', H: 'LR' },
+		opp = { T: 'B', L: 'R', R: 'L', B: 'T' },
+		coordVH = { V: ['height', 'top', 'bottom'], H: ['width', 'left', 'right'] },
+
+		ПроверкаHidden = (aO5, x) => {
+			// обработка скрытых тегов
 			const
 				aC = aO5.posC,
-				aO5s = aO5xs[x]
-			let
-				i = aO5s.indexOf(aO5)
-
-			while (i-- > 0) {
-				const
-					fO5 = aO5s[i],
-					act = fO5.act,
-					fC = fO5.posC
-
-				if (!act.hiddet[x] &&
-					aO5.cls.level < fO5.cls.level &&
-					aC.left < fC.right && aC.right > fC.left
-				) {
-					let st;
+				v = aO5.nears.out[x].v
+			let partV, fullV;
+			switch (x) {
+				case 'T': if (aC.top > v) fullV = 1; else if (aC.bottom > v) partV = 1; break
+				case 'L': if (aC.left > v) fullV = 1; else if (aC.right > v) partV = 1; break
+				case 'R': if (aC.right < v) fullV = 1; else if (aC.left < v) partV = 1; break
+				case 'B': if (aC.bottom < v) fullV = 1; else if (aC.top < v) partV = 1; break
+			}
+			if (fullV) 						// видимый полностью
+				aO5.hidden[x] = false
+			else
+				if (aO5.nears.out[x].p) {
 					switch (x) {
-						case 'T': if (aC.top <= fC.bottom) { st = true, aC.top = fC.bottom, aC.bottom = aC.top + aC.height }; break
-						case 'L': if (aC.left <= fC.right) { st = true, aC.left = fC.right, aC.right = aC.left + aC.width }; break
-						case 'R': if (aC.right >= fC.left) { st = true, aC.right = fC.left, aC.left = aC.right - aC.width }; break
-						case 'B': if (aC.bottom >= fC.top) { st = true, aC.bottom = fC.top, aC.top = aC.bottom - aC.height }; break
+						case 'T': aC.top = v; if (partV) aC.height = aC.bottom - v; else aC.height = 0; break
+						case 'L': aC.left = v; if (partV) aC.width = aC.right - v; else aC.width = 0; break
+						case 'R': aC.right = v; if (partV) aC.width = v - aC.left; else aC.width = 0; break
+						case 'B': aC.bottom = v; if (partV) aC.height = v - aC.top; else aC.height = 0; break
 					}
-					const
-						stxs = fO5.act.sO5s[x],
-						j = stxs.indexOf(aO5)
-					if (st) {   // aO5 sticked (прижимается) к fO5		
-						if (j < 0) {
-							if (o5debug > 0)
-								console.log("%c%s", fmtOK, `ChSticks`, `${aO5.name}`, ` на границе-${x}`, `${fO5.name} `)
-
-							stxs.push(aO5)
-							break
+					if (partV)
+						switch (x) {
+							case 'T': aO5.posS.top = aC.height - aO5.posO.height; break
+							case 'L': aO5.posS.left = aC.width - aO5.posO.width; break
 						}
+				}
+		},
+		MakeScroll = (time, scV, scH, tag, doschgs) => {
+			const
+				pO5scroll = tag.pO5 ? tag.pO5 : document.body.pO5,
+				aAlls = pO5scroll.aAlls,
+				ОпределениеТекущихГраниц = () => {
+					let xs = ''
+					if (scV > 0) xs += 'T'; else if (scV < 0) xs += 'B'
+					if (scH > 0) xs += 'L'; else if (scH < 0) xs += 'R'
+
+					for (const aO5 of aAlls) {				// 				ИсходныеКоординаты(aO5)
+						const p = aO5.act.shdw.getBoundingClientRect()
+
+						Object.assign(aO5.posO, { top: p.top, left: p.left, right: p.right, bottom: p.bottom, height: p.height, width: p.width })
+
+						Object.assign(aO5.posC, { width: p.width, height: p.height })
+						if (!aO5.pFixs.L && !aO5.pFixs.R) aO5.posC.left = p.left
+						if (!aO5.pFixs.T && !aO5.pFixs.B) aO5.posC.top = p.top
+
+						Object.assign(aO5.posS, { top: 0, left: 0 })
+
+						// Пересчет Границ Контейнеров
+						const pbase = aO5.act.pbase
+						if (pbase.act.tScroll !== time) {
+							pbase.act.tScroll = time
+
+							for (const pO5 of pbase.scrollPs) {
+								if (pO5.scops.time === time)  // значит этот и последующие уже определены
+									break
+
+								const
+									r = pO5.CalcScrollScope(),
+									sc = pO5.scops
+
+								Object.assign(pO5.schgs, { T: r.T - sc.T, L: r.L - sc.L, R: r.R - sc.R, B: r.B - sc.B })
+								Object.assign(sc, { time: time }, r)
+							}
+						}
+
+					}
+					return xs
+				},
+				ПодключениеГраницеФрейма = (aO5, x) => {
+					if (o5debug > 2)
+						console.log(`Подключение Границе Фрейма для aO5=${aO5.id} по ${x}`)
+
+					const c = Object.assign({}, aO5.posO)
+
+					let pFix = null
+					for (const frame of aO5.frames)
+						if (frame.fix) {
+							const
+								pO5 = frame.act.pO5,
+								v = pO5.scops[x]	// pO5.visis[x].v	//v = pO5.scops[x]
+
+							switch (x) {
+								case 'T': if (c.top <= v) { pFix = pO5; c.top = v }; break
+								case 'L': if (c.left <= v) { pFix = pO5; c.left = v }; break
+								case 'R': if (c.left + c.width >= v) { pFix = pO5; c.left = v - c.width }; break
+								case 'B': if (c.top + c.height >= v) { pFix = pO5; c.top = v - c.height }; break
+							}
+						}
+
+					if (pFix) {
+						const v = pFix.scops[x],
+							c = aO5.posC
+						switch (x) {
+							case 'T': c.top = v; break
+							case 'L': c.left = v; break
+							case 'R': c.left = v - c.width; break
+							case 'B': c.top = v - c.height; break
+						}
+
+						if (pFix !== aO5.pFixs[x])
+							aO5.DoFix(pFix, x)
 					}
 					else {
-						if (j >= 0)
-							stxs.splice(j, 1);
+						if (aO5.pFixs[x])
+							aO5.UnFix(x)
 					}
-				}
-			}
-			if (o5debug > 1) aO5.TestShowFix(x)
-		},
-		ChNudget = (aO5, x) => {
-			/* 
-				проверяю на сжатия предыдущих fO5
-				выборка делается по обратной упорядоченности
-			*/
-			const
-				aC = aO5.posC,
-				aO5s = aO5xs[x]
-			let
-				i = aO5s.indexOf(aO5)
+				},
+				ПроверитьПерекрытиеФреймами = (aO5, x, pO5) => {
+					const  // pO5 = aO5.pFixs[x],
+						// scops = pO5.scops,
+						visis = pO5.visis
 
-			while (i-- > 0) {
-				const
-					fO5 = aO5s[i],
-					fC = fO5.posC,
-					fS = fO5.posS,
-					act = fO5.act
+					if (visis.act.time !== time) {	// пересчет видимой части				
+						visis.act.time = time
+						Object.assign(pO5.visis[x], { p: pO5, v: pO5.scops[x] })
 
-				if (!act.hiddet[x] &&
-					aO5.cls.level > fO5.cls.level &&
-					aC.left < fC.right && aC.right > fC.left
-				) {
-					let nu, d;
-					switch (x) {
-						case 'T': if ((d = aC.top - fC.bottom) <= 0) { nu = x, fC.bottom = aC.top, fC.height += d, fS.top += d }; break
-						case 'L': if ((d = aC.left - fC.right) <= 0) { nu = x, fC.right = aC.left, fC.width += d, fS.left += d }; break
-						case 'R': if ((d = aC.right - fC.left) >= 0) { nu = x, fC.left = aC.right, fC.width -= d }; break
-						case 'B': if ((d = aC.bottom - fC.top) >= 0) { nu = x, fC.top = aC.bottom, fC.height -= d }; break
+						const scrollPs = aO5.act.pbase.scrollPs
+						let beg = !pO5;  // т.е. если не задано, то сразу проверяю
+						for (const p of scrollPs)
+							if (beg) { // только "выше" чем pO5
+								const
+									v = p.scops[x],
+									vi = visis[x].v,
+									itl = 'TL'.includes(x)
+								if ((v > vi && itl) || (v < vi && !itl))
+									Object.assign(visis[x], { p: p, v: v })
+							}
+							else
+								if (p === pO5) beg = true
 					}
 
-					if (nu) {
-						if (o5debug > 1) fO5.TestShowFix(x)
-
-						const stxs = fO5.act.sO5s[x]
-
-						if (o5debug > 0) {
-							let s = ''
-							for (const sO5 of stxs) s += (s ? ', ' : '') + sO5.name
-							console.log("%c%s", fmtOK, `ChNudget`, `${aO5.name}`, ` сжимает по ${x}`, `${fO5.name} переопределю: ${s}`)
-						}
-						fO5.act.nudget[x] = aO5
-
-						for (const sO5 of stxs) {
-							Object.assign(sO5.posC, sO5.posO)
-							ChSticks(sO5, x)
-						}
-					} else {
-						fO5.act.nudget[x] = null
-						/*								
-						// переделать дав "освоюождение"  | переделать дав "освоюождение"  | переделать дав "освоюождение"  | переделать дав "освоюождение"
-						*/
-						break
-					}
-				}
-			}
-			if (o5debug > 1) aO5.TestShowFix(x)
-		},
-		TryToFix = (aO5, x, pO5) => {
-			/*
-			отработка фиксации
-			*/
-			if (o5debug > 0) {
-				let s = ''
-				for (const nam in aO5.posC)
-					if (aO5.posC[nam] !== aO5.posO[nam])
-						s += (s ? ', ' : '') + `${nam}(${aO5.posO[nam]}->${aO5.posC[nam]})`
-				if (s)
-					console.log("%c%s", fmtOK, `TryToFix`, `для DoFix  ${aO5.name}`, ` по ${x} изменено: "${s}"`)
-			}
-
-			const
-				// X = {T:'B', L:'R', R:'L', B:'T', },
-				changed = aO5.Changed(x),
-				isfixed = aO5.IsFixed(x),
-				hiddet = aO5.act.hiddet
-
-			if (!aO5.cls.alive) {
-				if (x === 'T' || x === 'B') hiddet.T = hiddet.B = aO5.posC.height <= 0
-				if (x === 'L' || x === 'R') hiddet.L = hiddet.R = aO5.posC.width <= 0
-			}
-			if (isfixed && !changed)
-				aO5.UnFix(x)
-			else
-				if (!isfixed && changed)
-					aO5.DoFix(x, pO5)
-
-			if (o5debug > 1) aO5.TestShowFix(x)
-
-			return changed
-		},
-		CutFixed = (aO5, x) => {
-			/*
-			перебираются все контейнеры-владельцы (т.е. 'cut') и проверяются на 
-			ПОДЖАТИЕ с противоположной от 'x' сторона
-			*/
-			const
-				aC = aO5.posC,
-				aS = aO5.posS,
-				frames = aO5.frames
-
-			let pO5s = null
-			for (const frame of frames)
-				if (frame.cut) { // поиск фиксации на границе, т.е. с обрезанием
 					const
-						pO5 = frame.pO5,
-						sc = pO5.scope
-					let d = 0;
-					switch (x) {
-						case 'T': if ((d = aC.bottom - sc.bottom) > 0) { aC.bottom -= d, aC.height -= d, aS.top -= d }; break
-						case 'L': if ((d = aC.right - sc.right) > 0) { aC.right -= d, aC.width -= d, aS.left -= d }; break
-						case 'R': if ((d = sc.left - aC.left) > 0) { aC.left += d, aC.width -= d }; break
-						case 'B': if ((d = sc.top - aC.top) > 0) { aC.top += d, aC.height -= d }; break
-					}
+						itl = 'TL'.includes(x),
+						v = visis[x].v,
+						c = aO5.posC,
+						q = x === 'R' ? (c.left + c.width) : (
+							x === 'B' ? (c.top + c.height) : (
+								x === 'T' ? c.top : c.left
+							)
+						),
+						d = q - v
 
-					if (!pO5s)
-						pO5s = frame.pO5.pO5s	// самый дальний (для aO5) 'обрезающий' контейнер
-				}
-		},
-		TrunkFix = aO5 => {
-			/*
-			перебираю все дальние (после крайнего) контейнеры
-			и ОБРЕЗАЮТСЯ все вылезающие части зафиксированых тегов
-			*/
-			const
-				aC = aO5.posC,
-				aS = aO5.posS,
-				frames = aO5.frames
+					if ((d < 0 && itl) || (d > 0 && !itl))
+						switch (x) {
+							case 'T': c.top = v; c.height += d; aO5.posS.top += d; break
+							case 'L': c.left = v; c.width += d; aO5.posS.left += d; break
+							case 'R': c.width -= d; break
+							case 'B': c.height -= d; break
+							// case 'R': c.left -= d; c.width -= d; break
+							// case 'B': c.top -= d; c.height -= d; break
+						}
+				},
+				ОбрезаниеПротивоположнойСтороны = (aO5, y) => {
+					if (o5debug > 2)
+						console.log(`Обрезание с Противоположной Стороны для aO5=${aO5.id} по ${x}`)
+					const
+						o = opp[y],
+						c = aO5.posC,
+						itl = 'TL'.includes(o),
+						pO5 = aO5.act.pbase.pbO5,
+						r = { p: pO5, v: pO5.scops[o] }
 
-			let f;
-			for (const frame of frames)
-				if (frame.cut) {
-					f = frame  // первый frame - это самый удалённый контейнер с обрезанием
-					break
-				}
+					for (const frame of aO5.frames)
+						if (frame.cut) {
+							const
+								p = frame.act.pO5,
+								v = p.visis[o]	// pO5.visis[x].v	//v = pO5.scops[x]
 
-			const
-				pO5s = f ? f.pO5.pO5s : null
-			if (pO5s && !pO5s[0].final) {
-				let i = 0, d;
-				while (i++ < pO5s.length) {	// для i==0 отработало в CutFixed 
-					const pO5 = pO5s[i],
-						sc = pO5.scope
+							if ((r.v > v && itl) || (r.v < v && !itl)) {
+								r.p = p; r.v = v
+							}
+						}
+					const d = (() => {
+						switch (o) {
+							case 'T': return r.v - c.top
+							case 'L': return r.v - c.left
+							case 'R': return c.width - (r.v - c.left)
+							case 'B': return c.height - (r.v - c.top)
+						}
+					})()
+					if (d > 0)
+						switch (o) {
+							case 'T': c.height -= d; c.top += d; break
+							case 'L': c.width -= d; c.left += d; break
+							case 'R': c.width -= d; aO5.posS.left -= d; break
+							case 'B': c.height -= d; aO5.posS.top -= d; break
+						}
+					return r.p
+				},
+				НаБлижнемТеге = (aO5, x) => {
+					const
+						pbase=aO5.act.pbase,
+						iO5s = pbase.baO5s
 
-					if ((d = aC.top - sc.top) < 0) { aC.top = sc.top, aC.height -= d }
-					if ((d = aC.left - sc.left) < 0) { aC.left = sc.left, aC.width -= d }
-					if ((d = aC.right - sc.right) > 0) { aC.right = sc.right, aC.width -= d }
-					if ((d = aC.bottom - sc.bottom) > 0) { aC.bottom = sc.bottom, aC.height -= d }
-
-					if (pO5.final)
-						break
-				}
-			}
-
-			if (o5debug > 1) aO5.TestShowFix('TLRB')
-			return true
-		},
-		PrepScroll = aO5s => {
-
-			for (const aO5 of aO5s) {
-				const p = aO5.act.shdw.getBoundingClientRect()
-				Object.assign(aO5.posC, { top: p.top, left: p.left, right: p.right, bottom: p.bottom, height: p.height, width: p.width, })
-				Object.assign(aO5.posS, { top: 0, left: 0, })
-				Object.assign(aO5.posO, aO5.posC)
-
-				Object.assign(aO5.act.nudget, { T: null, L: null, R: null, B: null })
-			}
-
-			nPxs.clear()
-
-			// const
-			// 	pO5bases = []
-			// for (const aO5 of aO5s) {
-			// 	const pO5base = aO5.act.pO5base
-			// 	if (!pO5bases.includes(pO5base))
-			// 		pO5bases.push(pO5base)
-			// }
-			/*
-			подсчет координат всех 'активных' pO5
-			*/
-			const pO5bases = new Set()
-			for (const aO5 of aO5s)
-				pO5bases.add(aO5.act.pO5base)
-
-			for (const pO5base of pO5bases) {
-				const pO5s = pO5base.pO5s
-				for (const pO5 of pO5s) {
-					if (pO5.scope.time === timeStamp) // этот и последующие уже определены
-						break
-
-					pO5.scope.time = timeStamp
-					pO5.CalcScrollScope()
-
-					if (pO5.body) break
-				}
-			}
-
-			/*
-			для каждого pO5base подсчет внутреннего и внешнего периметров охватывающих его вреймов
-			а также внутреннего периметра контейнеров, охватывающих все вреймы
-			*/
-
-
-			// // для DoNudges
-			// const
-			// 	puts = aO5.cls.puts,
-			// 	posC = aO5.posC
-
-			// Object.assign(aO5.nP, {
-			// 	pT: null, pL: null, pR: null, pB: null,
-			// 	top: posC.top, left: posC.left, right: posC.right, bottom: posC.bottom,
-			// 	height: posC.height, width: posC.width,
-			// })
-
-			// Object.assign(aO5.posF, { top: posC.top, left: posC.left, right: posC.right, bottom: posC.bottom, })
-
-			// Object.assign(aO5.act.movto, {
-			// 	ifV: (scV > 0 && puts.B || scV < 0 && puts.T),
-			// 	ifH: (scH > 0 && puts.R || scH < 0 && puts.L),
-			// })
-		},
-		Scroll = (time, scV, scH, tag) => {
-			timeStamp = time
-			aO5xs = tag.pO5 ? tag.pO5.aO5xs : body.pO5.aO5xs
-
-			PrepScroll(aO5xs.T)
-
-			let xs = []
-			if (scV) xs.push(...['T', 'B'])
-			if (scH) xs.push(...['L', 'R'])
-
-			if (o5debug > 1) {
-				let s = ''
-				for (const x of xs)
-					s += `${x}: ${aO5xs[x].map(a => a.name).join(', ')}; `
-				console.log(`Scroll'ы: ${s}`)
-			}
-
-			for (const x of xs) {
-				let
-					i = 0,
-					ifixes = false
-
-				if (o5debug > 0)
-					console.log("%c%s", fmtOK, ` (${x}):`, `-------------------------------------------------------`)
-
-				for (const aO5 of aO5xs[x]) {
-					if (!aO5.cls.nofx &&					// не зажан как "неподвисающий"
-						aO5.cls.puts[x] &&
-						!aO5.act.hiddet[x] &&
-						(aO5.act.uScroll || aO5.act.fixeds[x])
-					) {
-						// TryUnHid(aO5, x)
-						const 
-						pO5=ChFixeds(aO5, x)
-
-					if (pO5) ifixes = true	//	признак что ВООБЩЕ уже есть зафиксированные
-						if (ifixes && i++ > 0) {	// т.е. для первого зафиксированного ЭТО не проверять
-							ChSticks(aO5, x)
-							ChNudget(aO5, x)
+					for (const iO5 of iO5s)
+						if(!iO5.pFixs[x]){
+							
 						}
 
-						if (TryToFix(aO5, x, pO5)) {
-// если убрать 'if' то похабно обрезает shp0							
-							TryToFix(aO5, x, pO5)
-							CutFixed(aO5)
-							TrunkFix(aO5)
-						}
-						else
+					// 	len = aO5.length,
+					// 	k = aO5s.indexOf(aO5)
+					// let cO5, i = k;
+		
+					while (++i < len) {
+						const fO5 = aO5s[i]
+						if (aO5.cls.level < fO5.cls.level &&
+							ПрилипаниекFO5(aO5, fO5, x)
+						) {
+							cO5 = fO5
 							break
+						}
+					}
+		
+					// фиксация на границе
+					i = k
+					while (++i < len) {
+						const fO5 = aO5s[i]
+						if (fO5 === cO5) break
+		
+						if (aO5.cls.level > fO5.cls.level &&
+							fO5.tryFix[x] &&
+							!fO5.hidden[x] && !fO5.zeroed[smode] &&
+							ЕстьСтыковка(aO5, fO5, x)
+						) {
+							const
+								aC = aO5.posC,
+								fC = fO5.posC,
+								fF = fC		// fO5.posCf
+		
+							switch (x) {
+								case 'T': fC.bottom = aC.top, fC.height = fF.bottom - fC.top; break
+								case 'L': fC.right = aC.left, fC.width = fF.right - fC.left; break
+								case 'R': fC.left = aC.right, fC.width = fF.right - fC.left; break
+								case 'B': fC.top = aC.bottom, fC.height = fF.bottom - fC.top; break
+							}
+							switch (x) {
+								case 'T': fO5.posS.top -= fO5.posO.height - fC.height; break
+								case 'L': fO5.posS.left -= fO5.posO.width - fC.width; break
+							}
+		
+							const nfx = aO5.nears.fix[x]
+							if (nfx.p) {
+								const v = nfx.v
+								fO5.zeroed[smode] ||= fC[coordVH[smode][0]] <= 0   // тут [0] = это height или width
+								if (fO5.zeroed[smode]) {
+									switch (x) {
+										case 'T': fC.top = fC.bottom = v; fC.height = 0; break
+										case 'L': fC.left = fC.right = v; fC.width = 0; break
+										case 'R': fC.right = fC.left = v; fC.width = 0; break
+										case 'B': fC.bottom = fC.top = v; fC.height = 0; break
+									}
+									if (!fO5.cls.alive) {
+										fO5.hidden[x] = true
+										fO5.isFull[smode] = false
+									}
+								}
+							}
+		
+							for (const sO5 of fO5.shrunks[x])
+								if (sO5.cls.level < fO5.cls.level) {
+									Object.assign(sO5.posC, sO5.posO)
+									sO5.tryFix[x] = false
+		
+									ПрилипаниекFO5(sO5, fO5, x)
+									НаБлижнемФрейме(sO5, x)
+								}
+						}
 					}
 				}
+
+			if (o5debug > 2) {
+				const Delta = v => isNaN(v) ? ' - ' : v.toFixed(0).padStart(3)
+				console.log(`MakeScroll на pO5scroll=${pO5scroll} V=${Delta(scV)}  H=${Delta(scH)}`)
+				Тестирование()
 			}
 
-			for (const aO5 of aO5xs.T)		// делать отдельно, т.к. перерисовать надо всех!
-				if (aO5.IsFixed())
+			const xs = ОпределениеТекущихГраниц()
+
+			for (const aO5 of aAlls)
+				for (const x of xs)
+					if (aO5.hidden[x])
+						ПроверкаHidden(aO5, x)
+
+			for (const aO5 of aAlls)
+				if (aO5.act.wasFull)     // проверять не все, а только частично невидимые????	
+					for (const x of xs) 
+						if (aO5.pFixs[x])
+							НаБлижнемТеге(aO5, x)
+
+
+			for (const aO5 of aAlls)
+				if (aO5.act.wasFull)     // проверять не все, а только частично невидимые????	
+					for (const x of xs) {
+						const o = opp[x]
+
+						if (!aO5.pFixs[o] && (!aO5.pFixs[x] || aO5.pFixs[x].schgs[x] || doschgs))
+							ПодключениеГраницеФрейма(aO5, x)
+
+						// if (aO5.pFixs[x]) {
+						// 	const v = aO5.pFixs[x].scops[x],
+						// 		c = aO5.posC
+						// 	switch (x) {
+						// 		case 'T': c.top = v; break
+						// 		case 'L': c.left = v; break
+						// 		case 'R': c.left = v - c.width; break
+						// 		case 'B': c.top = v - c.height; break
+						// 	}
+						// }
+						// else 
+						if (!aO5.pFixs[x] && aO5.pFixs[o])
+							ПодключениеГраницеФрейма(aO5, o)
+
+						const ps = []
+						for (const y of [x, o])
+							if (aO5.pFixs[y])
+								ps[x] = ОбрезаниеПротивоположнойСтороны(aO5, y)
+
+						for (const y of [x, o])
+							ПроверитьПерекрытиеФреймами(aO5, y, ps[y] || aO5.act.pbase.pbO5)
+						// ПроверитьПерекрытиеФреймами(aO5, y, ps[y]||aO5.pFixs[x]||aO5.pFixs[o]||aO5.act.pbase.pbO5)
+					}
+
+			for (const aO5 of aAlls)
+				if (aO5.pFixs.fixed)
 					aO5.ShowFix()
+
+
+			// for (const x of xp[smode]) {
+			// 	let i = 0
+			// 	for (const aO5 of aAlls[x]) {  	// нельзя тут if (!aO5.hidden[x]) т.к. надо пересчитать
+			// 		if (aO5.tryFix[opp[x]]) // ??????????/ || !aO5.isFull[smode])		// фиксация - только с одной стороны !!
+			// 			continue
+
+			// 		if (i > 0)
+			// 			НаБлижнемТеге(aO5, x, aAlls[opp[x]])
+
+			// 		НаБлижнемФрейме(aO5, x)
+			// 	}
+			// }
+
+			// // Тестирование()
+
+			// for (const aO5 of aAlls) {
+
+			// 	Фиксация(aO5)
+
+			// 	if (aO5.pFixs.fixed) {
+			// 		Обрезания(aO5) // д.б. после Фиксация
+
+			// 		aO5.ShowFix()
+
+			// 		for (const nam of coordVH[smode])
+			// 			aO5.posCf[nam] = aO5.posC[nam]
+			// 	}
+			// }
 		},
 		Throttle = (Fun, limit, dy0, dx0) => {
-			const
-				dym = dy0,
-				dxm = dx0
-			let lastCall = 0, // Время последнего вызова
-				lastLeft = 0,
-				lastTop = 0
+			const dym = dy0, dxm = dx0
+			let olddir;
 
 			return function (...args) {
 				const
-					now = performance.now(), // Date.now(),
-					tag = args[0].srcElement,
-					scV = tag.scrollTop - lastTop,	// был верт. скроллинг				
-					scH = tag.scrollLeft - lastLeft,	// был гориз. скроллинг				
-					need = now - lastCall >= limit || Math.abs(scV) > dym || Math.abs(scH) > dxm
+					event = args[0],
+					src = event.srcElement,
+					doc = src.scrollingElement,
+					tag = doc ? document.body : src
 
-				lastLeft = tag.scrollLeft
-				lastTop = tag.scrollTop
+				if (!tag.pO5)
+					return
 
-				if (need) {
-					lastCall = now
+				const
+					actScroll = tag.pO5.actScroll,
+					old = actScroll.timcall,
+					now = performance.now(),
+					screl = doc ? doc : tag,
+					scV = screl.scrollTop - actScroll.top,	// был верт. скроллинг				
+					scH = screl.scrollLeft - actScroll.left	// был гориз. скроллинг				
+
+				if (o5debug > 2) {
+					const
+						dir = scV > scH ? 'V' : 'H',
+						s = `V=${scV}, H=${scH},- sT=${screl.scrollTop}, aT=${actScroll.top}, sL=${screl.scrollLeft}, aL=${actScroll.left}, `
+
+					if (scV > 0 && scH > 0)
+						console.log("%c%s", fmtErr, `scroll__`, ` ${tag.id}:  ${s}`)
+					else
+						if (olddir !== dir) {
+							olddir = dir
+							console.log("%c%s", fmtOK, `scroll_${dir}`, ` ${tag.id}:  ${s}`)
+						}
+						else
+							console.log(`scroll_${dir}`, ` ${tag.id}:  ${s}`)
+				}
+
+				if (Math.abs(scV) >= dym || Math.abs(scH) >= dxm || (now - old) >= limit) {
+					Object.assign(actScroll, { top: screl.scrollTop, left: screl.scrollLeft, timcall: now })
 					Fun(now, scV, scH, tag)
 				}
 			}
 		},
-		ThrottledOnScroll = Throttle(Scroll, 100, 3, 3),
-		Activation = (isScroll, txt) => {
-			if (oldScroll === isScroll)
-				return
+		ThrottledOnScroll = Throttle(MakeScroll, 100, 2, 2),
+		EveScroll = e => ThrottledOnScroll(e)
 
-			oldScroll = isScroll
-
-			if (o5debug > 0)
-				C.ConsoleInfo(`DoScroll  ${isScroll ? 'START' : 'stop '} `, txt)
-
-			if (isScroll) {
-				window.addEventListener('scroll', ThrottledOnScroll, true);
-				Scroll(performance.now(), 1, 1, { id: `после DoScroll(${isScroll}, ${txt})` })   // давать именно здесь (иначе скачет источник скроллинга)! 
-			}
-			else
-				window.removeEventListener('scroll', ThrottledOnScroll, true);
-		}
-
-	wshp = C.AddModuleSub(olga5_modul, modulname, [Activation, Scroll])
-	nPxs = new wshp.Map()
+	C.AddModuleSub(olga5_modul, modulname, [MakeScroll, EveScroll])
+	// nPxs = new wshp.Map()
 })();

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>twoshp</title>
+    <link rel="shortcut icon" href="../add/favicon.svg" type="image/x-icon">
+</head>
+
+<body id="body" style="height: 1500px;">
+    <style>
+        .div {
+            position: relative;
+            overflow: scroll;
+            -webkit-user-drag: none;    /*   сделать #div1 не draggable вообще:  */
+            user-select: none;
+        }
+
+        .cbo {
+            position: absolute;
+            height: 800px;
+            width: 1000px;
+            background-image:
+                linear-gradient(90deg, gray 1px, transparent 1px),
+                linear-gradient(0deg, gray 1px, transparent 1px);
+            background-color: transparent;
+        }
+
+        .div span:first-child {
+            position: sticky;
+            top: 6px;
+            right: 18px;
+            float: right;
+            background-color: yellow;
+            color: black;
+            line-height: 10px;
+            left: 111px;
+        }
+
+        #div1 {
+            position: relative;
+            height: 80vh;
+            width: calc(100% - 166px);
+
+            border: 3px green dashed;
+            background-color: lightgreen;
+            min-height: 360px;
+            min-width: 360px;
+
+            /* padding-right: 25px;
+            box-sizing: border-box; */
+        }
+
+        #div2 {
+            border: 3px blue dashed;
+            height: 70vh;
+            width: 66vw;
+            background-color: lightblue;
+        }
+
+        #div3 {
+            border: 3px red dashed;
+            height: 50vh;
+            width: 56vw;
+            background-color: lightpink;
+        }
+
+        #div4 {
+            border: 3px lightgray dashed;
+            height: 22vh;
+            width: 46vw;
+            background-color: bisque;
+            min-height: 144px;
+        }
+
+        #cbo4 {
+            background-image:
+                linear-gradient(90deg, lightgray 1px, transparent 1px),
+                linear-gradient(0deg, lightgray 1px, transparent 1px);
+        }
+    </style>
+    <div id="div1" class="div" style="top:11px;left: 22px;">
+        <span>div1</span>
+        <div id="cbo1" class="cbo" style="background-size: 25px 25px; width: 3300px; height: 2200px;">
+        </div>
+    </div>
+</body>
+
+</html>

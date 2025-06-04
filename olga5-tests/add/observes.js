@@ -19,7 +19,7 @@ function Inito() {
 	"use strict";
 	const
 		callback = (entries, observer) => {
-			const name=observer.name.padEnd(6)
+			const name=observer.name.padEnd(6,'&nbsp;')
 			entries.forEach(entry => {
 				let u = ''
 

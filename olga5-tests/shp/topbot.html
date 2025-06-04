@@ -14,6 +14,15 @@
     "></script>
 	<script data-src='+/o5shp.js'></script>
 	<script data-src='+o5inc.js'></script>
+	<script>
+    document.addEventListener('DOMContentLoaded', ()=>{
+        window.scrollTo(0, 260)
+        document.getElementById('div' + 4).scrollTo(300, 150)
+        document.getElementById('div' + 3).scrollTo(550, 450)
+        document.getElementById('div' + 2).scrollTo(750, 650)
+        document.getElementById('div' + 1).scrollTo(950, 750)
+	})
+	</script>
 </head>
 
 <body id="body" style="height: 1500px;">
@@ -22,42 +31,31 @@
 			<u>&nbsp;видимость&nbsp;</u>
 			<br><input type="checkbox" onclick="oo5.CbVisible(this, 'clons')" title="исходники для объектов">clon
 			<br><input type="checkbox" onclick="oo5.CbVisible(this, 'carts')" checked title="подвисшие объекты">cart
-			<br><input type="checkbox" onclick="oo5.OutLines(this )" checked title="наличие синих рамок 'outline' вокруг всех 'shp'">с <i>outline</i>
+			<br><input type="checkbox" onclick="oo5.OutLines(this )" checked
+				title="наличие синих рамок 'outline' вокруг всех 'shp'">с <i>outline</i>
 			<br>
-			<br><u>&nbsp;зависания (TBLR):&nbsp;</u>			
+			<br><u>&nbsp;зависания (TBLR):&nbsp;</u>
 			<br><b>shp1</b>:
 			<span class="pmark shp1 T"><b>&nbsp;</b></span>
 			<span class="pmark shp1 B"><b>&nbsp;</b></span>
 			<span class="pmark shp1 L"><b>&nbsp;</b></span>
 			<span class="pmark shp1 R"><b>&nbsp;</b></span>
-			
-			<br><b>shp2</b>:
-			<span class="pmark shp2 T"><b>&nbsp;</b></span>
-			<span class="pmark shp2 B"><b>&nbsp;</b></span>
-			<span class="pmark shp2 L"><b>&nbsp;</b></span>
-			<span class="pmark shp2 R"><b>&nbsp;</b></span>
+
 			<br>
-			<br><u>&nbsp;контейнеры (f,c):&nbsp;</u>			
-			<br><b>shp1</b> body <span class="frame shp1 body" ><b>&nbsp;</b>&nbsp;<b>&nbsp;</b></span>
-			<br><b>    </b> div1 <span class="frame shp1 div1" ><b>&nbsp;</b>&nbsp;<b>&nbsp;</b></span>
-			<br><b>    </b> div2 <span class="frame shp1 div2" ><b>&nbsp;</b>&nbsp;<b>&nbsp;</b></span>
-			<br><b>    </b> div3 <span class="frame shp1 div3" ><b>&nbsp;</b>&nbsp;<b>&nbsp;</b></span>
-			<br><b>    </b> div4 <span class="frame shp1 div4" ><b>&nbsp;</b>&nbsp;<b>&nbsp;</b></span>
-			<br><b>    </b> все. <span class="frame shp1     " ><b>&nbsp;</b>&nbsp;<b>&nbsp;</b></span>
-			<br>			
-			<br><b>shp2</b> body <span class="frame shp2 body" ><b>&nbsp;</b>&nbsp;<b>&nbsp;</b></span>
-			<br><b>    </b> div1 <span class="frame shp2 div1" ><b>&nbsp;</b>&nbsp;<b>&nbsp;</b></span>
-			<br><b>    </b> div2 <span class="frame shp2 div2" ><b>&nbsp;</b>&nbsp;<b>&nbsp;</b></span>
-			<br><b>    </b> div3 <span class="frame shp2 div3" ><b>&nbsp;</b>&nbsp;<b>&nbsp;</b></span>
-			<br><b>    </b> div4 <span class="frame shp2 div4" ><b>&nbsp;</b>&nbsp;<b>&nbsp;</b></span>
-			<br><b>    </b> все. <span class="frame shp2     " ><b>&nbsp;</b>&nbsp;<b>&nbsp;</b></span>
+			<br><u>&nbsp;контейнеры (f,c):&nbsp;</u>
+			<br><b>shp1</b> body <span class="frame shp1 body"><b>&nbsp;</b>&nbsp;<b>&nbsp;</b></span>
+			<br><b> </b> div1 <span class="frame shp1 div1"><b>&nbsp;</b>&nbsp;<b>&nbsp;</b></span>
+			<br><b> </b> div2 <span class="frame shp1 div2"><b>&nbsp;</b>&nbsp;<b>&nbsp;</b></span>
+			<br><b> </b> div3 <span class="frame shp1 div3"><b>&nbsp;</b>&nbsp;<b>&nbsp;</b></span>
+			<br><b> </b> div4 <span class="frame shp1 div4"><b>&nbsp;</b>&nbsp;<b>&nbsp;</b></span>
+			<br><b> </b> все. <span class="frame shp1     "><b>&nbsp;</b>&nbsp;<b>&nbsp;</b></span>
 		</div>
 
 		<pre class="pre-head"><b>Варианты подвисания <i>olga5_shp</i></b>
 	</pre>
 		<div id="div0" class="thetext" style="height: 227px;">
 			<p class="title">
-				Демонстрация вариантов <i>подвисания</i> объектов вверху или внизу контейнера в зависимости от
+				Демонстрация вариантов <i>подвисания</i> объекта на границах контейнеров в зависимости от
 				направления скроллинга.
 			</p>
 			<div>
@@ -73,85 +71,40 @@
 				</p>
 			</div>
 		</div>
-		<style>
-			#div1 {
-				position: relative;
-				height: 80vh;
-				width: calc(100% - 166px);
+		
+		<span style="font-size: 12px;background: aqua; color:black;"> пояснение </span>
+		<span style="font-size: 16px;"><b>&uarr;</b></span>
+		<div id="div1" class="div" style="top:11px;left: 22px;">
+			<span>div1</span>
+			<div id="cbo1" class="cbo" style="background-size: 25px 25px; width: 3300px; height: 2200px;">
 
-				border: 3px green dashed;
-				background-color: lightgreen;
-				min-height: 600px;
-				min-width: 600px;
-			}
+				<div id="div2" class="div" style="top:11px;left: 22px;left:1000px; top:800px;">
+					<span>div2</span>
+					<div id="cbo2" class="cbo" style="background-size: 20px 20px; width: 2400px; height: 1800px; ">
 
-			#div2 {
-				border: 3px blue dashed;
-				height: 70vh;
-				width: 66vw;
-				background-color: lightblue;
-			}
-
-			#div3 {
-				border: 3px red dashed;
-				height: 44vh;
-				width: 56vw;
-				background-color: lightpink;
-			}
-
-			#div4 {
-				border: 3px lightgray dashed;
-				height: 22vh;
-				width: 46vw;
-				background-color: bisque;
-				min-height: 144px;
-			}
-
-			#cbo4 {
-				background-image:
-					linear-gradient(90deg, lightgray 1px, transparent 1px),
-					linear-gradient(0deg, lightgray 1px, transparent 1px);
-			}
-		</style>
-		 
-<span style="font-size: 12px;background: aqua; color:black;"> пояснение </span> 
-<span style="font-size: 16px;"><b>&uarr;</b></span> 
-<div id="div1" class="div" style="top:11px;left: 22px;">
-	<span>div1</span>
-	<div id="int1" class="int">
-		<div id="cbo1" class="cbo" style="background-size: 25px 25px; width: 2000px; height: 2000px;">
-
-			<div id="div2" class="div" style="top:11px;left: 22px;">
-				<span>div2</span>
-				<div id="int2" class="int">
-					<div id="cbo2" class="cbo" style="background-size: 20px 20px; width: 2000px; height: 2000px; ">
-
-						<div id="div3" class="div" style="top:11px;left: 22px;">
+						<div id="div3" class="div" style="top:11px;left: 22px;left:800px; top:700px;">
 							<span>div3</span>
-							<div id="int3" class="int">
-								<div id="cbo3" class="cbo" style="background-size: 15px 15px; width: 1200px; height: 1000px; ">
+							<div id="cbo3" class="cbo"
+								style="background-size: 15px 15px; width: 1900px; height: 1300px; ">
 
-<div id="div4" class="div" style="top:11px;left: 22px;">
+<div id="div4" class="div" style="top:11px;left: 22px;border-top-width: 9px;left:600px; top:510px;">
 	<span>div4</span>
-	<div id="int4" class="int">
-		<div id="cbo4" class="cbo" style="background-size: 10px 10px;width: 1400px; height: 400px; ">
-
-<div id="shp1" class="olga5_shp:Tr:i=div4,i=div1/c">
-	<p>название объекта</p>
-</div>
+	<div id="cbo4" class="cbo"
+		style="background-size: 10px 10px;width: 1600px; height: 600px; ">
+		<div id="shp1" class="olga5_shp:Tr:i=div4/fc,i=div3/f" style="left:470px; top:200px;">
+			<p>название объекта</p>
 		</div>
+		<!-- <div id="shp2" class="olga5_shp:Tr:i=div4,i=div1/c">
+			<p>название объекта</p>
+		</div> -->
 	</div>
 </div>
-								</div>
 							</div>
 						</div>
 					</div>
 				</div>
 			</div>
-
 		</div>
-	</div>
-</div>
 	</div>
 </body>
 

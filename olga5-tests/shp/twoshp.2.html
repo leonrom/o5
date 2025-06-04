@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<title>twoshp</title>
+	<link rel="shortcut icon" href="../add/favicon.svg" type="image/x-icon">
+
+	<link href='./add/all.css' media='screen' rel='stylesheet' />
+	<script src='./add/all.js'></script>
+
+	<script src='../../olga5/o5com.js' o5debug=0 data-o5urlrfs="
+      тесты='+ ../olga5-tests';
+    "></script>
+	<script data-src='+/o5shp.js'></script>
+	<script data-src='+o5inc.js'></script>
+	<script>
+		document.addEventListener('DOMContentLoaded', () => {
+			window.scrollTo(0, 260)
+			document.getElementById('div' + 3).scrollTo(550, 450)
+			document.getElementById('div' + 2).scrollTo(750, 650)
+			document.getElementById('div' + 1).scrollTo(950, 750)
+		})
+	</script>
+</head>
+
+<body id="body" style="height: 1500px;">
+	<div class='example olga5_Start'>
+		<div class='cboxed'>
+			<div title="видимость: клона и носителя, рамка обрамления">
+				<br><input type="checkbox" onclick="oo5.CbVisible(this, 'clons')" title="исходники для объектов">clon
+				<br><input type="checkbox" onclick="oo5.CbVisible(this, 'carts')" checked title="подвисшие объекты">cart
+				<br><input type="checkbox" onclick="oo5.OutLines(this )" checked title="синие рамки ">outline
+			</div>
+			<div class="shp1">
+				<p>
+					<b>shp1</b>: <input type="number" class="level shp1 T" min="-9" max="9" placeholder='0'>
+				</p>
+				<p title="места зависания тегов (Top Bottom Left Right)">
+					<span class="pmark shp1 T"><b>&nbsp;</b></span>
+					<span class="pmark shp1 B"><b>&nbsp;</b></span>
+					<span class="pmark shp1 L"><b>&nbsp;</b></span>
+					<span class="pmark shp1 R"><b>&nbsp;</b></span>
+				</p>
+				<p title="сдвиг соседнего тега  (Over Push Clench Shift )">
+					<span class="pshft shp1 O"><b>&nbsp;</b></span>
+					<span class="pshft shp1 P"><b>&nbsp;</b></span>
+					<span class="pshft shp1 C"><b>&nbsp;</b></span>
+					<span class="pshft shp1 S"><b class="select">&nbsp;</b></span>
+				</p>
+				<div class="bord" title="взаимодействующие контейнеры f - фиксация c - обрезание">
+					<p>&nbsp;<i>body </i><span class="frame shp1 body"><b>&nbsp;</b> <b>&nbsp;</b></span></p>
+					<p>&nbsp;<i>div1 </i><span class="frame shp1 div1"><b>&nbsp;</b> <b>&nbsp;</b></span></p>
+					<p>&nbsp;<i>div2 </i><span class="frame shp1 div2"><b>&nbsp;</b> <b>&nbsp;</b></span></p>
+					<p>&nbsp;<i>div3 </i><span class="frame shp1 div3"><b>&nbsp;</b> <b>&nbsp;</b></span></p>
+					<p>&nbsp;<i>div4 </i><span class="frame shp1 div4"><b>&nbsp;</b> <b>&nbsp;</b></span></p>
+					<p>&nbsp;<i>все. </i><span class="frame shp1     "><b>&nbsp;</b> <b>&nbsp;</b></span></p>
+				</div>
+			</div>
+
+			<div class="shp2">
+				<p>
+					<b>shp2</b>: <input type="number" class="level shp2 T" min="-9" max="9" placeholder='0'>
+				</p>
+				<p title="места зависания тегов (Top Bottom Left Right)">
+					<span class="pmark shp2 T"><b>&nbsp;</b></span>
+					<span class="pmark shp2 B"><b>&nbsp;</b></span>
+					<span class="pmark shp2 L"><b>&nbsp;</b></span>
+					<span class="pmark shp2 R"><b>&nbsp;</b></span>
+				</p>
+				<p title="сдвиг соседнего тега  (Over Push Clench Shift )">
+					<span class="pshft shp2 O"><b>&nbsp;</b></span>
+					<span class="pshft shp2 P"><b>&nbsp;</b></span>
+					<span class="pshft shp2 C"><b>&nbsp;</b></span>
+					<span class="pshft shp2 S"><b class="select">&nbsp;</b></span>
+				</p>
+				<div class="bord" title="взаимодействующие контейнеры f - фиксация c - обрезание">
+					<p>&nbsp;<i>body </i><span class="frame shp2 body"><b>&nbsp;</b> <b>&nbsp;</b></span></p>
+					<p>&nbsp;<i>div1 </i><span class="frame shp2 div1"><b>&nbsp;</b> <b>&nbsp;</b></span></p>
+					<p>&nbsp;<i>div2 </i><span class="frame shp2 div2"><b>&nbsp;</b> <b>&nbsp;</b></span></p>
+					<p>&nbsp;<i>div3 </i><span class="frame shp2 div3"><b>&nbsp;</b> <b>&nbsp;</b></span></p>
+					<p>&nbsp;<i>div4 </i><span class="frame shp2 div4"><b>&nbsp;</b> <b>&nbsp;</b></span></p>
+					<p>&nbsp;<i>все. </i><span class="frame shp2     "><b>&nbsp;</b> <b>&nbsp;</b></span></p>
+				</div>
+			</div>
+
+			<div class="shp3">
+				<p>
+					<b>shp3</b>: <input type="number" class="level shp3 T" min="-9" max="9" placeholder='0'>
+				</p>
+				<p title="места зависания тегов (Top Bottom Left Right)">
+					<span class="pmark shp3 T"><b>&nbsp;</b></span>
+					<span class="pmark shp3 B"><b>&nbsp;</b></span>
+					<span class="pmark shp3 L"><b>&nbsp;</b></span>
+					<span class="pmark shp3 R"><b>&nbsp;</b></span>
+				</p>
+				<p title="сдвиг соседнего тега  (Over Push Clench Shift )">
+					<span class="pshft shp3 O"><b>&nbsp;</b></span>
+					<span class="pshft shp3 P"><b>&nbsp;</b></span>
+					<span class="pshft shp3 C"><b>&nbsp;</b></span>
+					<span class="pshft shp3 S"><b class="select">&nbsp;</b></span>
+				</p>
+				<div class="bord" title="взаимодействующие контейнеры f - фиксация c - обрезание">
+					<p>&nbsp;<i>body </i><span class="frame shp3 body"><b>&nbsp;</b> <b>&nbsp;</b></span></p>
+					<p>&nbsp;<i>div1 </i><span class="frame shp3 div1"><b>&nbsp;</b> <b>&nbsp;</b></span></p>
+					<p>&nbsp;<i>div2 </i><span class="frame shp3 div2"><b>&nbsp;</b> <b>&nbsp;</b></span></p>
+					<p>&nbsp;<i>div3 </i><span class="frame shp3 div3"><b>&nbsp;</b> <b>&nbsp;</b></span></p>
+					<p>&nbsp;<i>div4 </i><span class="frame shp3 div4"><b>&nbsp;</b> <b>&nbsp;</b></span></p>
+					<p>&nbsp;<i>все. </i><span class="frame shp3     "><b>&nbsp;</b> <b>&nbsp;</b></span></p>
+				</div>
+			</div>
+			<!-- 
+			<br><b>shp2</b>:
+			<span class="pmark shp2 T"><b>&nbsp;</b></span>
+			<span class="pmark shp2 B"><b>&nbsp;</b></span>
+			<span class="pmark shp2 L"><b>&nbsp;</b></span>
+			<span class="pmark shp2 R"><b>&nbsp;</b></span>
+			<br><b>&nbsp;&nbsp;&nbsp;&nbsp;</b>:
+			<span class="pshft shp2 O"><b>&nbsp;</b></span>
+			<span class="pshft shp2 P"><b>&nbsp;</b></span>
+			<span class="pshft shp2 C"><b>&nbsp;</b></span>
+			<span class="pshft shp2 S"><b class="select">&nbsp;</b></span>
+			<br>
+			<br><b>shp2</b> body <span class="frame shp2 body"><b>&nbsp;</b>&nbsp;<b>&nbsp;</b></span>
+			<br><b> </b> div1 <span class="frame shp2 div1"><b>&nbsp;</b>&nbsp;<b>&nbsp;</b></span>
+			<br><b> </b> div2 <span class="frame shp2 div2"><b>&nbsp;</b>&nbsp;<b>&nbsp;</b></span>
+			<br><b> </b> div3 <span class="frame shp2 div3"><b>&nbsp;</b>&nbsp;<b>&nbsp;</b></span>
+			<br><b> </b> все. <span class="frame shp2     "><b>&nbsp;</b>&nbsp;<b>&nbsp;</b></span>
+			 -->
+		</div>
+
+		<pre class="pre-head"><b>Варианты подвисания <i>olga5_shp</i></b>
+	</pre>
+		<div id="div0" class="thetext" style="height: 227px;">
+			<p class="title">
+				Демонстрация вариантов <i>подвисания</i> и взаимодействия объектов.
+				Сравнивается поведение <b>shp2</b> при его вертикальных сдвигах относительно <b>shp1</b>,-
+				если прижать последний к правому краю и горизонтальным скроллингом менять их взаимное положение
+			</p>
+			<div>
+				<div o5include='тесты + /shp/add/all.html?.descript'></div>
+			</div>
+			<div>
+				<p class="moecomment">
+					Задайте несколько фреймов <i>зависания</i> (или <i>обрезания</i>) и посмотрите изменение
+					значений
+					<b>t</b> и <b>b</b>
+					при изменении взаимного положения контейнеров <b>div1</b>, <b>div2</b> и <b>div3</b>.
+					Оцените зависание <b>shp1</b> на <b>div1</b> при задании <b>Где</b>=<i>внизу</i>
+					в зависимости от наличия горизонтальной полосы скроллинга.
+				</p>
+			</div>
+		</div>
+
+		<span style="font-size: 12px;background: aqua; color:black;"> пояснение </span>
+		<span style="font-size: 16px;"><b>&uarr;</b></span>
+		<div id="div1" class="div" style="top:11px;left: 22px;">
+			<span>div1</span>
+			<div id="cbo1" class="cbo" style="background-size: 25px 25px; width: 3300px; height: 2200px;">
+
+				<div id="div2" class="div" style="top:11px;left: 22px;left:1000px; top:800px;">
+					<span>div2</span>
+					<div id="cbo2" class="cbo" style="background-size: 20px 20px; width: 2400px; height: 1800px; ">
+
+						<div id="div3" class="div" style="top:11px;left: 22px;left:800px; top:700px;">
+							<span>div3</span>
+							<div id="cbo3" class="cbo"
+								style="background-size: 15px 15px; width: 1900px; height: 1300px; ">
+
+								<div id="shp1" class="olga5_shp:TrLb:i=div3/fc" style="left:720px; top:500px;">
+									<p>название объекта</p>
+								</div>
+								<div id="shp2" class="olga5_shp:TrLb:i=div3/fc" style="left:600px; top:600px;">
+									<p>название объекта</p>
+								</div>
+								<div id="shp3" class="olga5_shp:TrLb:i=div3/fc" style="left:820px; top:550px;">
+									<p>название объекта</p>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+
+</html>

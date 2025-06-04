@@ -35,7 +35,7 @@
                         For now I’m going to continue to use document.createElement('img'). 
                         Not only is this the w3c recommendation but it’s the faster method in IE8, the version users are slowly starting to adopt.
                         */
-                        if (C.consts.o5debug > 2)
+                        if (C.consts.o5debug > 1)
                             console.log(`${lognam} olga5_Imgs создание нового для url=${url}`)
 
                         const nimg = document.createElement('img')

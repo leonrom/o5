@@ -100,7 +100,7 @@
     font-family: monospace;
 }
 
-div.olga5_shp.olga5-ignore.container,
+/* div.olga5_shp.olga5-ignore.container,
 .container {
     /* display: flow-root; */
     display: block;
@@ -110,7 +110,7 @@ div.olga5_shp.olga5-ignore.container,
 	height: calc(88% - 88px);
     /* max-width: 733px; */
     overflow: auto;
-}
+} */
 
 .container.main-div {
 	    height: 444px;

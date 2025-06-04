@@ -43,7 +43,7 @@ pre {
                 td2 = document.getElementById('td2'),
                 PrtS = mtags => {
                     for (const mtag of mtags)
-                        mtag.tag.insertAdjacentHTML('beforend', 
+                        mtag.tag.insertAdjacentHTML('beforeEnd', 
                     (mtag.tag.innerHTML.trim() ? ': ' : '') +
                             `<b>${C.MakeObjName(mtag.tag)}</b>: className=${mtag.origcls} ` +
                             `<span style="margin-left: 30px;"> className=${mtag.tag.className}</span>`+
@@ -55,8 +55,8 @@ pre {
                         ss = [],
                         add = td1.innerHTML ? '<br/>  ' : '  '
                     tags.forEach(tag => { ss.push(C.MakeObjName(tag)) })
-                    td1.insertAdjacentHTML('beforend', add + `C.<b>${fun}</b> ( '${query}',  '' )`)
-                    td2.insertAdjacentHTML('beforend', add + `${ss.join(', ')}`)
+                    td1.insertAdjacentHTML('beforeEnd', add + `C.<b>${fun}</b> ( '${query}',  '' )`)
+                    td2.insertAdjacentHTML('beforeEnd', add + `${ss.join(', ')}`)
                 }
 
             C.QuerySelectorInit(document.querySelectorAll("[class *= 'olga5_Start']"))

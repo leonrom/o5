@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head> 
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<title>twoshp</title>
+	<link rel="shortcut icon" href="../add/favicon.svg" type="image/x-icon">
+
+	<link href='./add/all.css' media='screen' rel='stylesheet' />
+	<script src='./add/all.js'></script>
+
+	<script src='../../olga5/o5com.js' o5debug=0 data-o5urlrfs="
+      тесты='+ ../olga5-tests';
+    "></script>
+
+	<script data-src='+o5dbg.js' o5load="up"></script>></script>
+
+	<script data-src='+o5shp.js'></script>
+	<script data-src='+o5inc.js'></script>
+
+</head>
+
+<body id="body" style="height: 1500px;">
+	<div class='example olga5_Start'>
+
+		<div class='cboxed'>
+			<div title="видимость: клона и носителя, рамка обрамления">
+				<p><input id="clons" type="checkbox" onclick="oo5.CbVisible(this)" title="исходники">clon</p>
+				<p><input id="carts" type="checkbox" onclick="oo5.CbVisible(this)" title="подвисшие">cart</p>
+				<p><input id="outli" type="checkbox" onclick="oo5.OutLines(this )" title="синие рамки ">outline</p>
+			</div>
+			<button id="btnCallScroll" type="button" style="top: 8px;" onclick="oo5.CallScroll('V' )">scr V</button>
+			<button id="btnCallScroll" type="button" style="top: 32px;" onclick="oo5.CallScroll('H' )">scr H</button>
+
+			<div class='divs'>
+				<div id="div-etalon">
+					<p>
+						<b class="name">X</b>:
+						<input class="level" type="number" min="-9" max="9" placeholder='0'>
+						<input class="alive" type="checkbox">
+					</p>
+					<p class="pmark" title="места зависания тегов">
+						<span class="T" title="завис. Top   "><b>&nbsp;</b></span>
+						<span class="B" title="завис. Bottom"><b>&nbsp;</b></span>
+						<span class="L" title="завис. Left  "><b>&nbsp;</b></span>
+						<span class="R" title="завис. Right "><b>&nbsp;</b></span>
+					</p>
+					<p class="pitch" title="сдвиг соседнего тега ">
+						<span class="O" title="сдвиг Over  "><b>&nbsp;</b></span>
+						<span class="P" title="сдвиг Push  "><b>&nbsp;</b></span>
+						<span class="C" title="сдвиг Clench"><b>&nbsp;</b></span>
+						<span class="S" title="сдвиг Shift "><b>&nbsp;</b></span>
+					</p>
+					<div class="frame" title="взаимодействующие контейнеры f - фиксация c - обрезание">
+						<p class="body">&nbsp;<i>body </i><span><b>&nbsp;</b> <b>&nbsp;</b></span></p>
+						<p class="div1">&nbsp;<i>div1 </i><span><b>&nbsp;</b> <b>&nbsp;</b></span></p>
+						<p class="div2">&nbsp;<i>div2 </i><span><b>&nbsp;</b> <b>&nbsp;</b></span></p>
+						<p class="div3">&nbsp;<i>div3 </i><span><b>&nbsp;</b> <b>&nbsp;</b></span></p>
+						<p class="div4">&nbsp;<i>div4 </i><span><b>&nbsp;</b> <b>&nbsp;</b></span></p>
+						<p class="    ">&nbsp;<i>все. </i><span><b>&nbsp;</b> <b>&nbsp;</b></span></p>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<pre id="ref0" class="pre-head"><b>Варианты подвисания <i>olga5_shp</i></b>
+	</pre>
+		<div class="thetext" style="height: 227px;">
+			<p>
+				Демонстрация вариантов <i>подвисания</i> и взаимодействия объектов.
+				Сравнивается поведение <b>shp2</b> при его вертикальных сдвигах относительно <b>shp1</b>,-
+				если, например, скроллировать вверх/вниз или прижать последний к правому краю и горизонтальным 
+				скроллингом менять их взаимное положение
+			</p>
+			<p>
+				Объект может фиксироваться только после того, как он появится на экране полностью. 
+				Объект не может быть одновременно фиксированным своими противоположными сторонами 
+				(при коллизиях приоритет у 'top' и 'left').
+			</p>
+			<p>
+				Незафиксированный объект можно перетащить по экрану, "захватив" его курсором мыши.
+			</p>
+			<div>
+				<div o5include='тесты + /shp/add/all.html?.descript'></div>
+			</div>
+			<!-- <p>
+				Задайте несколько фреймов <i>подвисания</i> (или <i>обрезания</i>) и посмотрите изменение
+				значений <b>t</b> и <b>b</b>
+				при изменении взаимного положения контейнеров <b>div1</b>, <b>div2</b> и <b>div3</b>.
+				Оцените зависание <b>shp1</b> на <b>div1</b> при задании <b>Где</b>=<i>внизу</i>
+				в зависимости от наличия горизонтальной полосы скроллинга.
+			</p> -->
+		</div>
+
+		<span style="font-size: 12px;background: lightcyan; color:black;">читать  пояснение </span>
+		<span id="ref1" style="font-size: 16px; background: yellow; font-weight: bold; border: 1px blue solid; border-radius: 5px;"><b>&uarr;</b></span>
+		<div id="div1" class="div" style="top:11px;left: 22px;">
+			<span>div1</span>
+			<div id="cbo1" class="cbo" style="background-size: 25px 25px; width: 3300px; height: 2200px;">
+
+				<div id="div2" class="div" style="top:11px;left: 22px;left:1000px; top:800px;">
+					<span>div2</span>
+					<div id="cbo2" class="cbo" style="background-size: 20px 20px; width: 2400px; height: 1800px; ">
+
+						<div id="div3" class="div" style="top:11px;left: 22px;left:800px; top:700px;">
+							<span>div3</span>
+							<div id="cbo3" class="cbo"
+								style="background-size: 15px 15px; width: 1900px; height: 1300px; ">
+
+								<div id="shp0" class="moved olga5_shp:TrLb:i=div3/fc,div2/f" style="left:750px; top:500px;">
+									<p>название объекта</p>
+								</div>
+								<div id="shp1" class="moved olga5_shp:nTrLb-1A:i=div3/fc" style="left:620px; top:600px; height: 60px; width: 322px;">
+									<p>название объекта</p>
+								</div>
+								<div id="shp2" class="moved olga5_shp:TrLb:1:i=div3/fc" style="left:900px; top:660px;">
+									<p>название объекта</p>
+								</div>
+								<div id="shp3" class="moved olga5_shp:TrLb2A:i=div3/fc" style="left:700px; top:700px; height: 60px;">
+									<p>название объекта</p>
+								</div>
+								<div id="shp4" class="moved olga5_shp:TrLb:3:i=div3/fc" style="left:950px; top:860px;">
+									<p>название объекта</p>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+
+</html>

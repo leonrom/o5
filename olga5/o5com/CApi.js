@@ -49,7 +49,7 @@
 			owners: [],
 			scrpts: [],
 			Match: Match,			
-			MyRound: s => { return Math.round(parseFloat(s)) },
+			// MyRound: s => { return Math.round(parseFloat(s)) },
 			MakeObjName: function (obj, len) { // моё формирование имени объекта
 				if (obj) {
 					const nam = Object.is(obj, window) ? '#window' : (
@@ -76,7 +76,7 @@
 				const tags = GetTagsBy(modul, 'getElementsByClassName', classnams),
 					rez = []
 				for (const tag of tags)
-					if (!tag.classList.contains(C.olga5ignore))
+					// if (!tag.classList.contains(C.olga5ignore))
 						rez.push(tag)
 				return rez
 			},
@@ -87,8 +87,8 @@
 				const tags = GetTagsBy(modul, 'querySelectorAll', '[class *=' + classnam + ']'),
 					match = Match(classnam),
 					rez = []
-				for (const tag of tags)
-					if (!tag.classList.contains(C.olga5ignore)) {
+				for (const tag of tags){
+					// if (!tag.classList.contains(C.olga5ignore)) {
 						const ms = tag.className.match(match)
 						if (ms) {
 							const quals = [],
@@ -130,7 +130,7 @@
 								else errs.push(modul)
 							}
 							C.owners.push({ start: tag, modules: quals, origcls: m }) // специально чуть по-иному
-							if (C.consts.o5debug > 2)
+							if (C.consts.o5debug > 1)
 								console.log(`${olga5_modul}/${modulname} QuerySelectorInit: id='${tag.id}',  '${m}', \n\t${quals}`)
 						}
 					}

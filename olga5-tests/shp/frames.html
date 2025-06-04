@@ -4,7 +4,7 @@
 <head>
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 	<title>frames</title>
-	<link rel="shortcut icon" href="./add/favicon.svg" type="image/x-icon">
+	<link rel="shortcut icon" href="../add/favicon.svg" type="image/x-icon">
 
 	<script src='../../olga5/o5com.js' o5debug=0 data-o5urlrfs="
       тесты='+ ../olga5-tests';
@@ -117,29 +117,33 @@
 			log = null
 		const
 			List = e => {
-				const
-					aO5 = e.detail.aO5
+				const aO5 = e.detail.aO5
+				if (aO5.act.iTested)
+					return
+
+				aO5.act.iTested = true  // отметка о показе
+
 				let onam = ''
 
-				let s = `&nbsp; ${aO5.name.padEnd(12)}: "` + aO5.frames.map(f => f.s).join(',') + `"`
+				let s = `&nbsp; <b>${aO5.name.padEnd(12, '&nbsp;')}</b>: "` + aO5.shp.aO5quals.join(':') + `"`
 				for (const f of aO5.frames) {
 					const fc = f.fix && f.cut ? '/fix/cut' : (f.fix ? '/fix' : (f.cut ? '/cut' : '')),
-						nam = f.pO5 ? f.pO5.name : `null`
+						nam = f.tag ? f.tag.pO5.name : `null`
 					// nam = f.pO5 === true ? 'ближний' : (f.pO5 ? f.pO5.name : `null`)
 					// nam = (f.pO5 ? `<b>${f.pO5.name}</b> ` : `null `).padEnd(9, '\u00A0')
 					s += '<br> ' +
-						`${f.typ}:${f.cod}/${f.num}${fc}; `.padEnd(18, '\u00A0') +
+						`${f.typ}=${f.cod}/${f.num}${fc}; `.padEnd(18, '\u00A0') +
 						`<b>${nam.padEnd(6, '\u00A0')}</b>` +
 						(f.pO5 ? ` [${f.pO5.classOrigs}]` : ``)
 					if (f.err) {
 						if (onam !== aO5.name) {
 							onam = aO5.name
-							log.insertAdjacentHTML('beforeend', `<b>${aO5.name}</b><br>`)
+							log.insertAdjacentHTML('beforeEnd', `<b>${aO5.name}</b><br>`)
 						}
-						log.insertAdjacentHTML('beforeend', `&mdash; ${f.err}<br>`)
+						log.insertAdjacentHTML('beforeEnd', `&mdash; ${f.err}<br>`)
 					}
 				}
-				aO5.shp.insertAdjacentHTML('afterbegin', s)
+				aO5.shp.insertAdjacentHTML('afterBegin', s)
 			},
 			Init = () => {
 				const
@@ -151,7 +155,7 @@
 						if (div.id !== 'strt' && (
 							div.classList.contains('ccc') || !div.classList.contains('olga5_shp')
 						))
-							div.insertAdjacentHTML('afterbegin', '#' + div.id + ' &nbsp; [' + div.className + ']')
+							div.insertAdjacentHTML('afterBegin', '#' + div.id + ' &nbsp; [' + div.className + ']')
 			}
 
 		window.addEventListener('o5_isInited', Init)
@@ -163,14 +167,15 @@
 		<table>
 			<tr>
 				<td>
-				</>
+					</>
 					Для каждого контейнера указываюся его id и квадратных скобках - заданные классы.
-					Для каждого <i>подвисабельного</i> объекта определяются его контейнеры: <b>id</b> жирным шрифом и классы (в квадратных скобках).
-				</p>
+					Для каждого <i>подвисабельного</i> объекта определяются его контейнеры: <b>id</b> жирным шрифом и
+					классы (в квадратных скобках).
+					</p>
 					<p>
-					PS для '#shp1-2' фрейм для "n=div/1c" получился <b>null</b> потому, что его тег совпал с
-					фреймовым "n=div/f", в который при этом добавился <b>cut</b>
-				</p>
+						PS для '#shp1-2' фрейм для "n=div/1c" получился <b>null</b> потому, что его тег совпал с
+						фреймовым "n=div/f", в который при этом добавился <b>cut</b>
+					</p>
 				</td>
 				<td>
 					<div id="log">
@@ -247,9 +252,9 @@
 		</div>
 	</div>
 	для shp4- в журнале не написано, что не найдено
-	почему 
+	почему
 	#moe4 : "i=dovX/f"
-i:dovX/0/fix;     null  #moe4   [ccc moe1 olga5_shp ]
+	i:dovX/0/fix; null #moe4 [ccc moe1 olga5_shp ]
 </body>
 
 </html>

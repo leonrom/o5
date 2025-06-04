@@ -32,7 +32,6 @@
 					let isd = MyEvents.doceves.includes(eve),
 						isu = false
 
-					// isd = su == 'D' ? true : (su == 'W' ? false : this.doceves.includes(eve))
 					for (let i = 1; i < ss.length; i++)
 						if (ss[i])
 							switch (ss[i][0].toUpperCase()) {
@@ -53,11 +52,11 @@
 			}
 			Object.freeze(this)
 		}
-		AddEvents = Fun => {
+		AddEvents(Fun) {
 			for (const meve of this.meves)
 				(meve.isd ? document : window).addEventListener(meve.eve, Fun, true)
 		}
-		RemEvents = Fun => {
+		RemEvents(Fun) {
 			for (const meve of this.meves)
 				(meve.isd ? document : window).removeEventListener(meve.eve, Fun, true)
 		}
@@ -70,7 +69,7 @@
 			Object.seal(this.act)
 			Object.freeze(this)
 		}
-		Stop = add => {
+		Stop(add) {
 			// console.log('...=', this.act.time,  this.act.name)
 			if (this.act.time) {
 				const dt = (' ' + (Number(new Date()) - this.act.time)).padStart(8) + ' ms',
@@ -84,7 +83,7 @@
 				}
 			}
 		}
-		Start = (name, iso5inc) => {
+		Start(name, iso5inc) {
 			if (this.act.time && !iso5inc)
 				this.Stop('не закончено')
 
@@ -208,7 +207,7 @@
 					}
 				}
 			}
-			if (C.consts.o5debug > 2)
+			if (C.consts.o5debug > 1)
 				console.log('    > ' + newloads.length ? ` (готовы к инициации: ${newloads.join(', ')})` : ' (но инициировать нечего)')
 
 			if (newloads.length > 0)
@@ -313,11 +312,14 @@
 	class Page {
 		pact = { url: '', ready: false, start: 0, timerp: new MyTimer(" КОНЕЦ  обработки  страницы"), timer: 0, mos: [] }
 		errs = []
-		PageHidden = e => { // закрытие всех новых элементов страницы
+
+		PageHidden(e) { // закрытие всех новых элементов страницы
 
 			const pact = this.pact
 			if (!pact.ready) return
 
+			let ac1 = 0,
+				ac2 = 0
 			pact.ready = false
 
 			const n0 = this.childs.length
@@ -330,7 +332,7 @@
 					owner = child.aO5_pageOwner
 				for (const item of owner.children)
 					if (item == child) {
-						// item.remove()
+						ac1++
 						item.style.display = 'none'
 						owner.removeChild(item)
 						break
@@ -340,15 +342,17 @@
 
 			C.scrpts.forEach(scrpt => {
 				const act = scrpt.act
-				if (act && pact.start == act.start && act.W && act.W.Done)
+				if (act && pact.start == act.start && act.W && act.W.Done) {
 					act.W.Done()
+					ac2++
+				}
 			})
 
-			this.pageDones.RemEvents(this.PageHidden)
-			// window.dispatchEvent(new window.Event('o5_isHidden'))
-			C.E.DispatchEvent('o5_isHidden')
+			this.pageDones.RemEvents(this.PageHidden.bind(this))
+			if (ac1 || ac2)
+				C.E.DispatchEvent('o5_isHidden', `закрытие всех (${ac1}/${ac2}) элементов страницы`)
 		}
-		PageLoad = e => { 	// проверки и начало инициализации страницы !
+		PageLoad(e) { 	// проверки и начало инициализации страницы !
 			const
 				iso5inc = e.type === 'o5inc_ready',
 				url = document.URL.match(/[^?&#]*/)[0].trim(),
@@ -357,7 +361,7 @@
 				head = ` PageLoad (${isnew ? 'новая' : 'повтор'}):  `
 
 			if (iso5inc) {
-				const hash=C.save.hash
+				const hash = C.save.hash
 				if (hash) { // делать именно после дозагрузок документа 
 					const tag = document.getElementById(hash)
 					if (tag) tag.scrollIntoView({ alignToTop: true, block: 'start', behavior: "auto" })
@@ -438,7 +442,7 @@
 					pact.timer = window.setTimeout(ScriptsFinish, 1000 * C.consts.o5timload, this, true)
 				}
 
-				this.pageDones.AddEvents(this.PageHidden)
+				this.pageDones.AddEvents(this.PageHidden.bind(this))
 
 				this.errs.splice(0, this.errs.length)
 
@@ -451,15 +455,27 @@
 				ScriptsStart()	// e.type == 'o5inc_ready'
 			}
 		}
-		AppendChild = (owner, child) => {
+		AppendChild(owner, child) {
 			child.aO5_pageOwner = owner
 			owner.appendChild(child)
 			this.childs.push(child)
 		}
-		InsertBefore = (owner, child, reference) => {
+		InsertBefore(owner, child, reference) {
 			child.aO5_pageOwner = owner
 			owner.insertBefore(child, reference)
 			this.childs.push(child)
+		}
+
+		static pageLoads = new MyEvents(C.consts.o5_pageLoads)
+		static pageDones = new MyEvents(C.consts.o5_pageDones)
+		static scriptLoad = new MyEvents('o5_scriptLoad')
+		static scriptDone = new MyEvents('o5_scriptDone')
+
+		static {
+			Page.prototype.pageLoads = Page.pageLoads
+			Page.prototype.pageDones = Page.pageDones
+			Page.prototype.scriptLoad = Page.scriptLoad
+			Page.prototype.scriptDone = Page.scriptDone
 		}
 
 		constructor() {
@@ -468,15 +484,16 @@
 			this.childs = []
 			this.starts = []
 
-			this.pageLoads = new MyEvents(C.consts.o5_pageLoads)
-			this.pageDones = new MyEvents(C.consts.o5_pageDones)
+			// this.pageLoads = new MyEvents(C.consts.o5_pageLoads)
+			// this.pageDones = new MyEvents(C.consts.o5_pageDones)
 
-			this.scriptLoad = new MyEvents('o5_scriptLoad')
-			this.scriptDone = new MyEvents('o5_scriptDone')
+			// this.scriptLoad = new MyEvents('o5_scriptLoad')
+			// this.scriptDone = new MyEvents('o5_scriptDone')
 
-			this.pageLoads.AddEvents(this.PageLoad)	//{ capture: true }
+			this.pageLoads.AddEvents(this.PageLoad.bind(this))	//{ capture: true }
 
 			Object.seal(this.pact)
+
 			Object.freeze(this)
 		}
 	}

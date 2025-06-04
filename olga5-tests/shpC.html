@@ -35,8 +35,8 @@
 
 				if (oldname !== aO5.name) {
 					oldname = aO5.name
-					log.insertAdjacentHTML('beforend', '<span class="span1">' +
-						`<b>${aO5.name.padEnd(3, ' ')}</b>` +
+					log.insertAdjacentHTML('beforeEnd', '<span class="span1">' +
+						`<b>${aO5.name.padEnd(3, '&nbsp;')}</b>` +
 						'</span><br/>')
 				}
 				for (const bord of blngs.bords) {
@@ -47,7 +47,7 @@
 					}
 					if (bord.typ === 'N')
 						console.log()
-					log.insertAdjacentHTML('beforend', '<span class="span2">' +
+					log.insertAdjacentHTML('beforeEnd', '<span class="span2">' +
 						`${u.padEnd(8, '.')} ::  ` +
 						`${bord.typ.substring(0, 1)}:` +
 						`${bord.cod.padEnd(9, '.')}:` +

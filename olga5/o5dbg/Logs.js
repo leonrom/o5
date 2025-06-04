@@ -54,7 +54,7 @@ pre span{
 						(dt.getSeconds() + '.').padStart(3, '0') +
 						(dt.getMilliseconds() + '').padEnd(3, '0'))
 				// o5log.innerText += '\n' + ds + ' ' + s
-				o5log.insertAdjacentHTML('beforend', '<pre>' + ds + ' ' + s + '</pre>')
+				o5log.insertAdjacentHTML('beforeEnd', '<pre>' + ds + ' ' + s + '</pre>')
 			}
 			else err = 'Не удалось инициировать ' + modulname + ' ?'
 		} catch (e) {

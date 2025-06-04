@@ -57,7 +57,7 @@
                 MakeObjName = obj => C.MakeObjName(obj).substring(1),
                 PrtS = mtags => {
                     for (const mtag of mtags)
-                        mtag.tag.insertAdjacentHTML('beforend', (mtag.tag.innerHTML.trim() ? '<br\>' : '') +
+                        mtag.tag.insertAdjacentHTML('beforeEnd', (mtag.tag.innerHTML.trim() ? '<br\>' : '') +
                             `<b>${MakeObjName(mtag.tag)}</b>: исх.className= "${mtag.origcls}"<br\>` +
                             `<span style="margin-left: 30px;">&nbsp;рез.className= "${mtag.tag.className}"</span>` +
                             `<span style="margin-left: 30px;"> <b>квалиф</b>.: ${mtag.quals.length > 0 ? mtag.quals.join(', ') : ' -'}</span>`)
@@ -68,8 +68,8 @@
                         ss = [],
                         add = td1.innerHTML ? '<br/>  ' : '  '
                     tags.forEach(tag => { ss.push(MakeObjName(tag)) })
-                    td1.insertAdjacentHTML('beforend',  add + `C.<b>${fun}</b> ( '${query}',  '' )`)
-                    td2.insertAdjacentHTML('beforend',  add + `${ss.join(', ')}`)
+                    td1.insertAdjacentHTML('beforeEnd',  add + `C.<b>${fun}</b> ( '${query}',  '' )`)
+                    td2.insertAdjacentHTML('beforeEnd',  add + `${ss.join(', ')}`)
                 },
                 olga5Start = 'olga5_Start',
                 starts = document.querySelectorAll("[class *= '" + olga5Start + "']")

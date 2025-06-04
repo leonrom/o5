@@ -207,7 +207,7 @@
 
 				if (ok && win.resize) {
 					if (window.olga5.o5shp)
-						window.olga5.o5shp.DoResize('из o5mnu')
+						window.olga5.o5shp.Bords.InitAllBords(0)
 				}
 				win.blockclick = true
 				e.cancelBubble = true
