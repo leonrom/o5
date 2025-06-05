@@ -578,7 +578,7 @@ class OO5 {
                 this.Activate({ detail: { div, aO5 } })
         }
 
-        window.addEventListener('o5_newAO5', this.Activate)
+        window.addEventListener('o5_containers', this.Activate)
         window.addEventListener('o5_fixed', this.ActFix)
     }
 }

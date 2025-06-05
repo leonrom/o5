@@ -39,10 +39,8 @@
         static TObj = { T: {}, L: {}, R: {}, B: {} }
         static nom = 0
 
-        constructor(mtag) {
-            const 
-            aO5 = this,
-            shp = mtag.tag
+        constructor(shp) {
+            const             aO5 = this
 
             shp.aO5shp = aO5
 
@@ -55,14 +53,13 @@
                 ext: {},    // для хранения произвольных данных внешними (тестовыми) модулями
                 cls: { puts: [], pitch: 'S', alive: false, none: false, level: 0, nofx: false },
                 act: {
-                    quals: mtag.quals.slice(),
                     pbase: null, 
                     clon: null,
                     cart: null,
                     shdw: shp,          // будет: или  shp или clon
                     checkN: -1,         // для проверок подвисания под ним
                     iTested: false,     // для контроля в тестах                    
-                    wasFull: false,     // был полностью показан на экране - может прилипнуть на границы
+                    // wasFull: false,     // был полностью показан на экране - может прилипнуть на границы
                 },
                 margs: { t: '', l: '', r: '', b: '', },
                 outln: { w: '', s: '', c: '', o: '', },
@@ -143,18 +140,6 @@
                 { outlineWidth: outln.w, outlineStyle: outln.s, outlineColor: outln.c, outlineOffset: outln.o }
             )
         }
-        ReadAttrs(quals){
-            const qs = quals || []
-            wshp.Frames.ReadCls(this, qs)
-            wshp.Frames.ReadFrames(this, qs)
-        }
-        // SetPosD() { // используется также в тестах
-        //     const
-        //         p = this.shp.getBoundingClientRect(),
-        //         y = window.scrollY,
-        //         x = window.scrollX
-        //     Object.assign(this.posD, { T: y + p.top, L: x + p.left, R: x + p.right, B: y + p.bottom, })
-        // }
         #HasFixedDebug() {
             let s = ''
             for (const x of 'TLRB')
@@ -322,26 +307,6 @@
             return clon
         }
     }
-
-    // const
-    //     Create = (shp, time) => {
-    //         const
-    //             aO5 = new AO5(shp)
-
-    //         wshp.PO5shp.CreatePrevPO5(aO5.parent)
-
-    //         if (wshp.allAO5s.has(aO5)) alert('Повтор создания ' + aO5.a_name)
-    //         else
-    //             wshp.allAO5s.add(aO5)
-
-    //         aO5.ReadAttrs(aO5.shp.aO5quals)
-
-    //         wshp.Boards.FindBords(aO5, time)
-            
-    //         window.dispatchEvent(new CustomEvent('o5_newAO5', { detail: { shp, aO5 } }))
-
-    //         return aO5
-    //     }
 
     wshp = C.AddModuleSub(olga5_modul, modulname, [AO5])
 })();

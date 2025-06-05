@@ -90,7 +90,7 @@
 			class: 'olga5_shp',
 			incls: {
 				// names: ['DoScroll', 'DoResize', 'Boards', 'Frames', 'AO5shp', 'PO5shp', 'DoInit'],
-				names: ['DoInit', 'AO5shp'],
+				names: ['DoInit', 'AO5shp', 'PO5shp', 'Boards', 'Frames'],
 				actscript: document.currentScript,
 			},
 		},
@@ -179,7 +179,8 @@
 		// }
 	}
 
+	wshp.tLastScroll = 0
 	wshp.ascroll = { isScroll: false, name: 'scroll', fun: null, arg: true },
-	wshp.allAO5s = new Set()		// все объекты в документе
+	// wshp.allAO5s = new Set()		// все объекты в документе
 	wshp.allPO5s = new Set()		// все объекты в документе
 })();

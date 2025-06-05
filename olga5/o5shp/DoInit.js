@@ -65,21 +65,29 @@
 
     /**
      * Обработчик событий от IntersectionObserver.
-     * Помечает элемент как показанный и отключает наблюдение.
+     * Создаёт aO5 для 'увиденного' элемента и отключает его наблюдение.
+     * запускает прослушиватель 'scroll
      * @function Observe
      * @param {IntersectionObserverEntry[]} entries - Список наблюдаемых пересечений.
      */
     const Observe = entries => {
-        const time = performance.now()
-
+        let aO5;
         for (const entry of entries)
             if (entry.isIntersecting) {
-                const aO5 = entry.target.aO5shp
-                aO5.act.wasShown = true
-                SwitchObserve(aO5, false)
+                const shp = entry.target
+                if (!(aO5=shp.aO5shp)){
+                    aO5=new wshp.AO5shp.AO5(shp)
 
-                if (entry.intersectionRatio === 1) {
-                    aO5.act.wasFull = true
+                    const el = observ.getel(shp)
+                    
+                    wshp.DoResize.PBase.FindBase(aO5)
+                    wshp.Frames.ReadAttrs(aO5, el.quals)
+                    wshp.Boards.FindBords(aO5)
+                }
+                observ.unobserve(shp)
+
+                if (!wshp.tLastScroll){
+                    wshp.tLastScroll = performance.now()  // пересчитываетс в DoScroll
                     C.E.AddEventListener('scroll', wshp.DoScroll.EveScroll, { couldRepeat: true })
                 }
             }
@@ -89,30 +97,28 @@
      * создаёт наблюдателя за элементтами
      * @function CreateObserver
      */
-    function createObserver(callback, options) {
+    function CreateObserver(options) {
         const state = {
             observer: null,
-            elements: new Set(),
+            elements: new Set,
         }
     
-        state.observer = new IntersectionObserver(callback, options)
+        state.observer = new IntersectionObserver(Observe, options)
     
         return {
-            observe: (el) => {
-                state.elements.add(el)
-                state.observer.observe(el)
+            observe: (tag, quals) => {
+                state.elements.add({tag:tag, quals: quals.join(':')})
+                state.observer.observe(tag)
             },
-            unobserve: (el) => {
+            unobserve: (tag) => {
+                state.observer.unobserve(tag)
+                const el=this.getel(tag)
                 state.elements.delete(el)
-                state.observer.unobserve(el)
             },
-            pause: () => {
-                state.observer.disconnect()
-            },
-            resume: () => {
-                // Нужен новый экземпляр, если был полностью остановлен
-                state.observer = new IntersectionObserver(callback, options)
-                state.elements.forEach(el => state.observer.observe(el))
+            getel: (tag)=> {
+                for (const el of state.elements)
+                    if (el.tag === tag )
+                        return el
             },
             get observedElements() {
                 return Array.from(state.elements)
@@ -120,28 +126,12 @@
         }
     }
 
-    const observ = new IntersectionObserver(Observe, {     
-        root: null,
-        threshold: [0, 1],
-        rootMargin: '0px',
-        trackVisibility: false,
-    });
-
     /**
      * Инициализирует список наблюдаемых элементов.
      * @function Init
      */
     const Init = () => {
-        const
-            mtags = C.SelectByClassName(wshp.W.class, olga5_modul),
-            CreateAO5 = mtag => {
-                for (const qual of mtag.quals)
-                    if (!qual.includes('=') && qual.match(/n/i))
-                        return
-
-                return new wshp.AO5shp.AO5(mtag)
-            }
-
+        const            mtags = C.SelectByClassName(wshp.W.class, olga5_modul)
         let found;
 
         for (const mtag of mtags) {
@@ -156,14 +146,8 @@
                         rootMargin: '0px',
                         trackVisibility: false,
                     })
-                observ.observe (mtag.tag)
-
-                const aO5 = CreateAO5(mtag)
-                if (aO5) {
-                    SwitchObserve(aO5, true)
-                    wshp.allAO5s.add(aO5)
-                    found = true
-                }
+                observ.observe (mtag.tag, mtag.quals)
+                found = true
             }
         }
 
