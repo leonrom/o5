@@ -63,6 +63,92 @@
         }
     };
 
+    /**          
+     * @function DebugShowRez
+     * показ контейнеров для aO5 при отладке
+         */
+    const DebugShowRez = aO5 => {
+        const rez = []
+        for (const p of aO5.parent.pO5.pOuts) {
+            rez.push({
+                p: p.name,
+                pOuts: Array.from(p.pOuts),
+                pIncs: Array.from(p.pIncs),
+                aAlls: Array.from(p.aAlls),
+            })
+        }
+        C.ConsoleInfo(` Обработанные контейнеры для ${aO5.a_name}`, rez.length, rez)
+
+        const pbase = aO5.act.pbase,
+            scrollPs = Array.from(pbase.scrollPs),
+            s = scrollPs.map(p => p.name).join(', ')
+        C.ConsoleInfo(` База для ${aO5.a_name} => ${aO5.act.pbase.pbO5.name}`, s)
+    };
+
+    /**          
+     * создать aO5 и прописать его во все вышестоящие контейнеры
+     * выполняется однократно для каждого обнаруживаемого (нового) aO5
+     * @function CreateAO5
+     * создаются/дополняются pO5 во всех обрамляющих контейнерах содержащих контейнер prev
+     * @function CreatePrevPO5
+     */
+    const CreateAO5 = shp => {
+        const
+            aO5 = new wshp.AO5shp.AO5(shp),
+            CreatePrevPO5 = prev => {
+                let pO5 = prev.pO5, ps;
+
+                if (!pO5){
+                    pO5 = new wshp.PO5shp.PO5(prev)
+
+                    pO5.pOuts.add(pO5)          // первым - самого себя!
+
+                    if (prev.nodeName !== 'BODY')
+                        ps = CreatePrevPO5(prev.parentElement)
+                }
+
+                if (ps)
+                    for (const p of ps)
+                        pO5.pOuts.add(p)
+
+                Object.freeze(pO5.pOuts)
+                return pO5.pOuts
+            },
+            GetPBase = pO5 => {
+                let pbase = wshp.PBase.pbases.get(pO5)
+
+                if (!pbase) {
+                    pbase = new wshp.PBase(pO5)
+                    wshp.PBase.pbases.set(pO5, pbase)
+                }
+                return pbase
+            }
+
+        CreatePrevPO5(aO5.parent)
+
+        let pbase = aO5.act.pbase
+        const pIncs = new Set()
+        for (const pO5 of aO5.parent.pO5.pOuts) {
+            pO5.aAlls.add(aO5)
+
+            if (pO5.scrls.H || pO5.scrls.V) {
+                if (!pbase)
+                    pbase = aO5.act.pbase = GetPBase(pO5)
+                pbase.scrollPs.add(pO5)
+            }
+
+            for (const pInc of pIncs)
+                pO5.pIncs.add(pInc)
+
+            pIncs.add(pO5)
+        }
+
+        if (o5debug > 1)
+            DebugShowRez(aO5)
+
+        return aO5
+    };
+
     /**
      * Обработчик событий от IntersectionObserver.
      * Создаёт aO5 для 'увиденного' элемента и отключает его наблюдение.
@@ -71,22 +157,21 @@
      * @param {IntersectionObserverEntry[]} entries - Список наблюдаемых пересечений.
      */
     const Observe = entries => {
-        let aO5;
         for (const entry of entries)
             if (entry.isIntersecting) {
                 const shp = entry.target
-                if (!(aO5=shp.aO5shp)){
-                    aO5=new wshp.AO5shp.AO5(shp)
+                if (!shp.aO5shp) {  // вообще-то можно и не проверять....
+                    const
+                        aO5 = CreateAO5(shp),
+                        el = observ.getel(shp)
 
-                    const el = observ.getel(shp)
-                    
                     wshp.DoResize.PBase.FindBase(aO5)
                     wshp.Frames.ReadAttrs(aO5, el.quals)
                     wshp.Boards.FindBords(aO5)
                 }
                 observ.unobserve(shp)
 
-                if (!wshp.tLastScroll){
+                if (!wshp.tLastScroll) {
                     wshp.tLastScroll = performance.now()  // пересчитываетс в DoScroll
                     C.E.AddEventListener('scroll', wshp.DoScroll.EveScroll, { couldRepeat: true })
                 }
@@ -94,7 +179,7 @@
     };
 
     /**
-     * создаёт наблюдателя за элементтами
+     * создаёт наблюдателя за элементами
      * @function CreateObserver
      */
     function CreateObserver(options) {
@@ -102,24 +187,26 @@
             observer: null,
             elements: new Set,
         }
-    
+
         state.observer = new IntersectionObserver(Observe, options)
-    
+
+        function getel(tag) {
+            for (const el of state.elements)
+                if (el.tag === tag)
+                    return el
+        }
+
         return {
             observe: (tag, quals) => {
-                state.elements.add({tag:tag, quals: quals.join(':')})
+                state.elements.add({ tag: tag, quals: quals.join(':') })
                 state.observer.observe(tag)
             },
             unobserve: (tag) => {
                 state.observer.unobserve(tag)
-                const el=this.getel(tag)
+                const el = getel(tag)   // заменено!
                 state.elements.delete(el)
             },
-            getel: (tag)=> {
-                for (const el of state.elements)
-                    if (el.tag === tag )
-                        return el
-            },
+            getel, // экспортируем в объект
             get observedElements() {
                 return Array.from(state.elements)
             },
@@ -131,13 +218,13 @@
      * @function Init
      */
     const Init = () => {
-        const            mtags = C.SelectByClassName(wshp.W.class, olga5_modul)
+        const mtags = C.SelectByClassName(wshp.W.class, olga5_modul)
         let found;
 
         for (const mtag of mtags) {
             if (
-                !mtag.tag.classList.contains('o5shp_none') && 
-                !mtag.quals.find(qual=>!qual.includes('=') && qual.match(/n/i))
+                !mtag.tag.classList.contains('o5shp_none') &&
+                !mtag.quals.find(qual => !qual.includes('=') && qual.match(/n/i))
             ) {
                 if (!observ)
                     observ = CreateObserver({
@@ -146,7 +233,7 @@
                         rootMargin: '0px',
                         trackVisibility: false,
                     })
-                observ.observe (mtag.tag, mtag.quals)
+                observ.observe(mtag.tag, mtag.quals)
                 found = true
             }
         }
@@ -156,5 +243,4 @@
     };
 
     const wshp = C.AddModuleSub(olga5_modul, modulname, [Init])
-
 })();
