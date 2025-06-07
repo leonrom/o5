@@ -89,8 +89,7 @@
 			Init: ShpInit,
 			class: 'olga5_shp',
 			incls: {
-				// names: ['DoScroll', 'DoResize', 'Boards', 'Frames', 'AO5shp', 'PO5shp', 'DoInit'],
-				names: ['DoInit', 'AO5shp', 'PO5shp', 'Boards', 'Frames'],
+				names: ['DoInit', 'AO5shp', 'PO5shp', 'Boards', 'Frames', 'DoScroll', 'DoResize'],
 				actscript: document.currentScript,
 			},
 		},

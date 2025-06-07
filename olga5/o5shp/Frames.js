@@ -11,13 +11,16 @@
         olga5_modul = "o5shp",
         modulname = 'Frames',
         C = window.olga5.C,
-        o5debug = C.consts.o5debug,
+        // o5debug = C.consts.o5debug,
         mdiglit = /[a-zA-Z]+|[+-]*\d+/g,
         msmall = /^[a-z]/,
         errs = []
     // fmtOK = "background: cornsilk; color: black;",
     // fmtErr = "background: yellow; color: black;",   
 
+    /**
+     * Представление одного "фрейма" с параметрами подвеса.
+     */
     class Frame {
         key = ''        // чтобы видеть первым
         constructor(frame) {
@@ -52,8 +55,17 @@
             Object.seal(this.act)
             Object.freeze(this)
         }
+        static Key(f) {
+            return f.typ + ',' + f.cod + ',' + f.num;
+        }
     }
 
+    /**
+     * Читает и парсит квалификаторы класса (вида `AL2TR`) в объект aO5.cls
+     * 
+     * @param {Object} aO5 - объект-приёмник (должен иметь `cls`)
+     * @param {string[]} quals - массив строк-квалификаторов
+     */
     const ReadCls = (aO5, quals) => {
         const cls = aO5.cls
         let setdef = true
@@ -101,18 +113,16 @@
             cls.pitch = 'S'
             cls.puts.T = 'T'
         }
-        else if (!cls.pitch.trim())
+        else if (!(cls.pitch || '').trim())
             cls.pitch = 'S'
     }
 
-    const ReadFrames = (aO5, quals) => {
+    const ReadFrames = (aO5, squals) => {
         const
-            frames = new Set(),
-            pbase = aO5.act.pbase,
-            Key = f => f.typ + ',' + f.cod + ',' + f.num
-
-        if (pbase.bframes.size === 0) {   // для неуказанных фреймов                 
-            const f0 = {
+            quals = squals.split(':'),
+            pbase = aO5.base.pbase,
+            frames = new Map(),
+            f0 = {
                 typ: 'n',       // окно браузера
                 cod: '',
                 num: 0,
@@ -121,101 +131,88 @@
                 s: 'умолчание?',
                 err: `${(quals && quals.length > 0) ? 'не найдены ' : 'не заданы '} фреймы: взяты ближйший с скроллингом`
             }
-            f0.key = Key(f0)
-            pbase.bframes.add(new Frame(f0))
-        }
+
+        f0.key = Frame.Key(f0)
+
+        if (pbase.bframes.size === 0)    // для неуказанных фреймов    
+            pbase.bframes.set(f0.key, new Frame(f0))
 
         for (const qual of quals)
             if (qual.match(msmall)) { // с маленькой буквы начинаются описания фреймов
                 const ss = qual.split(','),
                     typs = 'cins'
 
-                for (let s of ss) {
-                    if (s.length === 0) continue
+                for (const s of ss)
+                    if (s) {
 
-                    if (!s.includes('=')) // считаем, что это значение для id
-                        s = `i=${s}`
+                        const
+                            cc = s.includes('=') ? s.split('=') : ['i', s],  // считаем, что это значение для id
+                            typ = cc[0].trim().toLowerCase()
 
-                    const cc = s.split('=')
-
-                    const typ = cc[0].trim().toLowerCase()
-
-                    if (!typs.includes(typ)) {
-                        errs.push({ name: aO5.a_name, qual: qual, err: `тип ссылки '${typ}' не начинается одним из '${typs}'` })
-                        continue
-                    }
-
-                    const
-                        uu = (cc[1] || '').split('/'),
-                        f = {
-                            cut: false, fix: false, num: 0, err: '',
-                            typ: typ,
-                            cod: (uu[0] || '').trim(),
-                            s: s,
+                        if (!typs.includes(typ)) {
+                            errs.push({ name: aO5.a_name, qual: qual, err: `тип ссылки '${typ}' не начинается одним из '${typs}'` })
+                            continue
                         }
 
-                    if (uu.length > 1) {    //  && !uu[1].trim()
-                        for (let i = 1; i < uu.length; i++) {
-                            const pars = uu[i].match(mdiglit)
-                            if (pars) {
-                                for (const par of pars) {
-                                    const n = Number(par)
-                                    if (Number.isInteger(n) && !isNaN(n)) {
-                                        if (f.typ !== 'w')    // для 'window' номер игнорируется
-                                            f.num = n
-                                    }
-                                    else {
-                                        if (par.indexOf('f') >= 0) f.fix = true
-                                        if (par.indexOf('c') >= 0) f.cut = true
+                        const
+                            uu = (cc[1] || '').split('/'),
+                            f = {
+                                cut: false, fix: false, num: 0, err: '',
+                                typ: typ,
+                                cod: (uu[0] || '').trim(),
+                                s: s,
+                            }
+
+                        if (uu.length > 1) {    //  && !uu[1].trim()
+                            for (let i = 1; i < uu.length; i++) {
+                                const pars = uu[i].match(mdiglit)
+                                if (pars) {
+                                    for (const par of pars) {
+                                        const n = Number(par)
+                                        if (Number.isInteger(n) && !isNaN(n)) {
+                                            if (f.typ !== 'w')    // для 'window' номер игнорируется
+                                                f.num = n
+                                        }
+                                        else {
+                                            if (par.indexOf('f') >= 0) f.fix = true
+                                            if (par.indexOf('c') >= 0) f.cut = true
+                                        }
                                     }
                                 }
                             }
-                        }
 
-                        if (!f.fix || !f.cut) {
-                            let s = ``
-                            if (!f.fix) s = `не задан 'fix' (не подвисает); ` + (f.cut ? '.' : ', ')
-                            if (!f.cut) s += `не задан 'cut' (не обрезается).`
-                            Object.assign(f, { err: s, })
+                            if (!f.fix || !f.cut) {
+                                let s = ``
+                                if (!f.fix) s = `не задан 'fix' (не подвисает); ` + (f.cut ? '.' : ', ')
+                                if (!f.cut) s += `не задан 'cut' (не обрезается).`
+                                Object.assign(f, { err: s, })
+                            }
                         }
+                        else
+                            Object.assign(f, { cut: true, fix: true, err: `для ${s} по умолчанию вкл. 'fix' и 'cut'`, })
+
+                        const
+                            key = f.key = Frame.Key(f),
+                            xf = frames.get(key)
+                        if (xf) {
+                            xf.fix ||= f.fix;
+                            xf.cut ||= f.cut;
+                            f.err = ''
+                        }
+                        else
+                            frames.set(key, f)
                     }
-                    else
-                        Object.assign(f, { cut: true, fix: true, err: `для ${s} по умолчанию вкл. 'fix' и 'cut'`, })
-
-                    const key = f.key = Key(f)
-                    let xf;
-                    for (const frame of frames)
-                        if (frame.key === key) {
-                            xf = frame
-                            break
-                        }
-
-                    if (xf) {
-                        if (f.fix) xf.fix = true
-                        if (f.cut) xf.cut = true
-                        f.err = ''
-                    }
-                    else
-                        frames.push(f)
-                }
             }
 
         if (frames.size === 0)
-            frames.add(pbase.bframes.values().next().value)
+            frames.set(f0.key, f0)     //  pbase.bframes.values().next().value)
 
         aO5.frames.clear()
-        for (const frame of frames) {
-            const key = frame.key
-            // let f = pbase.bframes.find(f => f.key === key)
-            let f;
-            for (const bframe of pbase.bframes)
-                if (bframe.key === key) {
-                    f = bframe
-                    break
-                }
+        for (const [key, frame] of frames) {
+            let f = pbase.bframes.get(key);
             if (!f) {
                 f = new Frame(frame)
-                pbase.bframes.add(f)
+                pbase.bframes.set(Frame.Key(f), f)
             }
             f.aO5s.push(aO5)
             aO5.frames.add(f)
@@ -235,5 +232,4 @@
     }
 
     wshp = C.AddModuleSub(olga5_modul, modulname, [ReadAttrs])
-
 })();

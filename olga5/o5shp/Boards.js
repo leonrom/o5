@@ -27,66 +27,58 @@
                     break
                 }
         },
-        FillScrollable = (aO5) => {
-            /*
-            Вызывается при инициализации и при DoResize
-            */
-            const pStrt = aO5.parent.pO5
-            if (pStrt.act.time === wshp.tLastScroll) {
-                aO5.act.pbase = pStrt.act.pbase
-                return
-            }
+        // FillScrollable = (aO5) => {
+        //     /*
+        //     Вызывается при инициализации и при DoResize   ???????????????????????????
+        //     */
+        //     const pStrt = aO5.parent.pO5
+        //     if (pStrt.act.time === wshp.tLastScroll) 
+        //         return            
 
-            let pO5, pbase = null;
-            for (pO5 of pStrt.pOuts)
-                if (pO5.actScroll.V || pO5.actScroll.H) {
-                    if (!pbase) {
-                        if (pO5.act.time === wshp.tLastScroll)
-                            break
-                        else {
-                            pO5.act.time = wshp.tLastScroll
-                            pO5.act.pbase = new wshp.DoResize.PBase(pO5)
-                        }
-                        pbase = pO5.act.pbase
-                    }
-                    pbase.scrollPs.add(pO5)
-                }
+        //     let pO5, pbase = null;
+        //     for (pO5 of pStrt.pOuts)
+        //         if (pO5.actScroll.V || pO5.actScroll.H) {
+        //             if (!pbase) {
+        //                 if (pO5.act.time === wshp.tLastScroll)
+        //                     break
+        //                 else {
+        //                     pO5.act.time = wshp.tLastScroll
+        //                     pO5.act.pbase = new wshp.DoResize.PBase(pO5)
+        //                 }
+        //                 pbase = pO5.act.pbase
+        //             }
+        //             pbase.scrollPs.add(pO5)
+        //         }
 
-            if (!pbase)     //  т.е. последний в pStrt.pOuts
-                pO5.act.pbase = pbase = new wshp.DoResize.PBase(pO5)
+        //     if (!pbase)     //  т.е. последний в pStrt.pOuts
+        //         pO5.act.pbase = pbase = new wshp.DoResize.PBase(pO5)
 
-            if (pbase.scrollPs.size === 0)  // добавляю внешний (последний) контейнер
-                pbase.scrollPs.add(pO5)
+        //     if (pbase.scrollPs.size === 0)  // добавляю внешний (последний) контейнер
+        //         pbase.scrollPs.add(pO5)
 
-            pStrt.act.pbase = aO5.act.pbase = pbase
+        //     pStrt.act.pbase = aO5.act.pbase = pbase
 
-            for (const pO5 of pbase.scrollPs)
-                pO5.ActScroll(wshp.tLastScroll)
+        //     for (const pO5 of pbase.scrollPs)
+        //         pO5.ActScroll(wshp.tLastScroll)
 
-            if (o5debug > 1) {
-                const parentAdds = []
-                for (const pO5 of pbase.scrollPs)
-                    parentAdds.push({
-                        name: pO5.name,
-                        scrollV: pO5.actScroll.V ? 'да' : ' -',
-                        scrollH: pO5.actScroll.H ? 'да' : ' -',
-                    })
-                C.ConsoleInfo(`Скроллируемые в FillScrollable`, 'T=' + wshp.tLastScroll.toFixed(), parentAdds)
-            }
-        },
+        //     if (o5debug > 1) {
+        //         const parentAdds = []
+        //         for (const pO5 of pbase.scrollPs)
+        //             parentAdds.push({
+        //                 name: pO5.name,
+        //                 scrollV: pO5.actScroll.V ? 'да' : ' -',
+        //                 scrollH: pO5.actScroll.H ? 'да' : ' -',
+        //             })
+        //         C.ConsoleInfo(`Скроллируемые в FillScrollable`, 'T=' + wshp.tLastScroll.toFixed(), parentAdds)
+        //     }
+        // },
         FindBords = (aO5) => {
             
-            const pbase = aO5.act.pbase
-//             if (!pbase){
-//                 pbase = aO5.act.pbase = wshp.DoResize.PBase.FindBase(aO5.parent.pO5)
-//                 pbase.baO5s.add(aO5)
-// }
+            const pbase = aO5.base.pO5
 
-            FillScrollable(aO5)
+            // FillScrollable(aO5)
 
-            const
-                errs = [],
-                scrollPs = pbase.scrollPs
+            const                errs = []
 
             /*
             нахождение тегов-контейнеров для тех frame, у которых неопределён tag
@@ -101,7 +93,7 @@
                     clss = frame.clss,
                     t = frame.typ,
                     c = frame.c
-                for (const pO5 of scrollPs) {
+                for (const pO5 of aO5.base.pO5.pOuts) {
                     pO5c = pO5
                     if (
                         (t === 's' && (pO5.actScroll.V || pO5.actScroll.H)) ||
@@ -137,10 +129,10 @@
                 if (errs.length)
                     C.ConsoleError(`Ошибки определения фреймов для ${aO5.a_name}:`, errs.length, errs)
             }
+// // 
+//             wshp.PO5shp.InsertaO5s(aO5)
 
-            wshp.PO5shp.InsertaO5s(aO5)
-
-            for (const pO5 of pbase.scrollPs)
+            for (const pO5 of aO5.base.pO5.pOuts)
                 if (!observ.tags.has(pO5.tag))
                     observ.observe(pO5.tag)
 
@@ -148,7 +140,7 @@
             window.dispatchEvent(new CustomEvent('o5_containers', { detail: { aO5: aO5, } }))
         }
 
-    wshp = C.AddModuleSub(olga5_modul, modulname, [FindBords, FillScrollable])
+    wshp = C.AddModuleSub(olga5_modul, modulname, [FindBords])  // , FillScrollable
 
     observ = new wshp.IntersectionObserver(Observe, {
         root: null,

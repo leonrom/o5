@@ -40,7 +40,7 @@
         static nom = 0
 
         constructor(shp) {
-            const             aO5 = this
+            const aO5 = this
 
             shp.aO5shp = aO5
 
@@ -52,8 +52,8 @@
                 shp: shp,
                 ext: {},    // для хранения произвольных данных внешними (тестовыми) модулями
                 cls: { puts: [], pitch: 'S', alive: false, none: false, level: 0, nofx: false },
+                base:                {pO5: null, pbase: null},
                 act: {
-                    pbase: null, 
                     clon: null,
                     cart: null,
                     shdw: shp,          // будет: или  shp или clon
@@ -71,7 +71,7 @@
                 // wasFix: Object.assign({}, AO5.TFix),    //  сохраняемый результат фиксирования
                 // tryFix: Object.assign({}, AO5.TFix),    //  предлагаемые фиксирования 
 
-                pFixs:{fixed:false,  T: null, L: null, R: null, B: null },
+                pFixs: { fixed: false, T: null, L: null, R: null, B: null },
 
                 zeroed: { V: false, H: false },          //  имеют нулевой размер  - по результату ChNudget
                 isFull: { V: false, H: false }, //  признак, что тег был полностью видим - по вертикали и горизонтали   
@@ -88,24 +88,24 @@
                 orig: { display: '', position: '', top: 0, left: 0, height: 0, width: 0, },
             })
 
-            const 
+            const
                 names = ['fix', 'cut', 'out'],
                 n0 = { v: NaN, p: null },
                 xs = 'TLRB'
 
-                // for (const x of xs) {
-                //     Object.assign(this.pFixs[x], {p:null, v:NaN})
-                //     Object.seal(this.pFixs[x])  
-                // } 
-                Object.seal(this.pFixs)  
-                
+            // for (const x of xs) {
+            //     Object.assign(this.pFixs[x], {p:null, v:NaN})
+            //     Object.seal(this.pFixs[x])  
+            // } 
+            Object.seal(this.pFixs)
+
             for (const name of names) {
-                this.nears[name]= Object.assign({}, AO5.TObj)
+                this.nears[name] = Object.assign({}, AO5.TObj)
                 for (const x of xs) {
                     this.nears[name][x] = Object.assign({}, n0)
-                    Object.seal(this.nears[name][x])  
+                    Object.seal(this.nears[name][x])
                 }
-                Object.freeze(this.nears[name] )
+                Object.freeze(this.nears[name])
                 // Object.freeze(this.nears.fix.T )
             }
             Object.freeze(this.nears)
@@ -118,7 +118,7 @@
             // aO5.SetPosD()
 
             // 'tryFix', 'wasFix', 
-            for (const nam of ['act', 'margs', 'outln', 'shrunks', 'hidden', 'pFixs', 'zeroed', 'isFull', 'posC', 'posCf', 'posO', 'posD', 'posS', 'posSf', 'orig', 'cls'])
+            for (const nam of ['base', 'margs', 'outln', 'shrunks', 'hidden', 'pFixs', 'zeroed', 'isFull', 'posC', 'posO',  'posS',  'orig', 'cls'])
                 if (aO5[nam])
                     Object.seal(aO5[nam])
                 else
@@ -151,7 +151,7 @@
                 if (this.hidden[x])
                     return true
         }
-        DoFix(pFix,x) {
+        DoFix(pFix, x) {
             const aO5 = this,
                 shp = aO5.shp,
                 act = aO5.act,
@@ -161,7 +161,7 @@
             // for (const x of s)
             //     aO5.wasFix[x] = true
             // Object.assign(aO5.pFixs[x], pFix)
-            aO5.pFixs[x]= pFix
+            aO5.pFixs[x] = pFix
             aO5.pFixs.fixed = true
 
             // aO5.act.wasFull = true
@@ -198,15 +198,15 @@
 
             // for (const x of s)
             //     aO5.wasFix[x] = false
-            
+
             // Object.assign(this.pFixs[x], {p:null, v:NaN})
-            pFixs[x]= null
-            aO5.pFixs.fixed = pFixs.T || pFixs.L || pFixs.R || pFixs.B 
+            pFixs[x] = null
+            aO5.pFixs.fixed = pFixs.T || pFixs.L || pFixs.R || pFixs.B
 
             if (o5debug)
                 console.log("%c%s", fmtOK, `UnFix`, `${aO5.id}, осталось [${this.#HasFixedDebug()}] `)
 
-            if (act.shdw !== shp && !aO5.pFixs.fixed){  // !this.HasFixed()) {
+            if (act.shdw !== shp && !aO5.pFixs.fixed) {  // !this.HasFixed()) {
                 act.shdw = shp
 
                 Object.assign(shp.style, aO5.orig)

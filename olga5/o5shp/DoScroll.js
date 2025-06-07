@@ -87,7 +87,7 @@
 						Object.assign(aO5.posS, { top: 0, left: 0 })
 
 						// Пересчет Границ Контейнеров
-						const pbase = aO5.act.pbase
+						const pbase = aO5.base.pbase
 						if (pbase.act.tScroll !== time) {
 							pbase.act.tScroll = time
 
@@ -155,19 +155,18 @@
 						visis.act.time = time
 						Object.assign(pO5.visis[x], { p: pO5, v: pO5.scops[x] })
 
-						const scrollPs = aO5.act.pbase.scrollPs
 						let beg = !pO5;  // т.е. если не задано, то сразу проверяю
-						for (const p of scrollPs)
+						for (const pOut of aO5.base.pO5.pOuts)
 							if (beg) { // только "выше" чем pO5
 								const
-									v = p.scops[x],
+									v = pOut.scops[x],
 									vi = visis[x].v,
 									itl = 'TL'.includes(x)
 								if ((v > vi && itl) || (v < vi && !itl))
-									Object.assign(visis[x], { p: p, v: v })
+									Object.assign(visis[x], { p: pOut, v: v })
 							}
 							else
-								if (p === pO5) beg = true
+								if (pOut === pO5) beg = true
 					}
 
 					const
@@ -198,7 +197,7 @@
 						o = opp[y],
 						c = aO5.posC,
 						itl = 'TL'.includes(o),
-						pO5 = aO5.act.pbase.pbO5,
+						pO5 = aO5.base.pO5,
 						r = { p: pO5, v: pO5.scops[o] }
 
 					for (const frame of aO5.frames)
@@ -230,7 +229,7 @@
 				},
 				НаБлижнемТеге = (aO5, x) => {
 					const
-						pbase=aO5.act.pbase,
+						pbase=aO5.base.pbase,
 						iO5s = pbase.baO5s
 
 					for (const iO5 of iO5s)
@@ -357,8 +356,7 @@
 								ps[x] = ОбрезаниеПротивоположнойСтороны(aO5, y)
 
 						for (const y of [x, o])
-							ПроверитьПерекрытиеФреймами(aO5, y, ps[y] || aO5.act.pbase.pbO5)
-						// ПроверитьПерекрытиеФреймами(aO5, y, ps[y]||aO5.pFixs[x]||aO5.pFixs[o]||aO5.act.pbase.pbO5)
+							ПроверитьПерекрытиеФреймами(aO5, y, ps[y] || aO5.base.pO5)
 					}
 
 			for (const aO5 of aAlls)

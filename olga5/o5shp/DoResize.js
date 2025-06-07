@@ -13,12 +13,14 @@
         C = window.olga5.C,
         o5debug = C.consts.o5debug,
         isResize = { act: false, time: 0, name: 'isResize' }
-
+    /**
+     * база - скроллируемый контейнер, содержащий общую информацию для подвисабельных объектов
+     */
     class PBase {
-        constructor(pbO5) {
-            this.pbO5 = pbO5
+        constructor(pO5) {
+            this.pO5 = pO5
             this.baO5s = new Set()     // все эти будут проверяться на "натыкание"
-            this.bframes = new Set()   // mO5s = new wshp.Map()
+            this.bframes = new Map()   // mO5s = new wshp.Map()
             this.scrollPs = new Set()   // этот и скроллируемые "вышестоящиие" теги - обновляется в DoResize() 
             this.act = {
                 tResize: -1,         // только для DoResize
@@ -31,42 +33,9 @@
 
             Object.freeze(this)
 
-            PBase.pbases.set(pbO5, this)
-
-            // FillScrollable(this, 0)
+            PBase.pbases.set(pO5, this)
         }
         static pbases = new Map()
-        static FindBase = aO5 => {
-            /*
-            поиск pbase - первого НЕ скроллируемого контейнера
-            */
-           const pO5 =aO5.parent.pO5
-            let pbase = PBase.pbases.get(pO5)
-
-            if (!pbase) {
-                let pbO5 = pO5;
-                for (const xO5 of pO5.pOuts) {
-                    const
-                        tag = xO5.tag,
-                        style = getComputedStyle(tag),
-                        isOverflowHidden =
-                            style.overflow === 'hidden' &&
-                            style.overflowX === 'hidden' &&
-                            style.overflowY === 'hidden',
-                        hasNoScroll =
-                            tag.scrollWidth <= tag.clientWidth &&
-                            tag.scrollHeight <= tag.clientHeight
-
-                    if (!isOverflowHidden || !hasNoScroll) {
-                        pbO5 = xO5
-                        break
-                    }
-                }
-                pbase = new PBase(pbO5)
-            }
-
-            aO5.act.pbase = pbase
-        }
     }
 
     const

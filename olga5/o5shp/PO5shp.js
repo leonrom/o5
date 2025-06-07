@@ -21,11 +21,12 @@
                 C.ConsoleAlert(`Повтор создания 'pO5' для контейнера id='${tag.id}' [${tag.className.trim()}]`)
 
             const
-                pO5 = tag.pO5 = this,
+                pO5 = this,
                 ibody = tag.nodeName == 'BODY',
                 nst = window.getComputedStyle(tag),
                 classList = Array.from(tag.classList)
 
+            tag.pO5 = pO5
             wshp.allPO5s.add(pO5)
 
             Object.assign(pO5, {
@@ -34,17 +35,20 @@
                 classOrigs: classList,
                 ibody: ibody,
                 final: ibody || PO5.#finalClasses.find(cls => classList.includes(cls)),
-                act: { time: 0, pbase: null, pO5last: null },
-                pOuts: new Set(),  // список - этот + ВСЕ "вышестоящиие" теги - для формирования перечня скроллирующих контейнеров
-                pIncs: new Set(),  // список контейнеров внутри данного - чтобы обрабатывались при его скроллинге
-                // ?                aIncs: new Set(),  // скроллируемые, расположенные имено в это контейнере
-                aAlls: new Set(),  // абсолютно все, которые внутри (т.е. могут быть сдвинуты при скроллине)               
+                base: { pO5:null, }, // (все pO5) ссылка на ближайший скроллируемый контейнер
+                pOuts: new Set(),  //  (все pO5) список  скроллируемых контейнеров
+                pIncs: new Set(),  //  (скроллируемые pO5) список вложенных скроллируемых контейнеров 
+                aAlls: new Set(),  // (скроллируемые pO5) список всех подвисабельных тегов
                 borders: {
                     top: parseFloat(nst.borderTopWidth),
                     left: parseFloat(nst.borderLeftWidth),
                     right: parseFloat(nst.borderRightWidth),
                     bottom: parseFloat(nst.borderBottomWidth),
                 },
+                scrls: {
+                    H: nst.overflow === 'auto' || nst.overflowX === 'auto' || nst.overflow === 'scroll' || nst.overflowX === 'scroll',
+                    V: nst.overflow === 'auto' || nst.overflowY === 'auto' || nst.overflow === 'scroll' || nst.overflowY === 'scroll',
+                }
             })
             Object.assign(pO5.scops, pO5.CalcScrollScope())
             for (const x of 'TRLB') {
@@ -52,7 +56,7 @@
                 Object.seal(pO5.visis[x])
             }
 
-            for (const nam of ['aAlls', 'act', 'scops', 'schgs', 'actScroll'])
+            for (const nam of ['aAlls', 'pOuts', 'pIncs', 'base', 'scops', 'schgs', 'actScroll'])
                 if (pO5[nam])
                     Object.seal(pO5[nam])
                 else
@@ -70,7 +74,7 @@
         name = ''    // еще и тут - чтобы сразу видеть в отладчике
         scops = { T: 0, L: 0, R: 0, B: 0, time: 0 }  //  текущие границы
         schgs = { T: 0, L: 0, R: 0, B: 0 }  // изменение границ от предыдущего
-        visis = { T: {}, L: {}, R: {}, B: {}, act:{time:-1} }  // видимые границы 
+        visis = { T: {}, L: {}, R: {}, B: {}, act: { time: -1 } }  // видимые границы 
         actScroll = {
             time: 0,
             V: false, H: false,             // скроллируемость по верт. и гориз.
@@ -133,57 +137,5 @@
         }
     }
 
-    const
-        CreatePrevPO5 = prev => {
-            let pO5 = prev.pO5, pOuts, ps;
-
-            if (pO5) pOuts = pO5.pOuts
-            else {
-                pO5 = new PO5(prev)
-
-                // if (wshp.allPO5s.has(pO5)) alert('Повтор контейнера ' + pO5.name)
-                // else
-                //     wshp.allPO5s.add(pO5)
-
-                pOuts = pO5.pOuts
-                pOuts.add(pO5)          // первым - самого себя!
-
-                if (prev.nodeName == 'BODY')
-                    return pOuts
-
-                ps = CreatePrevPO5(prev.parentElement)
-            }
-
-            if (ps) {
-                ps.forEach(item => pOuts.add(item))
-
-                if (o5debug > 0)
-                    console.log("%c%s", fmtOK,
-                        `CreatePrevPO5  ${prev.pO5.name.padEnd(8)}: ` +
-                        ` '${Array.from(ps).map(p => `${p.name}`).join(', ')}'`
-                    )
-            }
-
-            Object.freeze(pOuts)
-
-            let pm; for (pm of pOuts); pO5.act.pO5last = pm
-
-            return pOuts
-        },
-        InsertaO5s = aO5 => {  // ненадо никаких сортировок
-            const xp = { V: 'TB', H: 'LR' }
-
-            for (const pO5 of aO5.act.pbase.scrollPs)      //   проверяем только скроллируемые
-                pO5.aAlls.add(aO5)
-
-            if (o5debug > 0) {
-                const arrs = []
-                for (const pO5 of aO5.act.pbase.scrollPs)
-                    arrs.push(Array.from(pO5.aAlls).map(a => a.id).join('; '))
-                // arrs.push(Array.from(pO5.aAlls).map(a => a.id + '/' + a.posD[x].toFixed()).join('; '))
-                C.ConsoleInfo(` Отсортированные массивы для контейнеров ${aO5.a_name}`, arrs.length, arrs)
-            }
-        }
-
-    wshp = C.AddModuleSub(olga5_modul, modulname, [InsertaO5s, CreatePrevPO5])
+    wshp = C.AddModuleSub(olga5_modul, modulname, [PO5])
 })();

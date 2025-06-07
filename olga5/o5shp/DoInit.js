@@ -66,23 +66,32 @@
     /**          
      * @function DebugShowRez
      * показ контейнеров для aO5 при отладке
+     *  Главная фишка динамическоо создания aO5
+     * демонстрируется, чо обрабатываются только "новые" контейнеры,
+     * а инфа из уже обработанных просто переписывается
          */
     const DebugShowRez = aO5 => {
         const rez = []
-        for (const p of aO5.parent.pO5.pOuts) {
+        let prev = aO5.parent
+        do {
+            const p = prev.pO5
             rez.push({
                 p: p.name,
-                pOuts: Array.from(p.pOuts),
-                pIncs: Array.from(p.pIncs),
-                aAlls: Array.from(p.aAlls),
+                base: p.base.pO5.name,
+                scrl: (p.scrls.H ? 'H' : '') + (p.scrls.V ? 'V' : ''),
+                pOuts: (Array.from(p.pOuts)).map(p => p.name).join(', '),
+                pIncs: (Array.from(p.pIncs)).map(p => p.name).join(', '),
+                aAlls: (Array.from(p.aAlls)).map(a => a.a_name).join(', '),
             })
-        }
-        C.ConsoleInfo(` Обработанные контейнеры для ${aO5.a_name}`, rez.length, rez)
-
-        const pbase = aO5.act.pbase,
-            scrollPs = Array.from(pbase.scrollPs),
-            s = scrollPs.map(p => p.name).join(', ')
-        C.ConsoleInfo(` База для ${aO5.a_name} => ${aO5.act.pbase.pbO5.name}`, s)
+            if (prev.pO5.ibody)
+                break
+            else
+                prev = prev.parentElement
+        } while (true)
+        const name=aO5.base.pO5?aO5.base.pO5.name:'?'
+        C.ConsoleInfo(`Контейнеры для ${aO5.a_name} в ${name}`, rez.length, rez)
+        if (!aO5.base.pO5)
+            console.log()
     };
 
     /**          
@@ -95,53 +104,63 @@
     const CreateAO5 = shp => {
         const
             aO5 = new wshp.AO5shp.AO5(shp),
-            CreatePrevPO5 = prev => {
-                let pO5 = prev.pO5, ps;
+            FindPScrolls = (aO5, prev) => {
+                let pO5 = prev.pO5, next, scrl;
 
-                if (!pO5){
+                if (!pO5) {
                     pO5 = new wshp.PO5shp.PO5(prev)
 
-                    pO5.pOuts.add(pO5)          // первым - самого себя!
+                    const ibody = prev.pO5.ibody
+                    scrl = ibody || pO5.scrls.H || pO5.scrls.V
 
-                    if (prev.nodeName !== 'BODY')
-                        ps = CreatePrevPO5(prev.parentElement)
+                    if (scrl || ibody) {
+                        pO5.pOuts.add(pO5)
+                        pO5.pIncs.add(pO5)
+                        pO5.base.pO5 = pO5
+                    }
+                    if (!ibody) {
+                        next = prev.parentElement
+
+                        console.log(`FindPScrolls next=${next.id}`)
+                        FindPScrolls(aO5, next)
+                    }
                 }
 
-                if (ps)
-                    for (const p of ps)
-                        pO5.pOuts.add(p)
+                console.log(`FindPScrolls next=${next ? next.id : '  - '}  prev=${prev.id}  pO5=${pO5.name}`)
 
-                Object.freeze(pO5.pOuts)
-                return pO5.pOuts
+                const nO5 = next ? next.pO5 : null
+                if (nO5) {
+                    if (nO5 && !pO5.base.pO5)
+                        pO5.base.pO5 = nO5.base.pO5
+
+                    for (const o5 of nO5.pOuts)
+                        pO5.pOuts.add(o5)
+                }
+                if (scrl) {
+                    pO5.aAlls.add(aO5)
+                    if (nO5)
+                        for (const o5 of nO5.pOuts)
+                            o5.pIncs.add(pO5)
+                }
+                aO5.base.pO5 = pO5.base.pO5     // ?????????????????
             },
-            GetPBase = pO5 => {
-                let pbase = wshp.PBase.pbases.get(pO5)
+            parent = aO5.parent
 
-                if (!pbase) {
-                    pbase = new wshp.PBase(pO5)
-                    wshp.PBase.pbases.set(pO5, pbase)
-                }
-                return pbase
-            }
+        if (parent.pO5)
+            aO5.base.pO5 = parent.pO5.base.pO5
+        else
+            FindPScrolls(aO5, parent)
 
-        CreatePrevPO5(aO5.parent)
+        // подключаем (и создаём) pbase
+        const bpO5 = aO5.base.pO5
+        let pbase = wshp.DoResize.PBase.pbases.get(bpO5)
 
-        let pbase = aO5.act.pbase
-        const pIncs = new Set()
-        for (const pO5 of aO5.parent.pO5.pOuts) {
-            pO5.aAlls.add(aO5)
-
-            if (pO5.scrls.H || pO5.scrls.V) {
-                if (!pbase)
-                    pbase = aO5.act.pbase = GetPBase(pO5)
-                pbase.scrollPs.add(pO5)
-            }
-
-            for (const pInc of pIncs)
-                pO5.pIncs.add(pInc)
-
-            pIncs.add(pO5)
+        if (!pbase) {
+            pbase = new wshp.DoResize.PBase(bpO5)
+            wshp.DoResize.PBase.pbases.set(bpO5, pbase)
         }
+        aO5.base.pbase = pbase
+
 
         if (o5debug > 1)
             DebugShowRez(aO5)
@@ -165,7 +184,6 @@
                         aO5 = CreateAO5(shp),
                         el = observ.getel(shp)
 
-                    wshp.DoResize.PBase.FindBase(aO5)
                     wshp.Frames.ReadAttrs(aO5, el.quals)
                     wshp.Boards.FindBords(aO5)
                 }
