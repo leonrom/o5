@@ -234,6 +234,43 @@
 								}
 						}
 					}
+				},
+				opp = { T: 'B', L: 'R', R: 'L', B: 'T' },
+				CalcBoards = (pIncs, x0) => {
+					const rez = []
+					let pT, visis, n=0
+					for (const pO5 of pIncs) {
+						if (!visis) {// первый пропускаю, т.к. это сам "первый" контейнер
+							visis = pO5.visis
+							pT = pO5
+							continue
+						}
+		
+						pO5.CalcScrollScope()
+		
+						let chg = ''
+						for (const x of [x0, opp[x0]]) {
+							const
+								v = pO5.scops[x],
+								vT = visis[x].v,
+								itl = 'TL'.includes(x)
+		
+							if ((vT > v && itl) || (vT < v && !itl)) {
+								Object.assign(pO5.visis[x], { p: pT, v: vT })
+		
+								if (o5debug)
+									chg += `${pT.name}:${x}=${vT}, `
+							}
+						}
+						visis = pO5.visis
+		
+						if (o5debug){
+							rez.push({ pO5: pO5.name, chg: chg })
+							if (chg) n++
+						}
+					}
+					if (o5debug && n)
+						C.ConsoleInfo(`Изменил ${n} границ`, ` по '${x0+opp[x0]}' в контейнере ${pT.name}`, rez)
 				}
 
 			let xs = ''
@@ -339,8 +376,8 @@
 			Object.assign(isResize, { act: true, time: time })
 
 			const aAlls = document.body.pO5.aAlls
-			for (const aO5 of aAlls)
-				wshp.Boards.FindBords(aO5)
+			// for (const aO5 of aAlls)
+			// 	wshp.Boards.FindBords(aO5)
 
 			MakeScroll(0.1, 0.1, body)
 

@@ -76,7 +76,6 @@ class OO5 {
             }
         }
 
-
         this.#wshp.Frames.ReadAttrs(aO5, [
             pitchs.join('') + ':',
             pmarks.join('') + ':',
@@ -84,7 +83,6 @@ class OO5 {
             alives.map(f => f ? ':A' : '').join(''),
             frames.map(f => `i=${f.nam}/${f.f}${f.c}`).join(',')
         ])
-        this.#wshp.Boards.FindBords(aO5, performance.now())
 
         this.#BordNames(aO5)
 

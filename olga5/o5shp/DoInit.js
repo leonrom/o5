@@ -10,7 +10,6 @@
      * Инициализация скроллируемых объектов.
      *
      * Содержит функции:
-     * - `SwitchObserve(aO5, on)` — включение/отключение наблюдения.
      * - `Observe(entries)` — обработка появления элементов в области видимости.
      * - `Init()` — первичная инициализация обсерверов.
      */
@@ -24,66 +23,6 @@
         fmtOK = "background: blue; color: white;",
         fmtErr = "background: yellow; color: black;",
         observes = [];
-    /**
-    * база - скроллируемый контейнер, содержащий общую информацию для подвисабельных объектов
-    */
-    class PBase {
-        constructor(pO5) {
-            this.pO5 = pO5
-            this.baO5s = new Set()     // все эти будут проверяться на "натыкание"
-            this.bframes = new Map()   // mO5s = new wshp.Map()
-
-            this.act = {
-                time: 0,          // только для DoChgs
-            }
-
-            Object.seal(this)
-            Object.seal(this.act)
-
-            Object.freeze(this)
-
-            PBase.pbases.set(pO5, this)
-        }
-        static pbases = new Map()
-    }
-
-    /**
-     * Включает или отключает наблюдение за элементом.
-     * @function SwitchObserve
-     * @param {Object} aO5 - Объект наблюдения (обёртка над DOM-элементом).
-     * @param {boolean} on - Флаг: true — включить, false — выключить.
-     */
-    const SwitchObserve = (aO5, on) => {
-        const name = aO5.a_name
-        if (on) {
-            if (observes.includes(aO5))
-                console.log("%c%s", fmtErr, `SwitchObserve`, ` добавление повторно '${name}`)
-            else {
-                observes.push(aO5)
-                observ.observe(aO5.shp)
-
-                if (o5debug)
-                    console.log("%c%s", fmtOK, `SwitchObserve`, ` добавлен '${name}`)
-            }
-        }
-        else {
-            const i = observes.indexOf(aO5)
-            if (i < 0)
-                console.log("%c%s", fmtErr, `SwitchObserve`, ` удаление отсутствующего sw.off='${name}`)
-            else {
-                observ.unobserve(aO5.shp)
-                observes.splice(i, 1)
-                if (observes.length === 0) {
-                    observ.disconnect()
-                    observ = null
-                }
-                if (o5debug)
-                    console.log("%c%s", fmtOK, `SwitchObserve`, ` удален '${name}' ` +
-                        (observes.length ? `осталось на обозрении = ${observes.length}` : `обозреватель ВЫКЛЮЧЕН`)
-                    )
-            }
-        }
-    };
 
     /**          
      * Демонстрация главной фишки динамическоо создания aO5
@@ -172,16 +111,8 @@
         else
             FindPScrolls(aO5, parent)
 
-        // подключаем (и создаём) pbase
-        const bpO5 = aO5.base.pO5
-        let pbase = PBase.pbases.get(bpO5)
-
-        if (!pbase)
-            pbase = new PBase(bpO5)
-
-        aO5.base.pbase = pbase
-
-
+        wshp.PBase.Attach(aO5)
+        
         if (o5debug > 1)
             DebugShowRez(aO5)
 
@@ -207,7 +138,6 @@
                         el = observ.getel(shp)
 
                     wshp.Frames.ReadAttrs(aO5, el.quals)
-                    wshp.Boards.FindBords(aO5)
                 }
                 observ.unobserve(shp)
 
@@ -244,6 +174,13 @@
                 state.observer.unobserve(tag)
                 const el = getel(tag)   // заменено!
                 state.elements.delete(el)
+
+                if (state.elements.length === 0) {
+                    state.observer.disconnect()
+                    state.observer = null
+                    if (o5debug)
+                        console.log("%c%s", fmtOK, `observe: `, ` отключено полностью`)
+                }
             },
             getel, // экспортируем в объект
             get observedElements() {

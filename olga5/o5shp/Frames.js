@@ -14,7 +14,12 @@
         // o5debug = C.consts.o5debug,
         mdiglit = /[a-zA-Z]+|[+-]*\d+/g,
         msmall = /^[a-z]/,
-        errs = []
+        errs = [],
+        frames = new Map(),
+        f0 = {
+            typ: 'n', cod: '', num: 0, cut: true, fix: true, s: 'умолчание?',
+            err: `${(quals && quals.length > 0) ? 'не найдены ' : 'не заданы '} фреймы: взяты ближйший с скроллингом`
+        }
     // fmtOK = "background: cornsilk; color: black;",
     // fmtErr = "background: yellow; color: black;",   
 
@@ -30,6 +35,7 @@
                     pO5: null,
                     xO5: null,
                     time: -1,
+                    err:'',
                     n: 0,
                 },
                 c: frame.cod.toUpperCase(),
@@ -66,7 +72,7 @@
      * @param {Object} aO5 - объект-приёмник (должен иметь `cls`)
      * @param {string[]} quals - массив строк-квалификаторов
      */
-    const ReadCls = (aO5, quals) => {
+    ReadCls = (aO5, quals) => {
         const cls = aO5.cls
         let setdef = true
         Object.assign(cls, {           // для повторной инициализации (напр. в тестах)
@@ -115,115 +121,172 @@
         }
         else if (!(cls.pitch || '').trim())
             cls.pitch = 'S'
-    }
+    },
 
-    const ReadFrames = (aO5, squals) => {
-        const
-            quals = squals.split(':'),
-            pbase = aO5.base.pbase,
-            frames = new Map(),
-            f0 = {
-                typ: 'n',       // окно браузера
-                cod: '',
-                num: 0,
-                cut: true,
-                fix: true,
-                s: 'умолчание?',
-                err: `${(quals && quals.length > 0) ? 'не найдены ' : 'не заданы '} фреймы: взяты ближйший с скроллингом`
+        /** 
+         * нахождение тегов-контейнеров для тех frame, у которых неопределён tag            
+         * и сортировка их по удалённости от aO5
+        */
+        StoreToBase = aO5 => {
+            const
+                pbase = aO5.base.pbase,
+                IsInClass = (pO5, clss) => {
+                    const classOrigs = pO5.classOrigs
+                    if (classOrigs.length > 0) {
+                        for (const cls of clss)
+                            if (cls && classOrigs.indexOf(cls) >= 0)
+                                return true
+                    }
+                    else {
+                        if (clss.length === 0 || clss.find(cls => cls.trim().length == 0) != null)
+                            return true
+                    }
+                }
+
+            // удаляю старое использование
+            for (const [key, f] of frames) {
+                const i = f.aO5s.indexOf(aO5)
+                if (i >= 0) {
+                    f.aO5s.splice(i, 1)
+                    if (s.aO5s.length === 0)
+                        frames.delete(key)
+                }
             }
 
-        f0.key = Frame.Key(f0)
+            // добавляю новый фрейм в базу
+            aO5.frames.clear()
 
-        if (pbase.bframes.size === 0)    // для неуказанных фреймов    
-            pbase.bframes.set(f0.key, new Frame(f0))
+            for (const [key, f] of frames) {
+                const 
+                    frame = pbase.bframes.get(key) || wshp.PBase.AddFrame(new Frame(f))
 
-        for (const qual of quals)
-            if (qual.match(msmall)) { // с маленькой буквы начинаются описания фреймов
-                const ss = qual.split(','),
-                    typs = 'cins'
+                if (!frame) {
 
-                for (const s of ss)
-                    if (s) {
+                    frame = new Frame(f)
+
+                    let pO5c;
+                    const
+                        clss = frame.clss,
+                        t = frame.typ,
+                        c = frame.c
+
+                    for (const pO5 of pbase.pO5.pOuts) {
+                        pO5c = pO5
+                        if (
+                            (t === 's' && (pO5.actScroll.V || pO5.actScroll.H)) ||
+                            (t === 'n' && pO5.tag.nodeName == c) ||
+                            (t === 'i' && pO5.tag.id.toUpperCase() == c) ||
+                            (t === 'c' && IsInClass(pO5, clss))
+                        )
+                            if (--frame.act.n > 0) frame.act.xO5 = pO5
+                            else
+                                frame.act.pO5 = pO5
+
+                        if (frame.act.pO5 || pO5.final)
+                            break
+                    }
+
+                    let err;
+                    if (!frame.act.pO5) {
+                        if (frame.act.xO5) {
+                            frame.act.pO5 = frame.act.xO5
+                            err = `взял ${frame.act.n}-й тег (вместо ${frame.num}) для фрейма "${frame.s}"`
+                        }
+                        else {
+                            frame.act.pO5 = pO5c
+                            err = `среди скроллиремых нет тега для фрейма "${frame.s}" - взял ${pO5c.name}`
+                        }
+                        errs.push(err)
+                    }
+
+                    if (o5debug)
+                        console.log(`Определил (и добавил в bframes) фрейм "${frame.key} на ${frame.act.pO5.name}" ` +
+                            (err ? `с ошибкой: ${err}` : ``))
+
+                    if (errs.length)
+                        C.ConsoleError(`Ошибки определения фреймов для ${aO5.a_name}:`, errs.length, errs)
+
+                    pbase.bframes.set(key, frame)
+                }
+
+                frame.aO5s.push(aO5)
+                aO5.frames.add(frame)
+            }
+        },
+        MakeFrames = (aO5, squals) => {
+            const
+                quals = squals.split(':'),
+                        typs = 'cins'
+
+            for (const qual of quals)
+                if (qual.match(msmall)) { // с маленькой буквы начинаются описания фреймов
+                    const ss = qual.split(',')
+
+                    for (const s of ss) {
+                        if (!s) continue
 
                         const
                             cc = s.includes('=') ? s.split('=') : ['i', s],  // считаем, что это значение для id
-                            typ = cc[0].trim().toLowerCase()
-
-                        if (!typs.includes(typ)) {
-                            errs.push({ name: aO5.a_name, qual: qual, err: `тип ссылки '${typ}' не начинается одним из '${typs}'` })
-                            continue
-                        }
-
-                        const
+                            typ = cc[0].trim().toLowerCase(),
                             uu = (cc[1] || '').split('/'),
                             f = {
-                                cut: false, fix: false, num: 0, err: '',
-                                typ: typ,
+                                cut: false, fix: false, num: 0, err: '', typ: typ,
                                 cod: (uu[0] || '').trim(),
-                                s: s,
+                                s: s
                             }
 
-                        if (uu.length > 1) {    //  && !uu[1].trim()
-                            for (let i = 1; i < uu.length; i++) {
-                                const pars = uu[i].match(mdiglit)
-                                if (pars) {
-                                    for (const par of pars) {
-                                        const n = Number(par)
-                                        if (Number.isInteger(n) && !isNaN(n)) {
-                                            if (f.typ !== 'w')    // для 'window' номер игнорируется
-                                                f.num = n
+                        if (!typs.includes(typ))
+                            errs.push({ name: aO5.a_name, qual: qual, err: `тип ссылки '${typ}' не начинается одним из '${typs}'` })
+                        else
+                            if (uu.length > 1) {    //  && !uu[1].trim()
+                                for (let i = 1; i < uu.length; i++) {
+                                    const pars = uu[i].match(mdiglit)
+                                    if (pars)
+                                        for (const par of pars) {
+                                            const n = Number(par)
+                                            if (Number.isInteger(n) && !isNaN(n)) {
+                                                if (f.typ !== 'w')    // для 'window' номер игнорируется
+                                                    f.num = n
+                                            }
+                                            else {
+                                                if (par.indexOf('f') >= 0) f.fix = true
+                                                if (par.indexOf('c') >= 0) f.cut = true
+                                            }
                                         }
-                                        else {
-                                            if (par.indexOf('f') >= 0) f.fix = true
-                                            if (par.indexOf('c') >= 0) f.cut = true
-                                        }
-                                    }
+                                }
+
+                                if (!f.fix || !f.cut) {
+                                    let s = ``
+                                    if (!f.fix) s = `не задан 'fix' (не подвисает); ` + (f.cut ? '.' : ', ')
+                                    if (!f.cut) s += `не задан 'cut' (не обрезается).`
+                                    Object.assign(f, { err: s, })
                                 }
                             }
-
-                            if (!f.fix || !f.cut) {
-                                let s = ``
-                                if (!f.fix) s = `не задан 'fix' (не подвисает); ` + (f.cut ? '.' : ', ')
-                                if (!f.cut) s += `не задан 'cut' (не обрезается).`
-                                Object.assign(f, { err: s, })
-                            }
-                        }
-                        else
-                            Object.assign(f, { cut: true, fix: true, err: `для ${s} по умолчанию вкл. 'fix' и 'cut'`, })
+                            else
+                                Object.assign(f, { cut: true, fix: true, err: `для ${s} по умолчанию вкл. 'fix' и 'cut'`, })
 
                         const
                             key = f.key = Frame.Key(f),
                             xf = frames.get(key)
                         if (xf) {
-                            xf.fix ||= f.fix;
-                            xf.cut ||= f.cut;
-                            f.err = ''
+                            xf.fix ||= f.fix; xf.cut ||= f.cut; f.err = ''
                         }
                         else
                             frames.set(key, f)
                     }
-            }
+                }
 
-        if (frames.size === 0)
-            frames.set(f0.key, f0)     //  pbase.bframes.values().next().value)
-
-        aO5.frames.clear()
-        for (const [key, frame] of frames) {
-            let f = pbase.bframes.get(key);
-            if (!f) {
-                f = new Frame(frame)
-                pbase.bframes.set(Frame.Key(f), f)
-            }
-            f.aO5s.push(aO5)
-            aO5.frames.add(f)
+            if (frames.size === 0)
+                frames.set(Frame.Key(f0), new Frame(f0))     //  pbase.bframes.values().next().value)            
         }
-    }
 
     const ReadAttrs = (aO5, quals) => {
         errs.splice()
+        frames.clear()
 
         ReadCls(aO5, quals)
-        ReadFrames(aO5, quals)
+        MakeFrames(aO5, quals)
+        StoreToBase(aO5)
 
         if (errs.length > 0) {
             const u = aO5.shp.quals ? `c квалиф. "${aO5.shp.quals.join(':')}"` : `(без квалификаторов)`

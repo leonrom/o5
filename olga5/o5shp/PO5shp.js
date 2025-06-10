@@ -5,7 +5,7 @@
 
 (function () {              // ---------------------------------------------- o5shp/PO5shp ---11
     "use strict"
-    let wshp;
+    let wshp, nst;
     const
         olga5_modul = "o5shp",
         modulname = 'PO5shp',
@@ -23,11 +23,11 @@
             const
                 pO5 = this,
                 ibody = tag.nodeName == 'BODY',
-                nst = window.getComputedStyle(tag),
                 classList = Array.from(tag.classList)
 
             tag.pO5 = pO5
 
+            nst = window.getComputedStyle(tag),
             Object.assign(pO5, {
                 tag: tag,
                 name: C.MakeObjName(tag),
@@ -43,6 +43,7 @@
                     left: parseFloat(nst.borderLeftWidth),
                     right: parseFloat(nst.borderRightWidth),
                     bottom: parseFloat(nst.borderBottomWidth),
+                    bgColor: nst.backgroundColor
                 },
                 scrls: {
                     H: nst.overflow === 'auto' || nst.overflowX === 'auto' || nst.overflow === 'scroll' || nst.overflowX === 'scroll',
@@ -57,8 +58,6 @@
                 scops: { T: 0, L: 0, R: 0, B: 0 },  //  текущие границы
                 schgs: { T: 0, L: 0, R: 0, B: 0 },  // изменение границ от предыдущего
             })
-
-            // pO5.CalcScrollScope()
 
             for (const x of 'TRLB') {
                 pO5.visis[x] = { p: null, v: NaN }
@@ -102,18 +101,6 @@
                 V: this.ibody || tag.offsetWidth > tag.clientWidth + r.left + r.right,
                 H: this.ibody || tag.offsetHeight > tag.clientHeight + r.top + r.bottom,
             })
-        }
-        IsInClass(clss) {
-            const classOrigs = this.classOrigs
-            if (classOrigs.length > 0) {
-                for (const cls of clss)
-                    if (cls && classOrigs.indexOf(cls) >= 0)
-                        return true
-            }
-            else {
-                if (clss.length === 0 || clss.find(cls => cls.trim().length == 0) != null)
-                    return true
-            }
         }
         CalcScrollScope() {   // видимост,- пересчитывается при скроллине в DoChgs
             const

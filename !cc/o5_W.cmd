@@ -5,7 +5,7 @@ type o5com.js ^
      o5com\TagsRef.js o5com\IniScripts.js ^
    > o5com!.js  2> o5.log
 
-type o5shp\AO5shp.js o5shp\PO5shp.js o5shp\DoInit.js o5shp\Boards.js o5shp\Frames.js o5shp\DoChgs.js ^
+type o5shp\AO5shp.js o5shp\PO5shp.js o5shp\DoInit.js o5shp/PBords.js 5shp\Frames.js o5shp\DoChgs.js ^
      o5shp.js ^
    > o5shp!.js  2>>o5.log
 

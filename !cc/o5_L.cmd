@@ -7,7 +7,7 @@ cat o5com.js \
 cat o5snd/AO5snd.js o5snd/Prep.js o5snd/Imgs.js o5snd.js \
   > ../!cc/o5snd!.js        2>>../!cc/o5.log
   
-cat o5shp/AO5shp.js o5shp/PO5shp.js o5shp/DoInit.js o5shp/Boards.js o5shp/Frames.js o5shp/DoChgs.js o5shp.js \
+cat o5shp/AO5shp.js o5shp/PO5shp.js o5shp/DoInit.js o5shp/PBords.js o5shp/Frames.js o5shp/DoChgs.js o5shp.js \
   > ../!cc/o5shp!.js        2>>../!cc/o5.log
 
 cat o5dbg/Events.js o5dbg/Logs.js o5dbg/Pos.js o5dbg/Ccss.js o5dbg/Utils.js o5dbg.js \
