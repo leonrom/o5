@@ -24,6 +24,28 @@
         fmtOK = "background: blue; color: white;",
         fmtErr = "background: yellow; color: black;",
         observes = [];
+    /**
+    * база - скроллируемый контейнер, содержащий общую информацию для подвисабельных объектов
+    */
+    class PBase {
+        constructor(pO5) {
+            this.pO5 = pO5
+            this.baO5s = new Set()     // все эти будут проверяться на "натыкание"
+            this.bframes = new Map()   // mO5s = new wshp.Map()
+
+            this.act = {
+                time: 0,          // только для DoChgs
+            }
+
+            Object.seal(this)
+            Object.seal(this.act)
+
+            Object.freeze(this)
+
+            PBase.pbases.set(pO5, this)
+        }
+        static pbases = new Map()
+    }
 
     /**
      * Включает или отключает наблюдение за элементом.
@@ -64,10 +86,9 @@
     };
 
     /**          
+     * Демонстрация главной фишки динамическоо создания aO5
      * @function DebugShowRez
-     * показ контейнеров для aO5 при отладке
-     *  Главная фишка динамическоо создания aO5
-     * демонстрируется, чо обрабатываются только "новые" контейнеры,
+     * контейнеры для aO5,- обрабатываются только "новые" контейнеры,
      * а инфа из уже обработанных просто переписывается
          */
     const DebugShowRez = aO5 => {
@@ -88,10 +109,10 @@
             else
                 prev = prev.parentElement
         } while (true)
-        const name=aO5.base.pO5?aO5.base.pO5.name:'?'
+        const name = aO5.base.pO5 ? aO5.base.pO5.name : '?'
         C.ConsoleInfo(`Контейнеры для ${aO5.a_name} в ${name}`, rez.length, rez)
         if (!aO5.base.pO5)
-            console.log()
+            alert('нету aO5.base.pO5')
     };
 
     /**          
@@ -142,7 +163,7 @@
                         for (const o5 of nO5.pOuts)
                             o5.pIncs.add(pO5)
                 }
-                aO5.base.pO5 = pO5.base.pO5     // ?????????????????
+                aO5.base.pO5 = pO5.base.pO5
             },
             parent = aO5.parent
 
@@ -153,12 +174,11 @@
 
         // подключаем (и создаём) pbase
         const bpO5 = aO5.base.pO5
-        let pbase = wshp.DoResize.PBase.pbases.get(bpO5)
+        let pbase = PBase.pbases.get(bpO5)
 
-        if (!pbase) {
-            pbase = new wshp.DoResize.PBase(bpO5)
-            wshp.DoResize.PBase.pbases.set(bpO5, pbase)
-        }
+        if (!pbase)
+            pbase = new PBase(bpO5)
+
         aO5.base.pbase = pbase
 
 
@@ -176,8 +196,10 @@
      * @param {IntersectionObserverEntry[]} entries - Список наблюдаемых пересечений.
      */
     const Observe = entries => {
+        let isi;
         for (const entry of entries)
             if (entry.isIntersecting) {
+                isi = true
                 const shp = entry.target
                 if (!shp.aO5shp) {  // вообще-то можно и не проверять....
                     const
@@ -189,11 +211,10 @@
                 }
                 observ.unobserve(shp)
 
-                if (!wshp.tLastScroll) {
-                    wshp.tLastScroll = performance.now()  // пересчитываетс в DoScroll
-                    C.E.AddEventListener('scroll', wshp.DoScroll.EveScroll, { couldRepeat: true })
-                }
+                wshp.DoChgs.ActListener(true)
             }
+        if (isi)
+            wshp.DoChgs.MakeScroll(0.1, 0.1, body)
     };
 
     /**

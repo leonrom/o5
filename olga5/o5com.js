@@ -35,11 +35,24 @@
 					has = E.events.find(event => event.eve === eve && event.nFun === nFun)
 				return has
 			},
+			/**
+ * Добавить слушатель с поддержкой кастомных опций
+ * @param {string} eve - имя события
+ * @param {Function} Fun - callback-функция
+ * @param {Object|boolean} opts - опции addEventListener и свои кастомные параметры
+ *        допустимые native опции: capture, once, passive
+ *        кастомные: couldRepeat (boolean, default true)
+ */
 			AddEventListener: (eve, Fun, opts) => {
 				const nFun = E.NFun(Fun)
-				if (E.events.find(event => event.eve == eve && event.nFun == nFun && event.opts == opts)){
+
+				if (typeof opts === 'boolean')
+					opts = { capture: opts };
+
+				if (E.events.find(event => event.eve == eve && event.nFun == nFun && event.opts == opts)) {
 					if (!opts.couldRepeat)
-					E.Err(`повторная регистрация  '${eve}' для ф-ии "${nFun}"`)}
+						E.Err(`повторная регистрация  '${eve}' для ф-ии "${nFun}"`)
+				}
 				else {
 					E.Msg('AddEventListener', eve, nFun)
 
@@ -54,8 +67,15 @@
 								Fun(donet.e)
 							}
 
-					E.events.push({ eve: eve, nFun: nFun, opts: opts })
-					window.addEventListener(eve, Fun, opts)
+					const opts2 = {capture:false, once:false, passive:false}
+					for (const opt in opts)
+						if (['capture', 'once', 'passive'].includes(opt))
+							if (typeof opts[opt] === 'boolean')
+								opts2[opt] = opts[opt]
+							else E.Err(`значение одной из опций - не булево а '${typeof opts[opt]}'`)
+
+					E.events.push({ eve: eve, nFun: nFun, opts: opts2 })
+					window.addEventListener(eve, Fun, opts2)
 				}
 			},
 			RemoveEventListener: (eve, Fun) => {

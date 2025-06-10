@@ -21,72 +21,32 @@
             */
             const time = performance.now()
 
-            for (const entry of entries)
-                if (entry.target.pO5.HasFixed()) {
-                    wshp.DoInit.TryScrollAct(true, time, 'из Boards')
-                    break
+            if (entry.isIntersecting)
+                wshp.DoChgs.ActListener(true)
+            else
+                if (!entry.isIntersecting) {
+                    // ????????????????????????????????????????????????????
+                    wshp.DoChgs.ActListener(false)
                 }
         },
-        // FillScrollable = (aO5) => {
-        //     /*
-        //     Вызывается при инициализации и при DoResize   ???????????????????????????
-        //     */
-        //     const pStrt = aO5.parent.pO5
-        //     if (pStrt.act.time === wshp.tLastScroll) 
-        //         return            
 
-        //     let pO5, pbase = null;
-        //     for (pO5 of pStrt.pOuts)
-        //         if (pO5.actScroll.V || pO5.actScroll.H) {
-        //             if (!pbase) {
-        //                 if (pO5.act.time === wshp.tLastScroll)
-        //                     break
-        //                 else {
-        //                     pO5.act.time = wshp.tLastScroll
-        //                     pO5.act.pbase = new wshp.DoResize.PBase(pO5)
-        //                 }
-        //                 pbase = pO5.act.pbase
-        //             }
-        //             pbase.scrollPs.add(pO5)
-        //         }
-
-        //     if (!pbase)     //  т.е. последний в pStrt.pOuts
-        //         pO5.act.pbase = pbase = new wshp.DoResize.PBase(pO5)
-
-        //     if (pbase.scrollPs.size === 0)  // добавляю внешний (последний) контейнер
-        //         pbase.scrollPs.add(pO5)
-
-        //     pStrt.act.pbase = aO5.act.pbase = pbase
-
-        //     for (const pO5 of pbase.scrollPs)
-        //         pO5.ActScroll(wshp.tLastScroll)
-
-        //     if (o5debug > 1) {
-        //         const parentAdds = []
-        //         for (const pO5 of pbase.scrollPs)
-        //             parentAdds.push({
-        //                 name: pO5.name,
-        //                 scrollV: pO5.actScroll.V ? 'да' : ' -',
-        //                 scrollH: pO5.actScroll.H ? 'да' : ' -',
-        //             })
-        //         C.ConsoleInfo(`Скроллируемые в FillScrollable`, 'T=' + wshp.tLastScroll.toFixed(), parentAdds)
-        //     }
-        // },
+        /** 
+         * нахождение тегов-контейнеров для тех frame, у которых неопределён tag            
+         * и сортировка их по удалённости от aO5
+        */
         FindBords = (aO5) => {
-            
-            const pbase = aO5.base.pO5
+            const errs = []
 
-            // FillScrollable(aO5)
-
-            const                errs = []
-
-            /*
-            нахождение тегов-контейнеров для тех frame, у которых неопределён tag
-            и сортировка их по удалённости от aO5
-            */
             for (const frame of aO5.frames) {
-                if (frame.act.pO5)
-                    continue
+//                 if (frame.act.pO5)           ???????????????????????????????????????????
+//                     continue
+// верхние 2 делать не надо
+// зато надо по ключу искать в pBase именно ОБНОВЛЕНИЕ pO5 для данного Time
+// если находится - присвоить
+// иначе:
+//   формировать
+//   сохранить в pBase
+
 
                 let pO5c;
                 const
@@ -124,23 +84,100 @@
 
                 if (o5debug)
                     console.log(`Определил (и добавил в bframes) фрейм "${frame.key} на ${frame.act.pO5.name}" ` +
-                        err ? `с ошибкой: ${err}` : ``)
+                        (err ? `с ошибкой: ${err}` : ``))
 
                 if (errs.length)
                     C.ConsoleError(`Ошибки определения фреймов для ${aO5.a_name}:`, errs.length, errs)
             }
-// // 
-//             wshp.PO5shp.InsertaO5s(aO5)
 
-            for (const pO5 of aO5.base.pO5.pOuts)
-                if (!observ.tags.has(pO5.tag))
-                    observ.observe(pO5.tag)
+            // for (const pO5 of aO5.base.pO5.pOuts)
+            //     if (!observ.tags.has(pO5.tag))
+            //         observ.observe(pO5.tag)
 
             // для тестирования в frames.html
             window.dispatchEvent(new CustomEvent('o5_containers', { detail: { aO5: aO5, } }))
+        },
+        CalcPO5base = (time, pbase, xs) => {  // убрать !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            pbase.act.time === time
+
+            // Пересчет Границ Контейнеров
+            const rez = [],
+                padd = [] // массив тех контейнеров, границы которых надо пересчитать
+            let pN;
+            for (const pO5 of pbase.pO5.pOuts)
+                if (pO5.scrls.V || pO5.scrls.H) {
+                    if (pO5.scops.time === time) { // значит этот и последующие уже определены
+                        pN = pO5
+                        break
+                    }
+                    pO5.CalcScrollScope(time, 'TLRB')
+                    padd.push(pO5)
+                }
+
+            // Зоны видимости
+            for (let i = padd.length - 1; i >= 0; i--) {
+                const pO5 = padd[i]
+                let chg = ''
+                for (const x of xs) {
+                    if (pN) {
+                        const
+                            v = pO5.scops[x],
+                            vN = pN.visis[x].v,
+                            itl = 'TL'.includes(x)
+                        if ((vN > v && itl) || (vN < v && !itl)) {
+                            Object.assign(pO5.visis[x], { p: pN, v: vN })
+
+                            if (o5debug)
+                                chg += `${pN.name}:${x}=${vN}, `
+                        }
+                    }
+                }
+                if (o5debug)
+                    rez.push({ pO5: pO5.name, chg: chg })
+                // visis = pO5.visis
+            }
+            if (o5debug && rez.length > 0)
+                C.ConsoleInfo(`Пересчитал границы для pbase=${pbase.pO5.name}`, rez.length, rez)
+        },
+		opp = { T: 'B', L: 'R', R: 'L', B: 'T' },
+        CalcBoards = (pIncs, x0) => {
+            const rez = []
+            let pT, visis, n=0
+            for (const pO5 of pIncs) {
+                if (!visis) {// первый пропускаю, т.к. это сам "первый" контейнер
+                    visis = pO5.visis
+                    pT = pO5
+                    continue
+                }
+
+                pO5.CalcScrollScope()
+
+                let chg = ''
+                for (const x of [x0, opp[x0]]) {
+                    const
+                        v = pO5.scops[x],
+                        vT = visis[x].v,
+                        itl = 'TL'.includes(x)
+
+                    if ((vT > v && itl) || (vT < v && !itl)) {
+                        Object.assign(pO5.visis[x], { p: pT, v: vT })
+
+                        if (o5debug)
+                            chg += `${pT.name}:${x}=${vT}, `
+                    }
+                }
+                visis = pO5.visis
+
+                if (o5debug){
+                    rez.push({ pO5: pO5.name, chg: chg })
+                    if (chg) n++
+                }
+            }
+            if (o5debug && n)
+                C.ConsoleInfo(`Изменил ${n} границ`, ` по '${x0+opp[x0]}' в контейнере ${pT.name}`, rez)
         }
 
-    wshp = C.AddModuleSub(olga5_modul, modulname, [FindBords])  // , FillScrollable
+    wshp = C.AddModuleSub(olga5_modul, modulname, [FindBords, CalcBoards])  // , FillScrollable
 
     observ = new wshp.IntersectionObserver(Observe, {
         root: null,

@@ -27,7 +27,6 @@
                 classList = Array.from(tag.classList)
 
             tag.pO5 = pO5
-            wshp.allPO5s.add(pO5)
 
             Object.assign(pO5, {
                 tag: tag,
@@ -35,7 +34,7 @@
                 classOrigs: classList,
                 ibody: ibody,
                 final: ibody || PO5.#finalClasses.find(cls => classList.includes(cls)),
-                base: { pO5:null, }, // (все pO5) ссылка на ближайший скроллируемый контейнер
+                base: { pO5: null, }, // (все pO5) ссылка на ближайший скроллируемый контейнер
                 pOuts: new Set(),  //  (все pO5) список  скроллируемых контейнеров
                 pIncs: new Set(),  //  (скроллируемые pO5) список вложенных скроллируемых контейнеров 
                 aAlls: new Set(),  // (скроллируемые pO5) список всех подвисабельных тегов
@@ -48,15 +47,25 @@
                 scrls: {
                     H: nst.overflow === 'auto' || nst.overflowX === 'auto' || nst.overflow === 'scroll' || nst.overflowX === 'scroll',
                     V: nst.overflow === 'auto' || nst.overflowY === 'auto' || nst.overflow === 'scroll' || nst.overflowY === 'scroll',
-                }
+                },
+                actScroll: {
+                    time: 0,
+                    V: false, H: false,             // скроллируемость по верт. и гориз.
+                    left: 0, top: 0, timcall: -1,   // координыты и время последнео  скроллинга
+                },
+                visis: { T: {}, L: {}, R: {}, B: {} },  // видимые границы 
+                scops: { T: 0, L: 0, R: 0, B: 0 },  //  текущие границы
+                schgs: { T: 0, L: 0, R: 0, B: 0 },  // изменение границ от предыдущего
             })
-            Object.assign(pO5.scops, pO5.CalcScrollScope())
+
+            // pO5.CalcScrollScope()
+
             for (const x of 'TRLB') {
                 pO5.visis[x] = { p: null, v: NaN }
                 Object.seal(pO5.visis[x])
             }
 
-            for (const nam of ['aAlls', 'pOuts', 'pIncs', 'base', 'scops', 'schgs', 'actScroll'])
+            for (const nam of ['aAlls', 'pOuts', 'pIncs', 'base', 'scops', 'schgs', 'visis', 'actScroll'])
                 if (pO5[nam])
                     Object.seal(pO5[nam])
                 else
@@ -72,19 +81,12 @@
                 console.log(`PO5 создано ${pO5.name}`)
         }
         name = ''    // еще и тут - чтобы сразу видеть в отладчике
-        scops = { T: 0, L: 0, R: 0, B: 0, time: 0 }  //  текущие границы
-        schgs = { T: 0, L: 0, R: 0, B: 0 }  // изменение границ от предыдущего
-        visis = { T: {}, L: {}, R: {}, B: {}, act: { time: -1 } }  // видимые границы 
-        actScroll = {
-            time: 0,
-            V: false, H: false,             // скроллируемость по верт. и гориз.
-            left: 0, top: 0, timcall: -1,   // координыты и время последнео  скроллинга
-        }
-        HasFixed() {
-            for (const aO5 of this.aAlls)
-                if (aO5.pFixs.fixed)
-                    return true
-        }
+
+        // HasFixed() {
+        //     for (const aO5 of this.aAlls)
+        //         if (aO5.pFixs.fixed)
+        //             return true
+        // }
         ActScroll(time) {
             if (this.actScroll.time === time)
                 return
@@ -113,7 +115,7 @@
                     return true
             }
         }
-        CalcScrollScope() {   // видимост,- пересчитывается при скроллине в DoScroll
+        CalcScrollScope() {   // видимост,- пересчитывается при скроллине в DoChgs
             const
                 pO5 = this,
                 tag = pO5.tag,
@@ -125,15 +127,25 @@
                 w = isBody ? de.clientWidth : tag.clientWidth,
                 h = isBody ? de.clientHeight : tag.clientHeight,
 
-                r = pO5.borders,
-                atTo = tag.clientTop > r.top,         // полоса - вверху
-                atLe = tag.clientLeft > r.left,       // полоса - слев       
-                scrW = tag.offsetWidth - tag.clientWidth - r.left - r.right,
-                scrH = tag.offsetHeight - tag.clientHeight - r.top - r.bottom,
-                top = p.top + r.top + (atTo ? scrH : 0),
-                left = p.left + r.left + (atLe ? scrW : 0)
+                b = pO5.borders,
+                atTo = tag.clientTop > b.top,         // полоса - вверху
+                atLe = tag.clientLeft > b.left,       // полоса - слев       
+                scrW = tag.offsetWidth - tag.clientWidth - b.left - b.right,
+                scrH = tag.offsetHeight - tag.clientHeight - b.top - b.bottom,
 
-            return { T: top, L: left, R: left + w, B: top + h }
+                r = {
+                    T: p.top + b.top + (atTo ? scrH : 0),
+                    L: p.left + b.left + (atLe ? scrW : 0),
+                    R: p.left + w,
+                    B: p.top + h
+                },
+                sc = pO5.scops
+
+            Object.assign(pO5.schgs, { T: r.T - sc.T, L: r.L - sc.L, R: r.R - sc.R, B: r.B - sc.B })
+            Object.assign(sc, r)
+
+            for (const x of 'TLRB')
+                Object.assign(pO5.visis[x], { p: pO5, v: pO5.scops[x] })
         }
     }
 

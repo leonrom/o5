@@ -76,17 +76,18 @@ class OO5 {
             }
         }
 
-        aO5.ReadAttrs([
+
+        this.#wshp.Frames.ReadAttrs(aO5, [
             pitchs.join('') + ':',
             pmarks.join('') + ':',
             levels.join('') + ':',
             alives.map(f => f ? ':A' : '').join(''),
             frames.map(f => `i=${f.nam}/${f.f}${f.c}`).join(',')
         ])
+        this.#wshp.Boards.FindBords(aO5, performance.now())
 
         this.#BordNames(aO5)
 
-        this.#wshp.Boards.FindBords(aO5, performance.now())
         this.CallScroll('V')     // достаточно по одному из 'V' и 'H'
     }
     #InitCtrls = (aO5, div) => {
@@ -153,19 +154,19 @@ class OO5 {
                     key = this.#frame,
                     pdiv = div.getElementsByClassName(key)[0],
                     ps = Array.from(pdiv.getElementsByTagName('p'))
-                    // FindFrame = id => frame => frame.act.pO5.tag.id === id
+                // FindFrame = id => frame => frame.act.pO5.tag.id === id
 
                 for (const p of ps) {
                     const
                         // id = p.id,
-                        icls = p.className.trim(),                        
+                        icls = p.className.trim(),
                         bs = Array.from(p.getElementsByTagName('b')),
                         nam = Array.from(p.getElementsByTagName('i'))[0].innerText
 
                     let frame = null
                     if (icls)
-                        for (const f of aO5.frames )
-                            if (f.act.pO5.tag.id === icls){
+                        for (const f of aO5.frames)
+                            if (f.act.pO5.tag.id === icls) {
                                 frame = f
                                 break
                             }
@@ -281,7 +282,7 @@ class OO5 {
             obj.style.opacity = opas
     }
     CallScroll = s => {  // вызывается из HTML
-        this.#wshp.DoScroll.MakeScroll(performance.now(), s.indexOf('V')<0?0:0.1, s.indexOf('H')<0?0:0.1, body, true)
+        this.#wshp.DoChgs.MakeScroll(s.indexOf('V') < 0 ? 0 : 0.1, s.indexOf('H') < 0 ? 0 : 0.1, body, true)
     }
     OutLines = cbx => {
         const
@@ -379,10 +380,13 @@ class OO5 {
             }
         }
 
-        const p1 = aO5.shp.getBoundingClientRect()
-        for (const xO5 of this.#wshp.allAO5s)
+        const
+            p1 = aO5.shp.getBoundingClientRect(),
+            aAlls = document.body.pO5.aAlls
+
+        for (const xO5 of aAlls)
             if (xO5 !== aO5) {
-                const p2 = xO5.HasFixed() ? xO5.posCf : xO5.shp.getBoundingClientRect()
+                const p2 = xO5.pFixs.fixed ? xO5.posCf : xO5.shp.getBoundingClientRect()
                 if (
                     (
                         (p1.left <= p2.right && p1.right >= p2.left) ||
@@ -393,12 +397,12 @@ class OO5 {
                     )
                 )
                     alert(`Не следует накладывать ${aO5.id} на объект ${xO5.id}`)
-                // console.log(xO5.id + ' top=' + xO5.posC.top, 'на', aO5.id + ' top=' + aO5.posC.top)
+                
             }
-        // aO5.SetPosD()
-        this.#wshp.PO5shp.InsertaO5s(aO5)
-        // this.#DoScroll()
-        this.CallScroll('V')     // достаточно по одному из 'V' и 'H'
+            
+        // this.#wshp.PO5shp.InsertaO5s(aO5)
+        
+        this.CallScroll('VH')     // достаточно по одному из 'V' и 'H'
     }
     DoMove = e => {
         const mpos = this.mpos

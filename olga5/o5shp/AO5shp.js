@@ -113,9 +113,6 @@
             for (const x of 'TLRB')
                 aO5.shrunks[x] = new Set()
 
-            // this.ReadAttrs(aO5.shp.aO5quals || [])
-            // thiswshp.Frames.ReadAttrs(aO5, aO5.shp.aO5quals || [])
-            // aO5.SetPosD()
 
             // 'tryFix', 'wasFix', 
             for (const nam of ['base', 'margs', 'outln', 'shrunks', 'hidden', 'pFixs', 'zeroed', 'isFull', 'posC', 'posO',  'posS',  'orig', 'cls'])
@@ -125,14 +122,6 @@
                     console.log("%c%s", fmtErr, `в aO5 отсутствует '${nam}'`)
 
             Object.freeze(this)
-
-            // if (o5debug > 1)
-            //     console.log(`>> class AO5  ${aO5.id}  => ` +
-            //         `T= ${aO5.posD.T.toFixed().padStart(4)}; ` +
-            //         `L= ${aO5.posD.L.toFixed().padStart(4)}; ` +
-            //         `R= ${aO5.posD.R.toFixed().padStart(4)}; ` +
-            //         `B= ${aO5.posD.B.toFixed().padStart(4)}; ` +
-            //         ``)
         }
         #SetMargOutls(style, margs, outln) {
             Object.assign(style,

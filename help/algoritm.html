@@ -95,7 +95,7 @@
                             и, если <i>контроль&nbsp;скроллинга</i> не включен, то
                             <ul>
                                 <li>включается <i>контроль&nbsp;скроллинга</i></li>
-                                <li>запускается <b>DoScroll</b>() отработки скроллинга</li>
+                                <li>запускается <b>DoChgs</b>() отработки скроллинга</li>
                             </ul>
                         </li>
                         <u>иначе</u>
@@ -108,13 +108,13 @@
             </ol>
             <p class="moecomment">
                 Здесь включить (отключить) <i>контроль&nbsp;скроллинга</i> означает 
-				window.addEventListener('scroll', DoScroll, true) ( 
-				window.removeEventListener('scroll', DoScroll, true))
+				window.addEventListener('scroll', DoChgs, true) ( 
+				window.removeEventListener('scroll', DoChgs, true))
             </p>
         </div>
         <div>
             <p>
-                Модуль <b>DoScroll</b> выполняет <i>контроль&nbsp;скроллинга</i>:
+                Модуль <b>DoChgs</b> выполняет <i>контроль&nbsp;скроллинга</i>:
             </p>
 
             <ul>
