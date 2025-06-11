@@ -76,13 +76,14 @@ class OO5 {
             }
         }
 
-        this.#wshp.Frames.ReadAttrs(aO5, [
+        this.#wshp.Frames.Frame.ReadAttrs(aO5, [
             pitchs.join('') + ':',
             pmarks.join('') + ':',
             levels.join('') + ':',
             alives.map(f => f ? ':A' : '').join(''),
             frames.map(f => `i=${f.nam}/${f.f}${f.c}`).join(',')
         ])
+        this.#wshp.PBases.PBase.StoreFrames(aO5)
 
         this.#BordNames(aO5)
 

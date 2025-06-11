@@ -111,8 +111,8 @@
         else
             FindPScrolls(aO5, parent)
 
-        wshp.PBase.Attach(aO5)
-        
+        wshp.PBases.PBase.Attach(aO5)
+
         if (o5debug > 1)
             DebugShowRez(aO5)
 
@@ -137,7 +137,8 @@
                         aO5 = CreateAO5(shp),
                         el = observ.getel(shp)
 
-                    wshp.Frames.ReadAttrs(aO5, el.quals)
+                    wshp.Frames.Frame.ReadAttrs(aO5, el.quals)                    
+                    wshp.PBases.PBase.StoreFrames(aO5)
                 }
                 observ.unobserve(shp)
 

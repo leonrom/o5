@@ -13,7 +13,7 @@
 			Init: ShpInit,
 			class: 'olga5_shp',
 			incls: {
-				names: ['DoInit', 'PBords', 'AO5shp', 'PO5shp', 'Frames', 'DoChgs'],
+				names: ['DoInit', 'PBases', 'AO5shp', 'PO5shp', 'Frames', 'DoChgs'],
 				actscript: document.currentScript,
 			},
 		},

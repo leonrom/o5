@@ -168,131 +168,130 @@
                 cart.appendChild(shp)
 
                 aO5.#SetMargOutls(shp.style, AO5.Margs, AO5.Outln)
-                Object.assign(shp.style, {
-                    position: 'absolute', top: 0, le
+                Object.assign(shp.style, { position: 'absolute', top: 0, left: 0 })
 
                 shp.addEventListener('dblclick', DblClick, true)
                 window.dispatchEvent(new CustomEvent('o5_fixed', { detail: { aO5: aO5, fix: true } }))
-                }
-        }
-            UnFix(x) {
-                const
-                    aO5 = this,
-                    shp = aO5.shp,
-                    act = aO5.act,
-                    clon = act.clon,
-                    cart = act.cart,
-                    pFixs = aO5.pFixs
-
-                // for (const x of s)
-                //     aO5.wasFix[x] = false
-
-                // Object.assign(this.pFixs[x], {p:null, v:NaN})
-                pFixs[x] = null
-                aO5.pFixs.fixed = pFixs.T || pFixs.L || pFixs.R || pFixs.B
-
-                if (o5debug)
-                    console.log("%c%s", fmtOK, `UnFix`, `${aO5.id}, осталось [${this.#HasFixedDebug()}] `)
-
-                if (act.shdw !== shp && !aO5.pFixs.fixed) {  // !this.HasFixed()) {
-                    act.shdw = shp
-
-                    Object.assign(shp.style, aO5.orig)
-                    aO5.#SetMargOutls(shp.style, aO5.margs, aO5.outln)
-
-                    clon.style.display = 'none'
-                    cart.style.display = 'none'
-
-                    aO5.parent.insertBefore(shp, cart)
-
-                    shp.removeEventListener('dblclick', DblClick, true)
-
-                    window.dispatchEvent(new CustomEvent('o5_fixed', { detail: { aO5: aO5, fix: false } }))
-                }
-            }
-            ShowFix = () => {
-                const aO5 = this,
-                    posC = aO5.posC,
-                    posS = aO5.posS,
-                    pw = (posC.width > 0) ? posC.width : 0,
-                    ph = (posC.height > 0) ? posC.height : 0,
-                    display = (pw === 0 || ph === 0) ? 'none' : ''      //   aO5.act.iHidden ||  //  || hi.T || hi.L|| hi.R || hi.B
-
-                // Object.assign(aO5.posCf, posC)
-                // Object.assign(aO5.posSf, posS)
-
-                Object.assign(aO5.act.cart.style, {
-                    display: display,
-                    top: posC.top + 'px',
-                    left: posC.left + 'px',
-                    width: pw + 'px',
-                    height: ph + 'px',
-                })
-
-                Object.assign(aO5.shp.style, {
-                    top: posS.top + 'px',
-                    left: posS.left + 'px',
-                })
-            }
-            #Clone = () => {
-                if (o5debug > 1)
-                    console.log(`----------------- клонирую '${this.id}' -----------`)
-
-                const aO5 = this,
-                    shp = aO5.shp,
-                    act = aO5.act,
-                    id = shp.id,
-                    clon = act.clon = shp.cloneNode(true),
-                    cart = act.cart = document.createElement('div'),
-                    style = shp.style
-
-                Object.assign(aO5.orig, {
-                    display: style.display,
-                    position: style.position,
-                    top: style.top, left: style.left, height: style.height, width: style.width,
-                })
-
-                clon.classList.add('olga5_clon')
-                if (id) clon.id = id + '_clon'
-                clon.aO5shp = aO5
-                Object.assign(clon.style, {
-                    display: 'none',
-                    opacity: 0,
-                })
-                shp.parentNode.insertBefore(clon, shp)
-
-                cart.classList.add('olga5_cart')                        // нужно ля тестов - CC()
-                if (id) cart.id = id + '_cart'
-                cart.aO5shp = aO5
-                Object.assign(cart.style, {
-                    display: 'none',
-                    cursor: 'pointer',
-                    position: 'fixed',
-                    overflow: 'hidden',
-                    background: 'none',
-                    zIndex: shp.style.zIndex ? Number(shp.style.zIndex) : 1,
-                })
-                shp.parentNode.insertBefore(cart, shp)
-
-                const nst = window.getComputedStyle(shp)
-                Object.assign(aO5.margs, {
-                    t: nst.getPropertyValue('margin-top'),
-                    l: nst.getPropertyValue('margin-left'),
-                    r: nst.getPropertyValue('margin-right'),
-                    b: nst.getPropertyValue('margin-bottom')
-                })
-                Object.assign(aO5.outln, {
-                    w: nst.getPropertyValue('outline-width'),
-                    s: nst.getPropertyValue('outline-style'),
-                    c: nst.getPropertyValue('outline-color'),
-                    o: nst.getPropertyValue('outline-offset')
-                })
-
-                aO5.#SetMargOutls(cart.style, AO5.Margs, aO5.outln)
-
-                return clon
             }
         }
+        UnFix(x) {
+            const
+                aO5 = this,
+                shp = aO5.shp,
+                act = aO5.act,
+                clon = act.clon,
+                cart = act.cart,
+                pFixs = aO5.pFixs
 
-        wshp = C.AddModuleSub(olga5_modul, modulname, [AO5])
-    }) ();
+            // for (const x of s)
+            //     aO5.wasFix[x] = false
+
+            // Object.assign(this.pFixs[x], {p:null, v:NaN})
+            pFixs[x] = null
+            aO5.pFixs.fixed = pFixs.T || pFixs.L || pFixs.R || pFixs.B
+
+            if (o5debug)
+                console.log("%c%s", fmtOK, `UnFix`, `${aO5.id}, осталось [${this.#HasFixedDebug()}] `)
+
+            if (act.shdw !== shp && !aO5.pFixs.fixed) {  // !this.HasFixed()) {
+                act.shdw = shp
+
+                Object.assign(shp.style, aO5.orig)
+                aO5.#SetMargOutls(shp.style, aO5.margs, aO5.outln)
+
+                clon.style.display = 'none'
+                cart.style.display = 'none'
+
+                aO5.parent.insertBefore(shp, cart)
+
+                shp.removeEventListener('dblclick', DblClick, true)
+
+                window.dispatchEvent(new CustomEvent('o5_fixed', { detail: { aO5: aO5, fix: false } }))
+            }
+        }
+        ShowFix = () => {
+            const aO5 = this,
+                posC = aO5.posC,
+                posS = aO5.posS,
+                pw = (posC.width > 0) ? posC.width : 0,
+                ph = (posC.height > 0) ? posC.height : 0,
+                display = (pw === 0 || ph === 0) ? 'none' : ''      //   aO5.act.iHidden ||  //  || hi.T || hi.L|| hi.R || hi.B
+
+            // Object.assign(aO5.posCf, posC)
+            // Object.assign(aO5.posSf, posS)
+
+            Object.assign(aO5.act.cart.style, {
+                display: display,
+                top: posC.top + 'px',
+                left: posC.left + 'px',
+                width: pw + 'px',
+                height: ph + 'px',
+            })
+
+            Object.assign(aO5.shp.style, {
+                top: posS.top + 'px',
+                left: posS.left + 'px',
+            })
+        }
+        #Clone = () => {
+            if (o5debug > 1)
+                console.log(`----------------- клонирую '${this.id}' -----------`)
+
+            const aO5 = this,
+                shp = aO5.shp,
+                act = aO5.act,
+                id = shp.id,
+                clon = act.clon = shp.cloneNode(true),
+                cart = act.cart = document.createElement('div'),
+                style = shp.style
+
+            Object.assign(aO5.orig, {
+                display: style.display,
+                position: style.position,
+                top: style.top, left: style.left, height: style.height, width: style.width,
+            })
+
+            clon.classList.add('olga5_clon')
+            if (id) clon.id = id + '_clon'
+            clon.aO5shp = aO5
+            Object.assign(clon.style, {
+                display: 'none',
+                opacity: 0,
+            })
+            shp.parentNode.insertBefore(clon, shp)
+
+            cart.classList.add('olga5_cart')                        // нужно ля тестов - CC()
+            if (id) cart.id = id + '_cart'
+            cart.aO5shp = aO5
+            Object.assign(cart.style, {
+                display: 'none',
+                cursor: 'pointer',
+                position: 'fixed',
+                overflow: 'hidden',
+                background: 'none',
+                zIndex: shp.style.zIndex ? Number(shp.style.zIndex) : 1,
+            })
+            shp.parentNode.insertBefore(cart, shp)
+
+            const nst = window.getComputedStyle(shp)
+            Object.assign(aO5.margs, {
+                t: nst.getPropertyValue('margin-top'),
+                l: nst.getPropertyValue('margin-left'),
+                r: nst.getPropertyValue('margin-right'),
+                b: nst.getPropertyValue('margin-bottom')
+            })
+            Object.assign(aO5.outln, {
+                w: nst.getPropertyValue('outline-width'),
+                s: nst.getPropertyValue('outline-style'),
+                c: nst.getPropertyValue('outline-color'),
+                o: nst.getPropertyValue('outline-offset')
+            })
+
+            aO5.#SetMargOutls(cart.style, AO5.Margs, aO5.outln)
+
+            return clon
+        }
+    }
+
+    wshp = C.AddModuleSub(olga5_modul, modulname, [AO5])
+})();
