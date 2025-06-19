@@ -21,12 +21,9 @@
 	<script>
 		document.addEventListener('DOMContentLoaded', () => {
 			window.scrollTo(0, 260)
-			let div;
-			for (const m of ['', 'a']) {
-				div = document.getElementById('div3' + m); if (div) div.scrollTo(550, 450)
-				div = document.getElementById('div2' + m); if (div) div.scrollTo(750, 650)
-				div = document.getElementById('div1' + m); if (div) div.scrollTo(950, 750)
-			}
+			document.getElementById('div' + 3).scrollTo(550, 450)
+			document.getElementById('div' + 2).scrollTo(750, 650)
+			document.getElementById('div' + 1).scrollTo(950, 750)
 		})
 	</script>
 </head>
@@ -39,9 +36,6 @@
 				<p><input id="carts" type="checkbox" onclick="oo5.CbVisible(this)" title="подвисшие">cart</p>
 				<p><input id="outli" type="checkbox" onclick="oo5.OutLines(this )" title="синие рамки ">outline</p>
 			</div>
-			<button id="btnCallScroll" type="button" style="top: 8px;" onclick="oo5.CallScroll('V' )">scr V</button>
-			<button id="btnCallScroll" type="button" style="top: 32px;" onclick="oo5.CallScroll('H' )">scr H</button>
-
 			<div class='divs'>
 				<div id="div-etalon">
 					<p>
@@ -62,11 +56,11 @@
 						<span class="S" title="сдвиг Shift "><b>&nbsp;</b></span>
 					</p>
 					<div class="frame" title="взаимодействующие контейнеры f - фиксация c - обрезание">
-						<p class="body">&nbsp;<i>body </i><span><b>&nbsp;</b> <b>&nbsp;</b></span></p>
-						<p class="div1">&nbsp;<i>div1 </i><span><b>&nbsp;</b> <b>&nbsp;</b></span></p>
-						<p class="div2">&nbsp;<i>div2 </i><span><b>&nbsp;</b> <b>&nbsp;</b></span></p>
-						<p class="div3">&nbsp;<i>div3 </i><span><b>&nbsp;</b> <b>&nbsp;</b></span></p>
-						<p class="div4">&nbsp;<i>div4 </i><span><b>&nbsp;</b> <b>&nbsp;</b></span></p>
+						<p class="body">&nbsp;<i>body</i><span><b>&nbsp;</b> <b>&nbsp;</b></span></p>
+						<p class="div1">&nbsp;<i>div1</i><span><b>&nbsp;</b> <b>&nbsp;</b></span></p>
+						<p class="div2">&nbsp;<i>div2</i><span><b>&nbsp;</b> <b>&nbsp;</b></span></p>
+						<p class="div3">&nbsp;<i>div3</i><span><b>&nbsp;</b> <b>&nbsp;</b></span></p>
+						<p class="div4">&nbsp;<i>div4</i><span><b>&nbsp;</b> <b>&nbsp;</b></span></p>
 						<p class="    ">&nbsp;<i>все. </i><span><b>&nbsp;</b> <b>&nbsp;</b></span></p>
 					</div>
 				</div>
@@ -107,52 +101,62 @@
 			style="font-size: 16px; background: yellow; font-weight: bold; border: 1px blue solid; border-radius: 5px;"><b>&uarr;</b></span>
 		<div id="div1" class="div" style="top:11px;left: 22px;">
 			<span>div1</span>
-			<div id="cbo1" class="cbo" style="background-size: 25px 25px; width: 3300px; height: 2200px;">
+			<div id="cbo1" class="cbo" style="background-size: 25px 25px; width: 3300px; height: 2600px;">
+				<span>div21</span>
+				<div id="cbo21" class="cbo" style="background-size: 20px 20px; width: 2400px; height: 1800px; ">
 
-				<div id="div2" class="div" style="left:1000px; top:800px;">
-					<span>div2</span>
-					<div id="cbo2" class="cbo">
+					<div id="div2" class="div" style="top:800px; left:1000px; height:411px;width: 522px; ">
+						<span>div2</span>
+						<div id="cbo2" class="cbo" style="background-size: 20px 20px; width: 2400px; height: 1800px; ">
 
-						<div id="div3" class="div" style="left:800px; top:700px;">
-							<span>div3</span>
-							<div id="cbo3" class="cbo"
-								style="background-size: 15px 15px; width: 1900px; height: 1300px; ">
+							<div id="div3" class="div" style="top:700px; left:800px; height:411px;width: 522px;">
+								<span>div3</span>
+								<div id="cbo3" class="cbo"
+									style="background-size: 15px 15px; width: 1900px; height: 1300px; ">
 
-								<div id="shp0" class="moved olga5_shp:TrLb:i=div3/fc,div2/f"
-									style="left:750px; top:500px;">
+									<div id="shp0" class="moved olga5_shp:TrLb:i=div3/fc,div2/f"
+										style="left:750px; top:500px;">
+										<p>название объекта</p>
+									</div>
+									<div id="shp1" class="moved olga5_shp:nTrLb-1A:i=div3/fc"
+										style="left:620px; top:600px; height: 60px; width: 322px;">
+										<p>название объекта</p>
+									</div>
+
+									<!-- <div id="shp2" class="moved olga5_shp:TrLb:1:i=div3/fc" style="left:900px; top:660px;">
 									<p>название объекта</p>
 								</div>
-								<!-- <div id="shp1" class="moved olga5_shp:TrLb-1A:i=div3/fc"
-									style="left:620px; top:600px; height: 60px; width: 322px;">
+								<div id="shp3" class="moved olga5_shp:TrLb2A:i=div3/fc" style="left:700px; top:700px; height: 60px;">
+									<p>название объекта</p>
+								</div>
+								<div id="shp4" class="moved olga5_shp:TrLb:3:i=div3/fc" style="left:950px; top:860px;">
 									<p>название объекта</p>
 								</div> -->
+								</div>
 							</div>
 						</div>
 					</div>
-				</div>
-			</div>
 
-			<div id="div2a" class="div" style="left:1030px; top:1460px;">
-				<span>div2a</span>
-				<div id="cbo2a" class="cbo">
-					<div id="div3a" class="div" style="left:800px; top:700px;">
-						<span>div3a</span>
-						<div id="cbo3a" class="cbo" style="background-size: 15px 15px; width: 1900px; height: 1300px; ">
+					<div id="div21" class="div" style="top:1500px; left:1200px; height:411px;width: 522px;">
+						<span>div21</span>
+						<div id="cbo21" class="cbo" style="background-size: 20px 20px; width: 2400px; height: 1800px; ">
 
-							<div id="shp0a" class="moved olga5_shp:TrLb:i=div3a/fc,div2a/f"
-								style="left:750px; top:500px;">
-								<p>название объекта</p>
-							</div>
+							<div id="div31" class="div" style="top:700px; left:800px; height:411px;width: 522px;">
+								<span>div31</span>
+								<div id="cbo31" class="cbo"
+									style="background-size: 15px 15px; width: 1900px; height: 1300px; ">
 
-							<!-- <div id="shp2" class="moved olga5_shp:TrLb:1:i=div3/fc" style="left:900px; top:660px;">
-								<p>название объекта</p>
+									<div id="shp01" class="moved olga5_shp:TrLb:i=div3/fc,div2/f"
+										style="left:750px; top:500px;">
+										<p>название объекта</p>
+									</div>
+									<div id="shp11" class="moved olga5_shp:nTrLb-1A:i=div3/fc"
+										style="left:620px; top:600px; height: 60px; width: 322px;">
+										<p>название объекта</p>
+									</div>
+
+								</div>
 							</div>
-							<div id="shp3" class="moved olga5_shp:TrLb2A:i=div3/fc" style="left:700px; top:700px; height: 60px;">
-								<p>название объекта</p>
-							</div>
-							<div id="shp4" class="moved olga5_shp:TrLb:3:i=div3/fc" style="left:950px; top:860px;">
-								<p>название объекта</p>
-							</div> -->
 						</div>
 					</div>
 				</div>

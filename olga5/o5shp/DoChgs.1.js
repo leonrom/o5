@@ -18,7 +18,6 @@
 		fmtOK = "background: cornsilk; color: black;",
 		fmtErr = "background: yellow; color: black;",
 		opp = { T: 'B', L: 'R', R: 'L', B: 'T' },
-		xpos = { T: 'top', L: 'left', R: 'right', B: 'bottom' },
 		coordVH = { V: ['height', 'top', 'bottom'], H: ['width', 'left', 'right'] },
 
 		CheckHidden = (aO5, x) => {
@@ -50,6 +49,17 @@
 						}
 				}
 		},
+		CurrAO5pos = aO5 => {
+			const p = aO5.act.shdw.getBoundingClientRect()
+
+			Object.assign(aO5.posO, { top: p.top, left: p.left, right: p.right, bottom: p.bottom, height: p.height, width: p.width })
+
+			Object.assign(aO5.posC, { width: p.width, height: p.height })
+			if (!aO5.pFixs.L && !aO5.pFixs.R) aO5.posC.left = p.left
+			if (!aO5.pFixs.T && !aO5.pFixs.B) aO5.posC.top = p.top
+
+			Object.assign(aO5.posS, { top: 0, left: 0 })
+		},
 		PutOnBound = (aO5, x) => {
 			if (o5debug > 2)
 				console.log(`Подключение Границе Фрейма для aO5=${aO5.id} по ${x}`)
@@ -59,7 +69,7 @@
 			for (const frame of aO5.frames)
 				if (frame.fix) {
 					const
-						pO5 = frame.pO5,
+						pO5 = frame.act.pO5,
 						v = pO5.scops[x]	// pO5.visis[x].v	//v = pO5.scops[x]
 
 					switch (x) {
@@ -108,9 +118,9 @@
 					case 'B': c.height -= d; break
 				}
 		},
-		MakeScroll = (scV, scH, pO5) => {  // , doschgs
+		MakeScroll = (scV, scH, pO5, doschgs) => {
 			const
-				// aAlls = pO5.aAlls,
+				aAlls = pO5.aAlls,
 				ОбрезаниеПротивоположнойСтороны = (aO5, y) => {
 					if (o5debug > 2)
 						console.log(`Обрезание с Противоположной Стороны для aO5=${aO5.id} по ${x}`)
@@ -124,7 +134,7 @@
 					for (const frame of aO5.frames)
 						if (frame.cut) {
 							const
-								p = frame.pO5,
+								p = frame.act.pO5,
 								v = p.visis[o]	// pO5.visis[x].v	//v = pO5.scops[x]
 
 							if ((r.v > v && itl) || (r.v < v && !itl)) {
@@ -224,182 +234,189 @@
 						}
 					}
 				},
-				opp = { T: 'B', L: 'R', R: 'L', B: 'T' }
-			// CalcBoards = (pIncs, x0) => {
-			// 	const rez = []
-			// 	let pT, visis, n = 0
-			// 	for (const pO5 of pIncs) {
-			// 		if (!visis) {// первый пропускаю, т.к. это сам "первый" контейнер
-			// 			visis = pO5.visis
-			// 			pT = pO5
-			// 			continue
-			// 		}
+				opp = { T: 'B', L: 'R', R: 'L', B: 'T' },
+				CalcBoards = (pIncs, x0) => {
+					const rez = []
+					let pT, visis, n=0
+					for (const pO5 of pIncs) {
+						if (!visis) {// первый пропускаю, т.к. это сам "первый" контейнер
+							visis = pO5.visis
+							pT = pO5
+							continue
+						}
+		
+						pO5.CalcScrollScope()
+		
+						let chg = ''
+						for (const x of [x0, opp[x0]]) {
+							const
+								v = pO5.scops[x],
+								vT = visis[x].v,
+								itl = 'TL'.includes(x)
+		
+							if ((vT > v && itl) || (vT < v && !itl)) {
+								Object.assign(pO5.visis[x], { p: pT, v: vT })
+		
+								if (o5debug)
+									chg += `${pT.name}:${x}=${vT}, `
+							}
+						}
+						visis = pO5.visis
+		
+						if (o5debug){
+							rez.push({ pO5: pO5.name, chg: chg })
+							if (chg) n++
+						}
+					}
+					if (o5debug && n)
+						C.ConsoleInfo(`Изменил ${n} границ`, ` по '${x0+opp[x0]}' в контейнере ${pT.name}`, rez)
+				}
 
-			// 		 //  pO5.CalcScrollScope()
-
-			// 		let chg = ''
-			// 		for (const x of [x0, opp[x0]]) {
-			// 			const
-			// 				v = pO5.scops[x],
-			// 				vT = visis[x].v,
-			// 				itl = 'TL'.includes(x)
-
-			// 			if ((vT > v && itl) || (vT < v && !itl)) {
-			// 				Object.assign(pO5.visis[x], { p: pT, v: vT })
-
-			// 				if (o5debug)
-			// 					chg += `${pT.name}:${x}=${vT}, `
-			// 			}
-			// 		}
-			// 		visis = pO5.visis
-
-			// 		if (o5debug) {
-			// 			rez.push({ pO5: pO5.name, chg: chg })
-			// 			if (chg) n++
-			// 		}
-			// 	}
-			// 	if (o5debug && n)
-			// 		C.ConsoleInfo(`Изменил ${n} границ`, ` по '${x0 + opp[x0]}' в контейнере ${pT.name}`, rez)
-			// }
-
-			// направление движения объектов в контейнере - обратное ползунку скроллинга	
 			let xs = ''
 			if (scV > 0) xs += 'T'; else if (scV < 0) xs += 'B'
 			if (scH > 0) xs += 'L'; else if (scH < 0) xs += 'R'
 
-			const
-				СдвигФиксированныхВложенныхКонтейнерах = (pO5, o, xx, v) => {
-					for (const iO5 of pO5.pIncs)
-						if (iO5 !== pO5) {
-							for (const aO5 of iO5.aAlls)
-								if (aO5.pFixs[o])   // зафиксированные объекты в этом контейнере
-									aO5.posC[xx] -= v
+			for (const x of xs)
+				CalcBoards(pO5.pIncs, x)
 
-							СдвигФиксированныхВложенныхКонтейнерах(iO5, o, xx, v)
-						}
-				},
-				РасфиксацияПротивоположных = (o, pO5) => {
-					for (const aO5 of pO5.aAlls)
-						if (aO5.pFixs[o] === pO5) {  // зафиксированные объекты в этом контейнере
-							const
-								aC = aO5.posC,
-								aO = aO5.posO
-							if ( 		//  Если вышло за shdw - расфиксирую
-								(o === 'T' && aC.top <= aO.top) ||
-								(o === 'B' && aC.top >= aO.top) ||
-								(o === 'L' && aC.left <= aO.left) ||
-								(o === 'R' && aC.left >= aO.left)
-							)
-								aO5.UnFix(o)
+			for (const aO5 of aAlls)
+				CurrAO5pos(aO5)
 
-							if (o5debug > 1)
-								console.log(`проверка расфиксации ${aO5.id} по ${o} `, !aO5.pFixs[o] ? '- расфиксировал!' : '')
-						}
-				}
+			for (const aO5 of aAlls)
+				for (const x of xs)
+					if (aO5.hidden[x])
+						CheckHidden(aO5, x)
 
-			for (const x of xs) {
-				РасфиксацияПротивоположных(opp[x], pO5)
-				for (const o of [x, opp[x]]) {
-					const isTB = o === 'T' || o === 'B'
-					СдвигФиксированныхВложенныхКонтейнерах(pO5, o, isTB ? 'top' : 'left', isTB ? scV : scH)
-				}
-			}
-			// for (const x of xs)
-			// CalcBoards(pO5.pIncs, x)
+			for (const aO5 of aAlls)
+				if (aO5.act.wasFull)     // проверять не все, а только частично невидимые????	
+					for (const x of xs)
+						if (aO5.pFixs[x])
+							НаБлижнемТеге(aO5, x)
 
-			// определение текущих позиций
-			pO5.CalcScrollScope()
-			for (const aO5 of pO5.aAlls)
-				aO5.CalcCurPos()
+			for (const aO5 of aAlls)
+				if (aO5.act.wasFull)     // проверять не все, а только частично невидимые????	
+					for (const x of xs) {
+						const o = opp[x]
 
-			// попытка фиксации не-зафиксированных объектов в этом контейнере.
+						if (!aO5.pFixs[o] && (!aO5.pFixs[x] || aO5.pFixs[x].schgs[x] || doschgs))
+							PutOnBound(aO5, x)
 
-			for (const x of xs) {
-				const v = pO5.scops[x]
-				for (const aO5 of pO5.aAlls)
-					if (!aO5.pFixs[x] && !aO5.pFixs[opp[x]]) {
-						let pFix = null
-						for (const frame of aO5.frames)
-							if (frame.pO5 === pO5 && frame.fix) {
-								const
-									c = aO5.posC,
-									o = aO5.posO
-								switch (x) {
-									case 'T': if (o.top <= v) { pFix = pO5; c.top = v }; break
-									case 'L': if (o.left <= v) { pFix = pO5; c.left = v }; break
-									case 'R': if (o.left + c.width >= v) { pFix = pO5; c.left = v - c.width }; break
-									case 'B': if (o.top + c.height >= v) { pFix = pO5; c.top = v - c.height }; break
-								}
-								break
-							}
+						if (!aO5.pFixs[x] && aO5.pFixs[o])
+							PutOnBound(aO5, o)
 
-						if (o5debug > 1)
-							console.log(`проверка фиксации ${aO5.id} по ${x} `, pFix ? `- зафиксировал posC= ${aO5.posC[xpos[x]]}  posO= ${aO5.posO[xpos[x]]}  !` : '')
+						const ps = []
+						for (const y of [x, o])
+							if (aO5.pFixs[y])
+								ps[x] = ОбрезаниеПротивоположнойСтороны(aO5, y)
 
-						if (pFix) {
-							aO5.DoFix(pFix, x)
-						}
+						for (const y of [x, o])
+							OverlapByFrames(aO5, y, ps[y] || aO5.base.pO5)
 					}
-			}
 
-			// for (const x of xs) {
-			// 	for (const aO5 of aAlls)
-			// 		if (!aO5.pFixs[x]) {  // зафиксированные объекты в этом контейнере
-			// 			const aC = aO5.posC
-			// 			switch (o) {
-			// 				case 'T': aC.top -= scV; aC.bottom -= scV; break
-			// 				case 'L': aC.left -= scH; aC.right -= scH; break
-			// 				case 'R': aC.right -= scH; aC.left -= scH; break
-			// 				case 'B': aC.bottom -= scV; aC.top -= scV; break
-			// 			}
-
-			// 		}
-			// }
-
-
-			// for (const x of xs)
-			// 	CalcBoards(pO5.pIncs, x)
-
-			// for (const aO5 of aAlls)
-			// 	CurrAO5pos(aO5)
-
-			// for (const aO5 of aAlls)
-			// 	for (const x of xs)
-			// 		if (aO5.hidden[x])
-			// 			CheckHidden(aO5, x)
-
-			// for (const aO5 of aAlls)
-			// 	if (aO5.act.wasFull)     // проверять не все, а только частично невидимые????	
-			// 		for (const x of xs)
-			// 			if (aO5.pFixs[x])
-			// 				НаБлижнемТеге(aO5, x)
-
-			// for (const aO5 of aAlls)
-			// 	if (aO5.act.wasFull)     // проверять не все, а только частично невидимые????	
-			// 		for (const x of xs) {
-			// 			const o = opp[x]
-
-			// 			if (!aO5.pFixs[o] && (!aO5.pFixs[x] || aO5.pFixs[x].schgs[x] || doschgs))
-			// 				PutOnBound(aO5, x)
-
-			// 			if (!aO5.pFixs[x] && aO5.pFixs[o])
-			// 				PutOnBound(aO5, o)
-
-			// 			const ps = []
-			// 			for (const y of [x, o])
-			// 				if (aO5.pFixs[y])
-			// 					ps[x] = ОбрезаниеПротивоположнойСтороны(aO5, y)
-
-			// 			for (const y of [x, o])
-			// 				OverlapByFrames(aO5, y, ps[y] || aO5.base.pO5)
-			// 		}
-
-			for (const pInc of pO5.pIncs)
-				for (const aO5 of pInc.aAlls)
-					if (aO5.pFixs.fixed)
-						aO5.ShowFix()
+			for (const aO5 of aAlls)
+				if (aO5.pFixs.fixed)
+					aO5.ShowFix()
 		}
+
+
+		// Throttle = (Fun, limit, dy0, dx0) => {
+		// 	const dym = dy0, dxm = dx0
+		// 	let olddir;
+
+		// 	return function (...args) {
+		// 		const
+		// 			event = args[0],
+		// 			src = event.srcElement,
+		// 			doc = src.scrollingElement,
+		// 			tag = doc ? document.body : src
+
+		// 		if (!tag.pO5)
+		// 			return
+
+		// 		const
+		// 			actScroll = tag.pO5.actScroll,
+		// 			old = actScroll.timcall,
+		// 			now = performance.now(),
+		// 			screl = doc ? doc : tag,
+		// 			scV = screl.scrollTop - actScroll.top,	// был верт. скроллинг				
+		// 			scH = screl.scrollLeft - actScroll.left	// был гориз. скроллинг				
+
+		// 		if (o5debug > 2) {
+		// 			const
+		// 				dir = scV > scH ? 'V' : 'H',
+		// 				s = `V=${scV}, H=${scH},- sT=${screl.scrollTop}, aT=${actScroll.top}, sL=${screl.scrollLeft}, aL=${actScroll.left}, `
+
+		// 			if (scV > 0 && scH > 0)
+		// 				console.log("%c%s", fmtErr, `scroll__`, ` ${tag.id}:  ${s}`)
+		// 			else
+		// 				if (olddir !== dir) {
+		// 					olddir = dir
+		// 					console.log("%c%s", fmtOK, `scroll_${dir}`, ` ${tag.id}:  ${s}`)
+		// 				}
+		// 				else
+		// 					console.log(`scroll_${dir}`, ` ${tag.id}:  ${s}`)
+		// 		}
+
+		// 		if (Math.abs(scV) >= dym || Math.abs(scH) >= dxm || (now - old) >= limit) {
+		// 			Object.assign(actScroll, { top: screl.scrollTop, left: screl.scrollLeft, timcall: now })
+		// 			Fun(scV, scH, tag)
+		// 		}
+		// 	}
+		// },
+
+		// ThrottledOnScroll = Throttle(MakeScroll, 100, 2, 2),
+		// EveScroll = e => {
+		// 	ThrottledOnScroll(e)
+		// },
+		// isResize = { act: false, time: 0 },
+		// Resize = async e => {
+		// 	const time = e.timeStamp
+
+		// 	if (!body.pO5 || !body.pO5.aAlls || (isResize.act && (time - isResize.time) < 66))
+		// 		return
+
+		// 	Object.assign(isResize, { act: true, time: time })
+
+		// 	const aAlls = document.body.pO5.aAlls
+		// 	// for (const aO5 of aAlls)
+		// 	// 	wshp.Boards.FindBords(aO5)
+
+		// 	MakeScroll(0.1, 0.1, body)
+
+		// 	isResize.act = false
+		// },
+		// OnResize = async e => {
+		// 	const name = await Resize(e)
+		// },
+		// Debounce = (func, delay) => {  // Функция для дебаунса    // function debounce(func, delay) {
+		// 	let timeout
+		// 	return function (...args) {
+		// 		clearTimeout(timeout)
+		// 		timeout = setTimeout(() => {// Вызываем функцию через задержку                    
+		// 			func(...args) // при "стрелочной" декларации, а в общем =>  func.apply(this, args); 
+		// 		}, delay)
+		// 	}
+		// },
+		// DebouncedResize = Debounce(OnResize, 66),
+		// iScroll = { act: false, eve: 'scroll', Fun: EveScroll, pars: { couldRepeat: true, capture: true } },
+		// ActListener = act => {
+		// 	if (act !== iScroll.act) {
+		// 		// if (act)
+		// 		// 	C.E.AddEventListener(iScroll.eve, iScroll.Fun, iScroll.pars)
+		// 		// else
+		// 		// 	C.E.RemoveEventListener(iScroll.eve, iScroll.Fun, iScroll.pars)
+
+		// 		C.E[(act ? 'Add' : 'Remove') + 'EventListener'](iScroll.eve, iScroll.Fun, iScroll.pars)
+		// 		iScroll.act = act
+
+		// 		if (o5debug)
+		// 			console.log("%c%s", fmtOK, `скроллинг`, act ? 'ЗАПУЩЕН' : 'остановлен')
+		// 	}
+		// }
 
 	wshp = C.AddModuleSub(olga5_modul, modulname, [MakeScroll])
 
+	// window.addEventListener('resize', DebouncedResize, true)
+	// document.addEventListener('resize', DebouncedResize, true)
+	  
 })();

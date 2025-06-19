@@ -21,73 +21,13 @@
         // fmtOK = "background: cornsilk; color: black;",
         // fmtErr = "background: yellow; color: black;",   
 
-
-        DebugShowRez = aO5 => {
-            const rez = []
-            for (const frame of aO5.frames) {
-                rez.push({
-                    frame: frame.ibase + '.' + frame.pO5.name,
-                    str: frame.typ + ':' + frame.cod + ':' + frame.num,
-                    fc: frame.fix ? 'fix' : '   ' + frame.cut ? 'cut' : '   ',
-                    err: frame.err,
-                    aO5s: frame.aO5s.map(a => a.a_name).join(', '),
-                    err: frame.err,
-                })
-            }
-            C.ConsoleInfo(`Фреймы у ${aO5.a_name}`, rez.length, rez)
-
-            if (!aO5.base.pO5)
-                alert('нету aO5.base.pO5')
-        };
-
-
-    /**
-* Представление одного "фрейма" с параметрами подвеса.
-*/
-    class Frame {
-        key = ''        // чтобы видеть первым
-        constructor(f) {
-            Object.assign(this , {
-                typ:f.typ, 
-                cod:f.cod, 
-                num:f.num, 
-                cut:f.cut, 
-                fix:f.fix, 
-                s:f.s, 
-                pO5: null,
-                xO5: null,
-                n: 0,
-                c: f.cod.toUpperCase(),
-                err: '',
-                clss: (f.typ === 'c') ? f.cod.split(/\s*[.]\s*/) : '',
-                ibase: 0,
-                aO5s: [], // кто его использует
-            })
-            
-            this.nears = { frame: this, } // чтобы печатать в отладке
-
-            Object.seal(this)
-
-            const
-                names = ['fix', 'cut', 'out'],
-                n0 = { v: NaN, p: null },
-                xs = 'TLRB'
-
-            for (const name of names) {
-                const near = this.nears[name] = {}
-                for (const x of xs) {
-                    near[x] = Object.assign({}, n0)
-                    Object.seal(near[x])  // seal
-                }
-                Object.freeze(this.nears[name])
-            }
-            Object.freeze(this.nears)
-
-        }
-        static Key(f) {
-            return f.typ + ',' + f.cod + ',' + f.num;
-        }
-        static ReadCls(aO5, quals) {
+        /**
+         * Читает и парсит квалификаторы класса (вида `AL2TR`) в объект aO5.cls
+         * 
+         * @param {Object} aO5 - объект-приёмник (должен иметь `cls`)
+         * @param {string[]} quals - массив строк-квалификаторов
+         */
+        ReadCls = (aO5, quals) => {
             const cls = aO5.cls
             let setdef = true
             Object.assign(cls, {           // для повторной инициализации (напр. в тестах)
@@ -136,8 +76,9 @@
             }
             else if (!(cls.pitch || '').trim())
                 cls.pitch = 'S'
-        }
-        static MakeFrames(aO5, squals, mframes) {
+        },
+
+        MakeFrames = (aO5, squals, mframes) => {
             const
                 quals = squals.split(':'),
                 typs = 'cins'
@@ -202,14 +143,73 @@
 
             if (mframes.size === 0)
                 mframes.set(Frame.Key(f0), new Frame(f0))     //  pbase.bframes.values().next().value)            
+        },
+        DebugShowRez = aO5 => {
+            const rez = []
+            for (const frame of aO5.frames) {
+                rez.push({
+                    frame: frame.act.ibase + '.' + frame.act.pO5.name,
+                    str: frame.typ + ':' + frame.cod + ':' + frame.num,
+                    fc: frame.fix ? 'fix' : '   ' + frame.cut ? 'cut' : '   ',
+                    err: frame.err,
+                    aO5s: frame.aO5s.map(a => a.a_name).join(', '),
+                    err: frame.err,
+                })
+            }
+            C.ConsoleInfo(`Фреймы у ${aO5.a_name}`, rez.length, rez)
+
+            if (!aO5.base.pO5)
+                alert('нету aO5.base.pO5')
+        };
+
+
+    /**
+* Представление одного "фрейма" с параметрами подвеса.
+*/
+    class Frame {
+        key = ''        // чтобы видеть первым
+        constructor(frame) {
+            Object.assign(this, frame, {
+                aO5s: [], // кто его использует
+                act: {
+                    pO5: null,
+                    xO5: null,
+                    err: '',
+                    ibase: 0,
+                },
+                c: frame.cod.toUpperCase(),
+                clss: (frame.typ === 'c') ? frame.cod.split(/\s*[.]\s*/) : ''
+            })
+            this.nears = { frame: this, } // чтобы печатать в отладке
+
+            const
+                names = ['fix', 'cut', 'out'],
+                n0 = { v: NaN, p: null },
+                xs = 'TLRB'
+
+            for (const name of names) {
+                const near = this.nears[name] = {}
+                for (const x of xs) {
+                    near[x] = Object.assign({}, n0)
+                    Object.seal(near[x])  // seal
+                }
+                Object.freeze(this.nears[name])
+            }
+            Object.freeze(this.nears)
+
+            Object.seal(this.act)
+            Object.freeze(this)
+        }
+        static Key(f) {
+            return f.typ + ',' + f.cod + ',' + f.num;
         }
         static ReadAttrs(aO5, quals) {
             const mframes = new Map()
 
             errs = []
 
-            Frame.ReadCls(aO5, quals)
-            Frame.MakeFrames(aO5, quals, mframes)
+            ReadCls(aO5, quals)
+            MakeFrames(aO5, quals, mframes)
 
             wshp.PBases.PBase.StoreFrames(aO5, mframes)
 
@@ -220,7 +220,7 @@
 
             // для тестирования в frames.html
             window.dispatchEvent(new CustomEvent('o5_containers', { detail: { aO5: aO5, } }))
-
+            
             if (o5debug > 1)
                 DebugShowRez(aO5)
         }

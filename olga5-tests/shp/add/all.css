@@ -53,6 +53,20 @@
     margin-top: 1px;
 }
 
+.frame i.button{
+    border: 1px solid gray;
+    padding: 0;
+    display: inline-block;
+    margin-right: 3px;
+    cursor: pointer;
+    border-radius: 5px;
+    padding-left: 2px;
+}
+.frame i.button:active {
+    transform: scale(0.96);    /* слегка уменьшается */
+    border-color: black;
+  }
+
 #div-etalon{
     display: none;
 }
@@ -263,6 +277,7 @@ div.olga5_cart.moved {
     min-width: 360px;
 }
 
+#div2a, 
 #div2 {
     border: 3px blue dashed;
     height: 70vh;
@@ -270,6 +285,7 @@ div.olga5_cart.moved {
     background-color: lightblue;
 }
 
+#div3a,
 #div3 {
     border: 3px red dashed;
     height: 50vh;
@@ -277,6 +293,7 @@ div.olga5_cart.moved {
     background-color: lightpink;
 }
 
+#div4a,
 #div4 {
     border: 3px lightgray dashed;
     height: 22vh;
@@ -285,6 +302,12 @@ div.olga5_cart.moved {
     min-height: 144px;
 }
 
+#cbo2a,
+#cbo2 {
+    background-size: 20px 20px; width: 2400px; height: 1800px; 
+}
+
+#cbo4a,
 #cbo4 {
     background-image:
         linear-gradient(90deg, lightgray 1px, transparent 1px),

@@ -61,14 +61,16 @@
     const CreateAO5 = shp => {
         const
             aO5 = new wshp.AO5shp.AO5(shp),
-            parent = aO5.parent,
-            pIncs = [],
             FindPScrolls = (aO5, prev) => {
                 let pO5 = prev.pO5, next, scrl;
 
                 if (!pO5) {
                     pO5 = new wshp.PO5shp.PO5(prev)
 
+                    if ( pO5.scrls.H || pO5.scrls.V || pO5.ibody) {
+                        pO5.pOuts.add(pO5)
+                        pO5.pIncs.add(pO5)
+                    }
                     if (!pO5.ibody) {
                         next = prev.parentElement
 
@@ -79,29 +81,24 @@
 
                 console.log(`FindPScrolls next=${next ? next.id : '  - '}  prev=${prev.id}  pO5=${pO5.name}`)
 
-                if (next)
-                    for (const o5 of next.pO5.pOuts)
+                const nO5 = next ? next.pO5 : null
+                if (nO5) {
+                    for (const o5 of nO5.pOuts)
                         pO5.pOuts.add(o5)
+                }
+                if (scrl && nO5)
+                    for (const o5 of nO5.pOuts)
+                        o5.pIncs.add(pO5)
             },
-            FillScrollableIncs = pOuts => {
-                for (const pO5 of pOuts)
-                    if (pO5.scrls.H || pO5.scrls.V) {
-                        let j = pIncs.length
-                        while (j-- > 0)
-                            pO5.pIncs.add(pIncs[j])
-                        
-                        pIncs.push(pO5)
-                    }
-            }
+            parent = aO5.parent
 
         if (!parent.pO5)
             FindPScrolls(aO5, parent)
 
-        FillScrollableIncs(aO5.parent.pO5.pOuts)
+        for (const pO5 of aO5.parent.pO5.pOuts)            
+            pO5.aAlls.add(aO5)
 
         wshp.PBases.PBase.Attach(aO5)
-
-        aO5.base.pO5.aAlls.add(aO5)
 
         if (o5debug > 1)
             DebugShowRez(aO5)
@@ -131,10 +128,10 @@
                 }
                 observ.unobserve(shp)
 
-                // wshp.DoChgs.ActListener(true)
+                wshp.DoChgs.ActListener(true)
             }
-        // if (isi)
-        //     wshp.DoChgs.MakeScroll(0.1, 0.1, body)
+        if (isi)
+            wshp.DoChgs.MakeScroll(0.1, 0.1, body)
     };
 
     /**

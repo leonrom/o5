@@ -209,7 +209,7 @@
                 window.dispatchEvent(new CustomEvent('o5_fixed', { detail: { aO5: aO5, fix: false } }))
             }
         }
-        ShowFix  () {
+        ShowFix = () => {
             const aO5 = this,
                 posC = aO5.posC,
                 posS = aO5.posS,
@@ -233,7 +233,7 @@
                 left: posS.left + 'px',
             })
         }
-        #Clone  () {
+        #Clone = () => {
             if (o5debug > 1)
                 console.log(`----------------- клонирую '${this.id}' -----------`)
 
@@ -290,19 +290,6 @@
             aO5.#SetMargOutls(cart.style, AO5.Margs, aO5.outln)
 
             return clon
-        }
-        CalcCurPos() {
-            const
-                aO5 = this,
-                p = aO5.act.shdw.getBoundingClientRect()
-
-            Object.assign(aO5.posO, { top: p.top, left: p.left, right: p.right, bottom: p.bottom, height: p.height, width: p.width })
-
-            Object.assign(aO5.posC, { width: p.width, height: p.height })
-            if (!aO5.pFixs.L && !aO5.pFixs.R) aO5.posC.left = p.left
-            if (!aO5.pFixs.T && !aO5.pFixs.B) aO5.posC.top = p.top
-
-            Object.assign(aO5.posS, { top: 0, left: 0 })
         }
     }
 

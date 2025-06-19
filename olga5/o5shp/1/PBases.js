@@ -28,7 +28,7 @@
 
             Object.freeze(this)
 
-            // pO5.base.pbase = this
+            pO5.base.pbase = this
             PBase.#pbases.set(pO5, this)
         }
         static Get(pO5) {
@@ -99,36 +99,36 @@
                     for (const pO5 of pbase.pO5.pOuts) {
                         pO5c = pO5
                         if (
-                            (t === 's' && (pO5.scrls.V || pO5.scrls.H)) ||
+                            (t === 's' && (pO5.actScroll.V || pO5.actScroll.H)) ||
                             (t === 'n' && pO5.tag.nodeName == c) ||
                             (t === 'i' && pO5.tag.id.toUpperCase() == c) ||
                             (t === 'c' && IsInClass(pO5, clss))
                         )
-                            if (--n > 0) frame.xO5 = pO5
+                            if (--n > 0) frame.act.xO5 = pO5
                             else
-                                frame.pO5 = pO5
+                                frame.act.pO5 = pO5
 
-                        if (frame.pO5 || pO5.final)
+                        if (frame.act.pO5 || pO5.final)
                             break
                     }
 
-                    if (!frame.pO5) {
-                        if (frame.xO5) {
-                            frame.pO5 = frame.xO5
-                            frame.err = `взял ${n}-й тег (вместо ${frame.num}) для фрейма "${frame.s}"`
+                    if (!frame.act.pO5) {
+                        if (frame.act.xO5) {
+                            frame.act.pO5 = frame.act.xO5
+                            frame.act.err = `взял ${n}-й тег (вместо ${frame.num}) для фрейма "${frame.s}"`
                         }
                         else {
-                            frame.pO5 = pO5c
-                            frame.err = `среди скроллиремых нет тега для фрейма "${frame.s}" - взял ${pO5c.name}`
+                            frame.act.pO5 = pO5c
+                            frame.act.err = `среди скроллиремых нет тега для фрейма "${frame.s}" - взял ${pO5c.name}`
                         }
-                        errs.push(frame.err)
+                        errs.push(frame.act.err)
                     }
 
                     if (o5debug)
-                        console.log(`Определил (и добавил в base.frames) фрейм "${frame.key} на ${frame.pO5.name}" ` +
-                            (frame.err ? `с ошибкой: ${frame.err}` : ``))
+                        console.log(`Определил (и добавил в base.frames) фрейм "${frame.key} на ${frame.act.pO5.name}" ` +
+                            (frame.act.err ? `с ошибкой: ${frame.act.err}` : ``))
 
-                    frame.ibase = ++ibase
+                    frame.act.ibase = ++ibase
                     pbase.frames.set(key, frame )
                     return frame
                 }

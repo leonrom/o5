@@ -83,11 +83,9 @@ class OO5 {
             alives.map(f => f ? ':A' : '').join(''),
             frames.map(f => `i=${f.nam}/${f.f}${f.c}`).join(',')
         ])
-        this.#wshp.PBases.PBase.StoreFrames(aO5)
 
         this.#BordNames(aO5)
-
-        this.CallScroll('V')     // достаточно по одному из 'V' и 'H'
+        this.#wshp.DoChgs.MakeScroll(0.1, 0.1, aO5.base.pO5, true)
     }
     #InitCtrls = (aO5, div) => {
         const
@@ -152,28 +150,47 @@ class OO5 {
                 const
                     key = this.#frame,
                     pdiv = div.getElementsByClassName(key)[0],
-                    ps = Array.from(pdiv.getElementsByTagName('p'))
-                // FindFrame = id => frame => frame.act.pO5.tag.id === id
+                    ps = Array.from(pdiv.getElementsByTagName('p')),
+                    StopPropagation= e => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                      },
+                    AskScroll = e => {
+                        const
+                            tag = document.getElementById(e.target.innerText),
+                            ish = e.button !== 0
+
+                        this.#wshp.DoChgs.MakeScroll(ish ? 0 : 0.1, ish ? 0.1 : 0, tag.pO5, true)
+                    }
 
                 for (const p of ps) {
                     const
                         // id = p.id,
                         icls = p.className.trim(),
                         bs = Array.from(p.getElementsByTagName('b')),
-                        nam = Array.from(p.getElementsByTagName('i'))[0].innerText
+                        is0 = Array.from(p.getElementsByTagName('i'))[0],
+                        nam = is0.innerText
 
                     let frame = null
                     if (icls)
                         for (const f of aO5.frames)
-                            if (f.act.pO5.tag.id === icls) {
+                            if (f.pO5.tag.id === icls) {
                                 frame = f
                                 break
                             }
 
-                    if (icls && !document.getElementById(icls)) {
-                        p.innerHTML = `<span class="absent"><i>&nbsp;${nam}</i> &nbsp; &nbsp; -</span>`
-                        continue
+                    // const el = document.getElementById(icls)
+                    if (document.getElementById(icls)) {
+                        is0.classList.add('button')
+                        is0.title = "Скроллинг: Л - гориз., П - верт."
+                        is0.addEventListener('contextmenu', StopPropagation)
+                        is0.addEventListener('mousedown', AskScroll)
                     }
+                    else
+                        if (icls) {
+                            p.innerHTML = `<span class="absent"><i>&nbsp;${nam}</i> &nbsp; &nbsp; -</span>`
+                            continue
+                        }
 
                     for (const i of [0, 1]) {
                         const
@@ -279,9 +296,6 @@ class OO5 {
 
         for (const obj of objs)
             obj.style.opacity = opas
-    }
-    CallScroll = s => {  // вызывается из HTML
-        this.#wshp.DoChgs.MakeScroll(s.indexOf('V') < 0 ? 0 : 0.1, s.indexOf('H') < 0 ? 0 : 0.1, body, true)
     }
     OutLines = cbx => {
         const
@@ -396,12 +410,10 @@ class OO5 {
                     )
                 )
                     alert(`Не следует накладывать ${aO5.id} на объект ${xO5.id}`)
-                
+
             }
-            
-        // this.#wshp.PO5shp.InsertaO5s(aO5)
-        
-        this.CallScroll('VH')     // достаточно по одному из 'V' и 'H'
+
+        this.#wshp.DoChgs.MakeScroll(0.1, 0.1, aO5.base.pO5, true)
     }
     DoMove = e => {
         const mpos = this.mpos
