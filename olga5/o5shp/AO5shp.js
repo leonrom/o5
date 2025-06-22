@@ -54,6 +54,7 @@
                 cls: { puts: [], pitch: 'S', alive: false, none: false, level: 0, nofx: false },
                 base: { pO5: null, pbase: null },
                 act: {
+                    time:-1,    // для пересчетка текущей позиции
                     clon: null,
                     cart: null,
                     shdw: shp,          // будет: или  shp или clon
@@ -291,7 +292,10 @@
 
             return clon
         }
-        CalcCurPos() {
+        CalcCurPos(time) {
+            if (this.act.time === time)
+                return
+
             const
                 aO5 = this,
                 p = aO5.act.shdw.getBoundingClientRect()
@@ -303,6 +307,7 @@
             if (!aO5.pFixs.T && !aO5.pFixs.B) aO5.posC.top = p.top
 
             Object.assign(aO5.posS, { top: 0, left: 0 })
+            aO5.act.time = time
         }
     }
 

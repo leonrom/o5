@@ -18,11 +18,12 @@
 		fmtOK = "background: cornsilk; color: black;",
 		fmtErr = "background: yellow; color: black;",
 		opp = { T: 'B', L: 'R', R: 'L', B: 'T' },
-		xpos = { T: 'top', L: 'left', R: 'right', B: 'bottom' },
+		xbord = { T: 'top', L: 'left', R: 'right', B: 'bottom' },
 		coordVH = { V: ['height', 'top', 'bottom'], H: ['width', 'left', 'right'] },
 
 		CheckHidden = (aO5, x) => {
 			// обработка скрытых тегов
+			aO5.CalcCurPos(time)		//????????????????????
 			const
 				aC = aO5.posC,
 				v = aO5.nears.out[x].v
@@ -54,13 +55,15 @@
 			if (o5debug > 2)
 				console.log(`Подключение Границе Фрейма для aO5=${aO5.id} по ${x}`)
 
+			aO5.CalcCurPos(time)		//????????????????????
+
 			const c = Object.assign({}, aO5.posO)
 			let pFix = null
 			for (const frame of aO5.frames)
 				if (frame.fix) {
 					const
 						pO5 = frame.pO5,
-						v = pO5.scops[x]	// pO5.visis[x].v	//v = pO5.scops[x]
+						v = pO5.pos.scops[x]	// pO5.pos.visis[x].v	//v = pO5.pos.scops[x]
 
 					switch (x) {
 						case 'T': if (c.top <= v) { pFix = pO5; c.top = v }; break
@@ -71,7 +74,7 @@
 				}
 
 			if (pFix) {
-				const v = pFix.scops[x],
+				const v = pFix.pos.scops[x],
 					c = aO5.posC
 				switch (x) {
 					case 'T': c.top = v; break
@@ -91,7 +94,7 @@
 		OverlapByFrames = (aO5, x, pO5) => {
 			const
 				itl = 'TL'.includes(x),
-				v = pO5.visis[x].v,
+				v = pO5.pos.visis[x].v,
 				c = aO5.posC,
 				q = x === 'R' ? (c.left + c.width) : (
 					x === 'B' ? (c.top + c.height) : (
@@ -108,9 +111,9 @@
 					case 'B': c.height -= d; break
 				}
 		},
-		MakeScroll = (scV, scH, pO5) => {  // , doschgs
+		MakeScroll = (scV, scH, pcO5) => {  // , doschgs
 			const
-				// aAlls = pO5.aAlls,
+				time = performance.now(),
 				ОбрезаниеПротивоположнойСтороны = (aO5, y) => {
 					if (o5debug > 2)
 						console.log(`Обрезание с Противоположной Стороны для aO5=${aO5.id} по ${x}`)
@@ -119,13 +122,13 @@
 						c = aO5.posC,
 						itl = 'TL'.includes(o),
 						pO5 = aO5.base.pO5,
-						r = { p: pO5, v: pO5.scops[o] }
+						r = { p: pO5, v: pO5.pos.scops[o] }
 
 					for (const frame of aO5.frames)
 						if (frame.cut) {
 							const
 								p = frame.pO5,
-								v = p.visis[o]	// pO5.visis[x].v	//v = pO5.scops[x]
+								v = p.pos.visis[o]	// pO5.pos.visis[x].v	//v = pO5.pos.scops[x]
 
 							if ((r.v > v && itl) || (r.v < v && !itl)) {
 								r.p = p; r.v = v
@@ -149,6 +152,7 @@
 					return r.p
 				},
 				НаБлижнемТеге = (aO5, x) => {
+					aO5.CalcCurPos(time)		//????????????????????
 					const
 						pbase = aO5.base.pbase,
 						iO5s = pbase.aO5s
@@ -230,7 +234,7 @@
 			// 	let pT, visis, n = 0
 			// 	for (const pO5 of pIncs) {
 			// 		if (!visis) {// первый пропускаю, т.к. это сам "первый" контейнер
-			// 			visis = pO5.visis
+			// 			visis = pO5.pos.visis
 			// 			pT = pO5
 			// 			continue
 			// 		}
@@ -240,18 +244,18 @@
 			// 		let chg = ''
 			// 		for (const x of [x0, opp[x0]]) {
 			// 			const
-			// 				v = pO5.scops[x],
+			// 				v = pO5.pos.scops[x],
 			// 				vT = visis[x].v,
 			// 				itl = 'TL'.includes(x)
 
 			// 			if ((vT > v && itl) || (vT < v && !itl)) {
-			// 				Object.assign(pO5.visis[x], { p: pT, v: vT })
+			// 				Object.assign(pO5.pos.visis[x], { p: pT, v: vT })
 
 			// 				if (o5debug)
 			// 					chg += `${pT.name}:${x}=${vT}, `
 			// 			}
 			// 		}
-			// 		visis = pO5.visis
+			// 		visis = pO5.pos.visis
 
 			// 		if (o5debug) {
 			// 			rez.push({ pO5: pO5.name, chg: chg })
@@ -268,22 +272,26 @@
 			if (scH > 0) xs += 'L'; else if (scH < 0) xs += 'R'
 
 			const
-				СдвигФиксированныхВложенныхКонтейнерах = (pO5, o, xx, v) => {
+				СдвигФиксированныхВложенныхКонтейнерах = (pO5, bord, v) => {
 					for (const iO5 of pO5.pIncs)
 						if (iO5 !== pO5) {
 							for (const aO5 of iO5.aAlls)
-								if (aO5.pFixs[o])   // зафиксированные объекты в этом контейнере
-									aO5.posC[xx] -= v
+								if (aO5.pFixs.fixed)   // зафиксированные объекты в этом контейнере
+									aO5.posC[bord] -= v
+							// сдвиг фиксированных в pcO5 и вложенных, 
+							// но если НЕ зафиксировано по pcO5[x]									
 
-							СдвигФиксированныхВложенныхКонтейнерах(iO5, o, xx, v)
+							СдвигФиксированныхВложенныхКонтейнерах(iO5, bord, v)
 						}
 				},
-				РасфиксацияПротивоположных = (o, pO5) => {
-					for (const aO5 of pO5.aAlls)
-						if (aO5.pFixs[o] === pO5) {  // зафиксированные объекты в этом контейнере
+				РасфиксацияПротивоположных = o => {
+					for (const aO5 of pcO5.aAlls)
+						if (aO5.pFixs[o] === pcO5) {  // зафиксированные объекты в этом контейнере
 							const
 								aC = aO5.posC,
 								aO = aO5.posO
+							aO5.CalcCurPos(time)
+
 							if ( 		//  Если вышло за shdw - расфиксирую
 								(o === 'T' && aC.top <= aO.top) ||
 								(o === 'B' && aC.top >= aO.top) ||
@@ -295,52 +303,87 @@
 							if (o5debug > 1)
 								console.log(`проверка расфиксации ${aO5.id} по ${o} `, !aO5.pFixs[o] ? '- расфиксировал!' : '')
 						}
+				},
+				НоваяФиксацияНаГранице = (aO5, x, v, pO5) => {
+					const
+						c = aO5.posC,
+						o = aO5.posO
+					aO5.CalcCurPos(time)
+
+					let p;
+					for (const frame of aO5.frames)
+						if (frame.pO5 === pO5 && frame.fix) {
+							switch (x) {
+								case 'T': if (o.top <= v) { c.top = v; p = pO5 }; break
+								case 'L': if (o.left <= v) { c.left = v; p = pO5 }; break
+								case 'R': if (o.left + c.width >= v) { c.left = v - c.width; p = pO5 }; break
+								case 'B': if (o.top + c.height >= v) { c.top = v - c.height; p = pO5 }; break
+							}
+
+							if (o5debug > 1)
+								console.log(`проверка фиксации ${aO5.id} по ${x} `,
+									p ? `- зафиксировал posC= ${c[xbord[x]]}  posO= ${o[xbord[x]]}  !` : '')
+
+							if (p) {
+								if (p !== aO5.pFixs[x])
+									aO5.DoFix(p, x)
+								return p
+							}
+						}
+				},
+				ФиксацииВложенныхКонтейнерах = (pO5, x) => {
+					const v = pO5.pos.scops[x]
+					for (const iO5 of pO5.pIncs)
+						if (iO5 !== pO5) {
+
+							iO5.CalcScrollScope(time)	// определение текущих позиций								
+
+							if (
+								((x === 'T' || x === 'L') && iO5.pos.scops[x] <= v) ||
+								((x === 'R' || x === 'B') && iO5.pos.scops[x] >= v)
+							) {
+								for (const aO5 of iO5.aAlls)
+									// if (!aO5.pFixs[x] && !aO5.pFixs[opp[x]])
+									НоваяФиксацияНаГранице(aO5, x, v, pO5)
+
+								ФиксацииВложенныхКонтейнерах(iO5, x)
+							}
+							else   // если этот не пересёк, то и остальным пофиг
+								break
+						}
+				},
+				ФиксацииЭтомКонтейнере = x => {
+					const v = pcO5.pos.scops[x]
+					for (const aO5 of pcO5.aAlls)
+						if (!aO5.pFixs[x] && !aO5.pFixs[opp[x]])
+							НоваяФиксацияНаГранице(aO5, x, v, pcO5)
 				}
 
 			for (const x of xs) {
-				РасфиксацияПротивоположных(opp[x], pO5)
-				for (const o of [x, opp[x]]) {
-					const isTB = o === 'T' || o === 'B'
-					СдвигФиксированныхВложенныхКонтейнерах(pO5, o, isTB ? 'top' : 'left', isTB ? scV : scH)
-				}
+				РасфиксацияПротивоположных(opp[x])
+				const isTB = 'TB'.includes(x)
+				СдвигФиксированныхВложенныхКонтейнерах(pcO5, isTB ? 'top' : 'left', isTB ? scV : scH)
 			}
 			// for (const x of xs)
 			// CalcBoards(pO5.pIncs, x)
 
-			// определение текущих позиций
-			pO5.CalcScrollScope()
-			for (const aO5 of pO5.aAlls)
-				aO5.CalcCurPos()
 
-			// попытка фиксации не-зафиксированных объектов в этом контейнере.
+			// // фиксации не-зафиксированных объектов в этом контейнере.
+			// for (const x of xs) {
+			// 	const v = pO5.pos.scops[x]
+			// 	for (const aO5 of pO5.aAlls)
+			// 		if (!aO5.pFixs[x] && !aO5.pFixs[opp[x]])
+			// 			НоваяФиксацияНаГранице(aO5, x, v, pO5)
+			// }
 
-			for (const x of xs) {
-				const v = pO5.scops[x]
-				for (const aO5 of pO5.aAlls)
-					if (!aO5.pFixs[x] && !aO5.pFixs[opp[x]]) {
-						let pFix = null
-						for (const frame of aO5.frames)
-							if (frame.pO5 === pO5 && frame.fix) {
-								const
-									c = aO5.posC,
-									o = aO5.posO
-								switch (x) {
-									case 'T': if (o.top <= v) { pFix = pO5; c.top = v }; break
-									case 'L': if (o.left <= v) { pFix = pO5; c.left = v }; break
-									case 'R': if (o.left + c.width >= v) { pFix = pO5; c.left = v - c.width }; break
-									case 'B': if (o.top + c.height >= v) { pFix = pO5; c.top = v - c.height }; break
-								}
-								break
-							}
+			// фиксации не-зафиксированных объектов в этом контейнере.
+			for (const x of xs)
+				ФиксацииЭтомКонтейнере(x)
 
-						if (o5debug > 1)
-							console.log(`проверка фиксации ${aO5.id} по ${x} `, pFix ? `- зафиксировал posC= ${aO5.posC[xpos[x]]}  posO= ${aO5.posO[xpos[x]]}  !` : '')
+			// фиксации не-зафиксированных объектов в этом и в остальных вложенных контейнерах.
+			for (const x of xs)
+				ФиксацииВложенныхКонтейнерах(pcO5, x)
 
-						if (pFix) {
-							aO5.DoFix(pFix, x)
-						}
-					}
-			}
 
 			// for (const x of xs) {
 			// 	for (const aO5 of aAlls)
@@ -379,7 +422,7 @@
 			// 		for (const x of xs) {
 			// 			const o = opp[x]
 
-			// 			if (!aO5.pFixs[o] && (!aO5.pFixs[x] || aO5.pFixs[x].schgs[x] || doschgs))
+			// 			if (!aO5.pFixs[o] && (!aO5.pFixs[x] || aO5.pFixs[x].pos.schgs[x] || doschgs))
 			// 				PutOnBound(aO5, x)
 
 			// 			if (!aO5.pFixs[x] && aO5.pFixs[o])
@@ -394,7 +437,7 @@
 			// 				OverlapByFrames(aO5, y, ps[y] || aO5.base.pO5)
 			// 		}
 
-			for (const pInc of pO5.pIncs)
+			for (const pInc of pcO5.pIncs)
 				for (const aO5 of pInc.aAlls)
 					if (aO5.pFixs.fixed)
 						aO5.ShowFix()
