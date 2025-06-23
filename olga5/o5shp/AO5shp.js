@@ -15,6 +15,7 @@
         o5debug = C.consts.o5debug,
         fmtOK = "background: cornsilk; color: black;",
         fmtErr = "background: yellow; color: black;",
+		xbord = { T: 'top', L: 'left', R: 'right', B: 'bottom' },
         DblClick = e => {
             let target = e.target
             while (target && !target.aO5shp)
