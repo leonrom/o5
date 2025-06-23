@@ -23,7 +23,7 @@
             if (target && target.aO5shp) {
                 const aO5 = target.aO5shp
 
-                aO5.UnFix('TLRB')
+                aO5.UnFix()  // т.е. расфиксирую всё
                 e.stopImmediatePropagation()
 
                 if (o5debug > 0)
@@ -54,7 +54,7 @@
                 cls: { puts: [], pitch: 'S', alive: false, none: false, level: 0, nofx: false },
                 base: { pO5: null, pbase: null },
                 act: {
-                    time:-1,    // для пересчетка текущей позиции
+                    time: -1,    // для пересчетка текущей позиции
                     clon: null,
                     cart: null,
                     shdw: shp,          // будет: или  shp или clon
@@ -72,7 +72,7 @@
                 // wasFix: Object.assign({}, AO5.TFix),    //  сохраняемый результат фиксирования
                 // tryFix: Object.assign({}, AO5.TFix),    //  предлагаемые фиксирования 
 
-                pFixs: { fixed: false, T: null, L: null, R: null, B: null },
+                pFixs: { fixed: false, T: [], L: [], R: [], B: [] },
 
                 zeroed: { V: false, H: false },          //  имеют нулевой размер  - по результату ChNudget
                 isFull: { V: false, H: false }, //  признак, что тег был полностью видим - по вертикали и горизонтали   
@@ -82,10 +82,7 @@
                 posS: { top: 0, left: 0, },
                 posC: { top: 0, left: 0, height: 0, width: 0, },      // координаты скроллируемого
                 posO: { top: 0, left: 0, right: 0, bottom: 0, height: 0, width: 0 },        // ПОТОМ УБРАТЬ за ненадобностьбю !!
-                // posSf: { top: 0, left: 0, },            // координаты, запомненные при фиксации
-                // posCf: Object.assign({}, AO5.Tall),     // координаты, запомненные при фиксации
 
-                // posD: Object.assign({}, AO5.TFix),      // границы для определения близости к контейнерам TLRB
                 orig: { display: '', position: '', top: 0, left: 0, height: 0, width: 0, },
             })
 
@@ -94,10 +91,7 @@
                 n0 = { v: NaN, p: null },
                 xs = 'TLRB'
 
-            // for (const x of xs) {
-            //     Object.assign(this.pFixs[x], {p:null, v:NaN})
-            //     Object.seal(this.pFixs[x])  
-            // } 
+
             Object.seal(this.pFixs)
 
             for (const name of names) {
@@ -133,7 +127,7 @@
         #HasFixedDebug() {
             let s = ''
             for (const x of 'TLRB')
-                if (this.pFixs[x]) s += x
+                if (this.pFixs[x].length) s += x
             return s
         }
         HasHidden() {
@@ -148,16 +142,15 @@
                 clon = act.clon || aO5.#Clone(),
                 cart = act.cart
 
-            // for (const x of s)
-            //     aO5.wasFix[x] = true
-            // Object.assign(aO5.pFixs[x], pFix)
-            aO5.pFixs[x] = pFix
+            aO5.pFixs[x].push(pFix)
             aO5.pFixs.fixed = true
+            pFix.aFixs[x].add(aO5)
 
             // aO5.act.wasFull = true
 
             if (o5debug)
-                console.log("%c%s", fmtOK, `DoFix`, `${aO5.id} на ${pFix.name}, всего теперь  [${this.#HasFixedDebug()}]`)
+                console.log("%c%s", fmtOK, `DoFix`,
+                    `${aO5.id} по ${x} на ${pFix.name}: всего [${Array.from(aO5.pFixs[x]).map(p => p.name).join(', ')}]`)
 
             if (act.shdw !== clon) {
                 act.shdw = clon
@@ -175,7 +168,7 @@
                 window.dispatchEvent(new CustomEvent('o5_fixed', { detail: { aO5: aO5, fix: true } }))
             }
         }
-        UnFix(x) {
+        UnFix(x, pO5) {
             const
                 aO5 = this,
                 shp = aO5.shp,
@@ -184,15 +177,35 @@
                 cart = act.cart,
                 pFixs = aO5.pFixs
 
-            // for (const x of s)
-            //     aO5.wasFix[x] = false
+            let u;
+            if (!pO5) {
+                if (o5debug) u = 'расфиксировал всё'
+                pFixs.fixed = false
+                for (const o of 'TRLB') {
+                    for (const p of pFixs[o])
+                        p.aFixs.delete(aO5)
+                    pFixs[o].length = 0
+                }
+            } else {
 
-            // Object.assign(this.pFixs[x], {p:null, v:NaN})
-            pFixs[x] = null
-            aO5.pFixs.fixed = pFixs.T || pFixs.L || pFixs.R || pFixs.B
+                pFixs[x].delete(pO5)
+                pO5.aFixs[x].delete(aO5)
 
+                if (o5debug) u = `расфиксировал ${pO5.name}`
+                if (pFixs[x].length) {
+                    const pO5 = pFixs[x].at(-1)
+                    aO5.posC[xbord[x]] = pO5.pos.scops[x]
+// неправильно тут перефиксировать - могло ведь и уползти ниже                    
+
+                    if (o5debug) u += `- перефиксировал на ${pO5.name}`
+                }
+                else {
+                    aO5.pFixs.fixed = pFixs.T.length || pFixs.L.length || pFixs.R.length || pFixs.B.length
+                    if (o5debug) u += ': всё расфиксировано'
+                }
+            }
             if (o5debug)
-                console.log("%c%s", fmtOK, `UnFix`, `${aO5.id}, осталось [${this.#HasFixedDebug()}] `)
+                console.log("%c%s", fmtOK, `UnFix`, `${aO5.id} ${u} : всего [${Array.from(aO5.pFixs[x]).map(p => p.name).join(', ')}] `)
 
             if (act.shdw !== shp && !aO5.pFixs.fixed) {  // !this.HasFixed()) {
                 act.shdw = shp
@@ -210,7 +223,7 @@
                 window.dispatchEvent(new CustomEvent('o5_fixed', { detail: { aO5: aO5, fix: false } }))
             }
         }
-        ShowFix  () {
+        ShowFix() {
             const aO5 = this,
                 posC = aO5.posC,
                 posS = aO5.posS,
@@ -234,7 +247,7 @@
                 left: posS.left + 'px',
             })
         }
-        #Clone  () {
+        #Clone() {
             if (o5debug > 1)
                 console.log(`----------------- клонирую '${this.id}' -----------`)
 
@@ -303,8 +316,8 @@
             Object.assign(aO5.posO, { top: p.top, left: p.left, right: p.right, bottom: p.bottom, height: p.height, width: p.width })
 
             Object.assign(aO5.posC, { width: p.width, height: p.height })
-            if (!aO5.pFixs.L && !aO5.pFixs.R) aO5.posC.left = p.left
-            if (!aO5.pFixs.T && !aO5.pFixs.B) aO5.posC.top = p.top
+            if (!aO5.pFixs.L.length && !aO5.pFixs.R.length) aO5.posC.left = p.left
+            if (!aO5.pFixs.T.length && !aO5.pFixs.B.length) aO5.posC.top = p.top
 
             Object.assign(aO5.posS, { top: 0, left: 0 })
             aO5.act.time = time
