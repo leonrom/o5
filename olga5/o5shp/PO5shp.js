@@ -102,7 +102,9 @@
                 // base: { pbase: null }, // (все pO5) ссылка на ближайший внешний скроллируемый контейнер
                 pOuts: new Set(),  //  (все pO5) список внешних скроллируемых контейнеров
                 pIncs: new Set(),  //  (скроллируемые pO5) список вложенных скроллируемых контейнеров 
-                aAlls: new Set(),  // (скроллируемые pO5) список всех 'своих' подвисабельных тегов
+                aAlls: new Set(),  // список всех 'внутренних' подвисабельных тегов
+                aOwns: new Set(),  // список только 'своих' подвисабельных тегов
+                aFixs: { T: 0, L: 0, R: 0, B: 0 }, // перечень aO5, завиксированнх на этой границе
                 borders: {
                     top: parseFloat(nst.borderTopWidth),
                     left: parseFloat(nst.borderLeftWidth),
@@ -129,6 +131,9 @@
             pO5.pOuts.add(pO5)
             pO5.pIncs.add(pO5)
 
+            for (const x of 'TLRB')
+                pO5.aFixs[x] = new Set()
+
             for (const nam of ['scops', 'schgs', 'visis'])
                 Object.seal(pO5.pos[nam])
 
@@ -138,6 +143,7 @@
             Object.freeze(pO5.pos.visis)
 
             Object.freeze(pO5.borders)
+            Object.freeze(pO5.aFixs)
             Object.freeze(pO5.scrls)
             Object.freeze(this)
 

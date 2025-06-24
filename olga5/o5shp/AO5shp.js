@@ -15,7 +15,7 @@
         o5debug = C.consts.o5debug,
         fmtOK = "background: cornsilk; color: black;",
         fmtErr = "background: yellow; color: black;",
-		xbord = { T: 'top', L: 'left', R: 'right', B: 'bottom' },
+        xbord = { T: 'top', L: 'left', R: 'right', B: 'bottom' },
         DblClick = e => {
             let target = e.target
             while (target && !target.aO5shp)
@@ -58,6 +58,7 @@
                     time: -1,    // для пересчетка текущей позиции
                     clon: null,
                     cart: null,
+                    fixed: false,
                     shdw: shp,          // будет: или  shp или clon
                     checkN: -1,         // для проверок подвисания под ним
                     iTested: false,     // для контроля в тестах                    
@@ -73,7 +74,7 @@
                 // wasFix: Object.assign({}, AO5.TFix),    //  сохраняемый результат фиксирования
                 // tryFix: Object.assign({}, AO5.TFix),    //  предлагаемые фиксирования 
 
-                pFixs: { fixed: false, T: [], L: [], R: [], B: [] },
+                pFixs: { T: [], L: [], R: [], B: [] },
 
                 zeroed: { V: false, H: false },          //  имеют нулевой размер  - по результату ChNudget
                 isFull: { V: false, H: false }, //  признак, что тег был полностью видим - по вертикали и горизонтали   
@@ -91,9 +92,6 @@
                 names = ['fix', 'cut', 'out'],
                 n0 = { v: NaN, p: null },
                 xs = 'TLRB'
-
-
-            Object.seal(this.pFixs)
 
             for (const name of names) {
                 this.nears[name] = Object.assign({}, AO5.TObj)
@@ -117,6 +115,7 @@
                 else
                     console.log("%c%s", fmtErr, `в aO5 отсутствует '${nam}'`)
 
+            Object.freeze(this.pFixs)
             Object.freeze(this)
         }
         #SetMargOutls(style, margs, outln) {
@@ -144,14 +143,14 @@
                 cart = act.cart
 
             aO5.pFixs[x].push(pFix)
-            aO5.pFixs.fixed = true
+            aO5.act.fixed = true
             pFix.aFixs[x].add(aO5)
 
             // aO5.act.wasFull = true
 
             if (o5debug)
                 console.log("%c%s", fmtOK, `DoFix`,
-                    `${aO5.id} по ${x} на ${pFix.name}: всего [${Array.from(aO5.pFixs[x]).map(p => p.name).join(', ')}]`)
+                    `${aO5.id} по ${x} на ${pFix.name}: всего [${aO5.pFixs[x].map(p => p.name).join(', ')}]`)
 
             if (act.shdw !== clon) {
                 act.shdw = clon
@@ -181,34 +180,36 @@
             let u;
             if (!pO5) {
                 if (o5debug) u = 'расфиксировал всё'
-                pFixs.fixed = false
+                aO5.act.fixed = false
                 for (const o of 'TRLB') {
-                    for (const p of pFixs[o])
-                        p.aFixs.delete(aO5)
+                    for (const p of pFixs[o]) 
+                        p.aFixs[o].delete(aO5)
+                        // pFixs[o].splice(pFixs[o].indexOf(p), 1)
+                        
                     pFixs[o].length = 0
                 }
             } else {
 
-                pFixs[x].delete(pO5)
                 pO5.aFixs[x].delete(aO5)
+                pFixs[x].splice(pFixs[x].indexOf(pO5), 1)
 
                 if (o5debug) u = `расфиксировал ${pO5.name}`
                 if (pFixs[x].length) {
-                    const pO5 = pFixs[x].at(-1)
-                    aO5.posC[xbord[x]] = pO5.pos.scops[x]
-// неправильно тут перефиксировать - могло ведь и уползти ниже                    
+                    const pNxt = pFixs[x].at(-1)
+                    aO5.posC[xbord[x]] = pNxt.pos.scops[x]
+                    // неправильно тут перефиксировать - могло ведь и уползти ниже                    
 
-                    if (o5debug) u += `- перефиксировал на ${pO5.name}`
+                    if (o5debug) u += `- перефиксировал на ${pNxt.name}`
                 }
                 else {
-                    aO5.pFixs.fixed = pFixs.T.length || pFixs.L.length || pFixs.R.length || pFixs.B.length
+                    aO5.act.fixed = pFixs.T.length || pFixs.L.length || pFixs.R.length || pFixs.B.length
                     if (o5debug) u += ': всё расфиксировано'
                 }
             }
             if (o5debug)
                 console.log("%c%s", fmtOK, `UnFix`, `${aO5.id} ${u} : всего [${Array.from(aO5.pFixs[x]).map(p => p.name).join(', ')}] `)
 
-            if (act.shdw !== shp && !aO5.pFixs.fixed) {  // !this.HasFixed()) {
+            if (act.shdw !== shp && !aO5.act.fixed) {  // !this.HasFixed()) {
                 act.shdw = shp
 
                 Object.assign(shp.style, aO5.orig)
