@@ -40,7 +40,8 @@
                 scrl: (pO5.scrls.H ? 'H' : '') + (pO5.scrls.V ? 'V' : ''),
                 pOuts: (Array.from(pO5.pOuts)).map(pO5 => pO5.name).join(', '),
                 pIncs: (Array.from(pO5.pIncs)).map(pO5 => pO5.name).join(', '),
-                aAlls: (Array.from(pO5.aAlls)).map(a => a.a_name).join(', '),
+                aOwns: (Array.from(pO5.aOwns)).map(a => a.a_name).join(', '),
+                // aAlls: (Array.from(pO5.aAlls)).map(a => a.a_name).join(', '),
             })
             if (prev.pO5.ibody)
                 break
@@ -101,7 +102,9 @@
 
         wshp.PBases.PBase.Attach(aO5)
 
-        aO5.base.pO5.aAlls.add(aO5)
+        aO5.base.pO5.aOwns.add(aO5)
+        // for (const p of aO5.base.pO5.pOuts)
+        //     p.aAlls.add(aO5)
 
         if (o5debug > 1)
             DebugShowRez(aO5)

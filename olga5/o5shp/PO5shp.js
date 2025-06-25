@@ -26,7 +26,8 @@
                     if (o5debug > 2)
                         console.log("%c%s", fmtErr, `scroll ${sl.pO5.id}: `, ' закончил!')
 
-                    Object.assign(pos, { top: sl.top, left: sl.left, height: 0, width: 0, time: sl.time })
+                    pO5.act.tAct = sl.time
+                    Object.assign(pos, { top: sl.top, left: sl.left, height: 0, width: 0 })
                     wshp.DoChgs.MakeScroll(sl.sV || sl.rV, sl.sH || sl.rH, sl.pO5)
                     sl.pO5 = null
                 }
@@ -34,7 +35,7 @@
                 const
                     dm = scroll.dm,
                     now = performance.now(),
-                    dt = now - pos.time >= dm.dt,
+                    dt = now - pO5.act.tAct >= dm.dt,
                     sV = el.scrollTop - pos.top,
                     sH = el.scrollLeft - pos.left,
                     rH = el.clientWidth - pos.width,
@@ -51,7 +52,9 @@
                             `sV=${sV}, sH=${sH}, rV=${rV}, rH=${rH},- sT=${el.scrollTop}, aT=${pos.top}, sL=${el.scrollLeft}, aL=${pos.left}, `
                         )
 
-                    Object.assign(pos, { top: el.scrollTop, left: el.scrollLeft, width: el.clientWidth, height: el.clientHeight, time: now })
+                    Object.assign(pos, { top: el.scrollTop, left: el.scrollLeft, width: el.clientWidth, height: el.clientHeight })
+                    pO5.act.tAct = now
+
                     wshp.DoChgs.MakeScroll(
                         typ === 'S' ? sV : (rV ? 0.1 : 0),
                         typ === 'S' ? sH : (rH ? 0.1 : 0),
@@ -59,8 +62,10 @@
                     )
                     sl.pO5 = null
                 }
-                else
-                    Object.assign(sl, { sV, sH, rV, rH, pO5, top: el.scrollTop, left: el.scrollLeft, height: el.clientHeight, width: el.clientWidth, time: now })
+                else{
+                    Object.assign(sl, { sV, sH, rV, rH, pO5, top: el.scrollTop, left: el.scrollLeft, height: el.clientHeight, width: el.clientWidth })
+                pO5.act.tAct = now
+                    }
             },
             Scroll: e => {
                 const el = e.target.pO5 ? e.target : document.body
@@ -69,9 +74,13 @@
             Resize: entries => {
                 const time = performance.now()
                 for (const e of entries) {
-                    const el = e.target.pO5 ? e.target : document.body
-                    scroll.Act(e.target, 'R')
-                    el.pO5.CalcScrollScope(time)
+                    const
+                        el = e.target.pO5 ? e.target : document.body,
+                        pO5 = el.pO5
+                    if (pO5.pos.time !== time) {
+                        scroll.Act(e.target, 'R')
+                        pO5.CalcScrollScope(time)
+                    }
                 }
             }
         },
@@ -102,7 +111,7 @@
                 // base: { pbase: null }, // (все pO5) ссылка на ближайший внешний скроллируемый контейнер
                 pOuts: new Set(),  //  (все pO5) список внешних скроллируемых контейнеров
                 pIncs: new Set(),  //  (скроллируемые pO5) список вложенных скроллируемых контейнеров 
-                aAlls: new Set(),  // список всех 'внутренних' подвисабельных тегов
+                // aAlls: new Set(),  // список всех 'внутренних' подвисабельных тегов
                 aOwns: new Set(),  // список только 'своих' подвисабельных тегов
                 aFixs: { T: 0, L: 0, R: 0, B: 0 }, // перечень aO5, завиксированнх на этой границе
                 borders: {
@@ -116,15 +125,18 @@
                     H: this.ibody || nst.overflow === 'auto' || nst.overflowX === 'auto' || nst.overflow === 'scroll' || nst.overflowX === 'scroll',
                     V: this.ibody || nst.overflow === 'auto' || nst.overflowY === 'auto' || nst.overflow === 'scroll' || nst.overflowY === 'scroll',
                 },
-                pos: { // позиции скроллинга, видимые границы , текущие границы,  изменение границ от предыдущего
-                    time: -1,  
+                pos: { // позиции скроллинга, видимые границы , текущие границы,  изменение границ от предыдущего              
                     top: el.scrollTop,
                     left: el.scrollLeft,
-                    width: el.clientWidth,   
-                    height: el.clientHeight,  
-                    scops: { T: 0, L: 0, R: 0, B: 0 },  
+                    width: el.clientWidth,
+                    height: el.clientHeight,
+                    scops: { T: 0, L: 0, R: 0, B: 0 },
                     schgs: { T: 0, L: 0, R: 0, B: 0 },
                     visis: { T: { p: null, v: NaN }, L: { p: null, v: NaN }, R: { p: null, v: NaN }, B: { p: null, v: NaN } }
+                },
+                act:{
+                    tAct:-1,
+                    tFix:-1
                 }
             })
             // добавляю сам себя
@@ -137,7 +149,7 @@
             for (const nam of ['scops', 'schgs', 'visis'])
                 Object.seal(pO5.pos[nam])
 
-            for (const nam of ['aAlls', 'pOuts', 'pIncs', 'scrls',  'pos'])
+            for (const nam of ['aOwns', 'pOuts', 'pIncs', 'scrls', 'pos', 'act'])
                 Object.seal(pO5[nam])
 
             Object.freeze(pO5.pos.visis)
@@ -157,7 +169,7 @@
         }
         name = ''    // еще и тут - чтобы сразу видеть в отладчике
         CalcScrollScope(time) {   // видимост,- пересчитывается при скроллине в DoChgs
-            if (this.pos.time === time)
+            if (this.pos.time === this.act.tAct)
                 return
 
             const
@@ -186,7 +198,7 @@
                 sc = pO5.pos.scops,
                 pos = pO5.pos
 
-            pos.time = time
+            pO5.act.tAct = time
             Object.assign(pos.schgs, { T: r.T - sc.T, L: r.L - sc.L, R: r.R - sc.R, B: r.B - sc.B })
             Object.assign(pos.scops, r)
 

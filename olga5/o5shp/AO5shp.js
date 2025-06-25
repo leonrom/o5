@@ -182,10 +182,10 @@
                 if (o5debug) u = 'расфиксировал всё'
                 aO5.act.fixed = false
                 for (const o of 'TRLB') {
-                    for (const p of pFixs[o]) 
+                    for (const p of pFixs[o])
                         p.aFixs[o].delete(aO5)
-                        // pFixs[o].splice(pFixs[o].indexOf(p), 1)
-                        
+                    // pFixs[o].splice(pFixs[o].indexOf(p), 1)
+
                     pFixs[o].length = 0
                 }
             } else {
