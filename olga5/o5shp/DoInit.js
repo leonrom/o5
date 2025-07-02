@@ -38,10 +38,12 @@
             rez.push({
                 pO5: pO5.name,
                 scrl: (pO5.scrls.H ? 'H' : '') + (pO5.scrls.V ? 'V' : ''),
+                pAlls: (Array.from(pO5.pAlls)).map(pO5 => pO5.name).join(', '),
                 pOuts: (Array.from(pO5.pOuts)).map(pO5 => pO5.name).join(', '),
                 pIncs: (Array.from(pO5.pIncs)).map(pO5 => pO5.name).join(', '),
+                aAlls: (Array.from(pO5.aAlls)).map(a => a.a_name).join(', '),
                 aOwns: (Array.from(pO5.aOwns)).map(a => a.a_name).join(', '),
-                // aAlls: (Array.from(pO5.aAlls)).map(a => a.a_name).join(', '),
+                aOuts: (Array.from(pO5.aOuts)).map(a => a.a_name).join(', '),
             })
             if (prev.pO5.ibody)
                 break
@@ -81,16 +83,17 @@
                 console.log(`FindPScrolls next=${next ? next.id : '  - '}  prev=${prev.id}  pO5=${pO5.name}`)
 
                 if (next)
-                    for (const o5 of next.pO5.pOuts)
-                        pO5.pOuts.add(o5)
+                    for (const o5 of next.pO5.pAlls)
+                        pO5.pAlls.add(o5)
             },
-            FillScrollableIncs = pOuts => {
-                for (const pO5 of pOuts)
+            FillScrollables = pAlls => {
+                for (const pO5 of pAlls)
                     if (pO5.scrls.H || pO5.scrls.V) {
                         let j = pIncs.length
-                        while (j-- > 0)
+                        while (j-- > 0) {
                             pO5.pIncs.add(pIncs[j])
-                        
+                            pIncs[j].pOuts.add(pO5)
+                        }
                         pIncs.push(pO5)
                     }
             }
@@ -98,13 +101,20 @@
         if (!parent.pO5)
             FindPScrolls(aO5, parent)
 
-        FillScrollableIncs(aO5.parent.pO5.pOuts)
+        FillScrollables(aO5.parent.pO5.pAlls)
 
         wshp.PBases.PBase.Attach(aO5)
 
         aO5.base.pO5.aOwns.add(aO5)
-        // for (const p of aO5.base.pO5.pOuts)
-        //     p.aAlls.add(aO5)
+        let out = false
+        for (const p of aO5.base.pO5.pOuts) {
+            if (out) p.aOuts.add(aO5)
+            p.aAlls.add(aO5)
+            for (const x of 'TLRB')
+                p.aUnfs[x].add(aO5)
+
+            out = true
+        }
 
         if (o5debug > 1)
             DebugShowRez(aO5)

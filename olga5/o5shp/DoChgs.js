@@ -155,8 +155,10 @@
 					rido: (x === 'T' || x === 'L'),
 					flank: tb ? 'top' : 'left',
 					shift: tb ? scV : scH,
-					v: pcO5.pos.scops[x],
-					p: pcO5,
+					vb: pcO5.pos.scops[x],
+					pb: pcO5,
+					px: null,
+					vx: NaN,
 					x: x,
 				})
 			}
@@ -199,7 +201,7 @@
 
 							if (p) {
 								if (bx.p !== aO5.pFixs[bx.x].at(-1))
-									aO5.DoFix(bx.p, bx.x)
+									aO5.DoFix(bx.x, bx.p)
 							}
 							break
 						}
@@ -221,13 +223,7 @@
 				// 				break
 				// 		}
 				// },
-				ПересчетГраницКонтейнеров = pO5 => {
-					for (const iO5 of pO5.pIncs)
-						if (iO5 !== pO5) {
-							iO5.CalcScrollScope(time)
-							ПересчетГраницКонтейнеров(iO5)
-						}
-				},
+
 				ПоказФиксированных = pO5 => {
 					const
 						ShowFix = aOwns => {
@@ -252,7 +248,7 @@
 								inside = (bx.rido && v > bx.v) || (!bx.rido && v < bx.v)
 
 							for (const aO5 of iO5.aOwns) {
-								aO5.CalcCurPos(time)
+								// aO5.CalcCurPos(time)
 
 								if (inside)
 									aO5.posC[bx.flank] -= bx.shift
@@ -271,54 +267,207 @@
 								}
 							РасфиксВоВложенных(iO5, bx)
 						}
+				},
+				ПопыткаФиксации = (aO5, x, pB) => {
+					const
+						c = aO5.posC,
+						// o = c, //aO5.posO,
+						vB = pB.pos.scops[x]
+
+					aO5.act.tryFix = true
+					for (const frame of aO5.frames)
+						if (frame.fix && frame.pO5 === pB) {
+							if (
+								(x === 'T' && (c.top <= vB)) ||
+								(x === 'L' && (c.left <= vB)) ||
+								(x === 'R' && (c.left + c.width >= vB)) ||
+								(x === 'B' && (c.top + c.height >= vB))
+							) {
+								switch (x) {
+									case 'T': c.top = vB; break
+									case 'L': c.left = vB; break
+									case 'R': c.left = vB - c.width; break
+									case 'B': c.top = vB - c.height; break
+								}
+								aO5.DoFix(x, pB)
+								return pB
+							}
+						}
+				},
+				ПересчетГраниц = pO5 => {
+					if (o5debug > 2) console.log(`ПересчетГраниц ${pO5.name}`)
+					for (const pInc of pO5.pIncs)
+						if (pInc !== pO5) {
+							pInc.CalcScrollScope(time)
+							ПересчетГраниц(pInc)
+						}
+				},
+				СдвигПротивоположнойСтороныКонтейнера = (x, pInc) => {
+					// T('проверка ', `pInc=${pInc.name} - внутр. контейнер для ${pcO5.name}`)
+					const
+						m = { p: null, v: NaN },
+						xtl = (x === 'T') || (x === 'L')
+					for (const p of pInc.pOuts) {
+						const vx = p.pos.scops[x]
+						if (!m.p || (xtl && m.v < vx) || (!xtl && m.v > vx))
+							Object.assign(m, { p: p, v: vx })
+					}
+
+					const enclx= pInc.pos.encls[x]
+					if (enclx !== m.p) {
+						T(m.p.name, `самый внутренний по ${x} для ${pcO5.name} (заменяет ${enclx ? enclx.name : 'null'})`)
+						// на внешних (по отношению к pInc)	 исключаю из фиксации aO5, чья base  - pInc или вложенные
+						for (const pO5 of pInc.pOuts) {
+							if (pO5 === pInc)
+								continue
+
+							T(pO5.name, `внешний контейнер для  ${pInc.name}`)
+							for (const aO5 of pO5.aFixs[x]) {
+								const pb = aO5.base.pO5
+
+								T(aO5.a_name, `тег с базою на  ${pb.name}`)
+								for (const p of pb.pInc[x]) { // начиная (т.е. включительно) с базы и внутрь
+									const a = p.aFixs[x].find(a => a === aO5)
+									if (a) {
+										T(' - ', `разфиксируется на  ${pO5.name}`)
+										a.UnFix(x, pO5)
+										if (ПопыткаФиксации(a, x, p))
+											T(' - ', `фиксируется на  ${p.name}`)
+									}
+								}
+							}
+						}
+
+						pInc.pos.encls[x] = m.p
+					}
+				},
+				СдвигФиксированныхТолькоКонтейнера = (x, iO5) => {
+					for (const aO5 of iO5.aFixs[x]) {
+						const pFix = aO5.pFixs[x].at(-1)
+						if (pFix === iO5)
+							aO5.posC[xbord[x]] = pFix.pos.scops[x]
+						// T(aO5.a_name, `пересчет фикс. границы ${x} на ${iO5.name}`)								aO5.posC[xbord[x]] = vx}
+					}
+				},
+				T = (s1, s2) => {
+					if (o5debug)
+						console.log("оок: %c%s", fmtOK, s1, s2)
 				}
 
-			ПересчетГраницКонтейнеров(pcO5)
+			// позиции всех внутренних тегов
+			for (const aO5 of pcO5.aAlls) {
+				aO5.CalcCurPos(time)
+				aO5.act.tryFix = false
+			}
+
+			// позиции всех вложенных контейнеров
+			ПересчетГраниц(pcO5)
 
 			/*
 				Обработка основного контейнера
 			*/
-			for (const aO5 of pcO5.aOwns)
-				aO5.CalcCurPos(time)
-
 			for (const x of xs) {
-				// Расфиксация на Противоположном конце
-				const o = opp[x]
-				// v = pcO5.pos. scops[o]
+				const
+					o = opp[x],
+					xtl = (x === 'T') || (x === 'L'),
+					vxtb = ((x === 'T') || (x === 'B')) ? 'top' : 'left';
 
-				for (const aO5 of pcO5.aOwns[o])
-					if (aO5.pFixs[o].at(-1) === pcO5) {  // зафиксированные объекты в этом контейнере
-						const aC = aO5.posC, aO = aO5.posO
-						// 					if ( 							//  Если вышло за shdw - расфиксирую
-						// 	(o === 'T' && aC.top > v) ||
-						// 	(o === 'B' && aC.top+aC.height < v) ||
-						// 	(o === 'L' && aC.left >v) ||
-						// 	(o === 'R' && aC.left+aC.width <v)
-						// )
-						if ( 							//  Если вышло за shdw - расфиксирую
-							(o === 'T' && aC.top <= aO.top) ||
-							(o === 'B' && aC.top >= aO.top) ||
-							(o === 'L' && aC.left <= aO.left) ||
-							(o === 'R' && aC.left >= aO.left)
-						)
-							aO5.UnFix(o, pcO5)
-					}
+				// позиции всех зафиксированных тегов во вложенных контейнерах				
+				// (function ПересчетТегов(pO5) {
+				// 	for (const iO5 of pO5.pIncs)
+				// 		if (iO5 !== pO5) {
+				// 			const vx = iO5.pos.scops[x]
+				// 			for (const aO5 of iO5.aFixs[x]){
+				// 				const va = aO5.posC[xbord[x]]
+				// 				if ((xtl && m.v < vx) || (!xtl && m.v > vx))
+				// 				aO5.posC[xbord[x]] = vx}
+				// 			ПересчетТегов(iO5)
+				// 		}
+				// })(pcO5)
 
-				// Фиксация незафиксированных				
-				for (const aO5 of pcO5.aOwns)
-					if (!aO5.pFixs[x].length && !aO5.pFixs[o].length) {
-						aO5.CalcCurPos(time)
-						НоваяФиксацияНаГранице(aO5, bdef[x])
-					}
+				// проверяю и обрабатываю относительные вложенности контейнеров
+				for (const pInc of pcO5.pIncs) {
+					СдвигПротивоположнойСтороныКонтейнера(opp[x], pInc)
+					if (pInc !== pcO5)
+						СдвигФиксированныхТолькоКонтейнера(x, pInc)
+				}
+
+				// // // обработка всех ('своих' и 'чужих')  зафиксированных по 'x'
+				// // for (const aO5 of pcO5.aFixs[x]) {
+				// // 	const pLast = aO5.pFixs[x].at(-1)
+				// // 	if (pLast !== bdef[x].px) {
+				// // 		aO5.UnFix(o, bdef[x].px)
+
+				// // 		aO5.posC[vxtb] = bdef[x].vx       проверять frame.fix
+				// // 		aO5.DoFix(o, pcO5)
+				// // 	}
+				// // }
+
+				// // обработка всех  зафиксированных  по 'o'
+				// for (const aO5 of pcO5.aFixs[o])
+				// 	if (			//  Если вышло за shdw - расфиксирую
+				// 		(o === 'T' && aO5.posC.top <= aO5.posO.top) ||
+				// 		(o === 'B' && aO5.posC.top >= aO5.posO.top) ||
+				// 		(o === 'L' && aO5.posC.left <= aO5.posO.left) ||
+				// 		(o === 'R' && aO5.posC.left >= aO5.posO.left)
+				// 	) {
+				// 		aO5.UnFix(o, pcO5)
+
+				// 		const pFixso = aO5.pFixs[o]
+				// 		let px, vx, j = pFixso.length
+				// 		while (j-- > 0) {		//  - сравниваю границы во всех где он зафиксирован
+				// 			const
+				// 				p = pFixso[j],
+				// 				v = p.pos.scops[o]
+				// 			if (!px || (!xtl && vx < v) || (xtl && vx > v)) {
+				// 				px = p
+				// 				vx = v
+				// 			}
+				// 		}
+				// 		// if (!v )						
+				// 		// 	console.log()							
+				// 		if (px && px !== pcO5) {	сравнивать не  pcO5 а с aO5.pFixs[o].at(-1)
+				// 			const aC = aO5.posC
+				// 			switch (o) {
+				// 				case 'T': aC.top = vx; break
+				// 				case 'L': aC.left = vx; break
+				// 				case 'R': aC.left = vx - aC.width; break
+				// 				case 'B': aC.top = vx - aC.height; break
+				// 			}
+				// 			aO5.DoFix(o, pcO5)    тут надо бы px
+				// 		}
+				// 	}
+
+				for (const aO5 of pcO5.aUnfs[x])
+					if (!aO5.act.tryFix)
+						ПопыткаФиксации(aO5, x, pcO5)
+
+				// // обработка всех незафиксированных на 'этой' стороне	
+				// const
+				// 	pb = bdef[x].pb,
+				// 	vb = bdef[x].vb
+				// for (const aO5 of pcO5.aUnfs[x]) {
+				// 	const aC = aO5.posC
+				// 	for (const frame of aO5.frames)
+				// 		if ((frame.fix && frame.pO5 === pb) && ( 							//  Если вышло за shdw - расфиксирую
+				// 			(x === 'T' && aC.top < vb) ||
+				// 			(x === 'L' && aC.left < vb) ||
+				// 			(x === 'R' && aC.left + aC.width > vb) ||
+				// 			(x === 'B' && aC.top + aC.height > vb)
+				// 		))
+				// 			aO5.DoFix(x, pb)
+				// }
+				// // if (!aO5.pFixs[x].length && !aO5.pFixs[o].length)
+				// // 	НоваяФиксацияНаГранице(aO5, bdef[x])
 			}
 
-			/*
-					Обработка вложенных контейнеров
-			*/
-			for (const x of xs) {
-				ФиксацияВоВложенных(pcO5, bdef[x])
-				РасфиксВоВложенных(pcO5, bdef[x])
-			}
+			// /*
+			// 		Обработка вложенных контейнеров
+			// */
+			// for (const x of xs) {
+			// 	ФиксацияВоВложенных(pcO5, bdef[x])
+			// 	РасфиксВоВложенных(pcO5, bdef[x])
+			// }
 
 			ПоказФиксированных(pcO5)
 		}

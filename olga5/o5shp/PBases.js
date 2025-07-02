@@ -41,8 +41,8 @@
                     if (pO5 && pO5.color !== 'transparent' && pO5.color !== 'rgba(0, 0, 0, 0)')
                         return pO5.color
                 },
-                FindNearest = pOuts => {
-                    for (const pOut of pOuts) {
+                FindNearest = pAlls => {
+                    for (const pOut of pAlls) {
                         const b = pOut.borders
                         if (b.top || b.left || b.right || b.bottom)
                             return pOut
@@ -60,7 +60,7 @@
 
             // подключаем (и создаём) pbase
             const
-                pO5 = FindNearest(aO5.parent.pO5.pOuts),
+                pO5 = FindNearest(aO5.parent.pO5.pAlls),
                 pbase = PBase.Get(pO5) || new PBase(pO5)   // там же и set()
                 
             Object.assign(aO5.base, { pO5, pbase })

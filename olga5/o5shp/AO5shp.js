@@ -59,6 +59,7 @@
                     clon: null,
                     cart: null,
                     fixed: false,
+                    tryFix: false,
                     shdw: shp,          // будет: или  shp или clon
                     checkN: -1,         // для проверок подвисания под ним
                     iTested: false,     // для контроля в тестах                    
@@ -135,8 +136,15 @@
                 if (this.hidden[x])
                     return true
         }
-        DoFix(pFix, x) {
-            const aO5 = this,
+        DoFix(x, pFix) {
+            const pFixsx = this.pFixs[x]
+            let j = pFixsx.length
+            while (j-- > 0)
+                if (pFixsx[j] === pFix)
+                    return
+
+            const
+                aO5 = this,
                 shp = aO5.shp,
                 act = aO5.act,
                 clon = act.clon || aO5.#Clone(),
@@ -145,6 +153,7 @@
             aO5.pFixs[x].push(pFix)
             aO5.act.fixed = true
             pFix.aFixs[x].add(aO5)
+            pFix.aUnfs[x].delete(aO5)
 
             // aO5.act.wasFull = true
 
@@ -168,7 +177,7 @@
                 window.dispatchEvent(new CustomEvent('o5_fixed', { detail: { aO5: aO5, fix: true } }))
             }
         }
-        UnFix(x, pO5) {
+        UnFix(x, pUnf) {
             const
                 aO5 = this,
                 shp = aO5.shp,
@@ -178,22 +187,24 @@
                 pFixs = aO5.pFixs
 
             let u;
-            if (!pO5) {
+            if (!pUnf) {
                 if (o5debug) u = 'расфиксировал всё'
                 aO5.act.fixed = false
                 for (const o of 'TRLB') {
-                    for (const p of pFixs[o])
+                    for (const p of pFixs[o]) {
                         p.aFixs[o].delete(aO5)
+                        p.aUnfs[o].add(aO5)
+                    }
                     // pFixs[o].splice(pFixs[o].indexOf(p), 1)
 
                     pFixs[o].length = 0
                 }
             } else {
+                pUnf.aUnfs[x].add(aO5)
+                pUnf.aFixs[x].delete(aO5)
+                pFixs[x].splice(pFixs[x].indexOf(pUnf), 1)
 
-                pO5.aFixs[x].delete(aO5)
-                pFixs[x].splice(pFixs[x].indexOf(pO5), 1)
-
-                if (o5debug) u = `расфиксировал ${pO5.name}`
+                if (o5debug) u = `расфиксировал ${pUnf.name}`
                 if (pFixs[x].length) {
                     const pNxt = pFixs[x].at(-1)
                     aO5.posC[xbord[x]] = pNxt.pos.scops[x]

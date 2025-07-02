@@ -62,10 +62,10 @@
                     )
                     sl.pO5 = null
                 }
-                else{
+                else {
                     Object.assign(sl, { sV, sH, rV, rH, pO5, top: el.scrollTop, left: el.scrollLeft, height: el.clientHeight, width: el.clientWidth })
-                pO5.act.tAct = now
-                    }
+                    pO5.act.tAct = now
+                }
             },
             Scroll: e => {
                 const el = e.target.pO5 ? e.target : document.body
@@ -109,11 +109,16 @@
                 ibody: ibody,
                 final: ibody || PO5.#finalClasses.find(cls => classList.includes(cls)),
                 // base: { pbase: null }, // (все pO5) ссылка на ближайший внешний скроллируемый контейнер
-                pOuts: new Set(),  //  (все pO5) список внешних скроллируемых контейнеров
-                pIncs: new Set(),  //  (скроллируемые pO5) список вложенных скроллируемых контейнеров 
-                // aAlls: new Set(),  // список всех 'внутренних' подвисабельных тегов
+                pAlls: new Set(),  //  (все pO5) список всех внешних  контейнеров
+                pOuts: new Set(),  //  (скроллируемые pO5) список скроллируемых внешних контейнеров
+                pIncs: new Set(),  //  (скроллируемые pO5) список скроллируемых вложенных контейнеров 
+
+                aAlls: new Set(),  // список 'всех' подвисабельных тегов (всл. влож. контейн.)
                 aOwns: new Set(),  // список только 'своих' подвисабельных тегов
-                aFixs: { T: 0, L: 0, R: 0, B: 0 }, // перечень aO5, завиксированнх на этой границе
+                aOuts: new Set(),  // список только 'чужих' подвисабельных тегов
+                aUnfs: { T: 0, L: 0, R: 0, B: 0 }, // перечни 'всех' aO5, не зафиксированнх на этой границе
+                aFixs: { T: 0, L: 0, R: 0, B: 0 }, // перечни 'всех' aO5, зафиксированнх на этой границе
+
                 borders: {
                     top: parseFloat(nst.borderTopWidth),
                     left: parseFloat(nst.borderLeftWidth),
@@ -131,31 +136,34 @@
                     width: el.clientWidth,
                     height: el.clientHeight,
                     scops: { T: 0, L: 0, R: 0, B: 0 },
-                    schgs: { T: 0, L: 0, R: 0, B: 0 },
-                    visis: { T: { p: null, v: NaN }, L: { p: null, v: NaN }, R: { p: null, v: NaN }, B: { p: null, v: NaN } }
+                    encls: { T: null, L: null, R: null, B: null },
+                    // encls: { T: {new:0, old:0}, L: {new:0, old:0}, R: {new:0, old:0}, B: {new:0, old:0} },
+                    // schgs: { T: 0, L: 0, R: 0, B: 0 },
+                    // visis: { T: { p: null, v: NaN }, L: { p: null, v: NaN }, R: { p: null, v: NaN }, B: { p: null, v: NaN } }
                 },
-                act:{
-                    tAct:-1,
-                    tFix:-1
-                }
+                act: { tAct: -1, tFix: -1 }
             })
             // добавляю сам себя
+            pO5.pAlls.add(pO5)
             pO5.pOuts.add(pO5)
             pO5.pIncs.add(pO5)
 
-            for (const x of 'TLRB')
+            for (const x of 'TLRB') {
                 pO5.aFixs[x] = new Set()
+                pO5.aUnfs[x] = new Set()
+            }
 
             for (const nam of ['scops', 'schgs', 'visis'])
                 Object.seal(pO5.pos[nam])
 
-            for (const nam of ['aOwns', 'pOuts', 'pIncs', 'scrls', 'pos', 'act'])
+            for (const nam of ['aAlls', 'aOwns', 'aOuts', 'aUnfs', 'pAAlls', 'pOuts', 'pIncs', 'encls', 'pos', 'act'])
                 Object.seal(pO5[nam])
 
             Object.freeze(pO5.pos.visis)
 
             Object.freeze(pO5.borders)
             Object.freeze(pO5.aFixs)
+            Object.freeze(pO5.aUnfs)
             Object.freeze(pO5.scrls)
             Object.freeze(this)
 
@@ -199,11 +207,11 @@
                 pos = pO5.pos
 
             pO5.act.tAct = time
-            Object.assign(pos.schgs, { T: r.T - sc.T, L: r.L - sc.L, R: r.R - sc.R, B: r.B - sc.B })
+            // Object.assign(pos.schgs, { T: r.T - sc.T, L: r.L - sc.L, R: r.R - sc.R, B: r.B - sc.B })
             Object.assign(pos.scops, r)
 
-            for (const x of 'TLRB')
-                Object.assign(pos.visis[x], { p: pO5, v: pO5.pos.scops[x] })
+            // for (const x of 'TLRB')
+            //     Object.assign(pos.visis[x], { p: pO5, v: pO5.pos.scops[x] })
 
             return true  // чтобы потом пересчитать aO5
         }

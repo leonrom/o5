@@ -151,10 +151,10 @@ class OO5 {
                     key = this.#frame,
                     pdiv = div.getElementsByClassName(key)[0],
                     ps = Array.from(pdiv.getElementsByTagName('p')),
-                    StopPropagation= e => {
+                    StopPropagation = e => {
                         e.preventDefault();
                         e.stopPropagation();
-                      },
+                    },
                     AskScroll = e => {
                         const
                             tag = document.getElementById(e.target.innerText),
@@ -172,25 +172,25 @@ class OO5 {
                         nam = is0.innerText
 
                     let frame = null
-                    if (icls)
+                    if (icls) {
                         for (const f of aO5.frames)
                             if (f.pO5.tag.id === icls) {
                                 frame = f
                                 break
                             }
 
-                    // const el = document.getElementById(icls)
-                    if (document.getElementById(icls)) {
-                        is0.classList.add('button')
-                        is0.title = "Скроллинг: Л - гориз., П - верт."
-                        is0.addEventListener('contextmenu', StopPropagation)
-                        is0.addEventListener('mousedown', AskScroll)
-                    }
-                    else
-                        if (icls) {
+                        // const el = document.getElementById(icls)
+                        if (document.getElementById(icls)) {
+                            is0.classList.add('button')
+                            is0.title = "Скроллинг: Л - гориз., П - верт."
+                            is0.addEventListener('contextmenu', StopPropagation)
+                            is0.addEventListener('mousedown', AskScroll)
+                        }
+                        else {
                             p.innerHTML = `<span class="absent"><i>&nbsp;${nam}</i> &nbsp; &nbsp; -</span>`
                             continue
                         }
+                    }
 
                     for (const i of [0, 1]) {
                         const

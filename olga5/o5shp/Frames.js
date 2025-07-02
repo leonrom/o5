@@ -28,7 +28,7 @@
                 rez.push({
                     frame: frame.ibase + '.' + frame.pO5.name,
                     str: frame.typ + ':' + frame.cod + ':' + frame.num,
-                    fc: frame.fix ? 'fix' : '   ' + frame.cut ? 'cut' : '   ',
+                    fc: (frame.fix ? 'fix' : '   ') + ' ' + (frame.cut ? 'cut' : '   '),
                     err: frame.err,
                     aO5s: frame.aO5s.map(a => a.a_name).join(', '),
                     err: frame.err,
