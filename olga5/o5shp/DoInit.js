@@ -22,7 +22,7 @@
         o5debug = C.consts.o5debug,
         fmtOK = "background: blue; color: white;",
         fmtErr = "background: yellow; color: black;",
-        observes = [];
+        pIncs = [];
 
     /**          
      * Демонстрация главной фишки динамическоо создания aO5
@@ -37,13 +37,13 @@
             const pO5 = prev.pO5
             rez.push({
                 pO5: pO5.name,
-                scrl: (pO5.scrls.H ? 'H' : '') + (pO5.scrls.V ? 'V' : ''),
-                pAlls: (Array.from(pO5.pAlls)).map(pO5 => pO5.name).join(', '),
-                pOuts: (Array.from(pO5.pOuts)).map(pO5 => pO5.name).join(', '),
-                pIncs: (Array.from(pO5.pIncs)).map(pO5 => pO5.name).join(', '),
-                aAlls: (Array.from(pO5.aAlls)).map(a => a.a_name).join(', '),
-                aOwns: (Array.from(pO5.aOwns)).map(a => a.a_name).join(', '),
-                aOuts: (Array.from(pO5.aOuts)).map(a => a.a_name).join(', '),
+                scrl: ' ' + (pO5.scrls.H ? 'H' : '') + (pO5.scrls.V ? 'V' : ''),
+                pAlls: ' ' + (Array.from(pO5.pAlls)).map(pO5 => pO5.name).join(', '),
+                pOuts: ' ' + (Array.from(pO5.pOuts)).map(pO5 => pO5.name).join(', '),
+                pIncs: ' ' + (Array.from(pO5.pIncs)).map(pO5 => pO5.name).join(', '),
+                aAlls: ' ' + (Array.from(pO5.aAlls)).map(a => a.a_name).join(', '),
+                aOwns: ' ' + (Array.from(pO5.aOwns)).map(a => a.a_name).join(', '),
+                aOuts: ' ' + (Array.from(pO5.aOuts)).map(a => a.a_name).join(', '),
             })
             if (prev.pO5.ibody)
                 break
@@ -61,66 +61,68 @@
      * создаются/дополняются pO5 во всех обрамляющих контейнерах содержащих контейнер prev
      * @function CreatePrevPO5
      */
-    const CreateAO5 = shp => {
-        const
-            aO5 = new wshp.AO5shp.AO5(shp),
-            parent = aO5.parent,
-            pIncs = [],
-            FindPScrolls = (aO5, prev) => {
-                let pO5 = prev.pO5, next, scrl;
+    const
+        CreateAO5 = shp => {
+            const
+                aO5 = new wshp.AO5shp.AO5(shp),
+                parent = aO5.parent,
 
-                if (!pO5) {
-                    pO5 = new wshp.PO5shp.PO5(prev)
+                FindPScrolls = (aO5, prev) => {
+                    let pO5 = prev.pO5, next, scrl;
 
-                    if (!pO5.ibody) {
-                        next = prev.parentElement
+                    if (!pO5) {
+                        pO5 = new wshp.PO5shp.PO5(prev)
 
-                        console.log(`FindPScrolls next=${next.id}`)
-                        FindPScrolls(aO5, next)
+                        if (!pO5.ibody) {
+                            next = prev.parentElement
+
+                            // console.log(`FindPScrolls next=${next.id}`)
+                            FindPScrolls(aO5, next)
+                        }
                     }
+                    if (o5debug > 1)
+                        console.log(` CreateAO5.FindPScrolls next=${next ? next.id : '  - '}  prev=${prev.id}  pO5=${pO5.name}`)
+
+                    if (next)
+                        for (const o5 of next.pO5.pAlls)
+                            pO5.pAlls.add(o5)
+                },
+                FillScrollables = pAlls => {
+                    for (const pO5 of pAlls)
+                        if (pO5.scrls.H || pO5.scrls.V || pO5.ibody) {
+                            let j = pIncs.length
+                            while (j-- > 0) {
+                                pO5.pIncs.add(pIncs[j])
+                                pIncs[j].pOuts.add(pO5)
+                            }
+                            pIncs.push(pO5)
+                        }
                 }
 
-                console.log(`FindPScrolls next=${next ? next.id : '  - '}  prev=${prev.id}  pO5=${pO5.name}`)
+            pIncs.length = 0
 
-                if (next)
-                    for (const o5 of next.pO5.pAlls)
-                        pO5.pAlls.add(o5)
-            },
-            FillScrollables = pAlls => {
-                for (const pO5 of pAlls)
-                    if (pO5.scrls.H || pO5.scrls.V) {
-                        let j = pIncs.length
-                        while (j-- > 0) {
-                            pO5.pIncs.add(pIncs[j])
-                            pIncs[j].pOuts.add(pO5)
-                        }
-                        pIncs.push(pO5)
-                    }
+            if (!parent.pO5)
+                FindPScrolls(aO5, parent)
+
+            FillScrollables(aO5.parent.pO5.pAlls)
+
+            wshp.PBases.PBase.Attach(aO5)
+
+            aO5.base.pO5.aOwns.add(aO5)
+            let out = false
+            for (const p of aO5.base.pO5.pOuts) {
+                if (out) p.aOuts.add(aO5)
+                p.aAlls.add(aO5)
+                // p.SetUnfix(aO5)
+
+                out = true
             }
 
-        if (!parent.pO5)
-            FindPScrolls(aO5, parent)
+            if (o5debug > 1)
+                DebugShowRez(aO5)
 
-        FillScrollables(aO5.parent.pO5.pAlls)
-
-        wshp.PBases.PBase.Attach(aO5)
-
-        aO5.base.pO5.aOwns.add(aO5)
-        let out = false
-        for (const p of aO5.base.pO5.pOuts) {
-            if (out) p.aOuts.add(aO5)
-            p.aAlls.add(aO5)
-            for (const x of 'TLRB')
-                p.aUnfs[x].add(aO5)
-
-            out = true
-        }
-
-        if (o5debug > 1)
-            DebugShowRez(aO5)
-
-        return aO5
-    };
+            return aO5
+        };
 
     /**
      * Обработчик событий от IntersectionObserver.
@@ -129,26 +131,53 @@
      * @function Observe
      * @param {IntersectionObserverEntry[]} entries - Список наблюдаемых пересечений.
      */
-    const Observe = entries => {
-        let isi;
-        for (const entry of entries)
-            if (entry.isIntersecting) {
-                isi = true
-                const shp = entry.target
-                if (!shp.aO5shp) {  // вообще-то можно и не проверять....
-                    const
-                        aO5 = CreateAO5(shp),
-                        el = observ.getel(shp)
+    const
+        // CheckOverflow = (pO5, time) => {  // определяю,- кто под кого подъехал
+        //     for (const x of 'TLRB') {
+        //         const
+        //             vx = pO5.pos.scops[x],
+        //             xtl = (x === 'T') || (x === 'L')
+        //         for (const p of pO5.pOuts)
+        //             if (p !== pO5) {
+        //                 if (p.act.tObs < 0)
+        //                     p.CalcScrollScope(time)
+        //                 // const v = p.pos.scops[x]
+        //                 // if ((xtl && v > vx) || (!xtl && v < vx))
+        //                 //     pO5.overflows[x].push(p)
+        //             }
+        //     }
+        // },
+        Observe = entries => {
+            let isi;
+            for (const entry of entries)
+                if (entry.isIntersecting) {
+                    isi = true
+                    const shp = entry.target
+                    if (!shp.aO5shp) {  // вообще-то можно и не проверять....
+                        const
+                            aO5 = CreateAO5(shp),
+                            el = observ.getel(shp)
 
-                    wshp.Frames.Frame.ReadAttrs(aO5, el.quals)
+                        wshp.Frames.Frame.ReadAttrs(aO5, el.quals)
+                    }
+                    observ.unobserve(shp)
+
+                    // for (const pO5 of pbase.pO5.pOuts)
+                    //     if (!pO5.overflows.inited) {
+                    //         CheckOverflow(pO5, time)
+                    //         pO5.overflows.inited = true
+                    //         if (o5debug > 1) {
+                    //             console.log(`начальная вложенность ${pO5.name}: `,
+                    //                 `T: [${pO5.overflows.T.map(p => p.name)}]`,
+                    //                 `L: [${pO5.overflows.T.map(p => p.name)}]`,
+                    //                 `R: [${pO5.overflows.T.map(p => p.name)}]`,
+                    //                 `B: [${pO5.overflows.T.map(p => p.name)}]`)
+                    //         }
+                    //     }
                 }
-                observ.unobserve(shp)
-
-                // wshp.DoChgs.ActListener(true)
-            }
-        // if (isi)
-        //     wshp.DoChgs.MakeScroll(0.1, 0.1, body)
-    };
+            // if (isi)
+            //     wshp.DoChgs.MakeScroll(0.1, 0.1, body)
+        }
 
     /**
      * создаёт наблюдателя за элементами

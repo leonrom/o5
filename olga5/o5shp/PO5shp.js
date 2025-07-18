@@ -5,7 +5,7 @@
 
 (function () {              // ---------------------------------------------- o5shp/PO5shp ---11
     "use strict"
-    let wshp, nst;
+    let wshp;
     const
         olga5_modul = "o5shp",
         modulname = 'PO5shp',
@@ -63,7 +63,8 @@
                     sl.pO5 = null
                 }
                 else {
-                    Object.assign(sl, { sV, sH, rV, rH, pO5, top: el.scrollTop, left: el.scrollLeft, height: el.clientHeight, width: el.clientWidth })
+                    Object.assign(sl, { sV, sH, rV, rH, pO5, })
+                    Object.assign(sl, { top: el.scrollTop, left: el.scrollLeft, height: el.clientHeight, width: el.clientWidth })
                     pO5.act.tAct = now
                 }
             },
@@ -95,12 +96,12 @@
             const
                 pO5 = this,
                 ibody = tag.nodeName == 'BODY',
-                classList = Array.from(tag.classList),
-                el = ibody ? tag.parentElement : tag
+                nst = window.getComputedStyle(tag),
+                el = ibody ? tag.parentElement : tag,
+                classList = Array.from(tag.classList)
 
             tag.pO5 = pO5
 
-            nst = window.getComputedStyle(tag)
             Object.assign(pO5, {
                 id: tag.id,
                 tag: tag,
@@ -108,16 +109,13 @@
                 classOrigs: classList,
                 ibody: ibody,
                 final: ibody || PO5.#finalClasses.find(cls => classList.includes(cls)),
-                // base: { pbase: null }, // (все pO5) ссылка на ближайший внешний скроллируемый контейнер
                 pAlls: new Set(),  //  (все pO5) список всех внешних  контейнеров
-                pOuts: new Set(),  //  (скроллируемые pO5) список скроллируемых внешних контейнеров
-                pIncs: new Set(),  //  (скроллируемые pO5) список скроллируемых вложенных контейнеров 
+                pOuts: new Set(),  //  (скроллируемые pO5) все скроллируемых внешних контейнеров
+                pIncs: new Set(),  //  (скроллируемые pO5) все скроллируемых вложенных контейнеров 
 
                 aAlls: new Set(),  // список 'всех' подвисабельных тегов (всл. влож. контейн.)
                 aOwns: new Set(),  // список только 'своих' подвисабельных тегов
                 aOuts: new Set(),  // список только 'чужих' подвисабельных тегов
-                aUnfs: { T: 0, L: 0, R: 0, B: 0 }, // перечни 'всех' aO5, не зафиксированнх на этой границе
-                aFixs: { T: 0, L: 0, R: 0, B: 0 }, // перечни 'всех' aO5, зафиксированнх на этой границе
 
                 borders: {
                     top: parseFloat(nst.borderTopWidth),
@@ -137,21 +135,14 @@
                     height: el.clientHeight,
                     scops: { T: 0, L: 0, R: 0, B: 0 },
                     encls: { T: null, L: null, R: null, B: null },
-                    // encls: { T: {new:0, old:0}, L: {new:0, old:0}, R: {new:0, old:0}, B: {new:0, old:0} },
-                    // schgs: { T: 0, L: 0, R: 0, B: 0 },
-                    // visis: { T: { p: null, v: NaN }, L: { p: null, v: NaN }, R: { p: null, v: NaN }, B: { p: null, v: NaN } }
                 },
-                act: { tAct: -1, tFix: -1 }
+                act: { tAct: -1, tFix: -1, tObs: -1 },
+                // overflows: { T: [], L: [], R: [], B: [], inited: false }
             })
             // добавляю сам себя
             pO5.pAlls.add(pO5)
             pO5.pOuts.add(pO5)
             pO5.pIncs.add(pO5)
-
-            for (const x of 'TLRB') {
-                pO5.aFixs[x] = new Set()
-                pO5.aUnfs[x] = new Set()
-            }
 
             for (const nam of ['scops', 'schgs', 'visis'])
                 Object.seal(pO5.pos[nam])
@@ -176,8 +167,8 @@
                 console.log(`PO5 создано ${pO5.name}`)
         }
         name = ''    // еще и тут - чтобы сразу видеть в отладчике
-        CalcScrollScope(time) {   // видимост,- пересчитывается при скроллине в DoChgs
-            if (this.pos.time === this.act.tAct)
+        CalcScrollScope(time) {   // видимост,- пересчитывается при скроллине в DoChgsconst
+            if (this.act.tObs === time)
                 return
 
             const
@@ -195,28 +186,18 @@
                 atTo = tag.clientTop > b.top,         // полоса - вверху
                 atLe = tag.clientLeft > b.left,       // полоса - слев       
                 scrW = tag.offsetWidth - tag.clientWidth - b.left - b.right,
-                scrH = tag.offsetHeight - tag.clientHeight - b.top - b.bottom,
+                scrH = tag.offsetHeight - tag.clientHeight - b.top - b.bottom
 
-                r = {
-                    T: p.top + b.top + (atTo ? scrH : 0),
-                    L: p.left + b.left + (atLe ? scrW : 0),
-                    R: p.left + w,
-                    B: p.top + h
-                },
-                sc = pO5.pos.scops,
-                pos = pO5.pos
+            Object.assign(pO5.pos.scops, {
+                T: p.top + b.top + (atTo ? scrH : 0),
+                L: p.left + b.left + (atLe ? scrW : 0),
+                R: p.left + w,
+                B: p.top + h
+            })
 
-            pO5.act.tAct = time
-            // Object.assign(pos.schgs, { T: r.T - sc.T, L: r.L - sc.L, R: r.R - sc.R, B: r.B - sc.B })
-            Object.assign(pos.scops, r)
-
-            // for (const x of 'TLRB')
-            //     Object.assign(pos.visis[x], { p: pO5, v: pO5.pos.scops[x] })
-
-            return true  // чтобы потом пересчитать aO5
+            pO5.act.tObs = time
         }
     }
 
-    // window.addEventListener('scroll', scroll.Act)
     wshp = C.AddModuleSub(olga5_modul, modulname, [PO5])
 })();

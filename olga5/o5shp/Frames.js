@@ -21,17 +21,15 @@
         // fmtOK = "background: cornsilk; color: black;",
         // fmtErr = "background: yellow; color: black;",   
 
-
         DebugShowRez = aO5 => {
             const rez = []
             for (const frame of aO5.frames) {
                 rez.push({
-                    frame: frame.ibase + '.' + frame.pO5.name,
-                    str: frame.typ + ':' + frame.cod + ':' + frame.num,
-                    fc: (frame.fix ? 'fix' : '   ') + ' ' + (frame.cut ? 'cut' : '   '),
-                    err: frame.err,
-                    aO5s: frame.aO5s.map(a => a.a_name).join(', '),
-                    err: frame.err,
+                    frame: ' '+ frame.ibase + '.' + frame.pO5.name,
+                    str: ' '+ frame.typ + ':' + frame.cod + ':' + frame.num,
+                    fc: ' '+ (frame.fix ? 'fix' : '   ') + ' ' + (frame.cut ? 'cut' : '   '),                    
+                    aO5s: ' '+ frame.aO5s.map(a => a.a_name).join(', '),
+                    err: ' '+ frame.err,
                 })
             }
             C.ConsoleInfo(`Фреймы у ${aO5.a_name}`, rez.length, rez)

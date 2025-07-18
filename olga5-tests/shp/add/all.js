@@ -76,13 +76,13 @@ class OO5 {
             }
         }
 
-        this.#wshp.Frames.Frame.ReadAttrs(aO5, [
-            pitchs.join('') + ':',
-            pmarks.join('') + ':',
-            levels.join('') + ':',
-            alives.map(f => f ? ':A' : '').join(''),
+        this.#wshp.Frames.Frame.ReadAttrs(aO5, 
+            pmarks.join('') + ':'+
+            pitchs.join('') + ':'+
+            levels.join('') + ':'+
+            alives.map(f => f ? ':A' : '').join('')+
             frames.map(f => `i=${f.nam}/${f.f}${f.c}`).join(',')
-        ])
+        )
 
         this.#BordNames(aO5)
         this.#wshp.DoChgs.MakeScroll(0.1, 0.1, aO5.base.pO5, true)

@@ -138,8 +138,8 @@
                 const i = f.aO5s.indexOf(aO5)
                 if (i >= 0) {
                     f.aO5s.splice(i, 1)
-                    if (s.aO5s.length === 0)
-                        frames.delete(key)
+                    if (f.aO5s.length === 0)
+                        pbase.frames.delete(key)
                 }
             }
 
