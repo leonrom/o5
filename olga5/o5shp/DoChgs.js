@@ -45,23 +45,6 @@
 		}
 	}
 
-	function CouldFrameFixOn(aO5, x, p) {
-		if (!aO5.pFixs[x].includes(p)) {
-			const v = p.pos.scops[x]
-			for (const frame of aO5.frames)
-				if (frame.fix && frame.pO5 === p)
-					if (
-						(x === 'T' && (aO5.posC.top <= v)) ||
-						(x === 'L' && (aO5.posC.left <= v)) ||
-						(x === 'R' && (aO5.posC.left + aO5.posC.width >= v)) ||
-						(x === 'B' && (aO5.posC.top + aO5.posC.height >= v))
-					){
-						aO5.DoFix(x, p)
-						break
-					}
-		}
-	}
-
 	/**
 	 * @typedef {Object} ScrollContext
 	 * @property {string} x - Текущее направление прокрутки ('T', 'B', 'L', 'R').
@@ -86,32 +69,7 @@
 			pInc.CalcScrollScope(time)
 
 		for (const x of xs) {
-			const
-				o = opp[x],
-				vx = pcO5.pos.scops[x]
-
-			for (const aO5 of pcO5.aOwns) {
-				const
-					aC = aO5.posC,
-					aO = aO5.posO
-
-				for (const p of pcO5.pOuts) {
-					// обработка по 'o'
-					if (aO5.pFixs[o].includes(p)) {
-						const vo = p.pos.scops[o]
-						if (
-							(o === 'T' && aO.top >= vo) ||
-							(o === 'L' && aO.left >= vo) ||
-							(o === 'R' && aO.left + aC.width <= vo) ||
-							(o === 'B' && aO.top + aC.height <= vo)
-						)
-							aO5.UnFix(o, p)
-					}
-
-					// обработка по 'x'
-					CouldFrameFixOn(aO5, x, p)
-				}
-			}
+			const o = opp[x]
 
 			// обработка вложенных контейнеров
 			const
@@ -121,31 +79,44 @@
 				xtl = (x === 'T') || (x === 'L')
 
 			for (const pInc of pcO5.pIncs)
-				if (pInc !== pcO5)
-					for (const aO5 of pInc.aOwns) {
-						const aC = aO5.posC
-						// расфиксация по 'o' (противоположных)
-						for (const p of aO5.pFixs[o]) {
-							const v = p.pos.scops[o]
-							if (
-								(o === 'T' && (aO5.posO.top >= v)) ||
-								(o === 'L' && (aO5.posO.left >= v)) ||
-								(o === 'R' && (aO5.posO.left + aC.width <= v)) ||
-								(o === 'B' && (aO5.posO.top + aC.height <= v))
-							)
-								aO5.UnFix(o, p)
-						}
+				for (const aO5 of pInc.aOwns) {
+					const 
+						aC = aO5.posC,
+						aO = aO5.posO
 
-						if (aO5.pFixs[o].length)
-							aO5.OnNearestFix(o)
-
-						// фиксация по 'x' 
-						for (const p of pInc.pOuts)
-							CouldFrameFixOn(aO5, x, p)
-
-						if (aO5.pFixs[x].length)
-							aO5.OnNearestFix(x)
+					// расфиксация по 'o' (противоположных)
+					for (const p of aO5.pFixs[o]) {
+						const v = p.pos.scops[o]
+						if (
+							(o === 'T' && (aO.top >= v)) ||
+							(o === 'L' && (aO.left >= v)) ||
+							(o === 'R' && (aO.left + aC.width <= v)) ||
+							(o === 'B' && (aO.top + aC.height <= v))
+						)
+							aO5.UnFix(o, p)
 					}
+
+					if (aO5.pFixs[o].length)
+						aO5.OnNearestFix(o)
+
+					// фиксация по 'x' 
+					for (const p of pInc.pOuts) {
+						const v = p.pos.scops[x]
+						if (!aO5.pFixs[x].includes(p) &&
+							aO5.pCouldFixs[x].includes(p) &&
+							(
+								(x === 'T' && (aO.top <= v)) ||
+								(x === 'L' && (aO.left <= v)) ||
+								(x === 'R' && (aO.left + aC.width >= v)) ||
+								(x === 'B' && (aO.top + aC.height >= v))
+							)
+						)
+							aO5.DoFix(x, p)
+					}
+
+					if (aO5.pFixs[x].length)
+						aO5.OnNearestFix(x)
+				}
 
 			for (const aO5 of pcO5.aAlls)
 				if (aO5.act.fixed)
