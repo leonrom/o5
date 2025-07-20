@@ -70,6 +70,7 @@
                 outln: { w: '', s: '', c: '', o: '', },
 
                 pFixs: { T: [], L: [], R: [], B: [] },
+                pCouldFixs: { T: [], L: [], R: [], B: [] },
 
                 shrunks: { T: [], L: [], R: [], B: [] },   // список прижатых aO5
 
@@ -106,7 +107,7 @@
             for (const x of 'TLRB')
                 aO5.shrunks[x] = new Set()
 
-            for (const nam of ['base', 'margs', 'outln', 'shrunks', 'hidden', 'pFixs', 'zeroed', 'isFull', 'posC', 'posO', 'posS', 'orig', 'cls'])
+            for (const nam of ['base', 'margs', 'outln', 'shrunks', 'hidden', 'pFixs', 'pCouldFixs', 'zeroed', 'isFull', 'posC', 'posO', 'posS', 'orig', 'cls'])
                 if (aO5[nam])
                     Object.seal(aO5[nam])
                 else
@@ -127,12 +128,17 @@
                     return true
         }
         #SetPosC(x, vx) {
+            const aC = this.posC
+            let o, v;
             switch (x) {
-                case 'T': this.posC.top = vx; break
-                case 'L': this.posC.left = vx; break
-                case 'R': this.posC.left = vx - this.posC.width; break
-                case 'B': this.posC.top = vx - this.posC.height; break
+                case 'T': o = 'B'; v = aC.top; aC.top = vx; break
+                case 'L': o = 'R'; v = aC.left; aC.left = vx; break
+                case 'R': o = 'L'; v = aC.left; aC.left = vx - aC.width; break
+                case 'B': o = 'T'; v = aC.top; aC.top = vx - aC.height; break
             }
+            if (this.pFixs[o].length)
+                if ('TB'.includes(x)) aC.height -= (v - aC.top)
+                else aC.width -= (v - aC.left)
         }
         OnNearestFix(x) {
             const xtl = 'TL'.includes(x)
@@ -152,7 +158,7 @@
             if (o5debug) {
                 const fmt = this.pFixs[x].includes(pO5) ? fmtErr : fmtOK
                 console.log("%c%s", fmt, `DoFix` + (fmt === fmtErr ? ' (повтор)' : ''),
-                    `${this.id} по ${x} на ${pO5.name}: всего [${this.pFixs[x].map(p => p.name).join(' ') + ' ' + pO5.name }]`)
+                    `${this.id} по ${x} на ${pO5.name}: всего [${this.pFixs[x].map(p => p.name).join(' ') + ' ' + pO5.name}]`)
             }
 
             this.pFixs[x].push(pO5)
@@ -198,9 +204,9 @@
 
             if (pFixs[x].length)
                 this.OnNearestFix(x)
-            else 
+            else
                 this.#SetPosC(x, 'TB'.includes(x) ? this.posO.top : this.posO.left)
-            
+
             this.act.fixed = pFixs.T.length || pFixs.L.length || pFixs.R.length || pFixs.B.length
 
             if (o5debug)
