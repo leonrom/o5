@@ -78,45 +78,86 @@
 				flank = tb ? 'top' : 'left',
 				xtl = (x === 'T') || (x === 'L')
 
-			for (const pInc of pcO5.pIncs)
-				for (const aO5 of pInc.aOwns) {
-					const 
-						aC = aO5.posC,
-						aO = aO5.posO
+			// for (const pInc of pcO5.pIncs)
+			// 	for (const aO5 of pInc.aOwns) {
 
-					// расфиксация по 'o' (противоположных)
-					for (const p of aO5.pFixs[o]) {
+			for (const aO5 of pcO5.aAlls) {
+				const
+					aC = aO5.posC,
+					aO = aO5.posO,
+					pOuts = aO5.base.pO5.pOuts,
+					ao = aO5.pFixs[o].length ? aC : aO,
+					vx = aO5.pAct[x].v
+				// ax = aO5.pFixs[x].length ? aC : aO
+
+				// расфиксация по 'o' (противоположных)
+				// const pFixso = aO5.pFixs[o]
+				// for (const p of pOuts)
+				// 	if (pFixso.includes(p)) 
+				for (const p of aO5.pFixs[o])
+					if (p === pcO5) {
 						const v = p.pos.scops[o]
-						if (
-							(o === 'T' && (aO.top >= v)) ||
-							(o === 'L' && (aO.left >= v)) ||
-							(o === 'R' && (aO.left + aC.width <= v)) ||
-							(o === 'B' && (aO.top + aC.height <= v))
+
+						if (isNaN(vx) ?
+							(
+								(o === 'T' && (aO.top > v)) ||
+								(o === 'L' && (aO.left > v)) ||
+								(o === 'R' && (aO.left + aO.width < v)) ||
+								(o === 'B' && (aO.top + aO.height < v))
+							) : (
+								(o === 'T' && (vx - aO.height > v)) ||
+								(o === 'L' && (vx - aO.width > v)) ||
+								(o === 'R' && (vx < v)) ||
+								(o === 'B' && (vx < v))
+							)
 						)
 							aO5.UnFix(o, p)
-					}
 
-					if (aO5.pFixs[o].length)
+						// if (aO5.pAct[x].p) {
+						// 	if (
+						// 		(o === 'T' && (vx- aO.height > v)) ||
+						// 		(o === 'L' && (vx-aO.width > v)) ||
+						// 		(o === 'R' && (vx < v)) ||
+						// 		(o === 'B' && (vx < v))
+						// 	)
+						// 		aO5.UnFix(o, p)
+						// }
+						// else {
+						// 	if (
+						// 		(o === 'T' && (aO.top > v)) ||
+						// 		(o === 'L' && (aO.left > v)) ||
+						// 		(o === 'R' && (aO.left + aO.width < v)) ||
+						// 		(o === 'B' && (aO.top + aO.height < v))
+						// 	)
+						// 		aO5.UnFix(o, p)
+						// }
+
 						aO5.OnNearestFix(o)
+					}
+					else
+						switch (o) {
+							case 'T':
+							case 'B': aC.top += scV; break
+							case 'L':
+							case 'R': aC.left += scH; break
+						}
 
-					// фиксация по 'x' 
-					for (const p of pInc.pOuts) {
+				// фиксация по 'x' 
+				const pFixsx = aO5.pFixs[x], pCFixsx = aO5.pCouldFixs[x]
+				for (const p of pOuts)
+					if (!pFixsx.includes(p) && pCFixsx.includes(p)) {
 						const v = p.pos.scops[x]
-						if (!aO5.pFixs[x].includes(p) &&
-							aO5.pCouldFixs[x].includes(p) &&
-							(
-								(x === 'T' && (aO.top <= v)) ||
-								(x === 'L' && (aO.left <= v)) ||
-								(x === 'R' && (aO.left + aC.width >= v)) ||
-								(x === 'B' && (aO.top + aC.height >= v))
-							)
+						if (
+							(x === 'T' && (ao.top <= v)) ||
+							(x === 'L' && (ao.left <= v)) ||
+							(x === 'R' && (ao.left + aC.width >= v)) ||
+							(x === 'B' && (ao.top + aC.height >= v))
 						)
 							aO5.DoFix(x, p)
 					}
 
-					if (aO5.pFixs[x].length)
-						aO5.OnNearestFix(x)
-				}
+				aO5.OnNearestFix(x)
+			}
 
 			for (const aO5 of pcO5.aAlls)
 				if (aO5.act.fixed)
