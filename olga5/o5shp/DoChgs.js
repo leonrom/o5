@@ -26,13 +26,31 @@
 				console.log("%c%s", fmtOK, s1, s2)
 		},
 		opp = { T: 'B', L: 'R', R: 'L', B: 'T' },
-		xbord = { T: 'top', L: 'left', R: 'right', B: 'bottom' }
+		xbord = { T: 'top', L: 'left', R: 'right', B: 'bottom' },
+		ПересекаетКонтейнер = (x, posX, v) => {
+			return (x === 'T' && (posX.top < v)) ||
+				(x === 'L' && (posX.left < v)) ||
+				(x === 'R' && (posX.left + posX.width > v)) ||
+				(x === 'B' && (posX.top + posX.height > v))
+		},
+		ОтметкаВидимостиГраниц = (p, x, vx, pO5) => {
+			const
+				v = p.pos.scops[x],
+				tl = 'TL'.includes(x),
+				visi = tl ? v >= vx : v <= vx,	// д.б. >=/<= чтоб сработала перефиксация
+				vp = p.visis[x].get(pO5)
+
+			if (vp !== visi) {
+				p.visis[x].set(pO5, visi)
+				p.act.visiChg = true
+			}
+		}
 
 	// ---- batching ShowFix() per frame ----
 	const FixUpdateQueue = new Set()
 	let fixUpdateScheduled = false
 
-	function ScheduleFixUpdate(aO5) {
+	function ScheduleShowFixed(aO5) {
 		FixUpdateQueue.add(aO5)
 		if (!fixUpdateScheduled) {
 			fixUpdateScheduled = true
@@ -64,104 +82,128 @@
 		for (const aO5 of pcO5.aAlls)			// позиции всех внутренних тегов
 			aO5.CalcCurPos()
 
-		const time = performance.now()
-		for (const pInc of pcO5.pIncs)			// позиции всех вложенных контейнеров
-			pInc.CalcScrollScope(time)
+		for (const pInc of pcO5.pIncs) {		// позиции всех вложенных контейнеров
+			pInc.CalcScrollScope()
+			pInc.act.visiChg = false
+		}
 
 		for (const x of xs) {
-			const o = opp[x]
-
-			// обработка вложенных контейнеров
 			const
-				tb = 'TB'.includes(x),
-				shift = tb ? scV : scH,
-				flank = tb ? 'top' : 'left',
-				xtl = (x === 'T') || (x === 'L')
+				o = opp[x],
+				vpx = pcO5.pos.scops[x],
+				vpo = pcO5.pos.scops[o]
 
-			// for (const pInc of pcO5.pIncs)
-			// 	for (const aO5 of pInc.aOwns) {
+			// проверяю въезжание вложенных контейнеров
+			for (const p of pcO5.pIncs)
+				if (p !== pcO5) {
+					ОтметкаВидимостиГраниц(p, x, vpx, pcO5)
+					ОтметкаВидимостиГраниц(p, o, vpo, pcO5)
+				}
 
 			for (const aO5 of pcO5.aAlls) {
 				const
 					aC = aO5.posC,
 					aO = aO5.posO,
-					pOuts = aO5.base.pO5.pOuts,
-					ao = aO5.pFixs[o].length ? aC : aO,
+					// pOuts = aO5.base.pO5.pOuts,
+					// ao = aO5.pFixs[o].length ? aC : aO,
+					// ax = aO5.pFixs[x].length ? aC : aO,
 					vx = aO5.pAct[x].v
-				// ax = aO5.pFixs[x].length ? aC : aO
 
-				// расфиксация по 'o' (противоположных)
-				// const pFixso = aO5.pFixs[o]
-				// for (const p of pOuts)
-				// 	if (pFixso.includes(p)) 
-				for (const p of aO5.pFixs[o])
-					if (p === pcO5) {
-						const v = p.pos.scops[o]
+				let chgo = false
+				for (const p of aO5.pFixs[o]) {
+					if (p.act.visiChg)
+						chgo = true
 
-						if (isNaN(vx) ?
-							(
-								(o === 'T' && (aO.top > v)) ||
-								(o === 'L' && (aO.left > v)) ||
-								(o === 'R' && (aO.left + aO.width < v)) ||
-								(o === 'B' && (aO.top + aO.height < v))
-							) : (
-								(o === 'T' && (vx - aO.height > v)) ||
-								(o === 'L' && (vx - aO.width > v)) ||
-								(o === 'R' && (vx < v)) ||
-								(o === 'B' && (vx < v))
-							)
-						)
-							aO5.UnFix(o, p)
-
-						// if (aO5.pAct[x].p) {
-						// 	if (
-						// 		(o === 'T' && (vx- aO.height > v)) ||
-						// 		(o === 'L' && (vx-aO.width > v)) ||
-						// 		(o === 'R' && (vx < v)) ||
-						// 		(o === 'B' && (vx < v))
-						// 	)
-						// 		aO5.UnFix(o, p)
-						// }
-						// else {
-						// 	if (
-						// 		(o === 'T' && (aO.top > v)) ||
-						// 		(o === 'L' && (aO.left > v)) ||
-						// 		(o === 'R' && (aO.left + aO.width < v)) ||
-						// 		(o === 'B' && (aO.top + aO.height < v))
-						// 	)
-						// 		aO5.UnFix(o, p)
-						// }
-
-						aO5.OnNearestFix(o)
+					const v = p.pos.scops[o]
+					if (isNaN(vx) ? !ПересекаетКонтейнер(o, aO, v) : (
+						(o === 'T' && (vx - aO.height >= v)) ||
+						(o === 'L' && (vx - aO.width >= v)) ||
+						(o === 'R' && (vx <= v)) ||
+						(o === 'B' && (vx <= v))
+					)) {
+						aO5.UnFix(o, p)
+						chgo = true
 					}
-					else
-						switch (o) {
-							case 'T':
-							case 'B': aC.top += scV; break
-							case 'L':
-							case 'R': aC.left += scH; break
-						}
+				}
+				if (chgo)
+					aO5.OnNearestFix(o)
 
 				// фиксация по 'x' 
-				const pFixsx = aO5.pFixs[x], pCFixsx = aO5.pCouldFixs[x]
-				for (const p of pOuts)
-					if (!pFixsx.includes(p) && pCFixsx.includes(p)) {
-						const v = p.pos.scops[x]
-						if (
-							(x === 'T' && (ao.top <= v)) ||
-							(x === 'L' && (ao.left <= v)) ||
-							(x === 'R' && (ao.left + aC.width >= v)) ||
-							(x === 'B' && (ao.top + aC.height >= v))
-						)
-							aO5.DoFix(x, p)
-					}
 
-				aO5.OnNearestFix(x)
+				let chgx = false
+				for (const p of aO5.pCouldFixs[x]) {		// на которых может зафиксироваться
+					if (p.act.visiChg)
+						chgx = true
+
+					const v = p.pos.scops[x]
+
+					// if (aO5.pFixs[x].includes(p)) {		// на которых зафиксировано
+					// 	if (ПересекаетКонтейнер(x, aC, v))
+					// 		chgx = true
+					// }
+					// else {
+
+					if (!aO5.pFixs[x].includes(p)) {		// на которых зафиксировано
+						if (ПересекаетКонтейнер(x, aO, v)) {
+							aO5.DoFix(x, p)
+							chgx = true
+
+							if (o5debug)
+								console.log("%c%s", fmtOK, `DoFix`,
+									`${aO5.id} всего на ${p.name} по ${x}: [${aO5.pFixs[x].map(p => p.name).join(', ')}]` +
+									`,  по ${o}: [${aO5.pFixs[o].map(p => p.name).join(', ')}]`)
+						}
+					}
+				}
+
+				if (chgx)
+					aO5.OnNearestFix(x)
+
+				if (aO5.act.fixed) {
+					if (!chgo && !chgx)
+						if (aO5.pAct[x].p) aO5.PutOnBoard(x, aO5.pAct[x].v)
+						else
+							if (aO5.pAct[o].p) aO5.PutOnBoard(o, aO5.pAct[o].v)
+							else
+								switch (x) {
+									case 'T': aC.top -= scV; break
+									case 'B': aC.top -= scV; break
+									case 'L': aC.left -= scH; break
+									case 'R': aC.left -= scH; break
+								}
+
+					// if (!chgo && !chgx
+					// 	&& aO5.pAct[x].p != pcO5
+					// 	&& aO5.pAct[o].p != pcO5
+
+					// 	// && !aO5.pFixs[o].length
+					// )
+					// 	switch (x) {
+					// 		case 'T': aC.top -= scV; break
+					// 		case 'B': aC.top -= scV; break
+					// 		case 'L': aC.left -= scH; break
+					// 		case 'R': aC.left -= scH; break
+					// 	}
+
+					ScheduleShowFixed(aO5)
+				}
+				// if (aO5.act.fixed && !chgo && !chgx
+				// 	&& aO5.pFixs[x].length === 0
+				// 	&& aO5.pAct[o].p !== pcO5
+				// 	// aO5.pAct[x].p !== pcO5 && aO5.pAct[o].p !== pcO5
+				// 	// aO5.pAct[x].p!==pcO5 && aO5.pFixs[o].length===0
+				// )
+				// 	switch (x) {
+				// 		case 'T': aC.top -= scV; break
+				// 		case 'B': aC.top -= scV; break
+				// 		case 'L': aC.left -= scH; break
+				// 		case 'R': aC.left -= scH; break
+				// 	}
 			}
 
-			for (const aO5 of pcO5.aAlls)
-				if (aO5.act.fixed)
-					ScheduleFixUpdate(aO5)
+			// for (const aO5 of pcO5.aAlls)
+			// 	if (aO5.act.fixed)
+			// 		ScheduleShowFixed(aO5)
 		}
 	}
 	wshp = C.AddModuleSub(olga5_modul, modulname, [MakeScroll])
