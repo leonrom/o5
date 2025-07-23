@@ -107,7 +107,7 @@
 					// pOuts = aO5.base.pO5.pOuts,
 					// ao = aO5.pFixs[o].length ? aC : aO,
 					// ax = aO5.pFixs[x].length ? aC : aO,
-					vx = aO5.pAct[x].v
+					vx = aO5.pAct[x] ? aO5.pAct[x].pos.scops[x] : NaN
 
 				let chgo = false
 				for (const p of aO5.pFixs[o]) {
@@ -125,7 +125,7 @@
 						chgo = true
 					}
 				}
-				if (chgo)
+				if (chgo && aO5.pFixs[o].length)
 					aO5.OnNearestFix(o)
 
 				// фиксация по 'x' 
@@ -156,21 +156,20 @@
 					}
 				}
 
-				if (chgx)
+				if (chgx && aO5.pFixs[x].length)
 					aO5.OnNearestFix(x)
 
 				if (aO5.act.fixed) {
 					if (!chgo && !chgx)
-						if (aO5.pAct[x].p) aO5.PutOnBoard(x, aO5.pAct[x].v)
-						else
-							if (aO5.pAct[o].p) aO5.PutOnBoard(o, aO5.pAct[o].v)
-							else
-								switch (x) {
-									case 'T': aC.top -= scV; break
-									case 'B': aC.top -= scV; break
-									case 'L': aC.left -= scH; break
-									case 'R': aC.left -= scH; break
-								}
+						if (!aO5.PutOnBoard(x, aO5.pAct)
+							&& !aO5.PutOnBoard(o, aO5.pAct)
+						)
+							switch (x) {
+								case 'T': aC.top -= scV; break
+								case 'B': aC.top -= scV; break
+								case 'L': aC.left -= scH; break
+								case 'R': aC.left -= scH; break
+							}
 
 					// if (!chgo && !chgx
 					// 	&& aO5.pAct[x].p != pcO5
