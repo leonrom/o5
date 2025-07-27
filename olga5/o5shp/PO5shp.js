@@ -134,9 +134,9 @@
                     width: el.clientWidth,
                     height: el.clientHeight,
                     scops: { T: 0, L: 0, R: 0, B: 0 },
-                    encls: { T: null, L: null, R: null, B: null },
                 },
-                act: { tAct: -1, tFix: -1, tObs: -1 },
+                visis: { T: new Map(), L: new Map(), R: new Map(), B: new Map() },
+                act: { tAct: -1, tFix: -1, visiChg: false },
                 // overflows: { T: [], L: [], R: [], B: [], inited: false }
             })
             // добавляю сам себя
@@ -147,10 +147,12 @@
             for (const nam of ['scops', 'schgs', 'visis'])
                 Object.seal(pO5.pos[nam])
 
-            for (const nam of ['aAlls', 'aOwns', 'aOuts', 'aUnfs', 'pAAlls', 'pOuts', 'pIncs', 'encls', 'pos', 'act'])
+            for (const nam of ['aAlls', 'aOwns', 'aOuts', 'aUnfs', 'pAAlls', 'pOuts', 'pIncs', 'pos', 'act'])
                 Object.seal(pO5[nam])
 
-            Object.freeze(pO5.pos.visis)
+            for (const x of 'TLRB')
+                Object.freeze(pO5.visis[x])
+            Object.freeze(pO5.visis)
 
             Object.freeze(pO5.borders)
             Object.freeze(pO5.aFixs)
@@ -167,10 +169,7 @@
                 console.log(`PO5 создано ${pO5.name}`)
         }
         name = ''    // еще и тут - чтобы сразу видеть в отладчике
-        CalcScrollScope(time) {   // видимост,- пересчитывается при скроллине в DoChgsconst
-            if (this.act.tObs === time)
-                return
-
+        CalcScrollScope() {   // видимост,- пересчитывается при скроллине в DoChgsconst
             const
                 pO5 = this,
                 tag = pO5.tag,
@@ -194,8 +193,6 @@
                 R: p.left + w,
                 B: p.top + h
             })
-
-            pO5.act.tObs = time
         }
     }
 

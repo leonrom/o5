@@ -132,21 +132,6 @@
      * @param {IntersectionObserverEntry[]} entries - Список наблюдаемых пересечений.
      */
     const
-        // CheckOverflow = (pO5, time) => {  // определяю,- кто под кого подъехал
-        //     for (const x of 'TLRB') {
-        //         const
-        //             vx = pO5.pos.scops[x],
-        //             xtl = (x === 'T') || (x === 'L')
-        //         for (const p of pO5.pOuts)
-        //             if (p !== pO5) {
-        //                 if (p.act.tObs < 0)
-        //                     p.CalcScrollScope(time)
-        //                 // const v = p.pos.scops[x]
-        //                 // if ((xtl && v > vx) || (!xtl && v < vx))
-        //                 //     pO5.overflows[x].push(p)
-        //             }
-        //     }
-        // },
         Observe = entries => {
             let isi;
             for (const entry of entries)

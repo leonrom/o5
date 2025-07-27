@@ -33,16 +33,20 @@
 				(x === 'R' && (posX.left + posX.width > v)) ||
 				(x === 'B' && (posX.top + posX.height > v))
 		},
-		ОтметкаВидимостиГраниц = (p, x, vx, pO5) => {
-			const
-				v = p.pos.scops[x],
-				tl = 'TL'.includes(x),
-				visi = tl ? v >= vx : v <= vx,	// д.б. >=/<= чтоб сработала перефиксация
-				vp = p.visis[x].get(pO5)
+		ОтметкаВидимостиГраниц = (p, avx, pO5) => {
+			for (const av of avx) {
+				const
+					x = av[0],
+					vx = av[1],
+					v = p.pos.scops[x],
+					tl = 'TL'.includes(x),
+					visi = tl ? v >= vx : v <= vx,	// д.б. >=/<= чтоб сработала перефиксация
+					vp = p.visis[x].get(pO5)
 
-			if (vp !== visi) {
-				p.visis[x].set(pO5, visi)
-				p.act.visiChg = true
+				if (vp !== visi) {
+					p.visis[x].set(pO5, visi)
+					p.act.visiChg = true
+				}
 			}
 		}
 
@@ -73,13 +77,13 @@
 	 * @property {Object} pcO5 - Родительский контейнер.
 	 */
 
-	function MakeScroll(scV, scH, pcO5) {
+	function MakeScroll(scV, scH, pcO5, fromTest) {
 		// направление движения объектов в контейнере - обратное ползунку скроллинга	
 		let xs = ''
 		if (scV > 0) xs += 'T'; else if (scV < 0) xs += 'B'
 		if (scH > 0) xs += 'L'; else if (scH < 0) xs += 'R'
 
-		for (const aO5 of pcO5.aAlls)			// позиции всех внутренних тегов
+		for (const aO5 of pcO5.aAlls)			// позиции всех внутренних тегов - 1 раз!
 			aO5.CalcCurPos()
 
 		for (const pInc of pcO5.pIncs) {		// позиции всех вложенных контейнеров
@@ -87,122 +91,88 @@
 			pInc.act.visiChg = false
 		}
 
+		const scops = pcO5.pos.scops
 		for (const x of xs) {
-			const
-				o = opp[x],
-				vpx = pcO5.pos.scops[x],
-				vpo = pcO5.pos.scops[o]
+			const o = opp[x]
 
 			// проверяю въезжание вложенных контейнеров
+			const vpx = scops[x], vpo = scops[o]
 			for (const p of pcO5.pIncs)
-				if (p !== pcO5) {
-					ОтметкаВидимостиГраниц(p, x, vpx, pcO5)
-					ОтметкаВидимостиГраниц(p, o, vpo, pcO5)
-				}
+				if (p !== pcO5)
+					ОтметкаВидимостиГраниц(p, [[x, vpx], [o, vpo]], pcO5)
 
 			for (const aO5 of pcO5.aAlls) {
-				const
-					aC = aO5.posC,
-					aO = aO5.posO,
-					// pOuts = aO5.base.pO5.pOuts,
-					// ao = aO5.pFixs[o].length ? aC : aO,
-					// ax = aO5.pFixs[x].length ? aC : aO,
-					vx = aO5.pAct[x] ? aO5.pAct[x].pos.scops[x] : NaN
+				const pFixs = aO5.pFixs, posO = aO5.posO
 
-				let chgo = false
-				for (const p of aO5.pFixs[o]) {
-					if (p.act.visiChg)
-						chgo = true
-
-					const v = p.pos.scops[o]
-					if (isNaN(vx) ? !ПересекаетКонтейнер(o, aO, v) : (
-						(o === 'T' && (vx - aO.height >= v)) ||
-						(o === 'L' && (vx - aO.width >= v)) ||
-						(o === 'R' && (vx <= v)) ||
-						(o === 'B' && (vx <= v))
-					)) {
+				// расфиксация по 'o' 
+				let chgo = fromTest||false
+				for (const p of pFixs[o])
+					if (
+						!ПересекаетКонтейнер(o, posO, p.pos.scops[o])
+					) {
 						aO5.UnFix(o, p)
 						chgo = true
+
+						if (o5debug)
+							console.log("%c%s", fmtOK, `UnFix`,
+								`${aO5.id} по ${o} : всего [${Array.from(pFixs[o]).map(p => p.name).join(', ')}] `)
 					}
+
+				if (pFixs[o].length) {
+					if (!chgo)
+						for (const p of pFixs[o])
+							if (p.act.visiChg) { chgo = true; break }
+					if (chgo)
+						aO5.OnNearestFix(o)
 				}
-				if (chgo && aO5.pFixs[o].length)
-					aO5.OnNearestFix(o)
 
 				// фиксация по 'x' 
-
-				let chgx = false
-				for (const p of aO5.pCouldFixs[x]) {		// на которых может зафиксироваться
-					if (p.act.visiChg)
+				let chgx = fromTest||false
+				for (const p of aO5.pCouldFixs[x]) 		// на которых может зафиксироваться
+					if (
+						!pFixs[x].includes(p) &&
+						!pFixs[o].includes(p) &&
+						ПересекаетКонтейнер(x, posO, p.pos.scops[x])
+					) {
+						aO5.DoFix(x, p)
 						chgx = true
 
-					const v = p.pos.scops[x]
-
-					// if (aO5.pFixs[x].includes(p)) {		// на которых зафиксировано
-					// 	if (ПересекаетКонтейнер(x, aC, v))
-					// 		chgx = true
-					// }
-					// else {
-
-					if (!aO5.pFixs[x].includes(p)) {		// на которых зафиксировано
-						if (ПересекаетКонтейнер(x, aO, v)) {
-							aO5.DoFix(x, p)
-							chgx = true
-
-							if (o5debug)
-								console.log("%c%s", fmtOK, `DoFix`,
-									`${aO5.id} всего на ${p.name} по ${x}: [${aO5.pFixs[x].map(p => p.name).join(', ')}]` +
-									`,  по ${o}: [${aO5.pFixs[o].map(p => p.name).join(', ')}]`)
-						}
+						if (o5debug)
+							console.log("%c%s", fmtOK, `DoFix`,
+								`${aO5.id} всего на ${p.name} по ${x}: [${pFixs[x].map(p => p.name).join(', ')}]` +
+								`,  по ${o}: [${pFixs[o].map(p => p.name).join(', ')}]`)
 					}
+
+				if (pFixs[x].length) {
+					if (!chgx)
+						for (const p of pFixs[x])
+							if (p.act.visiChg) { chgx = true; break }
+					if (chgx)
+						aO5.OnNearestFix(x)
 				}
 
-				if (chgx && aO5.pFixs[x].length)
-					aO5.OnNearestFix(x)
-
 				if (aO5.act.fixed) {
-					if (!chgo && !chgx)
-						if (!aO5.PutOnBoard(x, aO5.pAct)
-							&& !aO5.PutOnBoard(o, aO5.pAct)
-						)
-							switch (x) {
-								case 'T': aC.top -= scV; break
-								case 'B': aC.top -= scV; break
-								case 'L': aC.left -= scH; break
-								case 'R': aC.left -= scH; break
-							}
+					if (
+						!chgo &&
+						!chgx &&
+						!aO5.PutOnBoard(x, aO5.pAct) &&
+						!aO5.PutOnBoard(o, aO5.pAct)
+					){
+						switch (x) {
+							case 'T': aO5.posC.top -= scV; break
+							case 'B': aO5.posC.top -= scV; break
+							case 'L': aO5.posC.left -= scH; break
+							case 'R': aO5.posC.left -= scH; break
+						}
 
-					// if (!chgo && !chgx
-					// 	&& aO5.pAct[x].p != pcO5
-					// 	&& aO5.pAct[o].p != pcO5
-
-					// 	// && !aO5.pFixs[o].length
-					// )
-					// 	switch (x) {
-					// 		case 'T': aC.top -= scV; break
-					// 		case 'B': aC.top -= scV; break
-					// 		case 'L': aC.left -= scH; break
-					// 		case 'R': aC.left -= scH; break
-					// 	}
+						if (o5debug>1)
+							console.log("%c%s", fmtOK, `сдвиг`,
+								`${aO5.id} по ${x} для ${'TB'.includes(x)?('top на '+scV):('left на '+scH)} `)
+					}
 
 					ScheduleShowFixed(aO5)
 				}
-				// if (aO5.act.fixed && !chgo && !chgx
-				// 	&& aO5.pFixs[x].length === 0
-				// 	&& aO5.pAct[o].p !== pcO5
-				// 	// aO5.pAct[x].p !== pcO5 && aO5.pAct[o].p !== pcO5
-				// 	// aO5.pAct[x].p!==pcO5 && aO5.pFixs[o].length===0
-				// )
-				// 	switch (x) {
-				// 		case 'T': aC.top -= scV; break
-				// 		case 'B': aC.top -= scV; break
-				// 		case 'L': aC.left -= scH; break
-				// 		case 'R': aC.left -= scH; break
-				// 	}
 			}
-
-			// for (const aO5 of pcO5.aAlls)
-			// 	if (aO5.act.fixed)
-			// 		ScheduleShowFixed(aO5)
 		}
 	}
 	wshp = C.AddModuleSub(olga5_modul, modulname, [MakeScroll])

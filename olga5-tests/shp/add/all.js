@@ -76,13 +76,32 @@ class OO5 {
             }
         }
 
-        this.#wshp.Frames.Frame.ReadAttrs(aO5, 
-            pmarks.join('') + ':'+
-            pitchs.join('') + ':'+
-            levels.join('') + ':'+
-            alives.map(f => f ? ':A' : '').join('')+
+        this.#wshp.Frames.Frame.ReadAttrs(aO5,
+            pmarks.join('') + ':' +
+            pitchs.join('') + ':' +
+            levels.join('') + ':' +
+            alives.map(f => f ? ':A' : '').join('') +
             frames.map(f => `i=${f.nam}/${f.f}${f.c}`).join(',')
         )
+
+        for (const x of 'TLRB')
+            for (const p of aO5.pFixs[x]) {
+                const name = p.name.substring(1)
+                let isfix = false
+                for (const frame of frames)
+                    if (frame.nam === name && frame.f === 'f') {
+                        isfix = true
+                        break
+                    }
+
+                if (aO5.pFixs[x].includes(p)) 
+                    if (!isfix)
+                        aO5.UnFix(x, p)
+                
+                // else
+                //     if (isfix)
+                //         aO5.DoFix(x, p)
+            }
 
         this.#BordNames(aO5)
         this.#wshp.DoChgs.MakeScroll(0.1, 0.1, aO5.base.pO5, true)

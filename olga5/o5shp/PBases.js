@@ -6,7 +6,7 @@
 (function () {              // ---------------------------------------------- o5shp/PBases ---
     "use strict"
 
-    let wshp, observ, ibase=0
+    let wshp, observ, ibase = 0
 
     const
         olga5_modul = "o5shp",
@@ -28,7 +28,6 @@
 
             Object.freeze(this)
 
-            // pO5.base.pbase = this
             PBase.#pbases.set(pO5, this)
         }
         static Get(pO5) {
@@ -62,7 +61,7 @@
             const
                 pO5 = FindNearest(aO5.parent.pO5.pAlls),
                 pbase = PBase.Get(pO5) || new PBase(pO5)   // там же и set()
-                
+
             Object.assign(aO5.base, { pO5, pbase })
             pbase.aO5s.add(aO5)
         }
@@ -93,8 +92,8 @@
                         clss = frame.clss,
                         t = frame.typ,
                         c = frame.c
-                        
-                    let n =frame.num 
+
+                    let n = frame.num
 
                     for (const pO5 of pbase.pO5.pOuts) {
                         pO5c = pO5
@@ -129,7 +128,7 @@
                             (frame.err ? `с ошибкой: ${frame.err}` : ``))
 
                     frame.ibase = ++ibase
-                    pbase.frames.set(key, frame )
+                    pbase.frames.set(key, frame)
                     return frame
                 }
 
@@ -153,10 +152,21 @@
                 aO5.frames.add(frame)
             }
 
+            // формирую список на которых aO5 может фиксироваться
+            for (const x of 'TLRB') {
+                aO5.pCouldFixs[x].length = 0
+                for (const p of pbase.pO5.pOuts) 
+                    for (const frame of aO5.frames)
+                        if (frame.fix && frame.pO5 === p) {
+                            aO5.pCouldFixs[x].push(p)
+                            break
+                        }
+            }
+
             if (errs.length)
                 C.ConsoleError(`Ошибки определения фреймов для ${aO5.a_name}:`, errs.length, errs)
         }
     }
-    
+
     wshp = C.AddModuleSub(olga5_modul, modulname, [PBase])
 })();

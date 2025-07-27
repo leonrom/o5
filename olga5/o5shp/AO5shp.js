@@ -71,6 +71,7 @@
 
                 pFixs: { T: [], L: [], R: [], B: [] },
                 pCouldFixs: { T: [], L: [], R: [], B: [] },
+                pAct: { T: null, L: null, R: null, B: null },
 
                 shrunks: { T: [], L: [], R: [], B: [] },   // список прижатых aO5
 
@@ -104,15 +105,16 @@
             }
             Object.freeze(this.nears)
 
-            for (const x of 'TLRB')
+            for (const x of 'TLRB') {
                 aO5.shrunks[x] = new Set()
-
-            for (const nam of ['base', 'margs', 'outln', 'shrunks', 'hidden', 'pFixs', 'pCouldFixs', 'zeroed', 'isFull', 'posC', 'posO', 'posS', 'orig', 'cls'])
+            }
+            for (const nam of ['pAct', 'base', 'margs', 'outln', 'shrunks', 'hidden', 'zeroed', 'isFull', 'posC', 'posO', 'posS', 'orig', 'cls'])
                 if (aO5[nam])
                     Object.seal(aO5[nam])
                 else
                     console.log("%c%s", fmtErr, `в aO5 отсутствует '${nam}'`)
 
+            Object.freeze(this.pCouldFixs)
             Object.freeze(this.pFixs)
             Object.freeze(this)
         }
@@ -127,39 +129,85 @@
                 if (this.hidden[x])
                     return true
         }
-        #SetPosC(x, vx) {
+        // ShiftFixed(x, scV, scH) {
+        //     switch (x) {
+        //         case 'T': this.posC.top -= scV; break
+        //         case 'B': this.posC.top += scV; break
+        //         case 'L': this.posC.left -= scH; break
+        //         case 'R': this.posC.left += scH; break
+        //     }
+        // }
+        PutOnBoard1(x, vx) {
             const aC = this.posC
-            let o, v;
             switch (x) {
-                case 'T': o = 'B'; v = aC.top; aC.top = vx; break
-                case 'L': o = 'R'; v = aC.left; aC.left = vx; break
-                case 'R': o = 'L'; v = aC.left; aC.left = vx - aC.width; break
-                case 'B': o = 'T'; v = aC.top; aC.top = vx - aC.height; break
+                case 'T': aC.top = vx; return 'B'
+                case 'L': aC.left = vx; return 'R'
+                case 'R': aC.left = vx - aC.width; return 'L'
+                case 'B': aC.top = vx - aC.height; return 'T'
             }
-            if (this.pFixs[o].length)
-                if ('TB'.includes(x)) aC.height -= (v - aC.top)
-                else aC.width -= (v - aC.left)
+        }
+        PutOnBoard(x, pAct) {
+            if (!pAct[x])
+                return ''
+
+            const
+                vx = pAct[x].pos.scops[x],
+                aC = this.posC
+
+            switch (x) {
+                case 'T': aC.top = vx; return 'B'
+                case 'L': aC.left = vx; return 'R'
+                case 'R': aC.left = vx - aC.width; return 'L'
+                case 'B': aC.top = vx - aC.height; return 'T'
+            }
         }
         OnNearestFix(x) {
-            const xtl = 'TL'.includes(x)
-            let vx = NaN
-            for (const pFix of this.pFixs[x]) {		//  - сравниваю границы во всех где он зафиксирован
-                const v = pFix.pos.scops[x]
-                if (isNaN(vx) || (xtl && v > vx) || (!xtl && v < vx))
+            const
+                xtl = 'TL'.includes(x),
+                vold = this.pAct[x] ? this.pAct[x].pos.scops[x] : '?NaN?'
+            let s, vx, px = null
+            for (const p of this.pFixs[x]) {		//  - сравниваю границы во всех где он зафиксирован
+                const v = p.pos.scops[x]
+                if (!px || (xtl && v > vx) || (!xtl && v < vx)) {
                     vx = v
+                    px = p
+                }
             }
-            this.#SetPosC(x, vx)
+            if (o5debug) {
+                const
+                    p = this.pAct[x],
+                    old = p ? (p.name + '(' + vold + ')') : 'null(NaN)'
+                s = ` по '${x}': с ${old} на ${px.name}(${vx}) `
+            }
+            this.pAct[x] = px
+
+            const o = this.PutOnBoard(x, this.pAct)
+            if (this.pFixs[o].length) {
+                const dv = this.pAct[o].pos.scops[x] - vx
+                switch (x) {
+                    case 'T': this.posC.height = dv; break         // aS.top -= aC.height - dv;  
+                    case 'L': this.posC.width = dv; break          // aS.left -= aC.width - dv;  
+                    case 'R': this.posC.width = -dv; break
+                    case 'B': this.posC.height = -dv; break
+                }
+
+                if (o5debug)
+                    s = ` ${'TB'.includes(x) ? 'height' : 'width'} уменшен на ${dv}`
+            }
+
+            if (o5debug)
+                console.log("%c%s", fmtOK, `Перефиксация`, s)
         }
         DoFix(x, pO5) {
             const
                 act = this.act,
                 clon = act.clon || this.#Clone()
 
-            if (o5debug) {
-                const fmt = this.pFixs[x].includes(pO5) ? fmtErr : fmtOK
-                console.log("%c%s", fmt, `DoFix` + (fmt === fmtErr ? ' (повтор)' : ''),
-                    `${this.id} по ${x} на ${pO5.name}: всего [${this.pFixs[x].map(p => p.name).join(' ') + ' ' + pO5.name}]`)
-            }
+            // if (o5debug) {
+            //     const fmt = this.pFixs[x].includes(pO5) ? fmtErr : fmtOK
+            //     console.log("%c%s", fmt, `DoFix` + (fmt === fmtErr ? ' (повтор)' : ''),
+            //         `${this.id} по ${x} на ${pO5.name}: всего [${this.pFixs[x].map(p => p.name).join(' ') + ' ' + pO5.name}]`)
+            // }
 
             this.pFixs[x].push(pO5)
             act.fixed = true
@@ -194,23 +242,18 @@
             if (ia >= 0)
                 pFixs[x].splice(ia, 1)
 
-            // let vx = pFixs[x].length ? this.#FindNearestFix(x) : NaN
-
-            // if (isNaN(vx)) {  // значит уже расфиксировано по 'x'
-            //     this.act.fixed = pFixs.find(pFix => pFix.length > 0)
-            //     vx = this.posO['TB'.includes(x) ? 'top' : 'left']
-            // }
-            // this.#SetPosC(x, vx)
-
             if (pFixs[x].length)
                 this.OnNearestFix(x)
-            else
-                this.#SetPosC(x, 'TB'.includes(x) ? this.posO.top : this.posO.left)
-
+            else {
+                switch (x) {
+                    case 'T': this.posC.top = this.posO.top; break
+                    case 'L': this.posC.left = this.posO.left; break
+                    case 'R': this.posC.left = this.posO.left - this.posC.width; break
+                    case 'B': this.posC.top = this.posO.top - this.posC.height; break
+                }
+                this.pAct[x] = null
+            }
             this.act.fixed = pFixs.T.length || pFixs.L.length || pFixs.R.length || pFixs.B.length
-
-            if (o5debug)
-                console.log("%c%s", fmtOK, `UnFix`, `${aO5.id} по ${x} : всего [${Array.from(aO5.pFixs[x]).map(p => p.name).join(', ')}] `)
 
             if (!this.act.fixed && act.shdw === clon) {
                 const
