@@ -170,6 +170,8 @@
         }
         name = ''    // еще и тут - чтобы сразу видеть в отладчике
         CalcScrollScope() {   // видимост,- пересчитывается при скроллине в DoChgsconst
+if (this.tag.nodeName === 'BODY')            
+    console.log()
             const
                 pO5 = this,
                 tag = pO5.tag,
@@ -180,6 +182,9 @@
                     tag.getBoundingClientRect(),
                 w = isBody ? de.clientWidth : tag.clientWidth,
                 h = isBody ? de.clientHeight : tag.clientHeight,
+
+				W = isBody?window.innerWidth: tag.clientWidth,
+				H = isBody?window.innerHeight: tag.clientHeight,
 
                 b = pO5.borders,
                 atTo = tag.clientTop > b.top,         // полоса - вверху

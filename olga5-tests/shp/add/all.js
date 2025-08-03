@@ -87,20 +87,8 @@ class OO5 {
         for (const x of 'TLRB')
             for (const p of aO5.pFixs[x]) {
                 const name = p.name.substring(1)
-                let isfix = false
-                for (const frame of frames)
-                    if (frame.nam === name && frame.f === 'f') {
-                        isfix = true
-                        break
-                    }
-
-                if (aO5.pFixs[x].includes(p)) 
-                    if (!isfix)
-                        aO5.UnFix(x, p)
-                
-                // else
-                //     if (isfix)
-                //         aO5.DoFix(x, p)
+                if (!frames.find(frame => frame.nam === name && frame.f === 'f'))
+                    aO5.UnFix(x, p)
             }
 
         this.#BordNames(aO5)

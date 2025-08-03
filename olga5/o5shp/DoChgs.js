@@ -17,38 +17,31 @@
 		o5debug = C.consts.o5debug,
 		fmtOK = "background: cornsilk; color: black;",
 		fmtErr = "background: yellow; color: black;",
-		IsOut = (xtl, v, V) => {
-			if (xtl) return v < V	// 'pInc' ползет вверх и его верхний край 'v' выше чем 'V'
-			else return v > V		// 'pInc' ползет вниз и его верхний край 'v' ниже чем 'V'
-		},
-		TT = (s1, s2) => {
-			if (o5debug > 1)
-				console.log("%c%s", fmtOK, s1, s2)
-		},
 		opp = { T: 'B', L: 'R', R: 'L', B: 'T' },
-		xbord = { T: 'top', L: 'left', R: 'right', B: 'bottom' },
-		ПересекаетКонтейнер = (x, posX, v) => {
-			return (x === 'T' && (posX.top < v)) ||
-				(x === 'L' && (posX.left < v)) ||
-				(x === 'R' && (posX.left + posX.width > v)) ||
-				(x === 'B' && (posX.top + posX.height > v))
-		},
-		ОтметкаВидимостиГраниц = (p, avx, pO5) => {
-			for (const av of avx) {
-				const
-					x = av[0],
-					vx = av[1],
-					v = p.pos.scops[x],
-					tl = 'TL'.includes(x),
-					visi = tl ? v >= vx : v <= vx,	// д.б. >=/<= чтоб сработала перефиксация
-					vp = p.visis[x].get(pO5)
-
-				if (vp !== visi) {
-					p.visis[x].set(pO5, visi)
-					p.act.visiChg = true
-				}
+		IsOut = (x, aX, v) => {	// если результат > 0 то тег вышел за пределы контейнера
+			switch (x) {
+				case 'T': return v - aX.top;
+				case 'L': return v - aX.left;
+				case 'R': return aX.left + aX.width - v;
+				case 'B': return aX.top + aX.height - v;
 			}
 		}
+	// ОтметкаВидимостиГраниц = (p, avx, pO5) => {
+	// 	for (const av of avx) {
+	// 		const
+	// 			x = av[0],
+	// 			vx = av[1],
+	// 			v = p.pos.scops[x],
+	// 			tl = 'TL'.includes(x),
+	// 			visi = tl ? v >= vx : v <= vx,	// д.б. >=/<= чтоб сработала перефиксация
+	// 			vp = p.visis[x].get(pO5)
+
+	// 		if (vp !== visi) {
+	// 			p.visis[x].set(pO5, visi)
+	// 			p.act.visiChg = true
+	// 		}
+	// 	}
+	// }
 
 	// ---- batching ShowFix() per frame ----
 	const FixUpdateQueue = new Set()
@@ -96,20 +89,32 @@
 			const o = opp[x]
 
 			// проверяю въезжание вложенных контейнеров
-			const vpx = scops[x], vpo = scops[o]
-			for (const p of pcO5.pIncs)
-				if (p !== pcO5)
-					ОтметкаВидимостиГраниц(p, [[x, vpx], [o, vpo]], pcO5)
+			for (const m of [x, o]) {
+				const mv = scops[m]
+				for (const p of pcO5.pIncs)
+					if (p !== pcO5) {					//	Отметка Видимости Границ (p, [[x, vpx], [o, vpo]], pcO5)
+						const
+							v = p.pos.scops[m],
+							visi = 'TL'.includes(m) ? v >= mv : v <= mv,	// д.б. >=/<= чтоб сработала перефиксация
+							vp = p.visis[m].get(pcO5)
+
+						if (vp !== visi) {
+							p.visis[m].set(pcO5, visi)
+							p.act.visiChg = true
+						}
+					}
+			}
 
 			for (const aO5 of pcO5.aAlls) {
-				const pFixs = aO5.pFixs, posO = aO5.posO
+				const
+					pFixs = aO5.pFixs,
+					posO = aO5.posO,
+					aC = aO5.posC
 
 				// расфиксация по 'o' 
-				let chgo = fromTest||false
+				let chgo = fromTest || false
 				for (const p of pFixs[o])
-					if (
-						!ПересекаетКонтейнер(o, posO, p.pos.scops[o])
-					) {
+					if (IsOut(o, posO, p.pos.scops[o]) <= 0) {
 						aO5.UnFix(o, p)
 						chgo = true
 
@@ -127,18 +132,22 @@
 				}
 
 				// фиксация по 'x' 
-				let chgx = fromTest||false
-				for (const p of aO5.pCouldFixs[x]) 		// на которых может зафиксироваться
+
+				const pOuts= aO5.base.pbase.pO5.pOuts
+				let chgx = fromTest || false
+
+				for (const p of pOuts) 		// на которых может зафиксироваться
 					if (
 						!pFixs[x].includes(p) &&
 						!pFixs[o].includes(p) &&
-						ПересекаетКонтейнер(x, posO, p.pos.scops[x])
-					) {
+						aO5.pCouldFixs[x].includes(p) &&
+						IsOut(x, posO, p.pos.scops[x]) >= 0
+					) { // фиксируем
 						aO5.DoFix(x, p)
 						chgx = true
 
 						if (o5debug)
-							console.log("%c%s", fmtOK, `DoFix`,
+							console.log("%c%s", fmtOK, `фиксирую`,
 								`${aO5.id} всего на ${p.name} по ${x}: [${pFixs[x].map(p => p.name).join(', ')}]` +
 								`,  по ${o}: [${pFixs[o].map(p => p.name).join(', ')}]`)
 					}
@@ -157,18 +166,36 @@
 						!chgx &&
 						!aO5.PutOnBoard(x, aO5.pAct) &&
 						!aO5.PutOnBoard(o, aO5.pAct)
-					){
-						switch (x) {
-							case 'T': aO5.posC.top -= scV; break
-							case 'B': aO5.posC.top -= scV; break
-							case 'L': aO5.posC.left -= scH; break
-							case 'R': aO5.posC.left -= scH; break
-						}
+					) {
+						if ('TB'.includes(x)) aC.top -= scV
+						else aC.left -= scH
 
-						if (o5debug>1)
+						if (o5debug > 1)
 							console.log("%c%s", fmtOK, `сдвиг`,
-								`${aO5.id} по ${x} для ${'TB'.includes(x)?('top на '+scV):('left на '+scH)} `)
+								`${aO5.id} по ${x} для ${'TB'.includes(x) ? ('top на ' + scV) : ('left на ' + scH)} `)
 					}
+
+					for (const m of [x, o])
+						if (pFixs[m].length) {		// уже где-то зафиксирован и подъезжает под границцу								
+							const pCouldFix = aO5.pCouldFixs[m]
+							for (const p of pOuts) 		// на которых может зафиксироваться
+								if (!pCouldFix.includes(p)) {
+									const
+										v = p.pos.scops[m],
+										d = IsOut(m, aC, v)
+									if (d > 0) {
+										switch (m) {
+											case 'T': aC.height -= d; aC.top = v; aO5.posS.top -= d; break
+											case 'L': aC.width -= d; aC.left = v; aO5.posS.left -= d; break
+											case 'R': aC.width -= d; aC.left = v - aC.width; break
+											case 'B': aC.height -= d; aC.top = v - aC.height; break
+										}
+
+										if (o5debug)
+											console.log("%c%s", fmtOK, `подсовую`, `${aO5.id} под ${p.name} по ${m}`)
+									}
+								}
+						}
 
 					ScheduleShowFixed(aO5)
 				}
