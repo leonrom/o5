@@ -151,7 +151,7 @@
                 return ''
 
             const
-                vx = pAct[x].pos.scops[x],
+                vx = pAct[x].scops[x],
                 aC = this.posC
 
             switch (x) {
@@ -164,10 +164,10 @@
         OnNearestFix(x) {
             const
                 xtl = 'TL'.includes(x),
-                vold = this.pAct[x] ? this.pAct[x].pos.scops[x] : '?NaN?'
+                vold = this.pAct[x] ? this.pAct[x].scops[x] : '?NaN?'
             let s, vx, px = null
             for (const p of this.pFixs[x]) {		//  - сравниваю границы во всех где он зафиксирован
-                const v = p.pos.scops[x]
+                const v = p.scops[x]
                 if (!px || (xtl && v > vx) || (!xtl && v < vx)) {
                     vx = v
                     px = p
@@ -183,7 +183,7 @@
 
             const o = this.PutOnBoard(x, this.pAct)
             if (this.pFixs[o].length) {
-                const dv = this.pAct[o].pos.scops[x] - vx
+                const dv = this.pAct[o].scops[x] - vx
                 switch (x) {
                     case 'T': this.posC.height = dv; break         // aS.top -= aC.height - dv;  
                     case 'L': this.posC.width = dv; break          // aS.left -= aC.width - dv;  

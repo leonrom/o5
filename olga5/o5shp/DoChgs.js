@@ -26,22 +26,6 @@
 				case 'B': return aX.top + aX.height - v;
 			}
 		}
-	// ОтметкаВидимостиГраниц = (p, avx, pO5) => {
-	// 	for (const av of avx) {
-	// 		const
-	// 			x = av[0],
-	// 			vx = av[1],
-	// 			v = p.pos.scops[x],
-	// 			tl = 'TL'.includes(x),
-	// 			visi = tl ? v >= vx : v <= vx,	// д.б. >=/<= чтоб сработала перефиксация
-	// 			vp = p.visis[x].get(pO5)
-
-	// 		if (vp !== visi) {
-	// 			p.visis[x].set(pO5, visi)
-	// 			p.act.visiChg = true
-	// 		}
-	// 	}
-	// }
 
 	// ---- batching ShowFix() per frame ----
 	const FixUpdateQueue = new Set()
@@ -80,11 +64,11 @@
 			aO5.CalcCurPos()
 
 		for (const pInc of pcO5.pIncs) {		// позиции всех вложенных контейнеров
-			pInc.CalcScrollScope()
-			pInc.act.visiChg = false
+			pInc.CalcScope()
+			pInc.visis.act.isChg = false
 		}
 
-		const scops = pcO5.pos.scops
+		const scops = pcO5.scops
 		for (const x of xs) {
 			const o = opp[x]
 
@@ -94,13 +78,13 @@
 				for (const p of pcO5.pIncs)
 					if (p !== pcO5) {					//	Отметка Видимости Границ (p, [[x, vpx], [o, vpo]], pcO5)
 						const
-							v = p.pos.scops[m],
+							v = p.scops[m],
 							visi = 'TL'.includes(m) ? v >= mv : v <= mv,	// д.б. >=/<= чтоб сработала перефиксация
 							vp = p.visis[m].get(pcO5)
 
 						if (vp !== visi) {
 							p.visis[m].set(pcO5, visi)
-							p.act.visiChg = true
+							p.visis.act.isChg = true
 						}
 					}
 			}
@@ -114,7 +98,7 @@
 				// расфиксация по 'o' 
 				let chgo = fromTest || false
 				for (const p of pFixs[o])
-					if (IsOut(o, posO, p.pos.scops[o]) <= 0) {
+					if (IsOut(o, posO, p.scops[o]) <= 0) {
 						aO5.UnFix(o, p)
 						chgo = true
 
@@ -124,9 +108,7 @@
 					}
 
 				if (pFixs[o].length) {
-					if (!chgo)
-						for (const p of pFixs[o])
-							if (p.act.visiChg) { chgo = true; break }
+					chgo ||= pFixs[o].find(p=>p.visis.act.isChg)
 					if (chgo)
 						aO5.OnNearestFix(o)
 				}
@@ -141,7 +123,7 @@
 						!pFixs[x].includes(p) &&
 						!pFixs[o].includes(p) &&
 						aO5.pCouldFixs[x].includes(p) &&
-						IsOut(x, posO, p.pos.scops[x]) >= 0
+						IsOut(x, posO, p.scops[x]) >= 0
 					) { // фиксируем
 						aO5.DoFix(x, p)
 						chgx = true
@@ -153,9 +135,7 @@
 					}
 
 				if (pFixs[x].length) {
-					if (!chgx)
-						for (const p of pFixs[x])
-							if (p.act.visiChg) { chgx = true; break }
+					chgx ||= pFixs[x].find(p=>p.visis.act.isChg)
 					if (chgx)
 						aO5.OnNearestFix(x)
 				}
@@ -181,7 +161,7 @@
 							for (const p of pOuts) 		// на которых может зафиксироваться
 								if (!pCouldFix.includes(p)) {
 									const
-										v = p.pos.scops[m],
+										v = p.scops[m],
 										d = IsOut(m, aC, v)
 									if (d > 0) {
 										switch (m) {

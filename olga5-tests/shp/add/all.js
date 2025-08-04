@@ -228,7 +228,13 @@ class OO5 {
         this.markout = '     --------------    '
         this.dshps = new Set()
     }
-
+    CallScroll = s => {  // вызывается из HTML
+        const
+            scV = s.indexOf('V') < 0 ? 0 : 0.1,
+            scH = s.indexOf('H') < 0 ? 0 : 0.1
+        this.#wshp.DoChgs.MakeScroll(scV, scH, body.pO5, true)
+        // this.#wshp.DoChgs.MakeScroll(0.1, 0.1, aO5.base.pO5, true)
+    }
     CbLevel = e => {
         const
             inp = e.target,
