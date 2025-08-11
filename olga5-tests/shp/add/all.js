@@ -71,7 +71,7 @@ class OO5 {
                             f5 = { nam: b5.nam, f: '', c: '' }
                             frames.push(f5)
                         }
-                        f5[txt] = txt // 'i=' + b5.nam + '/' + txt
+                        f5[txt] = txt
                     }
             }
         }
@@ -163,11 +163,17 @@ class OO5 {
                         e.stopPropagation();
                     },
                     AskScroll = e => {
-                        const
-                            tag = document.getElementById(e.target.innerText),
-                            ish = e.button !== 0
-
-                        this.#wshp.DoChgs.MakeScroll(ish ? 0 : 0.1, ish ? 0.1 : 0, tag.pO5, true)
+                        const btn = document.getElementById('btnScrollHead')
+                        if (btn) {
+                            const nam = e.target.innerText
+                            if (document.getElementById(e.target.innerText))
+                                btn.innerText = e.target.innerText
+                            else
+                                console.error(`нет такого контейнера '${nam}' `)
+                        }
+                        else
+                            console.error(`нет кнопки "btnScrollHead" ??`)
+                        // this.#wshp.DoChgs.MakeScroll(ish ? 0 : 0.1, ish ? 0.1 : 0, tag.pO5, true)
                     }
 
                 for (const p of ps) {
@@ -191,7 +197,7 @@ class OO5 {
                             is0.classList.add('button')
                             is0.title = "Скроллинг: Л - гориз., П - верт."
                             is0.addEventListener('contextmenu', StopPropagation)
-                            is0.addEventListener('mousedown', AskScroll)
+                            is0.addEventListener('mouseup', AskScroll)
                         }
                         else {
                             p.innerHTML = `<span class="absent"><i>&nbsp;${nam}</i> &nbsp; &nbsp; -</span>`
@@ -228,11 +234,19 @@ class OO5 {
         this.markout = '     --------------    '
         this.dshps = new Set()
     }
-    CallScroll = s => {  // вызывается из HTML
+    CallScroll = m => {  // вызывается из HTML
         const
-            scV = s.indexOf('V') < 0 ? 0 : 0.1,
-            scH = s.indexOf('H') < 0 ? 0 : 0.1
-        this.#wshp.DoChgs.MakeScroll(scV, scH, body.pO5, true)
+            btn = document.getElementById('btnScrollHead'),
+            nam = btn.innerText,
+            bord = document.getElementById(nam)
+        let scV = 0, scH = 0
+        switch (m) {
+            case 'T': scV = 0.1; break
+            case 'L': scH = 0.1; break
+            case 'R': scH = -0.1; break
+            case 'B': scV = -0.1; break
+        }
+        this.#wshp.DoChgs.MakeScroll(scV, scH, bord.pO5, true)
         // this.#wshp.DoChgs.MakeScroll(0.1, 0.1, aO5.base.pO5, true)
     }
     CbLevel = e => {
@@ -530,7 +544,7 @@ class OO5 {
         const
             elements = document.querySelectorAll('[class*="olga5_shp"]'),
             tags = Array.from(elements).filter(element => {
-                return element.className.match(/olga5_shp[\s:]/)
+                return element.className.match(/olga5_shp[\s:]/) && !element.classList.contains('o5shp_none')
             }),
             divE = document.getElementById('div-etalon'),
             clons = document.getElementById('clons'),

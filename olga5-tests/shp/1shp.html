@@ -39,8 +39,11 @@
 				<p><input id="carts" type="checkbox" onclick="oo5.CbVisible(this)" title="подвисшие">cart</p>
 				<p><input id="outli" type="checkbox" onclick="oo5.OutLines(this )" title="синие рамки ">outline</p>
 			</div>
-			<button id="btnCallScroll" type="button" style="top: 8px;" onclick="oo5.CallScroll('V' )">scr V</button>
-			<button id="btnCallScroll" type="button" style="top: 32px;" onclick="oo5.CallScroll('H' )">scr H</button>
+			<button id="btnScrollHead" type="button" title="контейнер, который будет скроллироваться">body</button>
+			<button class="btnCallScroll" type="button" style="top: 18px; right:18px;" onclick="oo5.CallScroll('T' )" title="сдвиг тегов 'вверх '">T</button>
+			<button class="btnCallScroll" type="button" style="top: 18px; right:2px; " onclick="oo5.CallScroll('L' )" title="сдвиг тегов 'влево '">L</button>
+			<button class="btnCallScroll" type="button" style="top: 34px; right:18px;" onclick="oo5.CallScroll('R' )" title="сдвиг тегов 'вправо'">R</button>
+			<button class="btnCallScroll" type="button" style="top: 34px; right:2px; " onclick="oo5.CallScroll('B' )" title="сдвиг тегов 'вниз  '">B</button>
 
 			<div class='divs'>
 				<div id="div-etalon">
@@ -113,7 +116,8 @@
 					<span>div2</span>
 					<div id="cbo2" class="cbo">
 
-						<div id="div3" class="div" style="left:800px; top:700px;">
+						<div id="div3" class="div" style="left:800px; top:700px;
+    border-top-width: 8px;">
 							<span>div3</span>
 							<div id="cbo3" class="cbo"
 								style="background-size: 15px 15px; width: 1900px; height: 1300px; ">
@@ -144,7 +148,7 @@
 						<span>div3a</span>
 						<div id="cbo3a" class="cbo" style="background-size: 15px 15px; width: 1900px; height: 1300px; ">
 
-							<div id="shp0a" class="moved olga5_shp:TrLb:i=div3a/fc,div2a/f"
+							<div id="shp9" class="moved olga5_shp:TrLb:i=div3a/fc,div2a/f"
 								style="left:750px; top:500px;">
 								<p>название объекта</p>
 							</div>

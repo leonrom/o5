@@ -330,7 +330,19 @@ div.olga5_cart.moved {
     cursor : grabbing;
 }
 
-#btnCallScroll{
+#btnScrollHead{
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 30px;
+    padding: 0px 2px;
+    background-color: transparent;
+    color: black;
+    border: 1px red solid;
+    border-radius: 5px;
+    font-size: x-small;
+}
+.btnCallScroll{
     position: absolute;
     top: 0px;
     right: 0px;
@@ -342,7 +354,15 @@ div.olga5_cart.moved {
     cursor: pointer;
     font-size: x-small;
 }
-#btnCallScroll:active {
+.btnCallScroll:active {
     box-shadow: -1px -1px #666;
     transform: translateY(1px);
   }
+
+.body,
+.div1,
+.div2,
+.div3,
+.div4{
+    cursor: pointer;
+}

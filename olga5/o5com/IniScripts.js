@@ -377,9 +377,9 @@
 
 			const starts = document.querySelectorAll("[class *= '" + this.olga5Start + "']")
 			if (!starts || !starts.length) {
-				if (C.consts.o5debug)
-					console.log('%c%s', clrPage, head + ` нет тегов с ${this.olga5Start} - игнорируется`, url)
-				return
+				starts=[document.body]
+				document.body.classList.add(this.olga5Start)
+				console.error('%c%s', clrPage, head + ` нет тегов с ${this.olga5Start} - принят <body>`, url)
 			}
 
 			const

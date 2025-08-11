@@ -16,23 +16,28 @@
         fmtOK = "background: cornsilk; color: black;",
         fmtErr = "background: yellow; color: black;",
         DblClick = e => {
-            let target = e.target
-            while (target && !target.aO5shp)
-                target = target.parentElement
-
-            if (target && target.aO5shp) {
-                const aO5 = target.aO5shp
-
-                for (const x of 'TRLB')    // т.е. расфиксирую всё
-                    for (const p of pFixs(x))
-                        aO5.UnFix(x, p)
-
-                e.stopImmediatePropagation()
-
+            if (e.currentTarget !== e.target && e.target.ondblclick) {
                 if (o5debug > 0)
-                    console.log("%c%s", fmtOK, `расфиксация '${aO5.id}' по событию '${e.type}'`)
+                    console.error(` У тега ${C.MakeObjName(e.target)} уже есть свой dblclick-обработчик — пропускаем`)
+                return
             }
+            // let target = e.target
+            // while (target && !target.aO5shp)
+            //     target = target.parentElement
+
+            // if (target && target.aO5shp) {
+            const aO5 = e.currentTarget.aO5shp
+
+            for (const x of 'TRLB')    // т.е. расфиксирую всё
+                for (const p of aO5.pFixs[x])
+                    aO5.UnFix(x, p)
+
+            e.stopImmediatePropagation()
+
+            if (o5debug > 0)
+                console.log("%c%s", fmtOK, `расфиксация '${aO5.id}' по событию '${e.type}'`)
         }
+
 
     class AO5 {
         static Margs = { t: 0, l: 0, r: 0, b: 0 }

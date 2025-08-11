@@ -21,9 +21,8 @@
                 time: 0
             },
             dm: { V: 2, H: 2, dt: 100 },
-            Act: (el, typ) => {
+            Act: (pO5, typ) => {
                 const
-                    pO5 = el.pO5,
                     scrll = pO5.scrll,
                     sl = saved.last
 
@@ -40,19 +39,23 @@
                 }
 
                 const
+                    el = pO5.el,
                     dm = saved.dm,
                     now = performance.now(),
-                    dt = now - scrll.time >= dm.dt,
                     sV = el.scrollTop - scrll.top,
                     sH = el.scrollLeft - scrll.left,
                     rH = el.clientWidth - scrll.width,
-                    rV = el.clientHeight - scrll.height
+                    rV = el.clientHeight - scrll.height,
+                    dt = now - scrll.time >= dm.dt,
+                    strt = scrll.time === 0,
+                    typS = typ === 'S'
 
                 if (
-                    (sV !== 0 && (Math.abs(sV) >= dm.V || dt)) ||
-                    (sH !== 0 && (Math.abs(sH) >= dm.H || dt)) ||
-                    (rV !== 0 && (Math.abs(rV) >= dm.V || dt)) ||
-                    (rH !== 0 && (Math.abs(rH) >= dm.H || dt))
+                    (Math.abs(sV) >= dm.V || dt) ||
+                    (Math.abs(sH) >= dm.H || dt) ||
+                    (Math.abs(rV) >= dm.V || dt) ||
+                    (Math.abs(rH) >= dm.H || dt) ||
+                    strt
                 ) {
                     if (o5debug > 2)
                         console.log("%c%s", fmtErr, `saved ${pO5.id}: `, typ === 'S' ? 'скроллинг' : 'размеры'
@@ -65,42 +68,40 @@
                     })
 
                     wshp.DoChgs.MakeScroll(
-                        typ === 'S' ? sV : (rV ? 0.1 : 0),
-                        typ === 'S' ? sH : (rH ? 0.1 : 0),
+                        strt ? 0.1 : (typS ? sV : (rV ? 0.1 : 0)),
+                        strt ? 0.1 : (typS ? sH : (rH ? 0.1 : 0)),
                         pO5
                     )
                     sl.pO5 = null
                 }
-                else {
-                    Object.assign(sl, {
-                        pO5: pO5,
-                        time: now,
-                        sV: sV, sH: sH, rV: rV, rH: rH,
-                        top: el.scrollTop, left: el.scrollLeft, height: el.clientHeight, width: el.clientWidth
-                    })
-                }
-            },
-            Scroll: e => {
-                const el = e.target.pO5 ? e.target : document.body
-                saved.Act(el, 'S')
+                else
+                    if (sV || sH || rH || rH) {
+                        Object.assign(sl, {
+                            pO5: pO5,
+                            time: now,
+                            sV: sV, sH: sH, rV: rV, rH: rH,
+                            top: el.scrollTop, left: el.scrollLeft, height: el.clientHeight, width: el.clientWidth
+                        })
+                    }
             },
             Resize: entries => {
-                const time = performance.now()
-                for (const e of entries) {
+                let n, p;
+                for (const e of entries) { // ищу самый внешний контейнер
                     const
-                        el = e.target.pO5 ? e.target : document.body,
-                        pO5 = el.pO5
-                    if (pO5.scrll.time !== time) {
-                        saved.Act(e.target, 'R')
-                        pO5.CalcScope(time)
+                        pO5 = e.target.pO5,
+                        z = pO5.pOuts.size
+                    if (n < z || !p) {
+                        n = z
+                        p = pO5
                     }
                 }
+                if (p)
+                    saved.Act(p, 'R')
             }
         },
         ro = new ResizeObserver(saved.Resize)
 
     class PO5 {
-        static #finalClasses = ['olga5_shp', 'overview-content', 'viewitem-panel']
         constructor(tag) {
             if (tag.pO5)
                 C.ConsoleAlert(`Повтор создания 'pO5' для контейнера id='${tag.id}' [${tag.className.trim()}]`)
@@ -108,8 +109,8 @@
             const
                 pO5 = this,
                 ibody = tag.nodeName == 'BODY',
+                final = tag.classList.contains('olga5_Start'),
                 nst = window.getComputedStyle(tag),
-                // el = ibody ? tag.parentElement : tag,
                 classList = Array.from(tag.classList),
                 el = ibody ? document.documentElement : tag
 
@@ -117,12 +118,13 @@
             tag.pO5 = pO5
 
             Object.assign(pO5, {
-                id: tag.id,
+                el: el,     //   tag и el различаются только для тега body
                 tag: tag,
+                id: tag.id,
                 name: C.MakeObjName(tag),
                 classOrigs: classList,
                 ibody: ibody,
-                final: ibody || PO5.#finalClasses.find(cls => classList.includes(cls)),
+                final: final,
                 pAlls: new Set(),  //  (все pO5) список всех внешних  контейнеров
                 pOuts: new Set(),  //  (скроллируемые pO5) все скроллируемых внешних контейнеров
                 pIncs: new Set(),  //  (скроллируемые pO5) все скроллируемых вложенных контейнеров 
@@ -139,8 +141,8 @@
                     bgColor: nst.backgroundColor
                 },
                 scrls: {
-                    H: ibody || nst.overflow === 'auto' || nst.overflowX === 'auto' || nst.overflow === 'scroll' || nst.overflowX === 'scroll',
-                    V: ibody || nst.overflow === 'auto' || nst.overflowY === 'auto' || nst.overflow === 'scroll' || nst.overflowY === 'scroll',
+                    H: final || nst.overflow === 'auto' || nst.overflowX === 'auto' || nst.overflow === 'scroll' || nst.overflowX === 'scroll',
+                    V: final || nst.overflow === 'auto' || nst.overflowY === 'auto' || nst.overflow === 'scroll' || nst.overflowY === 'scroll',
                 },
                 scrll: { // позиции скроллинга, видимые границы , текущие границы,  изменение границ от предыдущего              
                     time: -1,
@@ -173,8 +175,10 @@
             this.CalcScope()
 
             if (pO5.scrls.H || pO5.scrls.V) {
-                ro.observe(el)
-                (ibody?window:el).addEventListener('scroll', saved.Scroll)
+                ro.observe(el);
+                (ibody ? window : el).addEventListener('scroll', () => {
+                    saved.Act(pO5, 'S')
+                })
             }
 
             if (o5debug > 1)
@@ -186,23 +190,20 @@
                 pO5 = this,
                 tag = pO5.tag,
                 de = document.documentElement,
-                isBody = tag.nodeName === 'BODY',
-                p = isBody ?
+                p = pO5.ibody ?
                     { top: 0, left: 0, right: de.clientWidth, bottom: de.clientHeight } :
                     tag.getBoundingClientRect(),
-                w = isBody ? de.clientWidth : tag.clientWidth,
-                h = isBody ? de.clientHeight : tag.clientHeight,
                 b = pO5.borders,
                 atTo = tag.clientTop > b.top,         // полоса - вверху
                 atLe = tag.clientLeft > b.left,       // полоса - слев       
-                scrW = tag.offsetWidth - tag.clientWidth - b.left - b.right,
-                scrH = tag.offsetHeight - tag.clientHeight - b.top - b.bottom
+                top = p.top + b.top + (atTo ? (tag.offsetHeight - tag.clientHeight) : 0),
+                left = p.left + b.left + (atLe ? (tag.offsetWidth - tag.clientWidth) : 0)
 
             Object.assign(pO5.scops, {
-                T: p.top + b.top + (atTo ? scrH : 0),
-                L: p.left + b.left + (atLe ? scrW : 0),
-                R: p.left + w,
-                B: p.top + h
+                T: top,
+                L: left,
+                R: left + (pO5.ibody ? de.clientWidth : tag.clientWidth),
+                B: top + (pO5.ibody ? de.clientHeight : tag.clientHeight)
             })
         }
     }
