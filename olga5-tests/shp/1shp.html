@@ -33,47 +33,8 @@
 
 <body id="body" style="height: 1500px;">
 	<div class='example olga5_Start'>
-		<div class='cboxed'>
-			<div title="видимость: клона и носителя, рамка обрамления">
-				<p><input id="clons" type="checkbox" onclick="oo5.CbVisible(this)" title="исходники">clon</p>
-				<p><input id="carts" type="checkbox" onclick="oo5.CbVisible(this)" title="подвисшие">cart</p>
-				<p><input id="outli" type="checkbox" onclick="oo5.OutLines(this )" title="синие рамки ">outline</p>
-			</div>
-			<button id="btnScrollHead" type="button" title="контейнер, который будет скроллироваться">body</button>
-			<button class="btnCallScroll" type="button" style="top: 18px; right:18px;" onclick="oo5.CallScroll('T' )" title="сдвиг тегов 'вверх '">T</button>
-			<button class="btnCallScroll" type="button" style="top: 18px; right:2px; " onclick="oo5.CallScroll('L' )" title="сдвиг тегов 'влево '">L</button>
-			<button class="btnCallScroll" type="button" style="top: 34px; right:18px;" onclick="oo5.CallScroll('R' )" title="сдвиг тегов 'вправо'">R</button>
-			<button class="btnCallScroll" type="button" style="top: 34px; right:2px; " onclick="oo5.CallScroll('B' )" title="сдвиг тегов 'вниз  '">B</button>
-
-			<div class='divs'>
-				<div id="div-etalon">
-					<p>
-						<b class="name">X</b>:
-						<input class="level" type="number" min="-9" max="9" placeholder='0'>
-						<input class="alive" type="checkbox">
-					</p>
-					<p class="pmark" title="места зависания тегов">
-						<span class="T" title="завис. Top   "><b>&nbsp;</b></span>
-						<span class="B" title="завис. Bottom"><b>&nbsp;</b></span>
-						<span class="L" title="завис. Left  "><b>&nbsp;</b></span>
-						<span class="R" title="завис. Right "><b>&nbsp;</b></span>
-					</p>
-					<p class="pitch" title="сдвиг соседнего тега ">
-						<span class="O" title="сдвиг Over  "><b>&nbsp;</b></span>
-						<span class="P" title="сдвиг Push  "><b>&nbsp;</b></span>
-						<span class="C" title="сдвиг Clench"><b>&nbsp;</b></span>
-						<span class="S" title="сдвиг Shift "><b>&nbsp;</b></span>
-					</p>
-					<div class="frame" title="взаимодействующие контейнеры f - фиксация c - обрезание">
-						<p class="body">&nbsp;<i>body </i><span><b>&nbsp;</b> <b>&nbsp;</b></span></p>
-						<p class="div1">&nbsp;<i>div1 </i><span><b>&nbsp;</b> <b>&nbsp;</b></span></p>
-						<p class="div2">&nbsp;<i>div2 </i><span><b>&nbsp;</b> <b>&nbsp;</b></span></p>
-						<p class="div3">&nbsp;<i>div3 </i><span><b>&nbsp;</b> <b>&nbsp;</b></span></p>
-						<p class="div4">&nbsp;<i>div4 </i><span><b>&nbsp;</b> <b>&nbsp;</b></span></p>
-						<p class="    ">&nbsp;<i>все. </i><span><b>&nbsp;</b> <b>&nbsp;</b></span></p>
-					</div>
-				</div>
-			</div>
+	<div class='cboxed'>
+		<div o5include='тесты + /shp/add/0shp.html?.cboxedinc'></div>
 		</div>
 
 		<pre id="ref0" class="pre-head"><b>Варианты подвисания <i>olga5_shp</i></b>
@@ -127,7 +88,7 @@
 									<p><br>контроль</p>
 								</div>
 								<!-- <div id="shp0" class="moved olga5_shp:TrLb:i=div3/fc" -->
-								<div id="shp0" class="moved olga5_shp:TrLb:i=div3/fc,div2/f"
+								<div id="shp0" class="moved olga5_shp:TrLbA:i=div3/fc,div2/f"
 									style="left:750px; top:500px;">
 									<p>название объекта</p>
 								</div>

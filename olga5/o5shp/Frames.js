@@ -14,6 +14,7 @@
         o5debug = C.consts.o5debug,
         mdiglit = /[a-zA-Z]+|[+-]*\d+/g,
         msmall = /^[a-z]/,
+        mselec = /[A-Z]|[+-]?\d+/g,
         f0 = {
             typ: 'n', cod: '', num: 0, cut: true, fix: true, s: 'умолчание?',
             err: `фреймы не найдены/заданы: взяты ближйший с скроллингом`
@@ -25,11 +26,11 @@
             const rez = []
             for (const frame of aO5.frames) {
                 rez.push({
-                    frame: ' '+ frame.ibase + '.' + frame.pO5.name,
-                    str: ' '+ frame.typ + ':' + frame.cod + ':' + frame.num,
-                    fc: ' '+ (frame.fix ? 'fix' : '   ') + ' ' + (frame.cut ? 'cut' : '   '),                    
-                    aO5s: ' '+ frame.aO5s.map(a => a.a_name).join(', '),
-                    err: ' '+ frame.err,
+                    frame: ' ' + frame.ibase + '.' + frame.pO5.name,
+                    str: ' ' + frame.typ + ':' + frame.cod + ':' + frame.num,
+                    fc: ' ' + (frame.fix ? 'fix' : '   ') + ' ' + (frame.cut ? 'cut' : '   '),
+                    aO5s: ' ' + frame.aO5s.map(a => a.a_name).join(', '),
+                    err: ' ' + frame.err,
                 })
             }
             C.ConsoleInfo(`Фреймы у ${aO5.a_name}`, rez.length, rez)
@@ -45,13 +46,13 @@
     class Frame {
         key = ''        // чтобы видеть первым
         constructor(f) {
-            Object.assign(this , {
-                typ:f.typ, 
-                cod:f.cod, 
-                num:f.num, 
-                cut:f.cut, 
-                fix:f.fix, 
-                s:f.s, 
+            Object.assign(this, {
+                typ: f.typ,
+                cod: f.cod,
+                num: f.num,
+                cut: f.cut,
+                fix: f.fix,
+                s: f.s,
                 pO5: null,
                 xO5: null,
                 n: 0,
@@ -61,7 +62,7 @@
                 ibase: 0,
                 aO5s: [], // кто его использует
             })
-            
+
             this.nears = { frame: this, } // чтобы печатать в отладке
 
             Object.seal(this)
@@ -85,129 +86,108 @@
         static Key(f) {
             return f.typ + ',' + f.cod + ',' + f.num;
         }
-        static ReadCls(aO5, quals) {
+
+        static ReadCls(aO5, ss) {
             const cls = aO5.cls
-            let setdef = true
+
             Object.assign(cls, {           // для повторной инициализации (напр. в тестах)
                 level: 0,
-                pitch: '',
+                pitch: 'S',
                 none: false,
+                nofx: false, 
                 alive: false,
-                puts: { T: '', L: '', R: '', B: '', },
             })
+            cls.puts.length = 0 //  : { T: '', L: '', R: '', B: '', },
 
-            let typ = 'i'
-            for (const qual of quals)
-                if (!qual.match(msmall)) {  // с больших букв начинаются зарактеристики подвисабельного объекта
-                    const qls = qual.match(mdiglit)
-                    if (qls)
-                        for (const ql of qls) {
-                            if (ql.trim() === '')
-                                continue
+            const cs = ss.match(mselec)
+            for (const c of cs)
+                if (!isNaN(c))
+                    cls.level = Number(c)
+                else
+                    switch (c) {
+                        case 'A': cls.alive = true; break
+                        case 'C':                       // сжимает предыдущий
+                        case 'P':                       // сталкивает предыдущий
+                        case 'S':                       // сдвигает предыдущий
+                        case 'O': cls.pitch = c; break  // наезжает на предыдущий
+                        case 'T':
+                        case 'L':
+                        case 'R':
+                        case 'B': cls.puts.push(c); break
+                        case 'N': cls.nofx = true; break    // не подвисает, но может сдвигать остальные
+                        default: errs.push(`не определён квалиф. '${ql[i]}' в строке "${qual}"`)
+                    }
 
-                            setdef = false;
-                            if (!isNaN(ql))
-                                cls.level = Number(ql)
-                            else
-                                for (let i = 0; i < ql.length; i++) {
-                                    const c = ql[i].toUpperCase()
-                                    switch (c) {
-                                        case 'A': cls.alive = true; break
-                                        case 'C':                       // сжимает предыдущий
-                                        case 'P':                       // сталкивает предыдущий
-                                        case 'S':                       // сдвигает предыдущий
-                                        case 'O': cls.pitch = c; break  // наезжает на предыдущий
-                                        case 'T':
-                                        case 'L':
-                                        case 'R':
-                                        case 'B': cls.puts[c] = c; break
-                                        case 'N': cls.nofx = true; break    // не подвисает, но может сдвигать остальные
-                                        default: errs.push(`не определён квалиф. '${ql[i]}' в строке "${qual}"`)
+            if (cls.puts.length === 0) cls.puts.push('T')
+        }
+
+        static MakeFrames(aO5, ss, mframes) {
+            const typs = 'cins'
+
+            for (const s of ss) {
+                if (!s) continue
+
+                const
+                    cc = s.includes('=') ? s.split('=') : ['i', s],  // считаем, что это значение для id
+                    typ = cc[0].trim().toLowerCase(),
+                    uu = (cc[1] || '').split('/'),
+                    f = {
+                        cut: false, fix: false, num: 0, err: '', typ: typ,
+                        cod: (uu[0] || '').trim(),
+                        s: s
+                    }
+
+                if (!typs.includes(typ))
+                    errs.push({ name: aO5.a_name, qual: qual, err: `тип ссылки '${typ}' не начинается одним из '${typs}'` })
+                else
+                    if (uu.length > 1) {    //  && !uu[1].trim()
+                        for (let i = 1; i < uu.length; i++) {
+                            const pars = uu[i].match(mdiglit)
+                            if (pars)
+                                for (const par of pars) {
+                                    const n = Number(par)
+                                    if (Number.isInteger(n) && !isNaN(n)) {
+                                        if (f.typ !== 'w')    // для 'window' номер игнорируется
+                                            f.num = n
+                                    }
+                                    else {
+                                        if (par.indexOf('f') >= 0) f.fix = true
+                                        if (par.indexOf('c') >= 0) f.cut = true
                                     }
                                 }
                         }
-                }
 
-            if (setdef) {
-                cls.pitch = 'S'
-                cls.puts.T = 'T'
-            }
-            else if (!(cls.pitch || '').trim())
-                cls.pitch = 'S'
-        }
-        static MakeFrames(aO5, squals, mframes) {
-            const
-                quals = squals.split(':'),
-                typs = 'cins'
-
-            for (const qual of quals)
-                if (qual.match(msmall)) { // с маленькой буквы начинаются описания фреймов
-                    const ss = qual.split(',')
-
-                    for (const s of ss) {
-                        if (!s) continue
-
-                        const
-                            cc = s.includes('=') ? s.split('=') : ['i', s],  // считаем, что это значение для id
-                            typ = cc[0].trim().toLowerCase(),
-                            uu = (cc[1] || '').split('/'),
-                            f = {
-                                cut: false, fix: false, num: 0, err: '', typ: typ,
-                                cod: (uu[0] || '').trim(),
-                                s: s
-                            }
-
-                        if (!typs.includes(typ))
-                            errs.push({ name: aO5.a_name, qual: qual, err: `тип ссылки '${typ}' не начинается одним из '${typs}'` })
-                        else
-                            if (uu.length > 1) {    //  && !uu[1].trim()
-                                for (let i = 1; i < uu.length; i++) {
-                                    const pars = uu[i].match(mdiglit)
-                                    if (pars)
-                                        for (const par of pars) {
-                                            const n = Number(par)
-                                            if (Number.isInteger(n) && !isNaN(n)) {
-                                                if (f.typ !== 'w')    // для 'window' номер игнорируется
-                                                    f.num = n
-                                            }
-                                            else {
-                                                if (par.indexOf('f') >= 0) f.fix = true
-                                                if (par.indexOf('c') >= 0) f.cut = true
-                                            }
-                                        }
-                                }
-
-                                if (!f.fix || !f.cut) {
-                                    let s = ``
-                                    if (!f.fix) s = `не задан 'fix' (не подвисает); ` + (f.cut ? '.' : ', ')
-                                    if (!f.cut) s += `не задан 'cut' (не обрезается).`
-                                    Object.assign(f, { err: s, })
-                                }
-                            }
-                            else
-                                Object.assign(f, { cut: true, fix: true, err: `для ${s} по умолчанию вкл. 'fix' и 'cut'`, })
-
-                        const
-                            key = f.key = Frame.Key(f),
-                            xf = mframes.get(key)
-                        if (xf) {
-                            xf.fix ||= f.fix; xf.cut ||= f.cut; f.err = ''
+                        if (!f.fix || !f.cut) {
+                            let s = ``
+                            if (!f.fix) s = `не задан 'fix' (не подвисает); ` + (f.cut ? '.' : ', ')
+                            if (!f.cut) s += `не задан 'cut' (не обрезается).`
+                            Object.assign(f, { err: s, })
                         }
-                        else
-                            mframes.set(key, new Frame(f))
                     }
+                    else
+                        Object.assign(f, { cut: true, fix: true, err: `для ${s} по умолчанию вкл. 'fix' и 'cut'`, })
+
+                const
+                    key = f.key = Frame.Key(f),
+                    xf = mframes.get(key)
+                if (xf) {
+                    xf.fix ||= f.fix; xf.cut ||= f.cut; f.err = ''
                 }
+                else
+                    mframes.set(key, new Frame(f))
+            }
 
             if (mframes.size === 0)
                 mframes.set(Frame.Key(f0), new Frame(f0))     //  pbase.bframes.values().next().value)            
         }
         static ReadAttrs(aO5, quals) {
-            const mframes = new Map()
+            const mframes = new Map(),
+                aquals = quals.split(/[:;]/)
 
             errs = []
 
-            Frame.ReadCls(aO5, quals)
-            Frame.MakeFrames(aO5, quals, mframes)
+            Frame.ReadCls(aO5, aquals[0] || '') // разделяющие запятые там просто игнорируются
+            Frame.MakeFrames(aO5, (aquals[1] || '').split(','), mframes)
 
             wshp.PBases.PBase.StoreFrames(aO5, mframes)
 
@@ -215,9 +195,6 @@
                 const u = aO5.shp.quals ? `c квалиф. "${aO5.shp.quals.join(':')}"` : `(без квалификаторов)`
                 C.ConsoleError(`Чтение frames '${aO5.a_name}' ${u} есть ошибки: `, errs.length, errs)
             }
-
-            // для тестирования в frames.html
-            window.dispatchEvent(new CustomEvent('o5_containers', { detail: { aO5: aO5, } }))
 
             if (o5debug > 1)
                 DebugShowRez(aO5)

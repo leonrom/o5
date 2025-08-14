@@ -118,7 +118,7 @@
             tag.pO5 = pO5
 
             Object.assign(pO5, {
-                el: el,     //   tag и el различаются только у1 тега body
+                el: el,     //   tag и el различаются только для тега body
                 tag: tag,
                 id: tag.id,
                 name: C.MakeObjName(tag),

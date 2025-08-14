@@ -59,7 +59,7 @@
                 id: shp.id,
                 shp: shp,
                 ext: {},    // для хранения произвольных данных внешними (тестовыми) модулями
-                cls: { level: 0, pitch: 0, none: 0, nofx: 0, alive: 0, puts: [] }, // инициализация будет в ReadCls(aO5, ss) 
+                cls: { puts: [], pitch: 'S', alive: false, none: false, level: 0, nofx: false },
                 base: { pO5: null, pbase: null },
                 act: {
                     time: -1,    // для пересчетка текущей позиции

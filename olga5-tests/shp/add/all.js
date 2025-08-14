@@ -21,12 +21,12 @@ class OO5 {
             cls = aO5.cls,
             ss = []
         let
-            s = '<b>' + aO5.id + '</b>' +
+            s = '<b><u>' + aO5.id + '</u></b>' +
                 `<br/>` +
-                '<b>' + this.#Join(cls.puts) + '</b>' +
-                ':<b>' + cls.pitch + '</b>(<i>' + this.#pitches[cls.pitch] + '</i>)' +
-                ':<b>' + cls.level + '</b>' +
-                (cls.alive ? ':<b>A</b><i>live</i>' : '') +
+                '<b>' + cls.puts.join('') + '</b>' +
+                ',<b>' + cls.pitch + '</b>(<i>' + this.#pitches[cls.pitch] + '</i>)' +
+                (cls.alive ? ',<b>A</b><i>live</i>' : '') +
+                ',<b>' + cls.level + '</b>' +
                 `<br/>`
 
         for (const frame of aO5.frames) {
@@ -76,13 +76,14 @@ class OO5 {
             }
         }
 
-        this.#wshp.Frames.Frame.ReadAttrs(aO5,
-            pmarks.join('') + ':' +
-            pitchs.join('') + ':' +
+        const sattr =
+            pmarks.join('') +
+            pitchs.join('') +
+            alives.map(f => f ? 'A' : '').join('') +
             levels.join('') + ':' +
-            alives.map(f => f ? ':A' : '').join('') +
             frames.map(f => `i=${f.nam}/${f.f}${f.c}`).join(',')
-        )
+
+        this.#wshp.Frames.Frame.ReadAttrs(aO5, sattr)
 
         for (const x of 'TLRB')
             for (const p of aO5.pFixs[x]) {
@@ -93,6 +94,7 @@ class OO5 {
 
         this.#BordNames(aO5)
         this.#wshp.DoChgs.MakeScroll(0.1, 0.1, aO5.base.pO5, true)
+        this.#wshp.DoChgs.MakeScroll(-0.1, -0.1, aO5.base.pO5, true)
     }
     #InitCtrls = (aO5, div) => {
         const
@@ -107,7 +109,7 @@ class OO5 {
                         cls = sp.className.trim(),
                         b = sp.getElementsByTagName('b')[0]
 
-                    b.innerHTML = aO5.cls.puts[cls] ? cls : this.#nbsp
+                    b.innerHTML = aO5.cls.puts.includes(cls) ? cls : this.#nbsp
                     b.b5 = { aO5: aO5, val: cls, div: div, key: key }
                     b.addEventListener('click', this.CbMark)
                     div.aO5bs.push(b)
@@ -276,7 +278,23 @@ class OO5 {
             cb = e.target,
             b5 = cb.b5
         if (b5) {
-            cb.innerHTML = cb.innerHTML === this.#nbsp ? b5.val : this.#nbsp  // переключение 
+            if (cb.innerHTML === this.#nbsp) cb.innerHTML = b5.val      // переключение
+            else {
+                cb.innerHTML = this.#nbsp
+                /*					 
+                    расфиксация по 'o' 				
+                */
+                const o = b5.val,
+                aO5=b5.aO5
+
+                for (const p of aO5.pFixs[o])
+                    aO5.UnFix(o, p)
+
+                aO5.pCurFix[o] = null
+                if ('TB'.includes(o)) aO5.posC.top = aO5.posO.top
+                else aO5.posC.left = aO5.posO.left
+            }
+
             this.#SetaO5(b5)
         }
     }

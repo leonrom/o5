@@ -144,8 +144,6 @@
                             el = observ.getel(shp)
 
                         wshp.Frames.Frame.ReadAttrs(aO5, el.quals)
-                        // для тестирования в frames.html
-                        window.dispatchEvent(new CustomEvent('o5_containers', { detail: { aO5: aO5, } }))
                     }
                     observ.unobserve(shp)
 
