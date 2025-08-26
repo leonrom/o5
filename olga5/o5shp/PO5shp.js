@@ -107,26 +107,26 @@
                 C.ConsoleAlert(`Повтор создания 'pO5' для контейнера id='${tag.id}' [${tag.className.trim()}]`)
 
             const
-                pO5 = this,
                 ibody = tag.nodeName == 'BODY',
                 final = tag.classList.contains('olga5_Start'),
                 nst = window.getComputedStyle(tag),
                 classList = Array.from(tag.classList),
                 el = ibody ? document.documentElement : tag
 
-            el.pO5 = pO5
-            tag.pO5 = pO5
+            el.pO5 = this
+            tag.pO5 = this
 
-            Object.assign(pO5, {
+            Object.assign(this, {
                 el: el,     //   tag и el различаются только у1 тега body
                 tag: tag,
                 id: tag.id,
-                name: C.MakeObjName(tag),
-                classOrigs: classList,
                 ibody: ibody,
                 final: final,
+                classOrigs: classList,
+                name: C.MakeObjName(tag),
+                
+                pOuts: [],         //  (скроллируемые pO5) все скроллируемых внешних контейнеров
                 pAlls: new Set(),  //  (все pO5) список всех внешних  контейнеров
-                pOuts: new Set(),  //  (скроллируемые pO5) все скроллируемых внешних контейнеров
                 pIncs: new Set(),  //  (скроллируемые pO5) все скроллируемых вложенных контейнеров 
 
                 aAlls: new Set(),  // список 'всех' подвисабельных тегов (всл. влож. контейн.)
@@ -150,60 +150,65 @@
                     left: el.scrollLeft,
                     width: el.clientWidth,
                     height: el.clientHeight,
-                },
-                visis: { // въезжание вложенных контейнеров
-                    T: new Map(), L: new Map(), R: new Map(), B: new Map(),
-                    act: { isChg: false },
+                },                
+                covers: { // въезжание вложенных контейнеров
+                    T: 0, L: 0, R: 0, B: 0,
+                    act: { isChg: false, start:true, T: 0, L: 0, R: 0, B: 0 },
                 },
                 scops: {    //   координаты рабочей зоны контейнера
                     T: 0, L: 0, R: 0, B: 0
                 },
             })
+            for (const x of 'TLRB'){
+                this.covers[x] = new Map()
+                this.covers.act[x] = {mp:null, mv:NaN}
+                Object.freeze(this.covers[x])
+            }
+
             // добавляю сам себя
-            pO5.pAlls.add(pO5)
-            pO5.pOuts.add(pO5)
-            pO5.pIncs.add(pO5)
+            this.pOuts.push(this)
+            this.pAlls.add(this)
+            this.pIncs.add(this)
 
-            for (const nam of ['aAlls', 'aOwns', 'aOuts', 'pOuts', 'pIncs', 'scrll', 'scops'])
-                Object.seal(pO5[nam])
+            for (const nam of ['aOwns', 'aOuts',  'scrll', 'scops'])  // 'aAlls', 'pOuts', 'pIncs',
+                Object.seal(this[nam])
 
-            Object.freeze(pO5.borders)
-            Object.freeze(pO5.scrls)
-            Object.freeze(pO5.visis)
+            Object.freeze(this.scrls)
+            Object.freeze(this.covers)
+            Object.freeze(this.borders)
             Object.freeze(this)
 
             this.CalcScope()
 
-            if (pO5.scrls.H || pO5.scrls.V) {
+            if (this.scrls.H || this.scrls.V) {
                 ro.observe(el);
                 (ibody ? window : el).addEventListener('scroll', () => {
-                    saved.Act(pO5, 'S')
+                    saved.Act(this, 'S')
                 })
             }
 
             if (o5debug > 1)
-                console.log(`PO5 создано ${pO5.name}`)
+                console.log(`PO5 создано ${this.name}`)
         }
         name = ''    // еще и тут - чтобы сразу видеть в отладчике
         CalcScope() {   // видимост,- пересчитывается при скроллине в DoChgsconst
             const
-                pO5 = this,
-                tag = pO5.tag,
+                tag = this.tag,
                 de = document.documentElement,
-                p = pO5.ibody ?
+                p = this.ibody ?
                     { top: 0, left: 0, right: de.clientWidth, bottom: de.clientHeight } :
                     tag.getBoundingClientRect(),
-                b = pO5.borders,
+                b = this.borders,
                 atTo = tag.clientTop > b.top,         // полоса - вверху
                 atLe = tag.clientLeft > b.left,       // полоса - слев       
                 top = p.top + b.top + (atTo ? (tag.offsetHeight - tag.clientHeight) : 0),
                 left = p.left + b.left + (atLe ? (tag.offsetWidth - tag.clientWidth) : 0)
 
-            Object.assign(pO5.scops, {
+            Object.assign(this.scops, {
                 T: top,
                 L: left,
-                R: left + (pO5.ibody ? de.clientWidth : tag.clientWidth),
-                B: top + (pO5.ibody ? de.clientHeight : tag.clientHeight)
+                R: left + (this.ibody ? de.clientWidth : tag.clientWidth),
+                B: top + (this.ibody ? de.clientHeight : tag.clientHeight)
             })
         }
     }

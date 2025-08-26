@@ -19,13 +19,13 @@
     class PBase {
         static #pbases = new Map()
         constructor(pO5) {
-            this.pO5 = pO5             // ссылка на скроллируемый контейнер
+            this.name = pO5.name       // ссылка на скроллируемый контейнер
             this.aO5s = new Set()      // все эти будут проверяться на "натыкание"
-            this.frames = new Map()   // mO5s = new wshp.Map()
-
-            Object.seal(this)
-            Object.seal(this.act)
-
+            this.frames = new Map()    // mO5s = new wshp.Map()
+            this.sOuts = {               // упорядоченные внешние (скроллируемые) конейнеры
+                T: new Set(), L: new Set(), R: new Set(), B: new Set()
+            }
+            Object.freeze(this.sOuts)
             Object.freeze(this)
 
             PBase.#pbases.set(pO5, this)
@@ -72,8 +72,9 @@
         static StoreFrames(aO5, mframes) {
             const
                 errs = [],
-                pbase = aO5.base.pbase,
-                // frames=pbase.frames,
+                // pbase = aO5.base.pbase,
+                pOuts = aO5.base.pO5.pOuts,
+                frames = aO5.base.pbase.frames,
                 IsInClass = (pO5, clss) => {
                     const classOrigs = pO5.classOrigs
                     if (classOrigs.length > 0) {
@@ -95,7 +96,7 @@
 
                     let n = frame.num
 
-                    for (const pO5 of pbase.pO5.pOuts) {
+                    for (const pO5 of pOuts) {
                         pO5c = pO5
                         if (
                             (t === 's' && (pO5.scrls.V || pO5.scrls.H)) ||
@@ -128,17 +129,17 @@
                             (frame.err ? `с ошибкой: ${frame.err}` : ``))
 
                     frame.ibase = ++ibase
-                    pbase.frames.set(key, frame)
+                    frames.set(key, frame)
                     return frame
                 }
 
             // удаляю старое использование
-            for (const [key, f] of pbase.frames) {
+            for (const [key, f] of frames) {
                 const i = f.aO5s.indexOf(aO5)
                 if (i >= 0) {
                     f.aO5s.splice(i, 1)
                     if (f.aO5s.length === 0)
-                        pbase.frames.delete(key)
+                        frames.delete(key)
                 }
             }
 
@@ -146,7 +147,7 @@
             aO5.frames.clear()
 
             for (const [key, f] of mframes) {
-                const frame = pbase.frames.get(key) || FillStoreFrame(key, f)
+                const frame = frames.get(key) || FillStoreFrame(key, f)
 
                 frame.aO5s.push(aO5)
                 aO5.frames.add(frame)
@@ -155,12 +156,13 @@
             // формирую список на которых aO5 может фиксироваться
             for (const x of 'TLRB') {
                 aO5.pCouldFixs[x].length = 0
-                for (const p of pbase.pO5.pOuts) 
-                    for (const frame of aO5.frames)
-                        if (frame.fix && frame.pO5 === p) {
-                            aO5.pCouldFixs[x].push(p)
-                            break
-                        }
+                if (aO5.cls.puts.includes(x))
+                    for (const p of pOuts)
+                        for (const frame of aO5.frames)
+                            if (frame.fix && frame.pO5 === p) {
+                                aO5.pCouldFixs[x].push(p)
+                                break
+                            }
             }
 
             if (errs.length)

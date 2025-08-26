@@ -93,7 +93,9 @@
                             let j = pIncs.length
                             while (j-- > 0) {
                                 pO5.pIncs.add(pIncs[j])
-                                pIncs[j].pOuts.add(pO5)
+                                const pOuts=pIncs[j].pOuts
+                                if (!pOuts.includes(pO5))
+                                    pOuts.push(pO5)
                             }
                             pIncs.push(pO5)
                         }
@@ -148,19 +150,6 @@
                         window.dispatchEvent(new CustomEvent('o5_containers', { detail: { aO5: aO5, } }))
                     }
                     observ.unobserve(shp)
-
-                    // for (const pO5 of pbase.pO5.pOuts)
-                    //     if (!pO5.overflows.inited) {
-                    //         CheckOverflow(pO5, time)
-                    //         pO5.overflows.inited = true
-                    //         if (o5debug > 1) {
-                    //             console.log(`начальная вложенность ${pO5.name}: `,
-                    //                 `T: [${pO5.overflows.T.map(p => p.name)}]`,
-                    //                 `L: [${pO5.overflows.T.map(p => p.name)}]`,
-                    //                 `R: [${pO5.overflows.T.map(p => p.name)}]`,
-                    //                 `B: [${pO5.overflows.T.map(p => p.name)}]`)
-                    //         }
-                    //     }
                 }
             // if (isi)
             //     wshp.DoChgs.MakeScroll(0.1, 0.1, body)

@@ -60,7 +60,7 @@
                 shp: shp,
                 ext: {},    // для хранения произвольных данных внешними (тестовыми) модулями
                 cls: { level: 0, pitch: 0, none: 0, nofx: 0, alive: 0, puts: [] }, // инициализация будет в ReadCls(aO5, ss) 
-                base: { pO5: null, pbase: null },
+                base: { pO5: null, pbase: null },  // будут присвоены в PBases в Attach(aO5)
                 act: {
                     time: -1,    // для пересчетка текущей позиции
                     clon: null,
@@ -78,7 +78,7 @@
                 pCouldFixs: { T: [], L: [], R: [], B: [] },
                 pCurFix: { T: null, L: null, R: null, B: null },
 
-                shrunks: { T: [], L: [], R: [], B: [] },   // список прижатых aO5
+                shrunks: { T: new Set(), L: new Set(), R: new Set(), B: new Set() },   // список прижатых aO5
 
                 nears: {},
                 hidden: Object.assign({}, AO5.TFix),    //  если zeroed и нету 'alive'           
@@ -110,16 +110,14 @@
             }
             Object.freeze(this.nears)
 
-            for (const x of 'TLRB') {
-                aO5.shrunks[x] = new Set()
-            }
-            for (const nam of ['pCurFix', 'base', 'margs', 'outln', 'shrunks', 'hidden', 'zeroed', 'isFull', 'posC', 'posO', 'posS', 'orig', 'cls'])
+            for (const nam of ['pCurFix', 'base', 'margs', 'outln', 'hidden', 'zeroed', 'isFull', 'posC', 'posO', 'posS', 'orig', 'cls'])
                 if (aO5[nam])
                     Object.seal(aO5[nam])
                 else
                     console.log("%c%s", fmtErr, `в aO5 отсутствует '${nam}'`)
 
             Object.freeze(this.pCouldFixs)
+            Object.freeze(this.shrunks)
             Object.freeze(this.pFixs)
             Object.freeze(this)
         }

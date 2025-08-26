@@ -85,12 +85,15 @@ class OO5 {
 
         this.#wshp.Frames.Frame.ReadAttrs(aO5, sattr)
 
-        for (const x of 'TLRB')
-            for (const p of aO5.pFixs[x]) {
-                const name = p.name.substring(1)
+        for (const x of 'TLRB'){
+            let j = aO5.pFixs[x].length
+            while (j-- > 0){
+                const 
+                    p = aO5.pFixs[x][j],
+                    name = p.name.substring(1)
                 if (!frames.find(frame => frame.nam === name && frame.f === 'f'))
                     aO5.UnFix(x, p)
-            }
+            }}
 
         this.#BordNames(aO5)
         this.#wshp.DoChgs.MakeScroll(0.1, 0.1, aO5.base.pO5, true)
@@ -287,8 +290,11 @@ class OO5 {
                 const o = b5.val,
                 aO5=b5.aO5
 
-                for (const p of aO5.pFixs[o])
-                    aO5.UnFix(o, p)
+                // for (const p of aO5.pFixs[o])
+                //     aO5.UnFix(o, p)
+            let j = aO5.pFixs[o].length
+            while (j-- > 0)
+                aO5.UnFix(o, aO5.pFixs[o][j])
 
                 aO5.pCurFix[o] = null
                 if ('TB'.includes(o)) aO5.posC.top = aO5.posO.top

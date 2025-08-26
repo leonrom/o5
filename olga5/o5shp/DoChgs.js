@@ -42,47 +42,14 @@
 		CalcpCurFix = (aO5, x, pFixsx) => {
 			const xtl = 'TL'.includes(x)
 			let vx, px;
-			for (const p of pFixsx) {		//  - сравниваю границы во всех где он зафиксирован
-				const v = p.scops[x]
+			for (const pFix of pFixsx) {		//  - сравниваю границы во всех где он зафиксирован
+				const v = pFix.scops[x]
 				if (!px || (xtl && v > vx) || (!xtl && v < vx)) {
 					vx = v
-					px = p
+					px = pFix
 				}
 			}
 			return px
-			// if (pCurFix[x] !== px) {
-			// 	if (o5debug) {
-			// 		const
-			// 			p = pCurFix[x],
-			// 			old = p ? (p.name + '(' + vold + ')') : "'нуля'"
-
-			// 		s = ` по '${x}': с ${old} на ${px.name}(${vx}) `
-			// 	}
-			// 	pCurFix[x] = px
-			// 	switch (x) {
-			// 		case 'T': aC.top = vx; break
-			// 		case 'L': aC.left = vx; break
-			// 		case 'R': aC.left = vx - aC.width; break
-			// 		case 'B': aC.top = vx - aC.height; break
-			// 	}
-			// }
-
-			// const o = opp[x]
-			// if (this.pFixs[o].length) {
-			// 	const dv = pCurFix[o].scops[o] - vx
-			// 	switch (x) {
-			// 		case 'T': aC.height = dv; break         // aS.top -= aC.height - dv;  
-			// 		case 'L': aC.width = dv; break          // aS.left -= aC.width - dv;  
-			// 		case 'R': aC.width = -dv; break
-			// 		case 'B': aC.height = -dv; break
-			// 	}
-
-			// 	if (o5debug)
-			// 		s = ` ${'TB'.includes(x) ? 'height' : 'width'} уменшен на ${dv} ` + s
-			// }
-
-			// if (o5debug && s)
-			// 	console.log("%c%s", fmtOK, `Перефиксация`, s)
 		}
 
 	// ---- batching ShowFix() per frame ----
@@ -113,7 +80,7 @@
 
 		for (const pInc of pcO5.pIncs) {		// позиции всех вложенных контейнеров
 			pInc.CalcScope()
-			pInc.visis.act.isChg = false
+			pInc.covers.act.isChg = false
 		}
 
 		const scops = pcO5.scops
@@ -121,25 +88,44 @@
 			const o = opp[x]
 
 			// проверяю въезжание вложенных контейнеров
-			for (const m of [x, o]) {
-				const mv = scops[m]
-				for (const p of pcO5.pIncs)
-					if (p !== pcO5) {					//	Отметка Видимости Границ (p, [[x, vpx], [o, vpo]], pcO5)
-						const
-							v = p.scops[m],
-							visi = 'TL'.includes(m) ? v >= mv : v <= mv,	// д.б. >=/<= чтоб сработала перефиксация
-							vp = p.visis[m].get(pcO5)
+			let ms;
+			for (const pInc of pcO5.pIncs)
+				if (pInc !== pcO5) {					//	Отметка Видимости Границ (pInc, [[x, vpx], [o, vpo]], pcO5)
+					if (pInc.covers.act.start) {
+						ms = 'TLRB'
+						pInc.covers.act.start = false
+					}
+					else ms = [x, o]
 
-						if (vp !== visi) {
-							p.visis[m].set(pcO5, visi)
-							p.visis.act.isChg = true
+					for (const m of ms) {
+						const
+							v = pInc.scops[m],
+							istl = 'TL'.includes(m),
+							cover = istl ? v < scops[m] : v > scops[m]	// д.б. >=/<= чтоб сработала перефиксация			
+
+						if (pInc.covers[m].has(pcO5) != cover) {  // д.б. '!=' т.к. сравнивать  null и false
+							pInc.covers.act.isChg = true
+							if (cover)
+								pInc.covers[m].set(pcO5, v)
+
+							else
+								pInc.covers[m].delete(pcO5)
+
+							let mp = null, mv = NaN;
+							for (const [p, v] of pInc.covers[m])
+								if (!mp ||
+									(istl ? v >= mv : v > v <= mv)
+								) {
+									mp = p; mv = v;
+								}
+							Object.assign(pInc.covers.act[m], { mp, mv })
 						}
 					}
-			}
+				}
 
 			for (const aO5 of pcO5.aAlls) {
 				const
-					pOuts = aO5.base.pbase.pO5.pOuts,
+					pOuts = aO5.base.pO5.pOuts,
 					pFixso = aO5.pFixs[o],
 					pf = aO5.pCurFix[x],
 					vf = pf ? pf.scops[x] : NaN,
@@ -153,8 +139,8 @@
 				let j = pFixso.length
 				while (j-- > 0) {
 					const
-						p = pFixso[j],
-						vo = p.scops[o]
+						pFix = pFixso[j],
+						vo = pFix.scops[o]
 					if (
 						(o === 'T' && vo < (pf ? (vf - aO.height) : aO.top)) ||
 						(o === 'L' && vo < (pf ? (vf - aO.width) : aO.left)) ||
@@ -162,8 +148,8 @@
 						(o === 'B' && vo > (pf ? (vf + aO.height) : (aO.top + aO.height))) ||
 						false
 					) {
-						// if (IsOut(o, aX, p.scops[o]) < 0) {
-						aO5.UnFix(o, p)
+						// if (IsOut(o, aX, pFix.scops[o]) < 0) {
+						aO5.UnFix(o, pFix)
 						chgo = true
 
 						if (o5debug)
@@ -180,35 +166,35 @@
 					else aC.left = aO.left
 				}
 				else
-					if (chgo || pFixso.find(p => p.visis.act.isChg) || fromTest)
+					if (chgo || pFixso.find(p => p.covers.act.isChg) || fromTest)
 						aO5.pCurFix[o] = CalcpCurFix(aO5, o, pFixso)
 
 				/* 
 					фиксация по 'x' 
 				*/
 				if (aO5.cls.puts.includes(x)) {
-					const						pFixsx = aO5.pFixs[x]
+					const pFixsx = aO5.pFixs[x]
 					let chgx = false
 
-					for (const p of pOuts) {	// на которых может зафиксироваться
+					for (const pOut of pOuts) {	// на которых может зафиксироваться
 						const
-							fx = !pFixsx.includes(p),
-							fo = !pFixso.includes(p),
-							fC = aO5.pCouldFixs[x].includes(p),
+							fx = !pFixsx.includes(pOut),
+							fo = !pFixso.includes(pOut),
+							fC = aO5.pCouldFixs[x].includes(pOut),
 							fI = pFixso.length > 0 ?
-								IsOut(x, aC, p.scops[x]) >= 0 :
-								IsOut(x, aO, p.scops[x]) >= 0
+								IsOut(x, aC, pOut.scops[x]) >= 0 :
+								IsOut(x, aO, pOut.scops[x]) >= 0
 						if (fx && fC && fI) { // фиксируем // && fo
-							aO5.DoFix(x, p)
+							aO5.DoFix(x, pOut)
 							chgx = true
 
 							if (o5debug)
 								console.log("%c%s", fmtOK, `фиксирую`,
-									`${aO5.id} всего на ${p.name} по ${x}: [${pFixsx.map(p => p.name).join(', ')}]` +
+									`${aO5.id} всего на ${pOut.name} по ${x}: [${pFixsx.map(p => p.name).join(', ')}]` +
 									`,  по ${o}: [${pFixso.map(p => p.name).join(', ')}]`)
 						}
 					}
-					if (chgx || fromTest || pFixsx.find(p => p.visis.act.isChg))
+					if (chgx || fromTest || pFixsx.find(p => p.covers.act.isChg))
 						aO5.pCurFix[x] = CalcpCurFix(aO5, x, pFixsx)
 				}
 
@@ -242,44 +228,30 @@
 							case 'B': break
 						}
 				}
-				// if (aO5.act.fixed) {
-				// 	if (
-				// 		!chgo &&
-				// 		!chgx &&
-				// 		!aO5.pCurFix[x] &&
-				// 		!aO5.pCurFix[o]
-				// 	) {
-				// 		if ('TB'.includes(x)) aC.top -= scV
-				// 		else aC.left -= scH
-
-				// 		if (o5debug > 1)
-				// 			console.log("%c%s", fmtOK, `сдвиг`,
-				// 				`${aO5.id} по ${x} для ${'TB'.includes(x) ? ('top на ' + scV) : ('left на ' + scH)} `)
-				// 	}
-
-				for (const m of [x, o])
-					if (aO5.pFixs[m].length) {		// уже где-то зафиксирован и подъезжает под границцу								
-						const pCouldFix = aO5.pCouldFixs[m]
-						for (const p of pOuts) 		// на которых может зафиксироваться
-							if (!pCouldFix.includes(p)) {
-								const
-									v = p.scops[m],
-									d = IsOut(m, aC, v)
-								if (d > 0) {
-									switch (m) {
-										case 'T': aC.height -= d; aC.top = v; aO5.posS.top -= d; break
-										case 'L': aC.width -= d; aC.left = v; aO5.posS.left -= d; break
-										case 'R': aC.width -= d; aC.left = v - aC.width; break
-										case 'B': aC.height -= d; aC.top = v - aC.height; break
-									}
-
-									if (o5debug)
-										console.log("%c%s", fmtOK, `подсовую`, `${aO5.id} под ${p.name} по ${m}`)
-								}
-							}
-					}
 
 				if (aO5.act.fixed) {
+					for (const m of [x, o])
+						if (aO5.pFixs[m].length) {		// уже где-то зафиксирован и подъезжает под границцу								
+							const pCouldFix = aO5.pCouldFixs[m]
+							for (const pOut of pOuts) 		// на которых может зафиксироваться
+								if (!pCouldFix.includes(pOut)) {
+									const
+										v = pOut.scops[m],
+										d = IsOut(m, aC, v)
+									if (d > 0) {
+										switch (m) {
+											case 'T': aC.height -= d; aC.top = v; aO5.posS.top -= d; break
+											case 'L': aC.width -= d; aC.left = v; aO5.posS.left -= d; break
+											case 'R': aC.width -= d; aC.left = v - aC.width; break
+											case 'B': aC.height -= d; aC.top = v - aC.height; break
+										}
+
+										if (o5debug)
+											console.log("%c%s", fmtOK, `подсовую`, `${aO5.id} под ${pOut.name} по ${m}`)
+									}
+								}
+						}
+
 					ScheduleShowFixed(aO5)
 				}
 			}
