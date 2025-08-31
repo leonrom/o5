@@ -7,8 +7,25 @@
 (function () {              // ---------------------------------------------- o5shp/DoChgs ---
 	"use strict"
 
-	let wshp;
+	let wshp, start;
 	let tstO5, tstId = 'shp4', tstNam = 'bottom', tstVal = 481;
+
+	// ---- batching ShowFix() per frame ----
+	const FixUpdateQueue = new Set()
+	let fixUpdateScheduled = false
+
+	function ScheduleShowFixed(aO5) {
+		FixUpdateQueue.add(aO5)
+		if (!fixUpdateScheduled) {
+			fixUpdateScheduled = true
+			requestAnimationFrame(() => {
+				for (const o of FixUpdateQueue)
+					o.ShowFix()
+				FixUpdateQueue.clear()
+				fixUpdateScheduled = false
+			})
+		}
+	}
 
 	const
 		olga5_modul = "o5shp",
@@ -50,26 +67,53 @@
 				}
 			}
 			return px
-		}
+		},
+		CalcCovers = (xs, pcO5) => {	// пересчет въезжания вложенных контейнеров
+			const
+				ms = (() => {		// границы пересчета
+					if (start) {
+						start = false
+						return 'TLRB'
+					}
+					let ms = ''
+					for (const x of xs) ms += x + opp[x]
+					return ms
+				}
+				)()
+			let isChg = false
+			for (const m of ms) {
+				const
+					istl = 'TL'.includes(m),
+					vm = pcO5.scops[m]
 
-	// ---- batching ShowFix() per frame ----
-	const FixUpdateQueue = new Set()
-	let fixUpdateScheduled = false
+				for (const pInc of pcO5.pIncs) {
+					const
+						v = pInc.scops[m],
+						cover = istl ? v < vm : v > vm	// д.б. >=/<= чтоб сработала перефиксация			
 
-	function ScheduleShowFixed(aO5) {
-		FixUpdateQueue.add(aO5)
-		if (!fixUpdateScheduled) {
-			fixUpdateScheduled = true
-			requestAnimationFrame(() => {
-				for (const o of FixUpdateQueue)
-					o.ShowFix()
-				FixUpdateQueue.clear()
-				fixUpdateScheduled = false
-			})
+					if (pInc.covers[m].has(pcO5) != cover) {  // д.б. '!=' т.к. сравнивать  null и false
+						isChg = true
+						if (cover)
+							pInc.covers[m].set(pcO5, v)
+						else
+							pInc.covers[m].delete(pcO5)
+
+						let mp = null, mv = NaN;
+						for (const [p, v] of pInc.covers[m])
+							if (!mp ||
+								(istl ? v >= mv : v > v <= mv)
+							) {
+								mp = p; mv = v;
+							}
+						Object.assign(pInc.covers.act[m], { mp, mv })
+					}
+				}
+				pInc.covers.act.isChg = isChg
+			}
 		}
-	}
 
 	function MakeScroll(scV, scH, pcO5, fromTest) {
+
 		// направление движения объектов в контейнере - обратное ползунку скроллинга	
 		let xs = ''
 		if (scV > 0) xs += 'T'; else if (scV < 0) xs += 'B'
@@ -78,50 +122,13 @@
 		for (const aO5 of pcO5.aAlls)			// позиции всех внутренних тегов - 1 раз!
 			aO5.CalcCurPos()
 
-		for (const pInc of pcO5.pIncs) {		// позиции всех вложенных контейнеров
+		for (const pInc of pcO5.pIncs) 		// позиции всех вложенных контейнеров
 			pInc.CalcScope()
-			pInc.covers.act.isChg = false
-		}
 
-		const scops = pcO5.scops
+		CalcCovers(xs, pcO5)
+
 		for (const x of xs) {
 			const o = opp[x]
-
-			// проверяю въезжание вложенных контейнеров
-			let ms;
-			for (const pInc of pcO5.pIncs)
-				if (pInc !== pcO5) {					//	Отметка Видимости Границ (pInc, [[x, vpx], [o, vpo]], pcO5)
-					if (pInc.covers.act.start) {
-						ms = 'TLRB'
-						pInc.covers.act.start = false
-					}
-					else ms = [x, o]
-
-					for (const m of ms) {
-						const
-							v = pInc.scops[m],
-							istl = 'TL'.includes(m),
-							cover = istl ? v < scops[m] : v > scops[m]	// д.б. >=/<= чтоб сработала перефиксация			
-
-						if (pInc.covers[m].has(pcO5) != cover) {  // д.б. '!=' т.к. сравнивать  null и false
-							pInc.covers.act.isChg = true
-							if (cover)
-								pInc.covers[m].set(pcO5, v)
-
-							else
-								pInc.covers[m].delete(pcO5)
-
-							let mp = null, mv = NaN;
-							for (const [p, v] of pInc.covers[m])
-								if (!mp ||
-									(istl ? v >= mv : v > v <= mv)
-								) {
-									mp = p; mv = v;
-								}
-							Object.assign(pInc.covers.act[m], { mp, mv })
-						}
-					}
-				}
 
 			for (const aO5 of pcO5.aAlls) {
 				const
