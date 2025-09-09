@@ -39,8 +39,10 @@
 				}
 
 				let s = `<b>${aO5.name.padEnd(3, '&nbsp;')}</b>`
-				for (const frame of aO5.frames) {
+				// for (const frame of aO5.frames) {        
+				for (const frm of aO5.frms) {
 					const
+						frame = this.#wshp.Frames.Frame.frames.get(frm.key),
 						u1 = (frame.fix && frame.cut) ? 'fc' : (frame.fix ? 'f' : (frame.cut ? 'c' : '')),
 						u2 = frame.num ? frame.num : '',
 						u = u1 + u2
@@ -48,12 +50,9 @@
 				}
 				s += ss.join(', ')
 
-
-
-
-
-				for (const frame of aO5.frames) {
-
+				// for (const frame of aO5.frames) {
+				for (const frm of aO5.frms) {
+					const frame = this.#wshp.Frames.Frame.frames.get(frm.key)
 					let u = ''
 					if (oldakey !== akey) {
 						oldakey = akey

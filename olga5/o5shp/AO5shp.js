@@ -47,7 +47,7 @@
         static TObj = { T: {}, L: {}, R: {}, B: {} }
         static nom = 0
 
-        constructor(shp) {
+        constructor(shp, quals) {
             const aO5 = this
 
             shp.aO5shp = aO5
@@ -56,11 +56,12 @@
                 a_name: window.olga5.C.MakeObjName(shp),  // shp.id, // только чтобы легче видеть в отладчике 
                 parent: shp.parentElement,
                 nom: AO5.nom++,
+                quals: quals,
                 id: shp.id,
                 shp: shp,
                 ext: {},    // для хранения произвольных данных внешними (тестовыми) модулями
                 cls: { level: 0, pitch: 0, none: 0, nofx: 0, alive: 0, puts: [] }, // инициализация будет в ReadCls(aO5, ss) 
-                base: { pO5: null, pbase: null },  // будут присвоены в PBases в Attach(aO5)
+                base: { bO5: null, pbase: null },  // будут присвоены в PBases в Attach(aO5)
                 act: {
                     time: -1,    // для пересчетка текущей позиции
                     clon: null,
@@ -86,7 +87,7 @@
                 zeroed: { V: false, H: false },          //  имеют нулевой размер  - по результату ChNudget
                 isFull: { V: false, H: false }, //  признак, что тег был полностью видим - по вертикали и горизонтали   
 
-                frames: new Set(),
+                frms: new Set(),
 
                 posS: { top: 0, left: 0, },
                 posC: { top: 0, left: 0, height: 0, width: 0, },      // координаты скроллируемого

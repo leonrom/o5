@@ -22,109 +22,112 @@
         o5debug = C.consts.o5debug,
         fmtOK = "background: blue; color: white;",
         fmtErr = "background: yellow; color: black;",
-        pIncs = [];
-
-    /**          
-     * Демонстрация главной фишки динамическоо создания aO5
-     * @function DebugShowRez
-     * контейнеры для aO5,- обрабатываются только "новые" контейнеры,
-     * а инфа из уже обработанных просто переписывается
-         */
-    const DebugShowRez = aO5 => {
-        const rez = []
-        let prev = aO5.parent
-        do {
-            const pO5 = prev.pO5
-            rez.push({
-                pO5: pO5.name,
-                scrl: ' ' + (pO5.scrls.H ? 'H' : '') + (pO5.scrls.V ? 'V' : ''),
-                pAlls: ' ' + (Array.from(pO5.pAlls)).map(pO5 => pO5.name).join(', '),
-                pOuts: ' ' + (Array.from(pO5.pOuts)).map(pO5 => pO5.name).join(', '),
-                pIncs: ' ' + (Array.from(pO5.pIncs)).map(pO5 => pO5.name).join(', '),
-                aAlls: ' ' + (Array.from(pO5.aAlls)).map(a => a.a_name).join(', '),
-                aOwns: ' ' + (Array.from(pO5.aOwns)).map(a => a.a_name).join(', '),
-                aOuts: ' ' + (Array.from(pO5.aOuts)).map(a => a.a_name).join(', '),
-            })
-            if (prev.pO5.ibody)
-                break
-            else
-                prev = prev.parentElement
-        } while (true)
-        const name = aO5.base.pO5 ? aO5.base.pO5.name : '?'
-        C.ConsoleInfo(`Контейнеры для ${aO5.a_name} в base=${name}`, rez.length, rez)
-    };
-
-    /**          
-     * создать aO5 и прописать его во все вышестоящие контейнеры
-     * выполняется однократно для каждого обнаруживаемого (нового) aO5
-     * @function CreateAO5
-     * создаются/дополняются pO5 во всех обрамляющих контейнерах содержащих контейнер prev
-     * @function CreatePrevPO5
-     */
-    const
-        CreateAO5 = shp => {
+        mselec = /[A-Z]|[+-]?\d+/g,
+        DebugShowRez = aO5s => {
             const
-                aO5 = new wshp.AO5shp.AO5(shp),
-                parent = aO5.parent,
+                head = ` после "${Array.from(aO5s).map(aO5 => aO5.a_name).join(', ')}"`,
+                rez = []
 
-                FindPScrolls = (aO5, prev) => {
-                    let pO5 = prev.pO5, next, scrl;
+            for (const aO5 of aO5s)
+                rez.push({
+                    aO5: aO5.a_name,
+                    base: aO5.base.bO5.name,
+                    frms: Array.from(aO5.frms).map(f => f.key +
+                        (f.fix && f.cut) ? '/FC' : ((f.fix ? '/F' : '') + (f.cut ? '/C' : ''))
+                    ).join(', ')
+                })
 
-                    if (!pO5) {
-                        pO5 = new wshp.PO5shp.PO5(prev)
+            C.ConsoleInfo(`Обработка ${head}`, rez.length, rez)
 
-                        if (!pO5.ibody) {
-                            next = prev.parentElement
+            rez.length = 0
+            for (const { pO5, pbase } of wshp.PBases.PBase) {
+                rez.push({
+                    base: pO5.name,
+                    pOuts: ' ' + (Array.from(pbase.pOuts.T)).map(pO5 => pO5.name).join(', '),
+                    aO5s: ' ' + (Array.from(pbase.aO5s)).map(aO5 => aO5.a_name).join(', ')
+                })
+            }
+            C.ConsoleInfo(`Базы ${head}`, rez.length, rez)
 
-                            // console.log(`FindPScrolls next=${next.id}`)
-                            FindPScrolls(aO5, next)
-                        }
-                    }
-                    if (o5debug > 1)
-                        console.log(` CreateAO5.FindPScrolls next=${next ? next.id : '  - '}  prev=${prev.id}  pO5=${pO5.name}`)
+            rez.length = 0
+            for (const { key, frame } of wshp.Frames.Frame) {
+                rez.push({
+                    key: key,
+                    tcn: frame.typ + ':' + frame.cod + ':' + frame.num,
+                    pO5: frame.pO5.name,
+                    aO5s: frame.aO5s.map(a => a.a_name).join(', '),
+                    err: frame.err,
+                })
+            }
+            C.ConsoleInfo(`Фреймы ${head}`, rez.length, rez)
+        },
 
-                    if (next)
-                        for (const o5 of next.pO5.pAlls)
-                            pO5.pAlls.add(o5)
-                },
-                FillScrollables = pAlls => {
-                    for (const pO5 of pAlls)
-                        if (pO5.scrls.H || pO5.scrls.V || pO5.ibody) {
-                            let j = pIncs.length
-                            while (j-- > 0) {
-                                pO5.pIncs.add(pIncs[j])
-                                const pOuts=pIncs[j].pOuts
-                                if (!pOuts.includes(pO5))
-                                    pOuts.push(pO5)
-                            }
-                            pIncs.push(pO5)
-                        }
+        Init = () => {
+            const mtags = C.SelectByClassName(wshp.W.class, olga5_modul)
+            let found;
+
+            for (const mtag of mtags) {
+                if (
+                    !mtag.tag.classList.contains('o5shp_none') &&
+                    !mtag.quals.find(qual => !qual.includes('=') && qual.match(/n/i))
+                ) {
+                    if (!observ)
+                        observ = CreateObserver({
+                            root: null,
+                            threshold: [0, 1],
+                            rootMargin: '0px',
+                            trackVisibility: false,
+                        })
+                    observ.observe(mtag.tag, mtag.quals)
+                    found = true
                 }
-
-            pIncs.length = 0
-
-            if (!parent.pO5)
-                FindPScrolls(aO5, parent)
-
-            FillScrollables(aO5.parent.pO5.pAlls)
-
-            wshp.PBases.PBase.Attach(aO5)
-
-            aO5.base.pO5.aOwns.add(aO5)
-            let out = false
-            for (const p of aO5.base.pO5.pOuts) {
-                if (out) p.aOuts.add(aO5)
-                p.aAlls.add(aO5)
-                // p.SetUnfix(aO5)
-
-                out = true
             }
 
-            if (o5debug > 1)
-                DebugShowRez(aO5)
+            if (!found)
+                console.log("%c%s", fmtErr, `В тегах с классом 'olga5_Start' нет объектов '${wshp.W.class}' без class='o5shp_none' и квалификатора ':N'`)
+        },
 
-            return aO5
-        };
+        ReadCls = (aO5, ss) => {
+            const cls = aO5.cls
+
+            Object.assign(cls, {           // для повторной инициализации (напр. в тестах)
+                level: 0,
+                pitch: 'S',
+                none: false,
+                nofx: false,
+                alive: false,
+            })
+            cls.puts.length = 0 //  : { T: '', L: '', R: '', B: '', },
+
+            const cs = ss.match(mselec)
+            for (const c of cs)
+                if (!isNaN(c))
+                    cls.level = Number(c)
+                else
+                    switch (c) {
+                        case 'A': cls.alive = true; break
+                        case 'C':                       // сжимает предыдущий
+                        case 'P':                       // сталкивает предыдущий
+                        case 'S':                       // сдвигает предыдущий
+                        case 'O': cls.pitch = c; break  // наезжает на предыдущий
+                        case 'T':
+                        case 'L':
+                        case 'R':
+                        case 'B': cls.puts.push(c); break
+                        case 'N': cls.nofx = true; break    // не подвисает, но может сдвигать остальные
+                        default: errs.push(`не определён квалиф. '${ql[i]}' в строке "${qual}"`)
+                    }
+
+            if (cls.puts.length === 0) cls.puts.push('T')
+        },
+
+        ReadAttrs = aO5 => {
+            const aquals = aO5.quals.split(/[:;]/)
+
+            ReadCls(aO5, aquals[0] || '') // разделяющие запятые там просто игнорируются
+
+            wshp.Frames.MakeFrames(aO5, (aquals[1] || '').split(','))
+        }
 
     /**
      * Обработчик событий от IntersectionObserver.
@@ -135,24 +138,36 @@
      */
     const
         Observe = entries => {
-            let isi;
+            const aO5s = new Set()
             for (const entry of entries)
                 if (entry.isIntersecting) {
-                    isi = true
-                    const shp = entry.target
-                    if (!shp.aO5shp) {  // вообще-то можно и не проверять....
-                        const
-                            aO5 = CreateAO5(shp),
-                            el = observ.getel(shp)
+                    const
+                        shp = entry.target,
+                        el = observ.getel(shp)
 
-                        wshp.Frames.Frame.ReadAttrs(aO5, el.quals)
-                        // для тестирования в frames.html
-                        window.dispatchEvent(new CustomEvent('o5_containers', { detail: { aO5: aO5, } }))
-                    }
+                    aO5s.add(new wshp.AO5shp.AO5(shp, el.quals))
+
                     observ.unobserve(shp)
                 }
-            // if (isi)
-            //     wshp.DoChgs.MakeScroll(0.1, 0.1, body)
+
+            const  bO5s = new Set()    
+            for (const aO5 of aO5s) {
+                if (wshp.PBases.PBase.Attach(aO5))  // если добавилась новая база
+                    bO5s.add(aO5.base.bO5)
+
+                ReadAttrs(aO5)
+
+                // для тестирования в frames.html
+                window.dispatchEvent(new CustomEvent('o5_containers', { detail: { aO5: aO5, } }))
+            }
+            
+            for (const bO5 of bO5s) 
+                    wshp.DoChgs.CalcCovers(bO5, 'TLRB')
+
+            if (o5debug > 1)
+                DebugShowRez(aO5s)
+
+            aO5s.clear()
         }
 
     /**
@@ -196,35 +211,5 @@
             },
         }
     }
-
-    /**
-     * Инициализирует список наблюдаемых элементов.
-     * @function Init
-     */
-    const Init = () => {
-        const mtags = C.SelectByClassName(wshp.W.class, olga5_modul)
-        let found;
-
-        for (const mtag of mtags) {
-            if (
-                !mtag.tag.classList.contains('o5shp_none') &&
-                !mtag.quals.find(qual => !qual.includes('=') && qual.match(/n/i))
-            ) {
-                if (!observ)
-                    observ = CreateObserver({
-                        root: null,
-                        threshold: [0, 1],
-                        rootMargin: '0px',
-                        trackVisibility: false,
-                    })
-                observ.observe(mtag.tag, mtag.quals)
-                found = true
-            }
-        }
-
-        if (!found)
-            console.log("%c%s", fmtErr, `В тегах с классом 'olga5_Start' нет объектов '${wshp.W.class}' без class='o5shp_none' и квалификатора ':N'`)
-    };
-
-    const wshp = C.AddModuleSub(olga5_modul, modulname, [Init])
+    const wshp = C.AddModuleSub(olga5_modul, modulname, [Init, ReadAttrs])
 })();

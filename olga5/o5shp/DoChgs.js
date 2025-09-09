@@ -68,76 +68,76 @@
 			}
 			return px
 		},
-		CalcCovers = (xs, pcO5) => {	// пересчет въезжания вложенных контейнеров
-			const
-				ms = (() => {		// границы пересчета
-					if (start) {
-						start = false
-						return 'TLRB'
-					}
-					let ms = ''
-					for (const x of xs) ms += x + opp[x]
-					return ms
-				}
-				)()
-			let isChg = false
+		CalcCovers = (pO5, ms) => {	// пересчет въезжания вложенных контейнеров
+			let isChg = false, isnew = 0
+			
 			for (const m of ms) {
 				const
 					istl = 'TL'.includes(m),
-					vm = pcO5.scops[m]
+					vm = pO5.scops[m]
 
-				for (const pInc of pcO5.pIncs) {
-					const
-						v = pInc.scops[m],
-						cover = istl ? v < vm : v > vm	// д.б. >=/<= чтоб сработала перефиксация			
+				for (const pInc of pO5.pIncs)
+					if (pInc !== pO5) {
+						const
+							v = pInc.scops[m],
+							cover = istl ? v < vm : v > vm	// д.б. >=/<= чтоб сработала перефиксация			
 
-					if (pInc.covers[m].has(pcO5) != cover) {  // д.б. '!=' т.к. сравнивать  null и false
-						isChg = true
-						if (cover)
-							pInc.covers[m].set(pcO5, v)
-						else
-							pInc.covers[m].delete(pcO5)
+						if (pInc.covers[m].has(pO5) != cover) {  // д.б. '!=' т.к. сравнивать  null и false
+if (o5debug)							
+	console.log(`-${isnew++?'     ':' === '} m=${m}  pInc=${pInc.name}   cover=${cover?'да ':'нет'}   `)
+							isChg = true
+							if (cover)
+								pInc.covers[m].set(pO5, v)
+							else
+								pInc.covers[m].delete(pO5)
 
-						let mp = null, mv = NaN;
-						for (const [p, v] of pInc.covers[m])
-							if (!mp ||
-								(istl ? v >= mv : v > v <= mv)
-							) {
-								mp = p; mv = v;
-							}
-						Object.assign(pInc.covers.act[m], { mp, mv })
+							let mp = null, mv;
+							for (const [p, v] of pInc.covers[m])
+								if (!mp ||
+									(istl ? v >= mv : v > v <= mv)
+								) {
+									mp = p; mv = v;
+								}
+							// Object.assign(pInc.covers.act[m], { mp, mv })
+							pInc.covers.act[m] = mp
+						}
+
+						pInc.covers.act.isChg = isChg
 					}
-				}
-				pInc.covers.act.isChg = isChg
 			}
 		}
-
 	function MakeScroll(scV, scH, pcO5, fromTest) {
-
-		// направление движения объектов в контейнере - обратное ползунку скроллинга	
-		let xs = ''
-		if (scV > 0) xs += 'T'; else if (scV < 0) xs += 'B'
-		if (scH > 0) xs += 'L'; else if (scH < 0) xs += 'R'
-
-		for (const aO5 of pcO5.aAlls)			// позиции всех внутренних тегов - 1 раз!
-			aO5.CalcCurPos()
-
-		for (const pInc of pcO5.pIncs) 		// позиции всех вложенных контейнеров
-			pInc.CalcScope()
-
-		CalcCovers(xs, pcO5)
-
-		for (const x of xs) {
-			const o = opp[x]
-
-			for (const aO5 of pcO5.aAlls) {
+		const
+			КоррекцияФиксированных = (aO5, m) => {	// уже где-то зафиксирован и подъезжает под границу								
 				const
-					pOuts = aO5.base.pO5.pOuts,
-					pFixso = aO5.pFixs[o],
+					aC = aO5.posC,
+					pCouldFix = aO5.pCouldFixs[m]
+				for (const pOut of aO5.base.bO5.pOuts) 		// на которых может зафиксироваться
+					if (!pCouldFix.includes(pOut)) {
+						const
+							v = pOut.scops[m],
+							d = IsOut(m, aC, v)
+						if (d > 0) {
+							switch (m) {
+								case 'T': aC.height -= d; aC.top = v; aO5.posS.top -= d; break
+								case 'L': aC.width -= d; aC.left = v; aO5.posS.left -= d; break
+								case 'R': aC.width -= d; aC.left = v - aC.width; break
+								case 'B': aC.height -= d; aC.top = v - aC.height; break
+							}
+
+							if (o5debug)
+								console.log("%c%s", fmtOK, `подсовую`, `${aO5.id} под ${pOut.name} по ${m}`)
+						}
+					}
+			},
+			РасфиксацияДругойСтороны = (aO5, x) => {
+				const
+					o = opp[x],
+					aC = aO5.posC,
+					aO = aO5.posO,
 					pf = aO5.pCurFix[x],
 					vf = pf ? pf.scops[x] : NaN,
-					aO = aO5.posO,
-					aC = aO5.posC
+					pFixso = aO5.pFixs[o]
 				let chgo = false
 
 				/*
@@ -148,6 +148,7 @@
 					const
 						pFix = pFixso[j],
 						vo = pFix.scops[o]
+
 					if (
 						(o === 'T' && vo < (pf ? (vf - aO.height) : aO.top)) ||
 						(o === 'L' && vo < (pf ? (vf - aO.width) : aO.left)) ||
@@ -166,7 +167,7 @@
 				}
 
 				if (chgo && pFixso.length === 0) {
-					// if ('TB'.includes(x)) { aC.top = aO.top; aC.height = aO.height }
+					// if ('TB'.includes(x)) { aC.t+O.top; aC.height = aO.height }
 					// else { aC.left = aO.left; aC.width = aO.width }
 					aO5.pCurFix[o] = null
 					if ('TB'.includes(o)) aC.top = aO.top  // здесь без разницы: 'x' или 'o'
@@ -176,11 +177,20 @@
 					if (chgo || pFixso.find(p => p.covers.act.isChg) || fromTest)
 						aO5.pCurFix[o] = CalcpCurFix(aO5, o, pFixso)
 
+			},
+			ФиксацияПоX = (aO5, x) => {
 				/* 
-					фиксация по 'x' 
-				*/
+				фиксация по 'x' 
+			*/
 				if (aO5.cls.puts.includes(x)) {
-					const pFixsx = aO5.pFixs[x]
+					const
+						o = opp[x],
+						aO = aO5.posO,
+						aC = aO5.posC,
+						pFixsx = aO5.pFixs[x],
+						pFixso = aO5.pFixs[o],
+						pOuts = aO5.base.pbase.pOuts[x]
+
 					let chgx = false
 
 					for (const pOut of pOuts) {	// на которых может зафиксироваться
@@ -204,9 +214,12 @@
 					if (chgx || fromTest || pFixsx.find(p => p.covers.act.isChg))
 						aO5.pCurFix[x] = CalcpCurFix(aO5, x, pFixsx)
 				}
-
+			},
+			ОбрезПоГраницам = (aO5, x) => {
 				// позиционирование по границам контейнеров
 				const
+					o = opp[x],
+					aC = aO5.posC,
 					vx = aO5.pCurFix[x] ? aO5.pCurFix[x].scops[x] : NaN,
 					vo = aO5.pCurFix[o] ? aO5.pCurFix[o].scops[o] : NaN
 
@@ -235,35 +248,43 @@
 							case 'B': break
 						}
 				}
+			}
+
+		// направление движения объектов в контейнере - обратное ползунку скроллинга	
+		let xs = ''
+		if (scV > 0) xs += 'T'; else if (scV < 0) xs += 'B'
+		if (scH > 0) xs += 'L'; else if (scH < 0) xs += 'R'
+
+		for (const aO5 of pcO5.aO5s)			// позиции всех внутренних тегов - 1 раз!
+			aO5.CalcCurPos()
+
+		for (const pInc of pcO5.pIncs) 		// позиции всех вложенных контейнеров
+			if (pInc !== pcO5)
+				pInc.CalcScope()
+
+		for (const x of xs) {
+			const ms = x + opp[x]
+
+			CalcCovers(pcO5, ms)
+
+			continue
+			for (const aO5 of pcO5.aO5s) {
+
+				РасфиксацияДругойСтороны(aO5, x)
+				ФиксацияПоX(aO5, x)
+
+				ОбрезПоГраницам(aO5, x)
 
 				if (aO5.act.fixed) {
-					for (const m of [x, o])
-						if (aO5.pFixs[m].length) {		// уже где-то зафиксирован и подъезжает под границцу								
-							const pCouldFix = aO5.pCouldFixs[m]
-							for (const pOut of pOuts) 		// на которых может зафиксироваться
-								if (!pCouldFix.includes(pOut)) {
-									const
-										v = pOut.scops[m],
-										d = IsOut(m, aC, v)
-									if (d > 0) {
-										switch (m) {
-											case 'T': aC.height -= d; aC.top = v; aO5.posS.top -= d; break
-											case 'L': aC.width -= d; aC.left = v; aO5.posS.left -= d; break
-											case 'R': aC.width -= d; aC.left = v - aC.width; break
-											case 'B': aC.height -= d; aC.top = v - aC.height; break
-										}
-
-										if (o5debug)
-											console.log("%c%s", fmtOK, `подсовую`, `${aO5.id} под ${pOut.name} по ${m}`)
-									}
-								}
-						}
+					for (const m of ms)
+						if (aO5.pFixs[m].length)
+							КоррекцияФиксированных(aO5, m)
 
 					ScheduleShowFixed(aO5)
 				}
 			}
 		}
 	}
-	wshp = C.AddModuleSub(olga5_modul, modulname, [MakeScroll])
+	wshp = C.AddModuleSub(olga5_modul, modulname, [MakeScroll, CalcCovers])
 
 })();

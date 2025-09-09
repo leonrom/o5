@@ -29,8 +29,10 @@ class OO5 {
                 ',<b>' + cls.level + '</b>' +
                 `<br/>`
 
-        for (const frame of aO5.frames) {
-            const
+        // for (const frame of aO5.frames) {
+        for (const frm of aO5.frms) {
+            const 
+                frame = this.#wshp.Frames.Frame.frames.get(frm.key),
                 u1 = (frame.fix && frame.cut) ? 'fc' : (frame.fix ? 'f' : (frame.cut ? 'c' : '')),
                 u2 = frame.num ? frame.num : '',
                 u = u1 + u2
@@ -83,17 +85,18 @@ class OO5 {
             levels.join('') + ':' +
             frames.map(f => `i=${f.nam}/${f.f}${f.c}`).join(',')
 
-        this.#wshp.Frames.Frame.ReadAttrs(aO5, sattr)
+        this.#wshp.DoInit.ReadAttrs(aO5, sattr)
 
-        for (const x of 'TLRB'){
+        for (const x of 'TLRB') {
             let j = aO5.pFixs[x].length
-            while (j-- > 0){
-                const 
+            while (j-- > 0) {
+                const
                     p = aO5.pFixs[x][j],
                     name = p.name.substring(1)
                 if (!frames.find(frame => frame.nam === name && frame.f === 'f'))
                     aO5.UnFix(x, p)
-            }}
+            }
+        }
 
         this.#BordNames(aO5)
         this.#wshp.DoChgs.MakeScroll(0.1, 0.1, aO5.base.pO5, true)
@@ -191,11 +194,13 @@ class OO5 {
 
                     let frame = null
                     if (icls) {
-                        for (const f of aO5.frames)
+                        for (const frm of aO5.frms) {
+                            const f = this.#wshp.Frames.Frame.frames.get(frm.key)
                             if (f.pO5.tag.id === icls) {
                                 frame = f
                                 break
                             }
+                        }
 
                         // const el = document.getElementById(icls)
                         if (document.getElementById(icls)) {
@@ -288,13 +293,13 @@ class OO5 {
                     расфиксация по 'o' 				
                 */
                 const o = b5.val,
-                aO5=b5.aO5
+                    aO5 = b5.aO5
 
                 // for (const p of aO5.pFixs[o])
                 //     aO5.UnFix(o, p)
-            let j = aO5.pFixs[o].length
-            while (j-- > 0)
-                aO5.UnFix(o, aO5.pFixs[o][j])
+                let j = aO5.pFixs[o].length
+                while (j-- > 0)
+                    aO5.UnFix(o, aO5.pFixs[o][j])
 
                 aO5.pCurFix[o] = null
                 if ('TB'.includes(o)) aO5.posC.top = aO5.posO.top

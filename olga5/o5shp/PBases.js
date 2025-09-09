@@ -13,160 +13,81 @@
         modulname = 'PBases',
         C = window.olga5.C,
         o5debug = C.consts.o5debug
+
     /**
-* база - скроллируемый контейнер, содержащий общую информацию для подвисабельных объектов
-*/
+    * база - скроллируемый контейнер, содержащий общую информацию для подвисабельных объектов
+    */
     class PBase {
         static #pbases = new Map()
+        static #idn = 0
         constructor(pO5) {
-            this.name = pO5.name       // ссылка на скроллируемый контейнер
+            this.idn = PBase.#idn++
             this.aO5s = new Set()      // все эти будут проверяться на "натыкание"
-            this.frames = new Map()    // mO5s = new wshp.Map()
-            this.sOuts = {               // упорядоченные внешние (скроллируемые) конейнеры
-                T: new Set(), L: new Set(), R: new Set(), B: new Set()
-            }
-            Object.freeze(this.sOuts)
+
+            this.pOuts = {}               // упорядоченные внешние (скроллируемые) конейнеры
+            for (const x of 'TLRB')
+                this.pOuts[x] = [...pO5.pOuts]
+
+            Object.freeze(this.pOuts)
             Object.freeze(this)
 
             PBase.#pbases.set(pO5, this)
         }
-        static Get(pO5) {
-            return PBase.#pbases.get(pO5)
-        }
         static Attach(aO5) {
-            // ищу ближайший контейнер с рамкой или отличным фоном             
-            const
-                CurColor = pO5 => {
-                    if (pO5 && pO5.color !== 'transparent' && pO5.color !== 'rgba(0, 0, 0, 0)')
-                        return pO5.color
-                },
-                FindNearest = pAlls => {
-                    for (const pOut of pAlls) {
-                        const b = pOut.borders
-                        if (b.top || b.left || b.right || b.bottom)
-                            return pOut
-                        else {
-                            const pNex = pOut.tag.parentElement.pO5
-                            if (!pNex)
-                                return pOut
+            let bO5, newPs=0;
+            const SetbO5 = pO5 => {
+                if (!bO5) bO5 = pO5
 
-                            const curColor = CurColor(pOut)
-                            if (curColor && curColor !== CurColor(pNex))
-                                return pOut
-                        }
+                for (const pOut of bO5.pOuts)
+                    pO5.pIncs.add(pOut)
+
+                for (const p of pO5.pOuts)
+                    for (const pOut of bO5.pOuts)
+                        pOut.pOuts.add(pO5)
+            }
+
+            let nst, scrls, tag = aO5.parent, found = false
+            do {
+                if (tag.pO5) {               // уже был раньше создан
+                    SetbO5(tag.pO5)
+                    scrls = tag.pO5.scrls   // для отладочной печати
+                    found = true
+                }
+                else {
+                    nst = window.getComputedStyle(tag)
+                    scrls = wshp.PO5shp.PO5.Scrls(tag, nst)
+                    if (scrls.V || scrls.H) {
+                        const pO5 = new wshp.PO5shp.PO5(tag, nst)
+                        SetbO5(pO5)
+                        newPs++
                     }
                 }
+
+                if (o5debug > 1)
+                    console.log(`${aO5.a_name}: tag=${tag.id}, V=${scrls.V}, H=${scrls.H}. ${found ? ' === конец' : ''}`)
+
+                tag = tag.parentNode
+            } while (!found && tag)
 
             // подключаем (и создаём) pbase
             const
-                pO5 = FindNearest(aO5.parent.pO5.pAlls),
-                pbase = PBase.Get(pO5) || new PBase(pO5)   // там же и set()
+                pbase = PBase.#pbases.get(bO5) || new PBase(bO5)   // там же и set()
 
-            Object.assign(aO5.base, { pO5, pbase })
+            for (const pOut of bO5.pOuts) {
+                pOut.pBases.add(pbase)
+                pOut.aO5s.add(aO5)
+            }
+            
+            Object.assign(aO5.base, { bO5, pbase })
             pbase.aO5s.add(aO5)
+
+            return newPs
         }
-        /** 
-         * нахождение тегов-контейнеров для тех frame, у которых неопределён tag            
-         * и сортировка их по удалённости от aO5
-        */
-        static StoreFrames(aO5, mframes) {
-            const
-                errs = [],
-                // pbase = aO5.base.pbase,
-                pOuts = aO5.base.pO5.pOuts,
-                frames = aO5.base.pbase.frames,
-                IsInClass = (pO5, clss) => {
-                    const classOrigs = pO5.classOrigs
-                    if (classOrigs.length > 0) {
-                        for (const cls of clss)
-                            if (cls && classOrigs.indexOf(cls) >= 0)
-                                return true
-                    }
-                    else {
-                        if (clss.length === 0 || clss.find(cls => cls.trim().length == 0) != null)
-                            return true
-                    }
-                },
-                FillStoreFrame = (key, frame) => {
-                    let pO5c;
-                    const
-                        clss = frame.clss,
-                        t = frame.typ,
-                        c = frame.c
-
-                    let n = frame.num
-
-                    for (const pO5 of pOuts) {
-                        pO5c = pO5
-                        if (
-                            (t === 's' && (pO5.scrls.V || pO5.scrls.H)) ||
-                            (t === 'n' && pO5.tag.nodeName == c) ||
-                            (t === 'i' && pO5.tag.id.toUpperCase() == c) ||
-                            (t === 'c' && IsInClass(pO5, clss))
-                        )
-                            if (--n > 0) frame.xO5 = pO5
-                            else
-                                frame.pO5 = pO5
-
-                        if (frame.pO5 || pO5.final)
-                            break
-                    }
-
-                    if (!frame.pO5) {
-                        if (frame.xO5) {
-                            frame.pO5 = frame.xO5
-                            frame.err = `взял ${n}-й тег (вместо ${frame.num}) для фрейма "${frame.s}"`
-                        }
-                        else {
-                            frame.pO5 = pO5c
-                            frame.err = `среди скроллиремых нет тега для фрейма "${frame.s}" - взял ${pO5c.name}`
-                        }
-                        errs.push(frame.err)
-                    }
-
-                    if (o5debug)
-                        console.log(`Определил (и добавил в base.frames) фрейм "${frame.key} на ${frame.pO5.name}" ` +
-                            (frame.err ? `с ошибкой: ${frame.err}` : ``))
-
-                    frame.ibase = ++ibase
-                    frames.set(key, frame)
-                    return frame
-                }
-
-            // удаляю старое использование
-            for (const [key, f] of frames) {
-                const i = f.aO5s.indexOf(aO5)
-                if (i >= 0) {
-                    f.aO5s.splice(i, 1)
-                    if (f.aO5s.length === 0)
-                        frames.delete(key)
-                }
+        // делаем класс итерируемым
+        static *[Symbol.iterator]() {
+            for (const [pO5, pbase] of this.#pbases.entries()) {
+                yield { pO5, pbase };
             }
-
-            // добавляю новый фрейм в базу
-            aO5.frames.clear()
-
-            for (const [key, f] of mframes) {
-                const frame = frames.get(key) || FillStoreFrame(key, f)
-
-                frame.aO5s.push(aO5)
-                aO5.frames.add(frame)
-            }
-
-            // формирую список на которых aO5 может фиксироваться
-            for (const x of 'TLRB') {
-                aO5.pCouldFixs[x].length = 0
-                if (aO5.cls.puts.includes(x))
-                    for (const p of pOuts)
-                        for (const frame of aO5.frames)
-                            if (frame.fix && frame.pO5 === p) {
-                                aO5.pCouldFixs[x].push(p)
-                                break
-                            }
-            }
-
-            if (errs.length)
-                C.ConsoleError(`Ошибки определения фреймов для ${aO5.a_name}:`, errs.length, errs)
         }
     }
 

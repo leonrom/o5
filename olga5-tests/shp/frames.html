@@ -126,8 +126,12 @@
 				let onam = ''
 
 				let s = `&nbsp; <b>${aO5.name.padEnd(12, '&nbsp;')}</b>: "` + aO5.shp.aO5quals.join(':') + `"`
-				for (const f of aO5.frames) {
-					const fc = f.fix && f.cut ? '/fix/cut' : (f.fix ? '/fix' : (f.cut ? '/cut' : '')),
+
+				// for (const f of aO5.frames) {
+				for (const frm of aO5.frms) {
+					const
+						f = this.#wshp.Frames.Frame.frames.get(frm.key),
+						fc = f.fix && f.cut ? '/fix/cut' : (f.fix ? '/fix' : (f.cut ? '/cut' : '')),
 						nam = f.tag ? f.tag.pO5.name : `null`
 					// nam = f.pO5 === true ? 'ближний' : (f.pO5 ? f.pO5.name : `null`)
 					// nam = (f.pO5 ? `<b>${f.pO5.name}</b> ` : `null `).padEnd(9, '\u00A0')
