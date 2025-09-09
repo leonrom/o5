@@ -58,9 +58,8 @@
                     strt
                 ) {
                     if (o5debug > 2)
-                        console.log("%c%s", fmtErr, `saved ${pO5.id}: `, typ === 'S' ? 'скроллинг' : 'размеры'
-                            `sV=${sV}, sH=${sH}, rV=${rV}, rH=${rH},- sT=${el.scrollTop}, aT=${scrll.top}, sL=${el.scrollLeft}, aL=${scrll.left}, `
-                        )
+                        console.log("%c%s", fmtErr, `saved ${pO5.id}: ${typ === 'S' ? 'скроллинг' : 'размеры'} `+
+                            `sV=${sV}, sH=${sH}, rV=${rV}, rH=${rH}, sT=${el.scrollTop}, aT=${scrll.top}, sL=${el.scrollLeft}, aL=${scrll.left}`)
 
                     Object.assign(scrll, {
                         time: now,
@@ -75,7 +74,7 @@
                     sl.pO5 = null
                 }
                 else
-                    if (sV || sH || rH || rH) {
+                    if (sV || sH || rV || rH) {
                         Object.assign(sl, {
                             pO5: pO5,
                             time: now,
@@ -102,14 +101,26 @@
         ro = new ResizeObserver(saved.Resize)
 
     class PO5 {
-        constructor(tag) {
+        static Final(tag) {
+            return tag.aO5shp ||            // контейнер сам является подвисабельным тегом
+                tag.nodeName == 'BODY' ||   // контейнер является конечным
+                tag.classList.contains('olga5_Start')
+        }
+        static Scrls(tag, nst) {
+            const final = PO5.Final(tag),
+            oxy=final || (nst.overflow === 'auto')
+            return {
+                H: oxy || nst.overflowX === 'auto' || nst.overflow === 'scroll' || nst.overflowX === 'scroll',
+                V: oxy || nst.overflowY === 'auto' || nst.overflow === 'scroll' || nst.overflowY === 'scroll',
+            }
+        }
+
+        constructor(tag, nst) {
             if (tag.pO5)
                 C.ConsoleAlert(`Повтор создания 'pO5' для контейнера id='${tag.id}' [${tag.className.trim()}]`)
 
             const
                 ibody = tag.nodeName == 'BODY',
-                final = tag.classList.contains('olga5_Start'),
-                nst = window.getComputedStyle(tag),
                 classList = Array.from(tag.classList),
                 el = ibody ? document.documentElement : tag
 
@@ -121,17 +132,18 @@
                 tag: tag,
                 id: tag.id,
                 ibody: ibody,
-                final: final,
+                final: PO5.Final(tag),
                 classOrigs: classList,
                 name: C.MakeObjName(tag),
-                
-                pOuts: [],         //  (скроллируемые pO5) все скроллируемых внешних контейнеров
-                pAlls: new Set(),  //  (все pO5) список всех внешних  контейнеров
-                pIncs: new Set(),  //  (скроллируемые pO5) все скроллируемых вложенных контейнеров 
 
-                aAlls: new Set(),  // список 'всех' подвисабельных тегов (всл. влож. контейн.)
-                aOwns: new Set(),  // список только 'своих' подвисабельных тегов
-                aOuts: new Set(),  // список только 'чужих' подвисабельных тегов
+                aO5s: new Set(),  // подвисабельные теги во вссех внутренних pBases
+                pOuts: new Set(),  // д.б. Set() иначе в Attach будут повторы  (скроллируемые pO5) все скроллируемых внешних контейнеров
+                pIncs: new Set(),  //   -"-    (скроллируемые pO5) все скроллируемых вложенных контейнеров 
+                pBases: new Set(),  //   -"-    (скроллируемые pO5) все скроллируемых вложенных контейнеров 
+
+                // aAlls: new Set(),  // список 'всех' подвисабельных тегов (всл. влож. контейн.)
+                // aOwns: new Set(),  // список только 'своих' подвисабельных тегов
+                // aOuts: new Set(),  // список только 'чужих' подвисабельных тегов
 
                 borders: {
                     top: parseFloat(nst.borderTopWidth),
@@ -140,37 +152,35 @@
                     bottom: parseFloat(nst.borderBottomWidth),
                     bgColor: nst.backgroundColor
                 },
-                scrls: {
-                    H: final || nst.overflow === 'auto' || nst.overflowX === 'auto' || nst.overflow === 'scroll' || nst.overflowX === 'scroll',
-                    V: final || nst.overflow === 'auto' || nst.overflowY === 'auto' || nst.overflow === 'scroll' || nst.overflowY === 'scroll',
-                },
+                scrls: PO5.Scrls(tag, nst),
                 scrll: { // позиции скроллинга, видимые границы , текущие границы,  изменение границ от предыдущего              
                     time: -1,
                     top: el.scrollTop,
                     left: el.scrollLeft,
                     width: el.clientWidth,
                     height: el.clientHeight,
-                },                
+                },
                 covers: { // въезжание вложенных контейнеров
                     T: 0, L: 0, R: 0, B: 0,
-                    act: { isChg: false, start:true, T: 0, L: 0, R: 0, B: 0 },
+                    act: { isChg: false, start: true, T: 0, L: 0, R: 0, B: 0 },
                 },
                 scops: {    //   координаты рабочей зоны контейнера
                     T: 0, L: 0, R: 0, B: 0
                 },
             })
-            for (const x of 'TLRB'){
+            for (const x of 'TLRB') {
                 this.covers[x] = new Map()
-                this.covers.act[x] = {mp:null, mv:NaN}
+                this.covers.act[x] = null   // { mp: null, mv: NaN }
                 Object.freeze(this.covers[x])
             }
 
             // добавляю сам себя
-            this.pOuts.push(this)
-            this.pAlls.add(this)
-            this.pIncs.add(this)
 
-            for (const nam of ['aOwns', 'aOuts',  'scrll', 'scops'])  // 'aAlls', 'pOuts', 'pIncs',
+            this.pOuts.add(this)
+            this.pIncs.add(this)
+            // this.pAlls.add(this)
+
+            for (const nam of ['scrll', 'scops'])  // 'aAlls', 'pOuts', 'pIncs',
                 Object.seal(this[nam])
 
             Object.freeze(this.scrls)
