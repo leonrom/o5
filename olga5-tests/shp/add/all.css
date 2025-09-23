@@ -38,26 +38,28 @@
 }
 
 .cboxed .divs{
-    /* border: 1px solid aqua; */
+    border: 1px solid aqua;
     padding-left: 3px;
-    padding-bottom: 3px;
-    width: 100%;
-    height: calc(100% - 44px);
-    overflow-y: scroll;
+    padding-bottom: 0px;
+    width: calc(100% - 16px);
+    /* height: calc(100% - 6px); */
+    overflow-y: hidden;
     overflow-x: hidden;
     direction: rtl;
+    height: 130px;
 }
 
 .cboxed p {
     margin: 0;
     margin-top: 1px;
+    cursor: auto;
 }
 
 .frame i.button{
     border: 1px solid gray;
     padding: 0;
     display: inline-block;
-    margin-right: 3px;
+    margin-right: 6px;
     cursor: pointer;
     border-radius: 5px;
     padding-left: 2px;
@@ -73,8 +75,8 @@
 
 .cboxed div.frame {
     max-height: fit-content;
-    margin-top: 2px;
-    border: 1px dotted gray;
+    margin-top: 7px;
+    /* border: 1px dotted gray; */
     background: beige;
     line-height: 11px;
 }
@@ -83,7 +85,7 @@
     direction: ltr;
     line-height: 14px;
     font-size: small;
-    border: 1px solid lightgreen;
+    /* border: 1px solid lightgreen; */
     margin-bottom: 4px;
     padding-bottom: 3px;
 }
@@ -96,7 +98,7 @@
 }
 
 .cboxed p i{
-    min-width: 33px;
+    min-width: 30px;
     display: inline-block;
 }
 .cboxed p b{
@@ -122,6 +124,13 @@
     border: 1px solid aqua;
     border-radius: 3px;
     cursor: pointer;
+}
+.cboxed span b.disable {
+    cursor: auto;
+    border: none;
+}
+.cboxed span{
+    cursor: auto;
 }
 
 .cboxed b.active {

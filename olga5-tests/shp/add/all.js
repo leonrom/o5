@@ -30,13 +30,10 @@ class OO5 {
                 `<br/>`
 
         // for (const frame of aO5.frames) {
-        for (const frm of aO5.frms) {
-            const 
-                frame = this.#wshp.Frames.Frame.frames.get(frm.key),
-                u1 = (frame.fix && frame.cut) ? 'fc' : (frame.fix ? 'f' : (frame.cut ? 'c' : '')),
-                u2 = frame.num ? frame.num : '',
-                u = u1 + u2
-            ss.push(frame.cod + (u ? ('/' + u) : ''))
+        for (const frame of aO5.frms.frames) {
+            const
+                u = frame.num ? frame.num : ''
+            ss.push(frame.cod + (u ? ('/' + u) : '') + '=' + frame.pO5.name)
         }
         s += ss.join(', ')
 
@@ -67,7 +64,7 @@ class OO5 {
                 case this.#level: levels.push(b.value); break
                 case this.#alive: alives.push(b.checked); break    // //  aO5.cls.level + (aO5.cls.alive ? ':A' : ''), 
                 case this.#frame:
-                    if (txt && !b5.all) {
+                    if (txt) {
                         let f5 = frames.find((f => f.nam === b5.nam))
                         if (!f5) {
                             f5 = { nam: b5.nam, f: '', c: '' }
@@ -78,29 +75,27 @@ class OO5 {
             }
         }
 
-        const sattr =
+        aO5.act.quals =
             pmarks.join('') +
             pitchs.join('') +
             alives.map(f => f ? 'A' : '').join('') +
             levels.join('') + ':' +
             frames.map(f => `i=${f.nam}/${f.f}${f.c}`).join(',')
 
-        this.#wshp.DoInit.ReadAttrs(aO5, sattr)
+        this.#wshp.DoInit.ReadAttrs(aO5)
 
         for (const x of 'TLRB') {
-            let j = aO5.pFixs[x].length
-            while (j-- > 0) {
-                const
-                    p = aO5.pFixs[x][j],
-                    name = p.name.substring(1)
-                if (!frames.find(frame => frame.nam === name && frame.f === 'f'))
-                    aO5.UnFix(x, p)
-            }
+            const
+                p = aO5.IsFix(x),
+                name = p ? p.name.substring(1) : ''
+            if (name && !frames.find(frame => frame.nam === name && frame.f === 'f'))
+                aO5.UnFix(x, p)
+
         }
 
         this.#BordNames(aO5)
-        this.#wshp.DoChgs.MakeScroll(0.1, 0.1, aO5.base.pO5, true)
-        this.#wshp.DoChgs.MakeScroll(-0.1, -0.1, aO5.base.pO5, true)
+        this.#wshp.DoChgs.MakeScroll(0.1, 0.1, aO5.base.pBase.pO5, true)
+        this.#wshp.DoChgs.MakeScroll(-0.1, -0.1, aO5.base.pBase.pO5, true)
     }
     #InitCtrls = (aO5, div) => {
         const
@@ -164,6 +159,7 @@ class OO5 {
             FillFrams = () => {
                 const
                     key = this.#frame,
+                    pid = aO5.base.pBase.pO5.id,
                     pdiv = div.getElementsByClassName(key)[0],
                     ps = Array.from(pdiv.getElementsByTagName('p')),
                     StopPropagation = e => {
@@ -173,60 +169,71 @@ class OO5 {
                     AskScroll = e => {
                         const btn = document.getElementById('btnScrollHead')
                         if (btn) {
-                            const nam = e.target.innerText
                             if (document.getElementById(e.target.innerText))
                                 btn.innerText = e.target.innerText
                             else
-                                console.error(`нет такого контейнера '${nam}' `)
+                                console.error(`нет такого контейнера '${e.target.innerText}' `)
                         }
                         else
                             console.error(`нет кнопки "btnScrollHead" ??`)
-                        // this.#wshp.DoChgs.MakeScroll(ish ? 0 : 0.1, ish ? 0.1 : 0, tag.pO5, true)
                     }
 
+                let found = false
                 for (const p of ps) {
                     const
-                        // id = p.id,
                         icls = p.className.trim(),
                         bs = Array.from(p.getElementsByTagName('b')),
                         is0 = Array.from(p.getElementsByTagName('i'))[0],
-                        nam = is0.innerText
+                        nam = is0.innerText,
+                        isbase = pid === icls
 
-                    let frame = null
-                    if (icls) {
-                        for (const frm of aO5.frms) {
-                            const f = this.#wshp.Frames.Frame.frames.get(frm.key)
-                            if (f.pO5.tag.id === icls) {
-                                frame = f
-                                break
-                            }
+                    for (const b of bs)
+                        if (!b.b5)
+                            b.b5 = { aO5: aO5, val: '', div: div, key: key }
+
+                    // div = document.getElementById(icls),
+                    let frame;
+                    for (const f of aO5.frms.frames)
+                        if (f.pO5.tag.id === icls) {
+                            frame = f
+                            break
+                        }
+                    // if (!frame) continue
+
+                    const c0='f', c1='c', cc='&nbsp;'
+                    let                        v0 = '?',                        v1 = '?'
+                    is0.classList.add('button')
+                    is0.title = "Скроллинг: Л - гориз., П - верт."
+                    is0.addEventListener('contextmenu', StopPropagation)
+                    is0.addEventListener('mouseup', AskScroll)
+
+                    if (isbase) {
+                        bs[1].classList.add('disable')
+                        v0 = frame ? c0 : cc
+                        v1 = c1
+                        found = true
+                    }
+                    else
+                        if (found) {
+                            bs[0].classList.add('disable')
+                            v0 = cc
+                        }
+                        else{
+                            v0 = frame ? c0 : cc
+                            bs[1].classList.add('disable')
                         }
 
-                        // const el = document.getElementById(icls)
-                        if (document.getElementById(icls)) {
-                            is0.classList.add('button')
-                            is0.title = "Скроллинг: Л - гориз., П - верт."
-                            is0.addEventListener('contextmenu', StopPropagation)
-                            is0.addEventListener('mouseup', AskScroll)
-                        }
-                        else {
-                            p.innerHTML = `<span class="absent"><i>&nbsp;${nam}</i> &nbsp; &nbsp; -</span>`
-                            continue
-                        }
+                    if (!found) {
+                        const pO5 = document.getElementById(icls)
+                        bs[1].classList.add('disable')
+                        aO5.CanFixsOn(pO5)
+                        v1 = cc
                     }
 
                     for (const i of [0, 1]) {
-                        const
-                            b = bs[i],
-                            val = (i === 0) ? 'f' : 'c'
-
-                        b.b5 = { aO5: aO5, val: val, div: div, key: key, nam: nam, all: !icls }
-                        if (frame)
-                            b.innerHTML = ((frame.fix && i === 0) || (frame.cut && i === 1)) ? val : this.#nbsp
-                        else
-                            b.innerHTML = this.#nbsp
-
-                        div.aO5bs.push(b)
+                        bs[i].b5 = { aO5: aO5, val: (i === 0 ? c0 : c1), div: div, key: key, nam: nam }
+                        bs[i].innerHTML = i === 0 ? v0 : v1
+                        div.aO5bs.push(bs[i])
                     }
                 }
 
@@ -257,7 +264,6 @@ class OO5 {
             case 'B': scV = -0.1; break
         }
         this.#wshp.DoChgs.MakeScroll(scV, scH, bord.pO5, true)
-        // this.#wshp.DoChgs.MakeScroll(0.1, 0.1, aO5.base.pO5, true)
     }
     CbLevel = e => {
         const
@@ -294,16 +300,12 @@ class OO5 {
                 */
                 const o = b5.val,
                     aO5 = b5.aO5
+                if (aO5.IsFix(o)) {
+                    aO5.UnFix(o)
 
-                // for (const p of aO5.pFixs[o])
-                //     aO5.UnFix(o, p)
-                let j = aO5.pFixs[o].length
-                while (j-- > 0)
-                    aO5.UnFix(o, aO5.pFixs[o][j])
-
-                aO5.pCurFix[o] = null
-                if ('TB'.includes(o)) aO5.posC.top = aO5.posO.top
-                else aO5.posC.left = aO5.posO.left
+                    if ('TB'.includes(o)) aO5.posC.top = aO5.posO.top
+                    else aO5.posC.left = aO5.posO.left
+                }
             }
 
             this.#SetaO5(b5)
@@ -336,10 +338,10 @@ class OO5 {
                 nval = cb.innerHTML === this.#nbsp ? b5.val : this.#nbsp
 
             cb.innerHTML = nval
-            if (b5.all)             // обработка общей кнопки
-                for (const b of bs)
-                    if (b !== cb && b.b5.key === key && b.b5.val == b5.val)
-                        b.innerHTML = nval
+            // if (b5.all)             // обработка общей кнопки
+            //     for (const b of bs)
+            //         if (b !== cb && b.b5.key === key && b.b5.val == b5.val)
+            //             b.innerHTML = nval
 
             this.#SetaO5(b5)
         }
@@ -455,7 +457,9 @@ class OO5 {
 
         for (const xO5 of aAlls)
             if (xO5 !== aO5) {
-                const p2 = xO5.pFixs.fixed ? xO5.posCf : xO5.shp.getBoundingClientRect()
+                const
+                    pF = xO5.pFixs,
+                    p2 = (pF.T || pF.L || pF.R || pF.B) ? xO5.posCf : xO5.shp.getBoundingClientRect()
                 if (
                     (
                         (p1.left <= p2.right && p1.right >= p2.left) ||
@@ -469,7 +473,7 @@ class OO5 {
 
             }
 
-        this.#wshp.DoChgs.MakeScroll(0.1, 0.1, aO5.base.pO5, true)
+        this.#wshp.DoChgs.MakeScroll(0.1, 0.1, aO5.base.pBase.pO5, true)
     }
     DoMove = e => {
         const mpos = this.mpos

@@ -128,15 +128,13 @@
 				let s = `&nbsp; <b>${aO5.name.padEnd(12, '&nbsp;')}</b>: "` + aO5.shp.aO5quals.join(':') + `"`
 
 				// for (const f of aO5.frames) {
-				for (const frm of aO5.frms) {
+				for (const frame of aO5.frms.frames) {
 					const
-						f = this.#wshp.Frames.Frame.frames.get(frm.key),
-						fc = f.fix && f.cut ? '/fix/cut' : (f.fix ? '/fix' : (f.cut ? '/cut' : '')),
+						f = this.#wshp.Frames.Frame.frames.get(frame.key),
 						nam = f.tag ? f.tag.pO5.name : `null`
-					// nam = f.pO5 === true ? 'ближний' : (f.pO5 ? f.pO5.name : `null`)
-					// nam = (f.pO5 ? `<b>${f.pO5.name}</b> ` : `null `).padEnd(9, '\u00A0')
+						
 					s += '<br> ' +
-						`${f.typ}=${f.cod}/${f.num}${fc}; `.padEnd(18, '\u00A0') +
+						`${f.typ}=${f.cod}/${f.num}; `.padEnd(18, '\u00A0') +
 						`<b>${nam.padEnd(6, '\u00A0')}</b>` +
 						(f.pO5 ? ` [${f.pO5.classOrigs}]` : ``)
 					if (f.err) {

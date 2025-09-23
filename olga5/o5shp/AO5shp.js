@@ -18,19 +18,14 @@
         DblClick = e => {
             if (e.currentTarget !== e.target && e.target.ondblclick) {
                 if (o5debug > 0)
-                    console.error(` У тега ${C.MakeObjName(e.target)} уже есть свой dblclick-обработчик — пропускаем`)
+                    console.log("%c%s", fmtErr, ` У тега ${C.MakeObjName(e.target)} уже есть свой dblclick-обработчик — пропускаем`)
                 return
             }
-            // let target = e.target
-            // while (target && !target.aO5shp)
-            //     target = target.parentElement
 
-            // if (target && target.aO5shp) {
             const aO5 = e.currentTarget.aO5shp
 
             for (const x of 'TRLB')    // т.е. расфиксирую всё
-                for (const p of aO5.pFixs[x])
-                    aO5.UnFix(x, p)
+                aO5.UnFix(x)
 
             e.stopImmediatePropagation()
 
@@ -47,6 +42,9 @@
         static TObj = { T: {}, L: {}, R: {}, B: {} }
         static nom = 0
 
+        #isCut = { T: false, L: false, R: false, B: false }
+        #pFixs = { T: null, L: null, R: null, B: null }
+
         constructor(shp, quals) {
             const aO5 = this
 
@@ -56,38 +54,34 @@
                 a_name: window.olga5.C.MakeObjName(shp),  // shp.id, // только чтобы легче видеть в отладчике 
                 parent: shp.parentElement,
                 nom: AO5.nom++,
-                quals: quals,
                 id: shp.id,
                 shp: shp,
                 ext: {},    // для хранения произвольных данных внешними (тестовыми) модулями
                 cls: { level: 0, pitch: 0, none: 0, nofx: 0, alive: 0, puts: [] }, // инициализация будет в ReadCls(aO5, ss) 
-                base: { bO5: null, pbase: null },  // будут присвоены в PBases в Attach(aO5)
+                base: { bO5: null, pBase: null },  // будут присвоены в PBases в Attach(aO5)
                 act: {
                     time: -1,    // для пересчетка текущей позиции
+                    shdw: shp,          // будет: или  shp или clon
                     clon: null,
                     cart: null,
-                    fixed: false,
-                    shdw: shp,          // будет: или  shp или clon
                     checkN: -1,         // для проверок подвисания под ним
+                    quals: quals,
                     iTested: false,     // для контроля в тестах       
-                    // fixOnO5: false,     // отметка зафиксированности на pcO5 при скроллингу            
                 },
                 margs: { t: '', l: '', r: '', b: '', },
                 outln: { w: '', s: '', c: '', o: '', },
 
-                pFixs: { T: [], L: [], R: [], B: [] },
-                pCouldFixs: { T: [], L: [], R: [], B: [] },
-                pCurFix: { T: null, L: null, R: null, B: null },
+                // pFixsOn: [],
 
                 shrunks: { T: new Set(), L: new Set(), R: new Set(), B: new Set() },   // список прижатых aO5
 
-                nears: {},
-                hidden: Object.assign({}, AO5.TFix),    //  если zeroed и нету 'alive'           
+                // nears: {},
+                // hidden: Object.assign({}, AO5.TFix),    //  если zeroed и нету 'alive'           
 
-                zeroed: { V: false, H: false },          //  имеют нулевой размер  - по результату ChNudget
-                isFull: { V: false, H: false }, //  признак, что тег был полностью видим - по вертикали и горизонтали   
+                // zeroed: { V: false, H: false },          //  имеют нулевой размер  - по результату ChNudget
+                // isFull: { V: false, H: false }, //  признак, что тег был полностью видим - по вертикали и горизонтали   
 
-                frms: new Set(),
+                frms: { tagCut: null, frames: new Set() },
 
                 posS: { top: 0, left: 0, },
                 posC: { top: 0, left: 0, height: 0, width: 0, },      // координаты скроллируемого
@@ -96,30 +90,13 @@
                 orig: { display: '', position: '', top: 0, left: 0, height: 0, width: 0, },
             })
 
-            const
-                names = ['fix', 'cut', 'out'],
-                n0 = { v: NaN, p: null },
-                xs = 'TLRB'
-
-            for (const name of names) {
-                this.nears[name] = Object.assign({}, AO5.TObj)
-                for (const x of xs) {
-                    this.nears[name][x] = Object.assign({}, n0)
-                    Object.seal(this.nears[name][x])
-                }
-                Object.freeze(this.nears[name])
-            }
-            Object.freeze(this.nears)
-
-            for (const nam of ['pCurFix', 'base', 'margs', 'outln', 'hidden', 'zeroed', 'isFull', 'posC', 'posO', 'posS', 'orig', 'cls'])
+            for (const nam of ['base', 'frms', 'margs', 'outln', 'posC', 'posO', 'posS', 'orig', 'cls'])
                 if (aO5[nam])
                     Object.seal(aO5[nam])
                 else
                     console.log("%c%s", fmtErr, `в aO5 отсутствует '${nam}'`)
 
-            Object.freeze(this.pCouldFixs)
             Object.freeze(this.shrunks)
-            Object.freeze(this.pFixs)
             Object.freeze(this)
         }
         #SetMargOutls(style, margs, outln) {
@@ -133,71 +110,79 @@
                 if (this.hidden[x])
                     return true
         }
-        DoFix(x, pO5) {
-            const
-                act = this.act,
-                clon = act.clon || this.#Clone()
-
-            // if (o5debug) {
-            //     const fmt = this.pFixs[x].includes(pO5) ? fmtErr : fmtOK
-            //     console.log("%c%s", fmt, `DoFix` + (fmt === fmtErr ? ' (повтор)' : ''),
-            //         `${this.id} по ${x} на ${pO5.name}: всего [${this.pFixs[x].map(p => p.name).join(' ') + ' ' + pO5.name}]`)
-            // }
-
-            this.pFixs[x].push(pO5)
-            act.fixed = true
-
-            if (act.shdw !== clon) {
-                const
-                    shp = this.shp,
-                    cart = act.cart
-
-                act.shdw = clon
-
-                cart.style.display = ''
-                clon.style.display = this.orig.display
-
-                cart.appendChild(shp)
-
-                this.#SetMargOutls(shp.style, AO5.Margs, AO5.Outln)
-                Object.assign(shp.style, { position: 'absolute', top: 0, left: 0 })
-
-                shp.addEventListener('dblclick', DblClick, true)
-                window.dispatchEvent(new CustomEvent('o5_fixed', { detail: { aO5: this, fix: true } }))
-            }
+        CanFixsOn(pO5) {
+            for (const frame of this.frms.frames)
+                if (frame.pO5 === pO5)
+                    return frame
         }
-        UnFix(x, pO5) {
+        IsCut(x) {
+            return this.#isCut[x]
+        }
+        DoCut(x, d, v) {
+            const aC = this.posC
+            switch (x) {
+                case 'T': aC.height -= d; aC.top = v; this.posS.top -= d; break
+                case 'L': aC.width -= d; aC.left = v; this.posS.left -= d; break
+                case 'R': aC.width -= d; aC.left = v - aC.width; break
+                case 'B': aC.height -= d; aC.top = v - aC.height; break
+            }
+            this.#isCut[x] = true
+        }
+        UnCut(x) {
+            this.#isCut[x] = false
+        }
+        IsFix(x) {
+            return this.#pFixs[x]
+        }
+        DoFix(x, pO5, v) {
+            const aO5 = this
+
+            if ('TB'.includes(x)) aO5.posC.top = v
+            else aO5.posC.left = v
+
+            aO5.#pFixs[x] = pO5
+
+            const
+                clon = aO5.act.clon || aO5.#Clone(),
+                shp = aO5.shp,
+                cart = aO5.act.cart
+
+            aO5.act.shdw = clon
+
+            cart.style.display = ''
+            clon.style.display = aO5.orig.display
+
+            cart.appendChild(shp)
+
+            aO5.#SetMargOutls(shp.style, AO5.Margs, AO5.Outln)
+            Object.assign(shp.style, { position: 'absolute', top: 0, left: 0 })
+
+            shp.addEventListener('dblclick', DblClick, true)
+            window.dispatchEvent(new CustomEvent('o5_fixed', { detail: { aO5: this, fix: true } }))
+        }
+        UnFix(x) { // тут pO5 чисто для проверки
             const
                 aO5 = this,
-                act = aO5.act,
-                clon = act.clon,
-                pFixs = this.pFixs,
-                ia = pFixs[x].indexOf(pO5)
+                shp = aO5.shp
 
-            if (ia >= 0)
-                pFixs[x].splice(ia, 1)
+            if ('TB'.includes(x)) aO5.posC.top = aO5.posO.top
+            else aO5.posC.left = aO5.posO.left
 
-            this.act.fixed = pFixs.T.length || pFixs.L.length || pFixs.R.length || pFixs.B.length
+            aO5.#pFixs[x] = null
 
-            if (!this.act.fixed && act.shdw === clon) {
-                const
-                    shp = aO5.shp,
-                    cart = act.cart
+            aO5.act.shdw = shp
 
-                act.shdw = shp
+            Object.assign(shp.style, aO5.orig)
+            aO5.#SetMargOutls(shp.style, aO5.margs, aO5.outln)
 
-                Object.assign(shp.style, aO5.orig)
-                aO5.#SetMargOutls(shp.style, aO5.margs, aO5.outln)
+            aO5.act.clon.style.display = 'none'
+            aO5.act.cart.style.display = 'none'
 
-                clon.style.display = 'none'
-                cart.style.display = 'none'
+            aO5.parent.insertBefore(shp, aO5.act.cart)
 
-                aO5.parent.insertBefore(shp, cart)
+            shp.removeEventListener('dblclick', DblClick, true)
 
-                shp.removeEventListener('dblclick', DblClick, true)
-
-                window.dispatchEvent(new CustomEvent('o5_fixed', { detail: { aO5: aO5, fix: false } }))
-            }
+            window.dispatchEvent(new CustomEvent('o5_fixed', { detail: { aO5: aO5, fix: false } }))
         }
         ShowFix() {
             const aO5 = this,
@@ -284,12 +269,12 @@
                 p = aO5.act.shdw.getBoundingClientRect()
 
             Object.assign(aO5.posO, { top: p.top, left: p.left, right: p.right, bottom: p.bottom, height: p.height, width: p.width })
-
             Object.assign(aO5.posC, { width: p.width, height: p.height })
-            if (!aO5.pFixs['L'].length && !aO5.pFixs['R'].length) aO5.posC.left = p.left
-            if (!aO5.pFixs['T'].length && !aO5.pFixs['B'].length) aO5.posC.top = p.top
-
             Object.assign(aO5.posS, { top: 0, left: 0 })
+
+            const pF = aO5.#pFixs
+            aO5.posC.top = pF.T ? pF.T.scops.T : (pF.B ? (pF.B.scops.B - p.height) : aO5.posO.top)
+            aO5.posC.left = pF.L ? pF.L.scops.L : (pF.R ? (pF.R.scops.R - p.width) : aO5.posO.left)
         }
     }
 

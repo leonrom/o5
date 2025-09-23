@@ -5,7 +5,7 @@
 
 (function () {              // ---------------------------------------------- o5shp/PO5shp ---11
     "use strict"
-    let wshp;
+    let wshp, observer;
     const
         olga5_modul = "o5shp",
         modulname = 'PO5shp',
@@ -98,16 +98,23 @@
                     saved.Act(p, 'R')
             }
         },
-        ro = new ResizeObserver(saved.Resize)
-
-    class PO5 {
-        static Final(tag) {
+        ro = new ResizeObserver(saved.Resize),
+        Observe = entries => {
+            const aO5s = new Set()
+            for (const entry of entries){
+                const pO5=entry.target.pO5
+                pO5.scops.isVisible=entry.isIntersecting            
+            }
+        },
+         IsFinal=tag=> {
             return tag.aO5shp ||            // контейнер сам является подвисабельным тегом
                 tag.nodeName == 'BODY' ||   // контейнер является конечным
                 tag.classList.contains('olga5_Start')
         }
+
+    class PO5 {
         static Scrls(tag, nst) {
-            const final = PO5.Final(tag),
+            const final = IsFinal(tag),
             oxy=final || (nst.overflow === 'auto')
             return {
                 H: oxy || nst.overflowX === 'auto' || nst.overflow === 'scroll' || nst.overflowX === 'scroll',
@@ -132,18 +139,14 @@
                 tag: tag,
                 id: tag.id,
                 ibody: ibody,
-                final: PO5.Final(tag),
+                final: IsFinal(tag),
                 classOrigs: classList,
                 name: C.MakeObjName(tag),
 
-                aO5s: new Set(),  // подвисабельные теги во вссех внутренних pBases
                 pOuts: new Set(),  // д.б. Set() иначе в Attach будут повторы  (скроллируемые pO5) все скроллируемых внешних контейнеров
-                pIncs: new Set(),  //   -"-    (скроллируемые pO5) все скроллируемых вложенных контейнеров 
                 pBases: new Set(),  //   -"-    (скроллируемые pO5) все скроллируемых вложенных контейнеров 
-
-                // aAlls: new Set(),  // список 'всех' подвисабельных тегов (всл. влож. контейн.)
-                // aOwns: new Set(),  // список только 'своих' подвисабельных тегов
-                // aOuts: new Set(),  // список только 'чужих' подвисабельных тегов
+                pIncs: new Set(),  //   -"-    (скроллируемые pO5) все скроллируемых вложенных контейнеров 
+                // aO5s: new Set(),  // подвисабельные теги во вссех внутренних pBases
 
                 borders: {
                     top: parseFloat(nst.borderTopWidth),
@@ -160,31 +163,25 @@
                     width: el.clientWidth,
                     height: el.clientHeight,
                 },
-                covers: { // въезжание вложенных контейнеров
-                    T: 0, L: 0, R: 0, B: 0,
-                    act: { isChg: false, start: true, T: 0, L: 0, R: 0, B: 0 },
+                bords: { // въезжание вложенных контейнеров
+                    T: this, L: this, R: this, B: this,
+                },
+                bChgs: { // въезжание вложенных контейнеров
+                    T: false, L: false, R: false, B: false,
                 },
                 scops: {    //   координаты рабочей зоны контейнера
+                    isVisible:true,
                     T: 0, L: 0, R: 0, B: 0
                 },
             })
-            for (const x of 'TLRB') {
-                this.covers[x] = new Map()
-                this.covers.act[x] = null   // { mp: null, mv: NaN }
-                Object.freeze(this.covers[x])
-            }
-
-            // добавляю сам себя
 
             this.pOuts.add(this)
-            this.pIncs.add(this)
-            // this.pAlls.add(this)
+            // this.pIncs.add(this)
 
-            for (const nam of ['scrll', 'scops'])  // 'aAlls', 'pOuts', 'pIncs',
+            for (const nam of ['scrll', 'scops', 'bords', 'bChgs'])  // 'aAlls', 'pOuts', 'pIncs',
                 Object.seal(this[nam])
 
             Object.freeze(this.scrls)
-            Object.freeze(this.covers)
             Object.freeze(this.borders)
             Object.freeze(this)
 
@@ -196,6 +193,15 @@
                     saved.Act(this, 'S')
                 })
             }
+            if (!observer)
+                observer = new IntersectionObserver(Observe, {
+                    root: null,
+                    threshold: [0, 1],
+                    rootMargin: '0px',
+                    trackVisibility: false,
+                }
+            )
+            observer.observe(tag)
 
             if (o5debug > 1)
                 console.log(`PO5 создано ${this.name}`)

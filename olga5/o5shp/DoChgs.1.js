@@ -49,18 +49,26 @@
 								pInc.scops[m] >= pOut.scops[m] :
 								pInc.scops[m] < pOut.scops[m],
 							pNew = isVisi ? pInc : pOut
+						// pNew = (mis0) ? (
+						// 	(!isVisi && pInc.bords[m] !== pOut) ? pOut : null
+						// ) : (
+						// 	(isVisi && pInc.bords[m] === pOut) ? pInc : null
+						// )
 
 						if (pNew !== pInc.bords[m]) {
 							if (o5debug)
 								console.log(`  pInc=${pInc.name}  'm=${m}': ${pInc.bords[m].name} => ${pNew.name}`)
 
 							pInc.bords[m] = pNew
-							pInc.bChgs[m] = true
+							pInc.bords.isChg += m
 						}
 					}
 			}
 
 			for (const pInc of pO5.pIncs)
+				// console.log(`- pO5=${pO5.name} -> pInc=${pInc.name} ${pInc.scops.isVisible}`)
+				// if (pInc.name==='#div3')
+				// 	console.log()
 				if (pInc.scops.isVisible)
 					CalcCovers(pInc, ms)
 		},
@@ -68,8 +76,7 @@
 			for (const pInc of pO5.pIncs) 		// позиции всех вложенных контейнеров
 				if (pInc.scops.isVisible) {
 					pInc.CalcScope()
-					for (const m of 'TLRB')
-						pInc.bChgs[m] = false
+					pInc.bords.isChg = ''
 
 					CalcBords(pInc)
 				}
@@ -84,69 +91,73 @@
 		}
 
 	function MakeScroll(scV, scH, pcO5, fromTest) {
+
 		// направление движения объектов в контейнере - обратное ползунку скроллинга	
 		let xs = ''
 		if (scV > 0) xs += 'T'; else if (scV < 0) xs += 'B'
 		if (scH > 0) xs += 'L'; else if (scH < 0) xs += 'R'
 
+		// for (const aO5 of pcO5.aO5s)			// позиции всех внутренних тегов - 1 раз!
+		// 	aO5.CalcCurPos()
+
 		CalcBords(pcO5)
 
 		for (const pBase of pcO5.pBases)
-			for (const aO5 of pBase.aO5s.T)			// позиции всех внутренних тегов - 1 раз!
+			for (const aO5 of pBase.aO5s)			// позиции всех внутренних тегов - 1 раз!
 				aO5.CalcCurPos()
 
 		for (const x of xs)
 			CalcCovers(pcO5, [x, opp[x]])
 
 		for (const x of xs)
-			for (const pBase of pcO5.pBases) {
-				const pO5 = pBase.pO5
-				if (pO5.scops.isVisible) {
+			for (const pBase of pcO5.pBases)
+				if (pBase.pO5.scops.isVisible) {
+					const bords = pBase.pO5.bords
 					for (const m of [x, opp[x]]) {
 						const
-							isChg = pO5.bChgs[m],
-							pOut = pO5.bords[m],
+							isChg = bords.isChg.includes(m),
+							pOut = bords[m],
 							v = pOut.scops[m]
-						// почему div4  попал в  pO5.bords
-						// if (isChg)
-						// 	console.log()
 
-						for (const aO5 of pBase.aO5s[m]) {
-							const
-								canFix = !aO5.IsCut(m) &&
-									aO5.cls.puts.includes(m) &&
-									aO5.CanFixsOn(pOut),
-									
-								d = IsOut(m, aO5.posC, v),
-								pFix = aO5.IsFix(m)
+						for (const aO5 of pBase.aO5s) {
+							let
+								pFm = aO5.pFixs[m]
 
-							if (isChg && canFix && pFix)
-								aO5.DoFix(m, pOut, v)	// перефиксирую на новой границе
+							if (pFm && isChg)
+								if (aO5.pCouldFixs[m].includes(pOut)) // перефиксирую на новой границе
+									pFm = aO5.pFixs[m] = pOut
 
-							if (m === x && d > 0 && canFix) {
-								aO5.DoFix(m, pOut, v)
-								aO5.UnCut(m)
-							}
-							if (m !== x && pFix && IsOut(m, aO5.posO, v) < 0) {
-								aO5.UnFix(m)
-								aO5.UnCut(m)
-							}
+							if (m === x) {
+								const
+									d = IsOut(m, aO5.posC, v)
 
-							// if (pFix && pFix === aO5.IsFix(m)) // было и осталось то-же самое Fix
-							if (pFix === aO5.IsFix(m)) // было и осталось то-же самое Fix
 								if (d > 0)
-									aO5.DoCut(m, d, v)
-								else
-									aO5.UnCut(m)
+									if (aO5.pCouldFixs[m].includes(pOut))
+										aO5.DoFix(m, pOut, v)
+									else
+										if (pFm)
+											aO5.DoCut(m, d, v)
+							} else
+								if (pFm) {
+									const
+										v = pOut.scops[m],
+										d = IsOut(m, aO5.posO, v)
+									if (d < 0)
+										aO5.UnFix(m, pFm)
+									else {
+										const b = IsOut(m, aO5.posC, v)
+										if (b > 0)
+											aO5.DoCut(m, b, v)
+									}
+								}
 						}
 					}
 				}
-			}
 
 		for (const pBase of pcO5.pBases)
-			for (const aO5 of pBase.aO5s.T)
+			for (const aO5 of pBase.aO5s)
 				for (const m of 'TLRB')
-					if (aO5.IsFix(m)) {
+					if (aO5.pFixs[m]) {
 						ScheduleShowFixed(aO5)
 						break
 					}

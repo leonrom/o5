@@ -31,20 +31,22 @@
             for (const aO5 of aO5s)
                 rez.push({
                     aO5: aO5.a_name,
-                    base: aO5.base.bO5.name,
-                    frms: Array.from(aO5.frms).map(f => f.key +
-                        (f.fix && f.cut) ? '/FC' : ((f.fix ? '/F' : '') + (f.cut ? '/C' : ''))
-                    ).join(', ')
+                    base: aO5.base.pBase.pO5.name,
+                    tagCut:aO5.frms.tagCut,
+                    frms: Array.from(aO5.frms.frames).map(f => f.key).join(', ')
                 })
 
             C.ConsoleInfo(`Обработка ${head}`, rez.length, rez)
 
             rez.length = 0
-            for (const { pO5, pbase } of wshp.PBases.PBase) {
+            for (const { bO5, pBase } of wshp.PBases.PBase) {
                 rez.push({
-                    base: pO5.name,
-                    pOuts: ' ' + (Array.from(pbase.pOuts.T)).map(pO5 => pO5.name).join(', '),
-                    aO5s: ' ' + (Array.from(pbase.aO5s)).map(aO5 => aO5.a_name).join(', ')
+                    base: pBase.pO5.name,
+                    pOuts: ' ' + (Array.from(pBase.pOuts.T)).map(pO5 => pO5.name).join(', '),
+                    aO5s_T: ' ' + (Array.from(pBase.aO5s.T)).map(aO5 => aO5.a_name).join(', '),
+                    aO5s_L: ' ' + (Array.from(pBase.aO5s.L)).map(aO5 => aO5.a_name).join(', '),
+                    aO5s_R: ' ' + (Array.from(pBase.aO5s.R)).map(aO5 => aO5.a_name).join(', '),
+                    aO5s_B: ' ' + (Array.from(pBase.aO5s.B)).map(aO5 => aO5.a_name).join(', ')
                 })
             }
             C.ConsoleInfo(`Базы ${head}`, rez.length, rez)
@@ -122,52 +124,53 @@
         },
 
         ReadAttrs = aO5 => {
-            const aquals = aO5.quals.split(/[:;]/)
+            const aquals = aO5.act.quals.split(/[:;]/)
 
             ReadCls(aO5, aquals[0] || '') // разделяющие запятые там просто игнорируются
 
             wshp.Frames.MakeFrames(aO5, (aquals[1] || '').split(','))
         }
 
-    /**
-     * Обработчик событий от IntersectionObserver.
-     * Создаёт aO5 для 'увиденного' элемента и отключает его наблюдение.
-     * запускает прослушиватель 'scroll
-     * @function Observe
-     * @param {IntersectionObserverEntry[]} entries - Список наблюдаемых пересечений.
-     */
     const
         Observe = entries => {
-            const aO5s = new Set()
+            const 
+                oO5s = new Set(),
+                bBases = new Set()
             for (const entry of entries)
                 if (entry.isIntersecting) {
                     const
                         shp = entry.target,
                         el = observ.getel(shp)
 
-                    aO5s.add(new wshp.AO5shp.AO5(shp, el.quals))
+                    oO5s.add(new wshp.AO5shp.AO5(shp, el.quals))
 
                     observ.unobserve(shp)
                 }
 
-            const  bO5s = new Set()    
-            for (const aO5 of aO5s) {
+            let isNew = false
+            for (const aO5 of oO5s) {
                 if (wshp.PBases.PBase.Attach(aO5))  // если добавилась новая база
-                    bO5s.add(aO5.base.bO5)
+                    isNew = true
 
                 ReadAttrs(aO5)
+                bBases.add(aO5.base.pBase)
 
                 // для тестирования в frames.html
                 window.dispatchEvent(new CustomEvent('o5_containers', { detail: { aO5: aO5, } }))
             }
-            
-            for (const bO5 of bO5s) 
-                    wshp.DoChgs.CalcCovers(bO5, 'TLRB')
 
+            if (oO5s.size >0)
+                for (const bBase of bBases)
+                    bBase.ReorderAO5s()
+
+            if (isNew) {
+                wshp.DoChgs.CalcCovers(body.pO5, 'TB')
+                wshp.DoChgs.CalcCovers(body.pO5, 'LR')
+            }
             if (o5debug > 1)
-                DebugShowRez(aO5s)
+                DebugShowRez(oO5s)
 
-            aO5s.clear()
+            oO5s.clear()
         }
 
     /**
