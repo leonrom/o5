@@ -144,6 +144,7 @@
                 name: C.MakeObjName(tag),
 
                 pOuts: new Set(),  // д.б. Set() иначе в Attach будут повторы  (скроллируемые pO5) все скроллируемых внешних контейнеров
+                tagsOut: new Set(),  // теги от pOuts
                 pBases: new Set(),  //   -"-    (скроллируемые pO5) все скроллируемых вложенных контейнеров 
                 pIncs: new Set(),  //   -"-    (скроллируемые pO5) все скроллируемых вложенных контейнеров 
                 // aO5s: new Set(),  // подвисабельные теги во вссех внутренних pBases
@@ -176,7 +177,7 @@
             })
 
             this.pOuts.add(this)
-            // this.pIncs.add(this)
+            this.tagsOut.add(tag)
 
             for (const nam of ['scrll', 'scops', 'bords', 'bChgs'])  // 'aAlls', 'pOuts', 'pIncs',
                 Object.seal(this[nam])
