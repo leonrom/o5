@@ -29,13 +29,10 @@ class OO5 {
                 ',<b>' + cls.level + '</b>' +
                 `<br/>`
 
-        // for (const frame of aO5.frames) {
-        for (const frame of aO5.frms.frames) {
-            const
-                u = frame.num ? frame.num : ''
-            ss.push(frame.cod + (u ? ('/' + u) : '') + '=' + frame.pO5.name)
-        }
-        s += ss.join(', ')
+        for (const frame of aO5.frms.frames)
+            ss.push(frame.pO5.name)
+        s += 'fix: ' + ss.join(', ') + `<br/>`
+        s += 'cut: ' + aO5.frms.tagCut.id
 
         if (ps && ps.length > 0)
             ps[0].innerHTML = s
@@ -67,7 +64,7 @@ class OO5 {
                     if (txt) {
                         let f5 = frames.find((f => f.nam === b5.nam))
                         if (!f5) {
-                            f5 = { nam: b5.nam, f: '', c: '' }
+                            f5 = { nam: b5.nam, cut: b5.cut }
                             frames.push(f5)
                         }
                         f5[txt] = txt
@@ -80,7 +77,7 @@ class OO5 {
             pitchs.join('') +
             alives.map(f => f ? 'A' : '').join('') +
             levels.join('') + ':' +
-            frames.map(f => `i=${f.nam}/${f.f}${f.c}`).join(',')
+            frames.map(f => `i=${f.nam}${f.cut ? '/c' : ''}`).join(',')
 
         this.#wshp.DoInit.ReadAttrs(aO5)
 
@@ -88,9 +85,8 @@ class OO5 {
             const
                 p = aO5.IsFix(x),
                 name = p ? p.name.substring(1) : ''
-            if (name && !frames.find(frame => frame.nam === name && frame.f === 'f'))
+            if (name && !frames.find(frame => frame.nam === name && !frame.cut))
                 aO5.UnFix(x, p)
-
         }
 
         this.#BordNames(aO5)
@@ -158,6 +154,7 @@ class OO5 {
             },
             FillFrams = () => {
                 const
+                    isdis = 'disable',
                     key = this.#frame,
                     pid = aO5.base.pBase.pO5.id,
                     pdiv = div.getElementsByClassName(key)[0],
@@ -189,7 +186,7 @@ class OO5 {
 
                     for (const b of bs)
                         if (!b.b5)
-                            b.b5 = { aO5: aO5, val: '', div: div, key: key }
+                            b.b5 = { aO5: aO5, val: '', div: div, key: key, cut: (b === bs[1]) }
 
                     // div = document.getElementById(icls),
                     let frame;
@@ -200,32 +197,32 @@ class OO5 {
                         }
                     // if (!frame) continue
 
-                    const c0='f', c1='c', cc='&nbsp;'
-                    let                        v0 = '?',                        v1 = '?'
+                    const c0 = 'f', c1 = 'c', cc = this.#nbsp
+                    let v0 = '?', v1 = '?'
                     is0.classList.add('button')
-                    is0.title = "Скроллинг: Л - гориз., П - верт."
+                    is0.title = "Выбор для скроллинга желтыми 'TLRB'"
                     is0.addEventListener('contextmenu', StopPropagation)
                     is0.addEventListener('mouseup', AskScroll)
 
                     if (isbase) {
-                        bs[1].classList.add('disable')
                         v0 = frame ? c0 : cc
                         v1 = c1
                         found = true
                     }
                     else
                         if (found) {
-                            bs[0].classList.add('disable')
+                            bs[0].classList.add(isdis)
                             v0 = cc
+                            v1 = (aO5.frms.tagCut.id === icls) ? c1 : cc
                         }
-                        else{
+                        else {
                             v0 = frame ? c0 : cc
-                            bs[1].classList.add('disable')
+                            bs[1].classList.add(isdis)
                         }
 
                     if (!found) {
                         const pO5 = document.getElementById(icls)
-                        bs[1].classList.add('disable')
+                        bs[1].classList.add(isdis)
                         aO5.CanFixsOn(pO5)
                         v1 = cc
                     }
@@ -235,9 +232,13 @@ class OO5 {
                         bs[i].innerHTML = i === 0 ? v0 : v1
                         div.aO5bs.push(bs[i])
                     }
+                    if (!bs[0].classList.contains(isdis))
+                        bs[0].addEventListener('click', this.CbFramF)
+                    if (!bs[1].classList.contains(isdis))
+                        bs[1].addEventListener('click', this.CbFramC)
                 }
 
-                pdiv.addEventListener('click', this.CbFram)
+                // pdiv.addEventListener('click', this.CbFram)
             }
 
         FillFrams()
@@ -327,24 +328,26 @@ class OO5 {
             this.#SetaO5(b5)
         }
     }
-    CbFram = e => {
-        const
+    CbFramC = e => {
+        const c1 = 'c', cc = this.#nbsp,
             cb = e.target,
-            b5 = cb.b5
-        if (b5) {
-            const
-                bs = b5.div.aO5bs,
-                key = cb.b5.key,
-                nval = cb.innerHTML === this.#nbsp ? b5.val : this.#nbsp
-
-            cb.innerHTML = nval
-            // if (b5.all)             // обработка общей кнопки
-            //     for (const b of bs)
-            //         if (b !== cb && b.b5.key === key && b.b5.val == b5.val)
-            //             b.innerHTML = nval
-
-            this.#SetaO5(b5)
+            key = this.#frame,
+            pdiv = cb.b5.div.getElementsByClassName(key)[0],
+            ps = Array.from(pdiv.getElementsByTagName('p'))
+        for (const p of ps) {
+            const bs = Array.from(p.getElementsByTagName('b'))
+            bs[1].innerHTML = cc
         }
+        cb.innerHTML = c1
+        this.#SetaO5(cb.b5)
+    }
+    CbFramF = e => {
+        const c0 = 'f', cc = this.#nbsp,
+            cb = e.target
+
+        cb.innerHTML = cb.innerHTML === cc ? c0 : cc
+
+        this.#SetaO5(cb.b5)
     }
     CbVisible = cbx => {
         const

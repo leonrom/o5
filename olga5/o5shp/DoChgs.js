@@ -35,44 +35,110 @@
 		fmtOK = "background: cornsilk; color: black;",
 		fmtErr = "background: yellow; color: black;",
 		opp = { T: 'B', L: 'R', R: 'L', B: 'T' },
-		CalcCovers = (pO5, ms) => {	//  пересчет въезжания вложенных контейнеров
-			for (const m of ms) {  // ms[0] прямой ход, ms[1] - обратный
-				const
-					// mis0 = m === ms[0],
-					isTL = 'TL'.includes(m)
+		/**
+		 * bordss[m] массив из bords по каждому направлению
+		 * bords[0] - ближайшая 'обрезающая' границы,
+		 * а bords[bords.length-1] - сам  этот pBase.pO5 (этот контейнер)
+		 */
+		SetBords = (m, pOut, bords, pBase, isTL, vb) => {
+			const
+				v = pOut.scops[m],
+				iOut = bords.indexOf(pOut),
+				inside = isTL ? vb < v : vb >= v //	граница 'vb' у pBase внутри pOut
 
-				for (const pInc of pO5.pIncs)
-					if (pO5.scops.isVisible) {
-						const
-							pOut = pO5.bords[m],
-							isVisi = isTL ?
-								pInc.scops[m] >= pOut.scops[m] :
-								pInc.scops[m] < pOut.scops[m],
-							pNew = isVisi ? pInc : pOut
-
-						if (pNew !== pInc.bords[m]) {
-							if (o5debug)
-								console.log(`  pInc=${pInc.name}  'm=${m}': ${pInc.bords[m].name} => ${pNew.name}`)
-
-							pInc.bords[m] = pNew
-							pInc.bChgs[m] = true
-						}
-					}
-			}
-
-			for (const pInc of pO5.pIncs)
-				if (pInc.scops.isVisible)
-					CalcCovers(pInc, ms)
-		},
-		CalcBords = pO5 => {
-			for (const pInc of pO5.pIncs) 		// позиции всех вложенных контейнеров
-				if (pInc.scops.isVisible) {
-					pInc.CalcScope()
-					for (const m of 'TLRB')
-						pInc.bChgs[m] = false
-
-					CalcBords(pInc)
+			if (iOut >= 0) {
+				if (!inside) {	// было пересечение а теперь стало внутри
+					bords.splice(iOut, 1)
+					pBase.bChgs[m] = -1
 				}
+			}
+			else
+				if (inside) {	// пересечения не было а вышло из внутри
+					let i = bords.length
+					while (i-- > 0)
+						if (isTL ? bords[i].scops[m] >= v : bords[i].scops[m] < v)
+							break
+
+					bords.splice(i, 0, pOut)
+					pBase.bChgs[m] = 1
+				}
+		},
+		CalcCovers = (m, pcO5) => {	//  пересчет въезжания вложенных контейнеров
+			const isTL = 'TL'.includes(m)
+			let covers;
+			for (const pBase of pcO5.pBases) {
+				const pbO5 = pBase.pO5
+				pBase.bChgs[m] = 0
+				if (pbO5.scops.isVisible) {
+					const
+						bords = pBase.bordss[m],
+						vb = pbO5.scops[m]
+
+					for (const pOut of pbO5.pOuts)
+						if (pOut !== pbO5)
+							SetBords(m, pOut, bords, pBase, isTL, vb)
+
+					if (pBase.bChgs[m] !== 0)
+						covers = true
+				}
+			}
+			return covers
+		},
+		CalcCuts = (m, pcO5, back) => {
+			const
+				isTL = 'TL'.includes(m),
+				pCut = pcO5.cuts[m],
+				vc = pCut.scops[m]
+			let cuts;
+			for (const pInc of pcO5.pIncs) {
+				if (pInc !== pcO5) { // && pInc.scops.isVisible) {
+					const
+						vi = back ? pInc.scops[m] : pInc.cuts[m].scops[m],
+						d = isTL ? vc - vi : vi - vc
+
+					if (d > 0 && pInc.cuts[m] !== pCut) {
+						pInc.cuts[m] = pCut
+						cuts = true
+					}
+					if (d < 0 && pInc.cuts[m] === pCut) {
+						const o = { p: null, d: NaN }
+						for (const p of pInc.pOuts) {
+							const d = isTL ? p.scops[m] - vi : vi - p.scops[m]
+							if (!o.p || d > o.d)
+								Object.assign(o, { p: p, d: d })
+						}
+						pInc.cuts[m] = o.p
+						cuts = true
+					}
+				}
+			}
+			return cuts
+		},
+		SetBorders = (x, pcO5) => {
+			for (const m of [x, opp[x]]) {// ms[0] прямой ход, ms[1] - обратный
+				const
+					cuts = CalcCuts(m, pcO5, m !== x),
+					covers = CalcCovers(m, pcO5)
+
+				if (cuts || covers) {
+					for (const pBase of pcO5.pBases)
+						pBase.bordss[m].sort((b1, b2) => b2.scops[m] - b1.scops[m]) // по возрастанию						
+
+					if (o5debug > 1) {
+						for (const pBase of pcO5.pBases)
+							console.log(
+								`covers [${m}]${covers ? '::' : '  '} ${pcO5.name}->${pBase.pO5.id} = ` +
+								`${pBase.bordss[m].map(b => b.name + ':' + b.scops[m]).join(', ')}`
+							)
+						const pAll = Array.from(wshp.PO5shp.PO5.pBody.pIncs)
+						if (cuts)
+							console.log(
+								`  cuts [${m}]${cuts ? '::' : '  '} ` +
+								`${pAll.map(p => p.name + ':' + p.cuts[m].name).join(', ')}`
+							)
+					}
+				}
+			}
 		},
 		IsOut = (m, aX, v) => {	// если результат > 0 то тег вышел за пределы контейнера
 			switch (m) {
@@ -89,14 +155,38 @@
 		if (scV > 0) xs += 'T'; else if (scV < 0) xs += 'B'
 		if (scH > 0) xs += 'L'; else if (scH < 0) xs += 'R'
 
-		CalcBords(pcO5)
+		for (const pInc of pcO5.pIncs) 		// позиции всех вложенных контейнеров
+			if (pInc !== pcO5)
+				pInc.CalcScope()
 
 		for (const pBase of pcO5.pBases)
 			for (const aO5 of pBase.aO5s.T)			// позиции всех внутренних тегов - 1 раз!
 				aO5.CalcCurPos()
 
+		// const chgs = {}
+		// for (const x of xs)
+		// 	if (CalcCovers(pcO5, [x, opp[x]]))
+		// 		chgs[x] = true
+
 		for (const x of xs)
-			CalcCovers(pcO5, [x, opp[x]])
+			SetBorders(x, pcO5)
+
+		// if (Object.keys(chgs).length > 0)
+		// 	for (const x of xs)
+		// 		if (chgs[x])
+		// 			for (const aO5 of pBase.aO5s[x]) {
+		// 				const
+		// 					pOuts = aO5.base.pBase.pO5.pOuts,
+		// 					aC = aO5.posC,
+		// 					near = { px, vx }
+
+		// 				for (const pOut of pOuts)
+		// 					if (aO5.CanFixsOn(pOut)) {
+		// 						const v = IsOut(m, aC, pOut.scops[m])
+		// 						if (!px || vx < v)
+		// 							Object.assign(near, { vx: v, px: pOut })
+		// 					}
+		// 			}
 
 		for (const x of xs)
 			for (const pBase of pcO5.pBases) {
@@ -104,19 +194,16 @@
 				if (pO5.scops.isVisible) {
 					for (const m of [x, opp[x]]) {
 						const
-							isChg = pO5.bChgs[m],
-							pOut = pO5.bords[m],
+							pOut = pBase.bordss[m][0],
+							isChg = pBase.bChgs[m] !== 0,
 							v = pOut.scops[m]
-						// почему div4  попал в  pO5.bords
-						// if (isChg)
-						// 	console.log()
 
 						for (const aO5 of pBase.aO5s[m]) {
 							const
-								canFix = !aO5.IsCut(m) &&
+								canFix = !aO5.IsCutF(m) &&
 									aO5.cls.puts.includes(m) &&
 									aO5.CanFixsOn(pOut),
-									
+
 								d = IsOut(m, aO5.posC, v),
 								pFix = aO5.IsFix(m)
 
@@ -125,19 +212,31 @@
 
 							if (m === x && d > 0 && canFix) {
 								aO5.DoFix(m, pOut, v)
-								aO5.UnCut(m)
+								aO5.UnCutF(m)
 							}
 							if (m !== x && pFix && IsOut(m, aO5.posO, v) < 0) {
 								aO5.UnFix(m)
-								aO5.UnCut(m)
+								aO5.UnCutF(m)
 							}
 
-							// if (pFix && pFix === aO5.IsFix(m)) // было и осталось то-же самое Fix
-							if (pFix === aO5.IsFix(m)) // было и осталось то-же самое Fix
+							if (pFix === aO5.IsFix(m)) { // было и осталось то-же самое Fix
 								if (d > 0)
-									aO5.DoCut(m, d, v)
-								else
-									aO5.UnCut(m)
+									aO5.DoCutF(x, m, d, v)
+								// if (d < 0 && aO5.IsCutF(m))
+								// 	aO5.DoCutF(x, m, d, v)
+								// 	// aO5.UnCutF(m, d)
+							}
+								if (d < 0)
+									aO5.UnCutF(m, d)
+
+							// 							if (pFix && pFix === aO5.IsFix(m)){ // было и осталось то-же самое Fix
+							// if (o5debug && d !== 0)
+							// 	console.log(`${d>0?'DoCutF':'UnCutF'}: d=${d}, v=${v} для ${pFix.id}[${m}]`)
+							// 								if (d > 0)
+							// 									aO5.DoCutF(m, d, v, false)
+							// 								if (d < 0)
+							// 									aO5.UnCutF(m)}
+
 						}
 					}
 				}
@@ -151,6 +250,6 @@
 						break
 					}
 	}
-	wshp = C.AddModuleSub(olga5_modul, modulname, [MakeScroll, CalcCovers])
+	wshp = C.AddModuleSub(olga5_modul, modulname, [MakeScroll, SetBorders])
 
 })();

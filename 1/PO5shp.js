@@ -58,7 +58,7 @@
                     strt
                 ) {
                     if (o5debug > 2)
-                        console.log("%c%s", fmtErr, `saved ${pO5.id}: ${typ === 'S' ? 'скроллинг' : 'размеры'} ` +
+                        console.log("%c%s", fmtErr, `saved ${pO5.id}: ${typ === 'S' ? 'скроллинг' : 'размеры'} `+
                             `sV=${sV}, sH=${sH}, rV=${rV}, rH=${rH}, sT=${el.scrollTop}, aT=${scrll.top}, sL=${el.scrollLeft}, aL=${scrll.left}`)
 
                     Object.assign(scrll, {
@@ -101,12 +101,12 @@
         ro = new ResizeObserver(saved.Resize),
         Observe = entries => {
             const aO5s = new Set()
-            for (const entry of entries) {
-                const pO5 = entry.target.pO5
-                pO5.scops.isVisible = entry.isIntersecting
+            for (const entry of entries){
+                const pO5=entry.target.pO5
+                pO5.scops.isVisible=entry.isIntersecting            
             }
         },
-        IsFinal = tag => {
+         IsFinal=tag=> {
             return tag.aO5shp ||            // контейнер сам является подвисабельным тегом
                 tag.nodeName == 'BODY' ||   // контейнер является конечным
                 tag.classList.contains('olga5_Start')
@@ -114,15 +114,13 @@
 
     class PO5 {
         static Scrls(tag, nst) {
-            // const final = IsFinal(tag),
-            //     oxy = final || (nst.overflow === 'auto')
-            const oxy = tag.nodeName == 'BODY' || (nst.overflow === 'auto')
+            const final = IsFinal(tag),
+            oxy=final || (nst.overflow === 'auto')
             return {
                 H: oxy || nst.overflowX === 'auto' || nst.overflow === 'scroll' || nst.overflowX === 'scroll',
                 V: oxy || nst.overflowY === 'auto' || nst.overflow === 'scroll' || nst.overflowY === 'scroll',
             }
         }
-        static pBody;
 
         constructor(tag, nst) {
             if (tag.pO5)
@@ -135,8 +133,6 @@
 
             el.pO5 = this
             tag.pO5 = this
-            if (ibody)
-                PO5.pBody = this
 
             Object.assign(this, {
                 el: el,     //   tag и el различаются только у1 тега body
@@ -145,10 +141,9 @@
                 ibody: ibody,
                 final: IsFinal(tag),
                 classOrigs: classList,
-                name: tag.id ? tag.id : C.MakeObjName(tag),
+                name: C.MakeObjName(tag),
 
                 pOuts: new Set(),  // д.б. Set() иначе в Attach будут повторы  (скроллируемые pO5) все скроллируемых внешних контейнеров
-                tagsOut: new Set(),  // теги от pOuts
                 pBases: new Set(),  //   -"-    (скроллируемые pO5) все скроллируемых вложенных контейнеров 
                 pIncs: new Set(),  //   -"-    (скроллируемые pO5) все скроллируемых вложенных контейнеров 
                 // aO5s: new Set(),  // подвисабельные теги во вссех внутренних pBases
@@ -168,20 +163,22 @@
                     width: el.clientWidth,
                     height: el.clientHeight,
                 },
+                bords: { // въезжание вложенных контейнеров
+                    T: this, L: this, R: this, B: this,
+                },
+                bChgs: { // въезжание вложенных контейнеров
+                    T: false, L: false, R: false, B: false,
+                },
                 scops: {    //   координаты рабочей зоны контейнера
-                    isVisible: true,
+                    isVisible:true,
                     T: 0, L: 0, R: 0, B: 0
                 },
-                cuts: {
-                    T: tag.pO5, L: tag.pO5, R: tag.pO5, B: tag.pO5,
-                }
             })
 
             this.pOuts.add(this)
-            this.pIncs.add(this)
-            this.tagsOut.add(tag)
+            // this.pIncs.add(this)
 
-            for (const nam of ['scrll', 'scops'])
+            for (const nam of ['scrll', 'scops', 'bords', 'bChgs'])  // 'aAlls', 'pOuts', 'pIncs',
                 Object.seal(this[nam])
 
             Object.freeze(this.scrls)
@@ -203,7 +200,7 @@
                     rootMargin: '0px',
                     trackVisibility: false,
                 }
-                )
+            )
             observer.observe(tag)
 
             if (o5debug > 1)

@@ -42,8 +42,7 @@
         static TObj = { T: {}, L: {}, R: {}, B: {} }
         static nom = 0
 
-        #isCutF = { T: '', L: '', R: '', B: '' }    // обрезание на pOut[]
-        #isCutB = { T: '', L: '', R: '', B: '' }    // обрезание на pIn[]
+        #isCut = { T: false, L: false, R: false, B: false }
         #pFixs = { T: null, L: null, R: null, B: null }
 
         constructor(shp, quals) {
@@ -72,10 +71,9 @@
                 margs: { t: '', l: '', r: '', b: '', },
                 outln: { w: '', s: '', c: '', o: '', },
 
-                pFixsOn: [],
-                // bords:{                    T: 0, L: 0, R: 0, B: 0},
+                // pFixsOn: [],
 
-                // shrunks: { T: new Set(), L: new Set(), R: new Set(), B: new Set() },   // список прижатых aO5
+                shrunks: { T: new Set(), L: new Set(), R: new Set(), B: new Set() },   // список прижатых aO5
 
                 // nears: {},
                 // hidden: Object.assign({}, AO5.TFix),    //  если zeroed и нету 'alive'           
@@ -98,7 +96,7 @@
                 else
                     console.log("%c%s", fmtErr, `в aO5 отсутствует '${nam}'`)
 
-            // Object.freeze(this.shrunks)
+            Object.freeze(this.shrunks)
             Object.freeze(this)
         }
         #SetMargOutls(style, margs, outln) {
@@ -117,67 +115,21 @@
                 if (frame.pO5 === pO5)
                     return frame
         }
-        #DoCut(x, m, d, v) {
+        IsCut(x) {
+            return this.#isCut[x]
+        }
+        DoCut(x, d, v) {
             const aC = this.posC
-            switch (m) {
-                case 'T': aC.height -= d; aC.top = v; break
-                case 'L': aC.width -= d; aC.left = v; break
+            switch (x) {
+                case 'T': aC.height -= d; aC.top = v; this.posS.top -= d; break
+                case 'L': aC.width -= d; aC.left = v; this.posS.left -= d; break
                 case 'R': aC.width -= d; aC.left = v - aC.width; break
                 case 'B': aC.height -= d; aC.top = v - aC.height; break
             }
-            if ('TL'.includes(x)) // && m !== x)
-                if (m !== x)
-                    switch (m) {
-                        case 'B': this.posS.top -= d; break
-                        case 'R': this.posS.left -= d; break
-                    }
+            this.#isCut[x] = true
         }
-        DoCutF(x, m, d, v) {
-            const aC = this.posC
-            switch (m) {
-                case 'T': aC.height -= d; aC.top = v; break
-                case 'L': aC.width -= d; aC.left = v; break
-                case 'R': aC.width -= d; aC.left = v - aC.width; break
-                case 'B': aC.height -= d; aC.top = v - aC.height; break
-            }
-            if ('TL'.includes(x)) // && m !== x)
-                if (m !== x)
-                    switch (m) {
-                        case 'B': this.posS.top -= d; break
-                        case 'R': this.posS.left -= d; break
-                    }
-            // else
-            //     switch (m) {
-            //         case 'T': this.posS.top -= d; break
-            //         case 'L': this.posS.left -= d; break
-            //     }
-
-            this.#isCutF[m] = x
-        }
-        UnCutF(m, d) {
-            // if (d < 0 && this.#isCutF[m]) {
-            //     this.posS.top -= d
-            //     if (this.posS.top >= 0) {
-            //         this.posS.top = 0
-            //         this.#isCutF[m] = ''
-            //     }
-            // }
-                    this.#isCutF[m] = ''
-        }
-        IsCutF(m) {
-            return this.#isCutF[m]
-        }
-        DoCutB(x, d, v) {
-            const aC = this.posC
-            switch (p = this.cls.pitch) {
-                case 'S': this.CutForw(x, d, v, 1); break   // сдвигается
-                case 'C': this.CutForw(x, d, v, 0); break   // сжимается
-                case 'P':                   // сталкивается
-                case 'O':                   // скрывается
-                    if ('TB'.includes(x)) aC.height = 0
-                    else aC.width = 0
-            }
-            this.#isCutB[x] = true
+        UnCut(x) {
+            this.#isCut[x] = false
         }
         IsFix(x) {
             return this.#pFixs[x]
@@ -317,16 +269,8 @@
                 p = aO5.act.shdw.getBoundingClientRect()
 
             Object.assign(aO5.posO, { top: p.top, left: p.left, right: p.right, bottom: p.bottom, height: p.height, width: p.width })
-            // Object.assign(aO5.posS, { top: 0, left: 0 })
-            if (!this.#isCutF.T && !this.#isCutF.B) {
-                aO5.posS.top = 0
-                aO5.posC.height = p.height
-            }
-            if (!this.#isCutF.L && !this.#isCutF.R) {
-                aO5.posS.left = 0
-                aO5.posC.width = p.width
-            }
-            // Object.assign(aO5.posC, { width: p.width, height: p.height })
+            Object.assign(aO5.posC, { width: p.width, height: p.height })
+            Object.assign(aO5.posS, { top: 0, left: 0 })
 
             const pF = aO5.#pFixs
             aO5.posC.top = pF.T ? pF.T.scops.T : (pF.B ? (pF.B.scops.B - p.height) : aO5.posO.top)

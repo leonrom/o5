@@ -24,12 +24,13 @@
                 }
             }
             aO5.frms.frames.clear()
-            aO5.frms.tagCut = null
 
             const
                 errs = [],
                 typs = 'cins',
                 pBase = aO5.base.pBase,
+                // pOuts = pBase.pO5.pOuts,
+                // pIncs = pBase.pO5.pIncs,
                 IsInClass = (cs, cod) => {
                     for (const c of cs)
                         if (c.toUpperCase == cod)
@@ -63,33 +64,33 @@
                     cc = s.includes('=') ? s.split('=') : ['i', s],  // считаем, что это значение для id                
                     uu = (cc[1] || '').split('/'),
                     cod = (uu[0] || '').trim().toUpperCase(),
-                    par = (uu[1] || '').trim(),
-                    cuts = par.match(/c/i)
+                    par = (uu[1] || '').replace(/f/gi, ''),  // 'f' уже не используется и игнорируется                    
+                    cut = par.match(/c/i)
+                let
+                    typ = cc[0].trim().toLowerCase(),
+                    num = 0
 
-                let typ = cc[0].trim().toLowerCase()
                 if (!typs.includes(typ)) {
                     errs.push(`тип ссылки '${typ}' не начинается одним из '${typs}' заменен на 'i'`)
                     typ = 'i'
                 }
 
-                if (cuts) {
-                    if (!aO5.frms.tagCut)
-                        aO5.frms.tagCut = FindTag(pBase.tagsIn, typ, cod, 0)
+                aO5.frms.tagCut = cut ? FindTag(pBase.tagsIn.concat(pBase.pO5), typ, cod, 0) : pBase.tagsIn[0]
+
+                if (!cut) {
+                    const n = Number(par)
+                    if (Number.isInteger(n) && !isNaN(n))
+                        num = n
                     else
-                        errs.push(`несколько cut-квалификаторов (т.е. содержащих '/c')`)
-                }
-                else {
-                    const num = par.replace(/[fc]/gi, '') || 0 // 'f' уже не используется и игнорируется                    
-                    if (!Number.isInteger(num) || isNaN(num)) {
-                        errs.push(`непонятное значение для num='${uu[1]}' (после символа '/')`)
-                        continue
-                    }
-                    const key = pBase.idn + ':' + typ + ',' + cod + ',' + num
+                        errs.push(`непонятный квалификатор '${uu[1]}' (после символа '/')`)
+
+                    const key = pBase.idn + ',' + typ + ',' + cod + ',' + num
 
                     let frame = Frame.frames.get(key)
+
                     if (!frame) {
                         const
-                            tag = FindTag(pBase.pO5.tagsOut, typ, cod, num)
+                            tag = FindTag(pBase.pOuts.T.map(p => p.tag), typ, cod, num)
 
                         frame = new Frame(key, typ, cod, num, tag.pO5)
 
@@ -103,8 +104,13 @@
                     aO5.frms.frames.add(frame)
                 }
             }
-            if (!aO5.frms.tagCut)
-                aO5.frms.tagCut = aO5.base.pBase.pO5.tag
+
+            // for (const frame of aO5.frms.frames)  // формирую список на которых aO5 может фиксироваться
+            //     for (const p of pOuts)
+            //         if (frame.pO5 === p) {
+            //             aO5.pFixsOn.push(p)
+            //             break
+            //         }
 
             if (errs.length)
                 C.ConsoleError(`Ошибки определения фреймов для ${aO5.a_name}:`, errs.length, errs)

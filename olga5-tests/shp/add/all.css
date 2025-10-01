@@ -125,9 +125,13 @@
     border-radius: 3px;
     cursor: pointer;
 }
+
+.cboxed span b:nth-child(2) {
+    border-radius: 8px;
+}
 .cboxed span b.disable {
     cursor: auto;
-    border: none;
+    border-color: transparent;
 }
 .cboxed span{
     cursor: auto;

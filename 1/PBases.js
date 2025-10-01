@@ -26,19 +26,13 @@
             this.idn = PBase.#idn++
             this.aO5s = { T: null, L: null, R: null, B: null }      // все эти будут проверяться на "натыкание"
 
-            this.tagsIn = new Set()
+            this.pOuts = {}               // упорядоченные внешние (скроллируемые) конейнеры
+            for (const x of 'TLRB')
+                this.pOuts[x] = [...pO5.pOuts]
 
-            this.bordss = { // въезжание вложенных контейнеров
-                T: [pO5], L: [pO5], R: [pO5], B: [pO5],
-            }
-            this.bChgs = { // въезжание вложенных контейнеров
-                T: 0, L: 0, R: 0, B: 0,
-            }
+            this.tagsIn= []
 
-            for (const nam of ['aO5s', 'bChgs'])
-                Object.seal(this[nam])
-
-            Object.freeze(this.bordss)
+            Object.freeze(this.pOuts)
             Object.freeze(this)
 
             PBase.#pbases.set(pO5, this)
@@ -63,33 +57,20 @@
             }
         }
         Add(bO5, aO5) {
-            const
-                pBase = this,
-                fintag = pBase.pO5.tag
-
+            const pBase = this
             Object.assign(aO5.base, { bO5, pBase })
             if (!pBase.#aO5s.includes(aO5))
                 pBase.#aO5s.push(aO5)
-
-            let tag = aO5.shp
-            do {
-                tag = tag.parentNode
-                pBase.tagsIn.add(tag)
-            } while (tag != fintag)
         }
         static Attach(aO5) {
             let bO5, pTop, newPs = 0;
             const SetbO5 = pO5 => {
                 if (!bO5) bO5 = pO5
+                else
+                    pO5.pIncs.add(pTop)
 
-                for (const pOut of bO5.pOuts) {
+                for (const pOut of bO5.pOuts)
                     pOut.pOuts.add(pO5)
-                    pOut.tagsOut.add(pO5.tag)
-                }
-
-                if (pTop)
-                    for (const pInc of pTop.pIncs)
-                        pO5.pIncs.add(pInc)
 
                 pTop = pO5
             }
@@ -125,6 +106,9 @@
                 pOut.pBases.add(pBase)
 
             pBase.Add(bO5, aO5)
+            // Object.assign(aO5.base, { bO5, pBase })
+            // if (!pBase.aaO5s.includes(aO5))
+            //     pBase.aaO5s.push(aO5)
 
             return newPs
         }

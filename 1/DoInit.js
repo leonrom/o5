@@ -31,9 +31,9 @@
             for (const aO5 of aO5s)
                 rez.push({
                     aO5: aO5.a_name,
-                    tagCut: aO5.frms.tagCut.id,
                     base: aO5.base.pBase.pO5.name,
-                    frms: Array.from(aO5.frms.frames).map(f => f.pO5.id).join(', ')
+                    tagCut:aO5.frms.tagCut,
+                    frms: Array.from(aO5.frms.frames).map(f => f.key).join(', ')
                 })
 
             C.ConsoleInfo(`Обработка ${head}`, rez.length, rez)
@@ -42,9 +42,7 @@
             for (const { bO5, pBase } of wshp.PBases.PBase) {
                 rez.push({
                     base: pBase.pO5.name,
-                    pOuts: ' ' + (Array.from(pBase.pO5.pOuts)).map(pO5 => pO5.name).join(', '),
-                    pIncs: ' ' + (Array.from(pBase.pO5.pIncs)).map(pO5 => pO5.name).join(', '),
-                    tagsIn: ' ' + (Array.from(pBase.tagsIn)).map(tag => tag.id).join(', '),
+                    pOuts: ' ' + (Array.from(pBase.pOuts.T)).map(pO5 => pO5.name).join(', '),
                     aO5s_T: ' ' + (Array.from(pBase.aO5s.T)).map(aO5 => aO5.a_name).join(', '),
                     aO5s_L: ' ' + (Array.from(pBase.aO5s.L)).map(aO5 => aO5.a_name).join(', '),
                     aO5s_R: ' ' + (Array.from(pBase.aO5s.R)).map(aO5 => aO5.a_name).join(', '),
@@ -60,6 +58,7 @@
                     tcn: frame.typ + ':' + frame.cod + ':' + frame.num,
                     pO5: frame.pO5.name,
                     aO5s: frame.aO5s.map(a => a.a_name).join(', '),
+                    err: frame.err,
                 })
             }
             C.ConsoleInfo(`Фреймы ${head}`, rez.length, rez)
@@ -134,7 +133,7 @@
 
     const
         Observe = entries => {
-            const
+            const 
                 oO5s = new Set(),
                 bBases = new Set()
             for (const entry of entries)
@@ -160,14 +159,14 @@
                 window.dispatchEvent(new CustomEvent('o5_containers', { detail: { aO5: aO5, } }))
             }
 
-            if (oO5s.size > 0)
+            if (oO5s.size >0)
                 for (const bBase of bBases)
                     bBase.ReorderAO5s()
 
-            if (isNew)
-                for (const x of 'TL')
-                    wshp.DoChgs.SetBorders(x, body.pO5)
-
+            if (isNew) {
+                wshp.DoChgs.CalcCovers(body.pO5, 'TB')
+                wshp.DoChgs.CalcCovers(body.pO5, 'LR')
+            }
             if (o5debug > 1)
                 DebugShowRez(oO5s)
 
