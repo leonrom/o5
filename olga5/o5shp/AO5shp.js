@@ -57,7 +57,7 @@
                 nom: AO5.nom++,
                 id: shp.id,
                 shp: shp,
-                ext: {},    // для хранения произвольных данных внешними (тестовыми) модулями
+                // ext: {},    // для хранения произвольных данных внешними (тестовыми) модулями
                 cls: { level: 0, pitch: 0, none: 0, nofx: 0, alive: 0, puts: [] }, // инициализация будет в ReadCls(aO5, ss) 
                 base: { bO5: null, pBase: null },  // будут присвоены в PBases в Attach(aO5)
                 act: {
@@ -117,7 +117,7 @@
                 if (frame.pO5 === pO5)
                     return frame
         }
-        #DoCut(x, m, d, v) {
+        #DoCut(m, d, v, shO) {
             const aC = this.posC
             switch (m) {
                 case 'T': aC.height -= d; aC.top = v; break
@@ -125,44 +125,48 @@
                 case 'R': aC.width -= d; aC.left = v - aC.width; break
                 case 'B': aC.height -= d; aC.top = v - aC.height; break
             }
-            if ('TL'.includes(x)) // && m !== x)
-                if (m !== x)
-                    switch (m) {
-                        case 'B': this.posS.top -= d; break
-                        case 'R': this.posS.left -= d; break
-                    }
+
+            if (shO)
+                switch (m) {
+                    case 'B': this.posS.top -= d; break
+                    case 'R': this.posS.left -= d; break
+                }
         }
         DoCutF(x, m, d, v) {
-            const aC = this.posC
-            switch (m) {
-                case 'T': aC.height -= d; aC.top = v; break
-                case 'L': aC.width -= d; aC.left = v; break
-                case 'R': aC.width -= d; aC.left = v - aC.width; break
-                case 'B': aC.height -= d; aC.top = v - aC.height; break
-            }
-            if ('TL'.includes(x)) // && m !== x)
-                if (m !== x)
-                    switch (m) {
-                        case 'B': this.posS.top -= d; break
-                        case 'R': this.posS.left -= d; break
-                    }
-            // else
-            //     switch (m) {
-            //         case 'T': this.posS.top -= d; break
-            //         case 'L': this.posS.left -= d; break
-            //     }
-
+            this.#DoCut(m, d, v, 'TL'.includes(x) && m !== x)
             this.#isCutF[m] = x
         }
-        UnCutF(m, d) {
-            // if (d < 0 && this.#isCutF[m]) {
-            //     this.posS.top -= d
-            //     if (this.posS.top >= 0) {
-            //         this.posS.top = 0
-            //         this.#isCutF[m] = ''
-            //     }
-            // }
-                    this.#isCutF[m] = ''
+        UnCutF(x, m, d, v) {
+            if (!this.#isCutF[m]) return
+
+            const
+                aC = this.posC,
+                isV = 'TB'.includes(x)
+            let isCut = false
+            if (typeof m !== 'undefined') {
+                this.#DoCut(m, d, v, 'BR'.includes(x) && m === x)
+                isCut = isV ? aC.height < this.posO.height : aC.width < this.posO.width
+            }
+            this.#isCutF[m] = isCut
+
+            if (isV) {
+                if (aC.height > this.posO.height) aC.height = this.posO.height
+                // if (m === 'B' && aC.top > v - aC.height) aC.top = v - aC.height
+            }
+            else {
+                if (aC.width > this.posO.width) aC.width = this.posO.width
+                // if (m === 'B' && aC.left > v - aC.width) aC.left = v - aC.width
+            }
+
+            if (!isCut) {            // коррекция чтобы не дёргалось
+                const pF = this.#pFixs
+                let z;
+                if (isV) {
+                    if (pF.T && aC.top > (z = pF.T.scops.T)) aC.top = z
+                }
+                else
+                    if (pF.L && aC.left > (z = pF.L.scops.L)) aC.left = z
+            }
         }
         IsCutF(m) {
             return this.#isCutF[m]

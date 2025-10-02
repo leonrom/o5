@@ -226,8 +226,8 @@
 								// 	aO5.DoCutF(x, m, d, v)
 								// 	// aO5.UnCutF(m, d)
 							}
-								if (d < 0)
-									aO5.UnCutF(m, d)
+								if (d < 0 )
+									aO5.UnCutF(x, m, d, v)
 
 							// 							if (pFix && pFix === aO5.IsFix(m)){ // было и осталось то-же самое Fix
 							// if (o5debug && d !== 0)
