@@ -35,11 +35,7 @@
 		fmtOK = "background: cornsilk; color: black;",
 		fmtErr = "background: yellow; color: black;",
 		opp = { T: 'B', L: 'R', R: 'L', B: 'T' },
-		/**
-		 * bordss[m] массив из bords по каждому направлению
-		 * bords[0] - ближайшая 'обрезающая' границы,
-		 * а bords[bords.length-1] - сам  этот pBase.pO5 (этот контейнер)
-		 */
+
 		SetBords = (m, pOut, bords, pBase, isTL, vb) => {
 			const
 				v = pOut.scops[m],
@@ -63,8 +59,7 @@
 					pBase.bChgs[m] = 1
 				}
 		},
-		CalcCovers = (m, pcO5) => {	//  пересчет въезжания вложенных контейнеров
-			const isTL = 'TL'.includes(m)
+		CalcCovers = (m, isTL, pcO5) => {	//  пересчет въезжания вложенных контейнеров
 			let covers;
 			for (const pBase of pcO5.pBases) {
 				const pbO5 = pBase.pO5
@@ -84,16 +79,15 @@
 			}
 			return covers
 		},
-		CalcCuts = (m, pcO5, back) => {
+		CalcCuts = (m, isTL, pcO5, x) => {
 			const
-				isTL = 'TL'.includes(m),
 				pCut = pcO5.cuts[m],
 				vc = pCut.scops[m]
 			let cuts;
 			for (const pInc of pcO5.pIncs) {
 				if (pInc !== pcO5) { // && pInc.scops.isVisible) {
 					const
-						vi = back ? pInc.scops[m] : pInc.cuts[m].scops[m],
+						vi = (m !== x) ? pInc.scops[m] : pInc.cuts[m].scops[m],
 						d = isTL ? vc - vi : vi - vc
 
 					if (d > 0 && pInc.cuts[m] !== pCut) {
@@ -117,12 +111,14 @@
 		SetBorders = (x, pcO5) => {
 			for (const m of [x, opp[x]]) {// ms[0] прямой ход, ms[1] - обратный
 				const
-					cuts = CalcCuts(m, pcO5, m !== x),
-					covers = CalcCovers(m, pcO5)
+					isTL = 'TL'.includes(m),
+					cuts = CalcCuts(m, isTL, pcO5, x),
+					covers = CalcCovers(m, isTL, pcO5)
 
 				if (cuts || covers) {
 					for (const pBase of pcO5.pBases)
-						pBase.bordss[m].sort((b1, b2) => b2.scops[m] - b1.scops[m]) // по возрастанию						
+						pBase.bordss[m].sort((b1, b2) =>	 // по возрастанию						
+							isTL ? (b2.scops[m] - b1.scops[m]) : (b1.scops[m] - b2.scops[m]))
 
 					if (o5debug > 1) {
 						for (const pBase of pcO5.pBases)
@@ -163,30 +159,8 @@
 			for (const aO5 of pBase.aO5s.T)			// позиции всех внутренних тегов - 1 раз!
 				aO5.CalcCurPos()
 
-		// const chgs = {}
-		// for (const x of xs)
-		// 	if (CalcCovers(pcO5, [x, opp[x]]))
-		// 		chgs[x] = true
-
 		for (const x of xs)
 			SetBorders(x, pcO5)
-
-		// if (Object.keys(chgs).length > 0)
-		// 	for (const x of xs)
-		// 		if (chgs[x])
-		// 			for (const aO5 of pBase.aO5s[x]) {
-		// 				const
-		// 					pOuts = aO5.base.pBase.pO5.pOuts,
-		// 					aC = aO5.posC,
-		// 					near = { px, vx }
-
-		// 				for (const pOut of pOuts)
-		// 					if (aO5.CanFixsOn(pOut)) {
-		// 						const v = IsOut(m, aC, pOut.scops[m])
-		// 						if (!px || vx < v)
-		// 							Object.assign(near, { vx: v, px: pOut })
-		// 					}
-		// 			}
 
 		for (const x of xs)
 			for (const pBase of pcO5.pBases) {
@@ -213,30 +187,18 @@
 							if (m === x && d > 0 && canFix) {
 								aO5.DoFix(m, pOut, v)
 								aO5.UnCutF(m)
-							}
+							}				
 							if (m !== x && pFix && IsOut(m, aO5.posO, v) < 0) {
 								aO5.UnFix(m)
 								aO5.UnCutF(m)
 							}
 
-							if (pFix === aO5.IsFix(m)) { // было и осталось то-же самое Fix
+							if (pFix === aO5.IsFix(m))  // было и осталось то-же самое Fix
 								if (d > 0)
 									aO5.DoCutF(x, m, d, v)
-								// if (d < 0 && aO5.IsCutF(m))
-								// 	aO5.DoCutF(x, m, d, v)
-								// 	// aO5.UnCutF(m, d)
-							}
-								if (d < 0 )
-									aO5.UnCutF(x, m, d, v)
 
-							// 							if (pFix && pFix === aO5.IsFix(m)){ // было и осталось то-же самое Fix
-							// if (o5debug && d !== 0)
-							// 	console.log(`${d>0?'DoCutF':'UnCutF'}: d=${d}, v=${v} для ${pFix.id}[${m}]`)
-							// 								if (d > 0)
-							// 									aO5.DoCutF(m, d, v, false)
-							// 								if (d < 0)
-							// 									aO5.UnCutF(m)}
-
+							if (d < 0)
+								aO5.UnCutF(x, m, d, v)
 						}
 					}
 				}
