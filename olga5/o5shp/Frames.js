@@ -73,8 +73,17 @@
                 }
 
                 if (cuts) {
-                    if (!aO5.frms.tagCut)
-                        aO5.frms.tagCut = FindTag(pBase.tagsIn, typ, cod, 0)
+                    let tag = aO5.frms.tagCut
+                    if (!tag) {
+                        tag = aO5.frms.tagCut = FindTag(pBase.tagsIn, typ, cod, 0)
+                        if (!tag.pO5)
+                            new wshp.PO5shp.PO5(tag, window.getComputedStyle(tag))
+                        
+                        if (!tag) {
+                            errs.push(`Нет тега для key=${key} среди внутренних_тегов - игнорирую`)
+                            continue
+                        }
+                    }
                     else
                         errs.push(`несколько cut-квалификаторов (т.е. содержащих '/c')`)
                 }
@@ -88,8 +97,12 @@
 
                     let frame = Frame.frames.get(key)
                     if (!frame) {
-                        const
-                            tag = FindTag(pBase.pO5.tagsOut, typ, cod, num)
+                        let tag = FindTag(pBase.pO5.tagsOut, typ, cod, num)
+
+                        if (!tag) {
+                            errs.push(`Нет тега для key=${key} среди внешних_ скролл_тегов - игнорирую`)
+                            continue
+                        }
 
                         frame = new Frame(key, typ, cod, num, tag.pO5)
 

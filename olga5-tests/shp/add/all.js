@@ -55,6 +55,8 @@ class OO5 {
                 // val = b5.val,
                 txt = b.innerText.trim()
 
+            // if (b.id === 'div4-b1')
+            //     console.log(1)
             switch (b5.key) {
                 case this.#pitch: pitchs.push(txt); break
                 case this.#pmark: pmarks.push(txt); break
@@ -83,10 +85,10 @@ class OO5 {
 
         for (const x of 'TLRB') {
             const
-                p = aO5.IsFix(x),
+                p = aO5.pFixs[x],
                 name = p ? p.name.substring(1) : ''
             if (name && !frames.find(frame => frame.nam === name && !frame.cut))
-                aO5.UnFix(x, p)
+                aO5.DoFix(x)
         }
 
         this.#BordNames(aO5)
@@ -174,36 +176,25 @@ class OO5 {
                         else
                             console.error(`нет кнопки "btnScrollHead" ??`)
                     }
-
-                let found = false
+                let found = false   // признак что наден базовый div (т.е. div3)
                 for (const p of ps) {
                     const
                         icls = p.className.trim(),
                         bs = Array.from(p.getElementsByTagName('b')),
                         is0 = Array.from(p.getElementsByTagName('i'))[0],
                         nam = is0.innerText,
-                        isbase = pid === icls
-
-                    for (const b of bs)
-                        if (!b.b5)
-                            b.b5 = { aO5: aO5, val: '', div: div, key: key, cut: (b === bs[1]) }
-
-                    // div = document.getElementById(icls),
-                    let frame;
-                    for (const f of aO5.frms.frames)
-                        if (f.pO5.tag.id === icls) {
-                            frame = f
-                            break
-                        }
-                    // if (!frame) continue
+                        isbase = pid === icls,
+                        frame = Array.from(aO5.frms.frames).find(f => f.pO5.tag.id === icls)
 
                     const c0 = 'f', c1 = 'c', cc = this.#nbsp
-                    let v0 = '?', v1 = '?'
                     is0.classList.add('button')
                     is0.title = "Выбор для скроллинга желтыми 'TLRB'"
                     is0.addEventListener('contextmenu', StopPropagation)
                     is0.addEventListener('mouseup', AskScroll)
 
+                    // if (p.className === 'div4')
+                    //     console.log(1)                    
+                    let v0 = '?', v1 = '?'
                     if (isbase) {
                         v0 = frame ? c0 : cc
                         v1 = c1
@@ -228,17 +219,21 @@ class OO5 {
                     }
 
                     for (const i of [0, 1]) {
-                        bs[i].b5 = { aO5: aO5, val: (i === 0 ? c0 : c1), div: div, key: key, nam: nam }
-                        bs[i].innerHTML = i === 0 ? v0 : v1
-                        div.aO5bs.push(bs[i])
-                    }
-                    if (!bs[0].classList.contains(isdis))
-                        bs[0].addEventListener('click', this.CbFramF)
-                    if (!bs[1].classList.contains(isdis))
-                        bs[1].addEventListener('click', this.CbFramC)
-                }
+                        const
+                            b = bs[i],
+                            cut = i === 1,
+                            val = cut ? c1 : c0
 
-                // pdiv.addEventListener('click', this.CbFram)
+                        b.b5= { aO5, div, key, nam, val, cut }
+ 
+                        b.title = cut ? 'обрезание (сзади)' : 'фиксация (по ходу)'
+                        b.innerHTML = i === 0 ? v0 : v1
+                        b.id = p.className + '-b' + i
+                        div.aO5bs.push(b)
+                    }
+                    if (!bs[0].classList.contains(isdis)) bs[0].addEventListener('click', this.CbFramF)
+                    if (!bs[1].classList.contains(isdis)) bs[1].addEventListener('click', this.CbFramC)
+                }
             }
 
         FillFrams()
@@ -301,8 +296,8 @@ class OO5 {
                 */
                 const o = b5.val,
                     aO5 = b5.aO5
-                if (aO5.IsFix(o)) {
-                    aO5.UnFix(o)
+                if (aO5.pFixs[o]) {
+                    aO5.DoFix(o)
 
                     if ('TB'.includes(o)) aO5.posC.top = aO5.posO.top
                     else aO5.posC.left = aO5.posO.left

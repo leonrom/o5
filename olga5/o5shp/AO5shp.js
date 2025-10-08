@@ -25,14 +25,13 @@
             const aO5 = e.currentTarget.aO5shp
 
             for (const x of 'TRLB')    // т.е. расфиксирую всё
-                aO5.UnFix(x)
+                aO5.DoFix(x)
 
             e.stopImmediatePropagation()
 
             if (o5debug > 0)
                 console.log("%c%s", fmtOK, `расфиксация '${aO5.id}' по событию '${e.type}'`)
         }
-
 
     class AO5 {
         static Margs = { t: 0, l: 0, r: 0, b: 0 }
@@ -42,9 +41,11 @@
         static TObj = { T: {}, L: {}, R: {}, B: {} }
         static nom = 0
 
-        #isCutF = { T: '', L: '', R: '', B: '' }    // обрезание на pOut[]
-        #isCutB = { T: '', L: '', R: '', B: '' }    // обрезание на pIn[]
-        #pFixs = { T: null, L: null, R: null, B: null }
+        pFixs = { T: null, L: null, R: null, B: null }
+
+        canFixs = { T: null, L: null, R: null, B: null }
+        extCuts = { T: null, L: null, R: null, B: null }
+        tagCuts = { T: null, L: null, R: null, B: null }
 
         constructor(shp, quals) {
             const aO5 = this
@@ -57,7 +58,6 @@
                 nom: AO5.nom++,
                 id: shp.id,
                 shp: shp,
-                // ext: {},    // для хранения произвольных данных внешними (тестовыми) модулями
                 cls: { level: 0, pitch: 0, none: 0, nofx: 0, alive: 0, puts: [] }, // инициализация будет в ReadCls(aO5, ss) 
                 base: { bO5: null, pBase: null },  // будут присвоены в PBases в Attach(aO5)
                 act: {
@@ -73,15 +73,6 @@
                 outln: { w: '', s: '', c: '', o: '', },
 
                 pFixsOn: [],
-                // bords:{                    T: 0, L: 0, R: 0, B: 0},
-
-                // shrunks: { T: new Set(), L: new Set(), R: new Set(), B: new Set() },   // список прижатых aO5
-
-                // nears: {},
-                // hidden: Object.assign({}, AO5.TFix),    //  если zeroed и нету 'alive'           
-
-                // zeroed: { V: false, H: false },          //  имеют нулевой размер  - по результату ChNudget
-                // isFull: { V: false, H: false }, //  признак, что тег был полностью видим - по вертикали и горизонтали   
 
                 frms: { tagCut: null, frames: new Set() },
 
@@ -98,7 +89,6 @@
                 else
                     console.log("%c%s", fmtErr, `в aO5 отсутствует '${nam}'`)
 
-            // Object.freeze(this.shrunks)
             Object.freeze(this)
         }
         #SetMargOutls(style, margs, outln) {
@@ -117,124 +107,94 @@
                 if (frame.pO5 === pO5)
                     return frame
         }
-        #DoCut(m, d, v, shO) {
-            const aC = this.posC
+        GetV(m, pos) {	// если результат > 0 то тег вышел за пределы контейнера
+            const aX = this[pos]
             switch (m) {
-                case 'T': aC.height -= d; aC.top = v; break
-                case 'L': aC.width -= d; aC.left = v; break
-                case 'R': aC.width -= d; aC.left = v - aC.width; break
-                case 'B': aC.height -= d; aC.top = v - aC.height; break
+                case 'T': return aX.top
+                case 'L': return aX.left
+                case 'R': return aX.left + aX.width
+                case 'B': return aX.top + aX.height
+            }
+        }
+        SetPos(x) {
+            const
+                v = this.pFixs[x].scops[x],
+                aC = this.posC
+            let d;
+            if (this.extCuts[x]) {
+                switch (x) {
+                    case 'T': d = v - aC.top; break
+                    case 'L': d = v - aC.left; break
+                    case 'R': d = (aC.left + aC.width) - v; break
+                    case 'B': d = (aC.top + aC.height) - v; break
+                }
             }
 
-            if (shO)
-                switch (m) {
-                    case 'B': this.posS.top -= d; break
-                    case 'R': this.posS.left -= d; break
+            switch (x) {
+                case 'T': aC.top = v; break
+                case 'L': aC.left = v; break
+                case 'R': aC.left = v - this.posO.width; break
+                case 'B': aC.top = v - this.posO.height; break
+            }
+
+            if (d > 0)
+                switch (x) {
+                    case 'T': aC.height -= d; this.posS.top -= d; break
+                    case 'L': aC.width -= d; this.posS.left -= d; break
+                    case 'R': aC.width -= d; break
+                    case 'B': aC.height -= d; break
                 }
         }
-        DoCutF(x, m, d, v) {
-            this.#DoCut(m, d, v, 'TL'.includes(x) && m !== x)
-            this.#isCutF[m] = x
-        }
-        UnCutF(x, m, d, v) {
-            if (!this.#isCutF[m]) return
-
+        CutFix(o) {
             const
-                aC = this.posC,
-                isV = 'TB'.includes(x)
-            let isCut = false
-            if (typeof m !== 'undefined') {
-                this.#DoCut(m, d, v, 'BR'.includes(x) && m === x)
-                isCut = isV ? aC.height < this.posO.height : aC.width < this.posO.width
-            }
-            this.#isCutF[m] = isCut
+                v = this.tagCuts[o].scops[o],
+                aC = this.posC
 
-            if (isV) {
-                if (aC.height > this.posO.height) aC.height = this.posO.height
-                // if (m === 'B' && aC.top > v - aC.height) aC.top = v - aC.height
-            }
-            else {
-                if (aC.width > this.posO.width) aC.width = this.posO.width
-                // if (m === 'B' && aC.left > v - aC.width) aC.left = v - aC.width
+            let d;
+            switch (o) {
+                case 'T': d = v - aC.top; break
+                case 'L': d = v - aC.left; break
+                case 'R': d = aC.left + aC.width - v; break
+                case 'B': d = aC.top + aC.height - v; break
             }
 
-            if (!isCut) {            // коррекция чтобы не дёргалось
-                const pF = this.#pFixs
-                let z;
-                if (isV) {
-                    if (pF.T && aC.top > (z = pF.T.scops.T)) aC.top = z
+            if (d > 0)
+                switch (o) {
+                    case 'T': aC.height -= d; aC.top +=d; break
+                    case 'L': aC.width -= d; aC.left +=d; break
+                    case 'R': aC.width -= d; this.posS.left -= d; break
+                    case 'B': aC.height -= d; this.posS.top -= d; break
                 }
-                else
-                    if (pF.L && aC.left > (z = pF.L.scops.L)) aC.left = z
-            }
+                
+            return (aC.height>0 && aC.width>0)
         }
-        IsCutF(m) {
-            return this.#isCutF[m]
-        }
-        DoCutB(x, d, v) {
-            const aC = this.posC
-            switch (p = this.cls.pitch) {
-                case 'S': this.CutForw(x, d, v, 1); break   // сдвигается
-                case 'C': this.CutForw(x, d, v, 0); break   // сжимается
-                case 'P':                   // сталкивается
-                case 'O':                   // скрывается
-                    if ('TB'.includes(x)) aC.height = 0
-                    else aC.width = 0
-            }
-            this.#isCutB[x] = true
-        }
-        IsFix(x) {
-            return this.#pFixs[x]
-        }
-        DoFix(x, pO5, v) {
-            const aO5 = this
-
-            if ('TB'.includes(x)) aO5.posC.top = v
-            else aO5.posC.left = v
-
-            aO5.#pFixs[x] = pO5
+        DoFix(x, pO5) {
+            if (this.pFixs[x] === pO5) return
 
             const
+                aO5 = this,
                 clon = aO5.act.clon || aO5.#Clone(),
                 shp = aO5.shp,
                 cart = aO5.act.cart
 
-            aO5.act.shdw = clon
+            aO5.act.shdw = pO5 ? clon : shp
+            aO5.pFixs[x] = pO5
+            cart.style.display = pO5 ? '' : 'none'
+            clon.style.display = pO5 ? aO5.orig.display : 'none'
 
-            cart.style.display = ''
-            clon.style.display = aO5.orig.display
+            if (pO5) {
+                cart.appendChild(shp)
+                aO5.#SetMargOutls(shp.style, AO5.Margs, AO5.Outln)
+                Object.assign(shp.style, { position: 'absolute', top: 0, left: 0 })
+            }
+            else {
+                Object.assign(shp.style, aO5.orig)
+                aO5.#SetMargOutls(shp.style, aO5.margs, aO5.outln)
+                aO5.parent.insertBefore(shp, aO5.act.cart)
+            }
 
-            cart.appendChild(shp)
-
-            aO5.#SetMargOutls(shp.style, AO5.Margs, AO5.Outln)
-            Object.assign(shp.style, { position: 'absolute', top: 0, left: 0 })
-
-            shp.addEventListener('dblclick', DblClick, true)
-            window.dispatchEvent(new CustomEvent('o5_fixed', { detail: { aO5: this, fix: true } }))
-        }
-        UnFix(x) { // тут pO5 чисто для проверки
-            const
-                aO5 = this,
-                shp = aO5.shp
-
-            if ('TB'.includes(x)) aO5.posC.top = aO5.posO.top
-            else aO5.posC.left = aO5.posO.left
-
-            aO5.#pFixs[x] = null
-
-            aO5.act.shdw = shp
-
-            Object.assign(shp.style, aO5.orig)
-            aO5.#SetMargOutls(shp.style, aO5.margs, aO5.outln)
-
-            aO5.act.clon.style.display = 'none'
-            aO5.act.cart.style.display = 'none'
-
-            aO5.parent.insertBefore(shp, aO5.act.cart)
-
-            shp.removeEventListener('dblclick', DblClick, true)
-
-            window.dispatchEvent(new CustomEvent('o5_fixed', { detail: { aO5: aO5, fix: false } }))
+            shp[(pO5 ? 'add' : 'remove') + 'EventListener']('dblclick', DblClick, true)
+            window.dispatchEvent(new CustomEvent('o5_fixed', { detail: { aO5: this, fix: pO5 } }))
         }
         ShowFix() {
             const aO5 = this,
@@ -242,7 +202,7 @@
                 posS = aO5.posS,
                 pw = (posC.width > 0) ? posC.width : 0,
                 ph = (posC.height > 0) ? posC.height : 0,
-                display = (pw === 0 || ph === 0) ? 'none' : ''      //   aO5.act.iHidden ||  //  || hi.T || hi.L|| hi.R || hi.B
+                display = (pw === 0 || ph === 0) ? 'none' : ''
 
             Object.assign(aO5.act.cart.style, {
                 display: display,
@@ -318,21 +278,14 @@
         CalcCurPos() {
             const
                 aO5 = this,
-                p = aO5.act.shdw.getBoundingClientRect()
+                p = aO5.act.shdw.getBoundingClientRect(),
+                aNaN = { T: NaN, L: NaN, R: NaN, B: NaN }
 
             Object.assign(aO5.posO, { top: p.top, left: p.left, right: p.right, bottom: p.bottom, height: p.height, width: p.width })
-            // Object.assign(aO5.posS, { top: 0, left: 0 })
-            if (!this.#isCutF.T && !this.#isCutF.B) {
-                aO5.posS.top = 0
-                aO5.posC.height = p.height
-            }
-            if (!this.#isCutF.L && !this.#isCutF.R) {
-                aO5.posS.left = 0
-                aO5.posC.width = p.width
-            }
-            // Object.assign(aO5.posC, { width: p.width, height: p.height })
+            Object.assign(aO5.posC, { height: p.height, width: p.width })
+            Object.assign(aO5.posS, { top: 0, left: 0 })
 
-            const pF = aO5.#pFixs
+            const pF = aO5.pFixs
             aO5.posC.top = pF.T ? pF.T.scops.T : (pF.B ? (pF.B.scops.B - p.height) : aO5.posO.top)
             aO5.posC.left = pF.L ? pF.L.scops.L : (pF.R ? (pF.R.scops.R - p.width) : aO5.posO.left)
         }

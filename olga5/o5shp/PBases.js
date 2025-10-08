@@ -20,19 +20,19 @@
     class PBase {
         static #pbases = new Map()
         static #idn = 0
-        #aO5s = []
+        aAll = []
         constructor(pO5) {
             this.pO5 = pO5
             this.idn = PBase.#idn++
             this.aO5s = { T: null, L: null, R: null, B: null }      // все эти будут проверяться на "натыкание"
-
+            
             this.tagsIn = new Set()
 
             this.bordss = { // въезжание вложенных контейнеров
                 T: [pO5], L: [pO5], R: [pO5], B: [pO5],
             }
             this.bChgs = { // въезжание вложенных контейнеров
-                T: 0, L: 0, R: 0, B: 0,
+                time:-1, T: 0, L: 0, R: 0, B: 0,
             }
 
             for (const nam of ['aO5s', 'bChgs'])
@@ -44,11 +44,11 @@
             PBase.#pbases.set(pO5, this)
         }
         ReorderAO5s() {
-            for (const aO5 of this.#aO5s)
+            for (const aO5 of this.aAll)
                 aO5.CalcCurPos()
 
             for (const m of 'TLRB') {
-                this.#aO5s.sort((a1, a2) => {   // по возрастанию
+                this.aAll.sort((a1, a2) => {   // по возрастанию
                     switch (m) {
                         case 'T': return a1.posO.top - a2.posO.top;
                         case 'L': return a1.posO.left - a2.posO.left;
@@ -56,7 +56,7 @@
                         case 'B': return (a2.posO.left + a2.posO.width) - (a1.posO.left + a1.posO.width);
                     }
                 })
-                this.aO5s[m] = new Set(this.#aO5s)
+                this.aO5s[m] = new Set(this.aAll)
 
                 // if (o5debug > 1)
                 //     console.log(`${this.idn}=${this.pO5.name}[${m}]: ${Array.from(this.aO5s[m]).map(a => a.a_name).join(',')}`)
@@ -68,8 +68,8 @@
                 fintag = pBase.pO5.tag
 
             Object.assign(aO5.base, { bO5, pBase })
-            if (!pBase.#aO5s.includes(aO5))
-                pBase.#aO5s.push(aO5)
+            if (!pBase.aAll.includes(aO5))
+                pBase.aAll.push(aO5)
 
             let tag = aO5.shp
             do {

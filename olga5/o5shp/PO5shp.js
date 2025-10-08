@@ -47,7 +47,7 @@
                     rH = el.clientWidth - scrll.width,
                     rV = el.clientHeight - scrll.height,
                     dt = now - scrll.time >= dm.dt,
-                    strt = scrll.time === 0,
+                    strt = scrll.time <= 0,
                     typS = typ === 'S'
 
                 if (
@@ -114,8 +114,6 @@
 
     class PO5 {
         static Scrls(tag, nst) {
-            // const final = IsFinal(tag),
-            //     oxy = final || (nst.overflow === 'auto')
             const oxy = tag.nodeName == 'BODY' || (nst.overflow === 'auto')
             return {
                 H: oxy || nst.overflowX === 'auto' || nst.overflow === 'scroll' || nst.overflowX === 'scroll',
@@ -169,6 +167,7 @@
                     height: el.clientHeight,
                 },
                 scops: {    //   координаты рабочей зоны контейнера
+                    time: -1,
                     isVisible: true,
                     T: 0, L: 0, R: 0, B: 0
                 },
@@ -188,7 +187,7 @@
             Object.freeze(this.borders)
             Object.freeze(this)
 
-            this.CalcScope()
+            this.CalcScope(0)
 
             if (this.scrls.H || this.scrls.V) {
                 ro.observe(el);
@@ -210,7 +209,7 @@
                 console.log(`PO5 создано ${this.name}`)
         }
         name = ''    // еще и тут - чтобы сразу видеть в отладчике
-        CalcScope() {   // видимост,- пересчитывается при скроллине в DoChgsconst
+        CalcScope(time) {   // видимост,- пересчитывается при скроллине в DoChgsconst
             const
                 tag = this.tag,
                 de = document.documentElement,
@@ -224,6 +223,7 @@
                 left = p.left + b.left + (atLe ? (tag.offsetWidth - tag.clientWidth) : 0)
 
             Object.assign(this.scops, {
+                time: time,
                 T: top,
                 L: left,
                 R: left + (this.ibody ? de.clientWidth : tag.clientWidth),
