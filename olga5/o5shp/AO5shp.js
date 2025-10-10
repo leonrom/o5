@@ -58,16 +58,18 @@
                 nom: AO5.nom++,
                 id: shp.id,
                 shp: shp,
-                cls: { level: 0, pitch: 0, none: 0, nofx: 0, alive: 0, puts: [] }, // инициализация будет в ReadCls(aO5, ss) 
+                cls: { level: 0, pitch: 0, none: 0, nofx: 0, alive: 0, puts: { T: false, L: false, R: false, B: false } }, // инициализация будет в ReadCls(aO5, ss) 
                 base: { bO5: null, pBase: null },  // будут присвоены в PBases в Attach(aO5)
                 act: {
-                    time: -1,    // для пересчетка текущей позиции
+                    // time: -1,    // для пересчетка текущей позиции
                     shdw: shp,          // будет: или  shp или clon
                     clon: null,
                     cart: null,
-                    checkN: -1,         // для проверок подвисания под ним
                     quals: quals,
-                    iTested: false,     // для контроля в тестах       
+                    isfix: false,
+                    ready: false,
+                    observer: null,
+                    // iTested: false,     // для контроля в тестах       
                 },
                 margs: { t: '', l: '', r: '', b: '', },
                 outln: { w: '', s: '', c: '', o: '', },
@@ -160,41 +162,80 @@
 
             if (d > 0)
                 switch (o) {
-                    case 'T': aC.height -= d; aC.top +=d; break
-                    case 'L': aC.width -= d; aC.left +=d; break
+                    case 'T': aC.height -= d; aC.top += d; break
+                    case 'L': aC.width -= d; aC.left += d; break
                     case 'R': aC.width -= d; this.posS.left -= d; break
                     case 'B': aC.height -= d; this.posS.top -= d; break
                 }
-                
-            return (aC.height>0 && aC.width>0)
+
+            return (aC.height > 0 && aC.width > 0)
+        }
+        IsFixed() {
+            const pF = this.pFixs
+            return pF.T || pF.L || pF.R || pF.B
         }
         DoFix(x, pO5) {
-            if (this.pFixs[x] === pO5) return
+            if (x && this.pFixs[x] === pO5) {
+                alert(`DoFix повтор на ${this.a_name} для : ${pO5 ? pO5.name : ' -  '}[${x}]`)
+                return
+            }
 
             const
                 aO5 = this,
-                clon = aO5.act.clon || aO5.#Clone(),
-                shp = aO5.shp,
-                cart = aO5.act.cart
+                act = aO5.act,
+                pF = aO5.pFixs,
+                wasFixed = aO5.IsFixed()
 
-            aO5.act.shdw = pO5 ? clon : shp
-            aO5.pFixs[x] = pO5
-            cart.style.display = pO5 ? '' : 'none'
-            clon.style.display = pO5 ? aO5.orig.display : 'none'
+            let s = ''
+            act.isfix = false
+            if (x) {
+                pF[x] = pO5
+                act.isfix = aO5.IsFixed()
 
-            if (pO5) {
-                cart.appendChild(shp)
-                aO5.#SetMargOutls(shp.style, AO5.Margs, AO5.Outln)
-                Object.assign(shp.style, { position: 'absolute', top: 0, left: 0 })
+                if (o5debug)
+                    s = `${pO5 ? 'зафиксирован' : 'расфиксирован'} ${pO5 ? pO5.name : ''} по [${x}]`
             }
             else {
-                Object.assign(shp.style, aO5.orig)
-                aO5.#SetMargOutls(shp.style, aO5.margs, aO5.outln)
-                aO5.parent.insertBefore(shp, aO5.act.cart)
+                pF.T = pF.L = pF.R = pF.B = null
+                act.ready = false
+                if (o5debug)
+                    s = `расфиксирован полностью`
             }
 
-            shp[(pO5 ? 'add' : 'remove') + 'EventListener']('dblclick', DblClick, true)
-            window.dispatchEvent(new CustomEvent('o5_fixed', { detail: { aO5: this, fix: pO5 } }))
+            if (act.isfix !== wasFixed) {
+                const
+                    clon = act.clon || aO5.#Clone(),
+                    cart = act.cart,
+                    shp = aO5.shp
+
+                act.shdw = act.isfix ? clon : shp
+                cart.style.display = act.isfix ? '' : 'none'
+                clon.style.display = act.isfix ? aO5.orig.display : 'none'
+
+                if (act.isfix) {
+                    act.observer.unobserve(shp)
+                    act.observer.observe(clon)
+
+                    cart.appendChild(shp)
+                    aO5.#SetMargOutls(shp.style, AO5.Margs, AO5.Outln)
+                    Object.assign(shp.style, { position: 'absolute', top: 0, left: 0 })
+                }
+                else {
+                    act.observer.unobserve(clon)
+                    act.observer.observe(shp)
+                    Object.assign(shp.style, aO5.orig)
+                    aO5.#SetMargOutls(shp.style, aO5.margs, aO5.outln)
+                    aO5.parent.insertBefore(shp, act.cart)
+                }
+                if (o5debug)
+                    s += `- физически`
+
+                shp[(act.isfix ? 'add' : 'remove') + 'EventListener']('dblclick', DblClick, true)
+                window.dispatchEvent(new CustomEvent('o5_fixed', { detail: { aO5: this, fix: act.isfix } }))
+            }
+            if (o5debug)
+                console.log(`DoFix ${this.a_name}: ` + s)
+
         }
         ShowFix() {
             const aO5 = this,
@@ -218,7 +259,7 @@
             })
         }
         #Clone() {
-            if (o5debug > 1)
+            if (o5debug )
                 console.log(`----------------- клонирую '${this.id}' -----------`)
 
             const aO5 = this,
@@ -253,7 +294,7 @@
                 position: 'fixed',
                 overflow: 'hidden',
                 background: 'none',
-                zIndex: shp.style.zIndex ? Number(shp.style.zIndex) : 1,
+                zIndex: shp.style.zIndex // ? Number(shp.style.zIndex) : 0,
             })
             shp.parentNode.insertBefore(cart, shp)
 
