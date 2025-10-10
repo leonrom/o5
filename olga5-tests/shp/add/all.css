@@ -46,7 +46,7 @@
     overflow-y: hidden;
     overflow-x: hidden;
     direction: rtl;
-    height: 130px;
+    height: auto;
 }
 
 .cboxed p {

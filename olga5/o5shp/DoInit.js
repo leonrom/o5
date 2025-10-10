@@ -23,6 +23,10 @@
         fmtOK = "background: blue; color: white;",
         fmtErr = "background: yellow; color: black;",
         mselec = /[A-Z]|[+-]?\d+/g,
+        state = {
+            observer: null,
+            elements: new Set,
+        },
         DebugShowRez = aO5s => {
             const
                 head = ` после "${Array.from(aO5s).map(aO5 => aO5.a_name).join(', ')}"`,
@@ -91,7 +95,9 @@
         },
 
         ReadCls = (aO5, ss) => {
-            const cls = aO5.cls
+            const 
+            cls = aO5.cls,
+            puts=cls.puts
 
             Object.assign(cls, {           // для повторной инициализации (напр. в тестах)
                 level: 0,
@@ -100,7 +106,7 @@
                 nofx: false,
                 alive: false,
             })
-            cls.puts.length = 0 //  : { T: '', L: '', R: '', B: '', },
+            puts.T = puts.L = puts.R = puts.B = false
 
             const cs = ss.match(mselec)
             for (const c of cs)
@@ -116,12 +122,12 @@
                         case 'T':
                         case 'L':
                         case 'R':
-                        case 'B': cls.puts.push(c); break
+                        case 'B': cls.puts[c] = true; break
                         case 'N': cls.nofx = true; break    // не подвисает, но может сдвигать остальные
                         default: errs.push(`не определён квалиф. '${ql[i]}' в строке "${qual}"`)
                     }
 
-            if (cls.puts.length === 0) cls.puts.push('T')
+            if (!puts.T && !puts.L && !puts.R && !puts.B) cls.puts.T=true
         },
 
         ReadAttrs = aO5 => {
@@ -137,40 +143,64 @@
             const
                 oO5s = new Set(),
                 bBases = new Set()
-            for (const entry of entries)
+            for (const entry of entries) {
+                const shp = entry.target
+                let aO5 = shp.aO5shp
+                // if (aO5 && aO5.act.isfix ) continue
+
+                // console.error(
+                //     (aO5 ? (aO5.a_name + ' ' + (aO5.act.isfix ? 'fix' : 'нет')) : ' -  ') +
+                //     `  isIntersecting=${entry.isIntersecting}, intersectionRatio=${entry.intersectionRatio}`)
                 if (entry.isIntersecting) {
-                    const
-                        shp = entry.target,
-                        el = observ.getel(shp)
+                    if (!aO5) {
+                        const el = observ.getel(shp)
+                        aO5 = new wshp.AO5shp.AO5(shp, el.quals)
+                        aO5.act.observer = state.observer
+                        oO5s.add(aO5)
+                    }
 
-                    oO5s.add(new wshp.AO5shp.AO5(shp, el.quals))
+// AO5shp:236   DoFix #shp0: зафиксирован div3 по [T]- физически
+// DoChgs:179   изменения для #shp0: *fix=null->div3,  fix=div3->div3,  fix=null->null,                     
+// DoInit:149 #shp0 fixis Intersecting=true,     intersectionRatio=0.9833333492279053 зафиксировано и clone чуть-чуть "ушла"
+// DoInit:149 #shp0 fixis Intersecting=false,    intersectionRatio=0                  зафиксировано и clone совсем скрылось "ушла"
+// DoInit:149 #shp0 fixis Intersecting=true,     intersectionRatio=0                  только подошло к видимости. м.б. 0 или чуть-чуть
+// AO5shp:236   DoFix #shp0: расфиксирован  по [T]- физически
+// DoChgs:179   изменения для #shp0: *fix=div3->null,  fix=div3->div3,  fix=null->null, 
+// DoInit:149 #shp0 нет   isIntersecting=false,  intersectionRatio=0                  расфиксировано - закрылся clone
+// DoInit:149 #shp0 нет   isIntersecting=true,   intersectionRatio=1                  расфиксировано - появилось shp
 
-                    observ.unobserve(shp)
+                    if (entry.intersectionRatio === 1)  //   && !aO5.act.isfix  (необязательно)
+                        aO5.act.ready = true
                 }
-
-            let isNew = false
-            for (const aO5 of oO5s) {
-                if (wshp.PBases.PBase.Attach(aO5))  // если добавилась новая база
-                    isNew = true
-
-                ReadAttrs(aO5)
-                bBases.add(aO5.base.pBase)
-
-                // для тестирования в frames.html
-                window.dispatchEvent(new CustomEvent('o5_containers', { detail: { aO5: aO5, } }))
+                else {
+                    if (aO5 && !aO5.IsFixed())
+                        aO5.act.ready = false
+                }
             }
 
-            if (oO5s.size > 0)
+            if (oO5s.size > 0) {
+                let isNew = false
+                for (const aO5 of oO5s) {
+                    if (wshp.PBases.PBase.Attach(aO5))  // если добавилась новая база
+                        isNew = true
+
+                    ReadAttrs(aO5)
+                    bBases.add(aO5.base.pBase)
+
+                    // для тестирования в frames.html
+                    window.dispatchEvent(new CustomEvent('o5_containers', { detail: { aO5: aO5, } }))
+                }
+
                 for (const bBase of bBases)
                     bBase.ReorderAO5s()
 
-            if (isNew)
-                for (const x of 'TL')
-                    wshp.DoChgs.SetBorders(x, body.pO5)
+                if (isNew)
+                    for (const x of 'TL')
+                        wshp.DoChgs.SetBorders(x, body.pO5)
 
-            if (o5debug > 1)
-                DebugShowRez(oO5s)
-
+                if (o5debug > 1)
+                    DebugShowRez(oO5s)
+            }
             oO5s.clear()
         }
 
@@ -179,10 +209,6 @@
      * @function CreateObserver
      */
     function CreateObserver(options) {
-        const state = {
-            observer: null,
-            elements: new Set,
-        }
 
         state.observer = new IntersectionObserver(Observe, options)
 
@@ -194,7 +220,7 @@
 
         return {
             observe: (tag, quals) => {
-                state.elements.add({ tag: tag, quals: quals.join(':') })
+                state.elements.add({ tag: tag, quals: quals ? quals.join(':') : '' })
                 state.observer.observe(tag)
             },
             unobserve: (tag) => {

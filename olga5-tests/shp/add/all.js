@@ -19,11 +19,12 @@ class OO5 {
     #BordNames = aO5 => {
         const ps = aO5.shp.getElementsByTagName('p'),
             cls = aO5.cls,
+            puts = cls.puts,
             ss = []
         let
             s = '<b><u>' + aO5.id + '</u></b>' +
                 `<br/>` +
-                '<b>' + cls.puts.join('') + '</b>' +
+                '<b>' + (puts.T ? 'T' : '') + (puts.L ? 'L' : '') + (puts.R ? 'R' : '') + (puts.B ? 'B' : '') + '</b>' +
                 ',<b>' + cls.pitch + '</b>(<i>' + this.#pitches[cls.pitch] + '</i>)' +
                 (cls.alive ? ',<b>A</b><i>live</i>' : '') +
                 ',<b>' + cls.level + '</b>' +
@@ -108,7 +109,7 @@ class OO5 {
                         cls = sp.className.trim(),
                         b = sp.getElementsByTagName('b')[0]
 
-                    b.innerHTML = aO5.cls.puts.includes(cls) ? cls : this.#nbsp
+                    b.innerHTML = aO5.cls.puts[cls] ? cls : this.#nbsp
                     b.b5 = { aO5: aO5, val: cls, div: div, key: key }
                     b.addEventListener('click', this.CbMark)
                     div.aO5bs.push(b)
@@ -224,8 +225,8 @@ class OO5 {
                             cut = i === 1,
                             val = cut ? c1 : c0
 
-                        b.b5= { aO5, div, key, nam, val, cut }
- 
+                        b.b5 = { aO5, div, key, nam, val, cut }
+
                         b.title = cut ? 'обрезание (сзади)' : 'фиксация (по ходу)'
                         b.innerHTML = i === 0 ? v0 : v1
                         b.id = p.className + '-b' + i
