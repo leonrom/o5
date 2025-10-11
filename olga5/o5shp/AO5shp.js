@@ -41,6 +41,7 @@
         static TObj = { T: {}, L: {}, R: {}, B: {} }
         static nom = 0
 
+        name = ''
         pFixs = { T: null, L: null, R: null, B: null }
 
         canFixs = { T: null, L: null, R: null, B: null }
@@ -48,12 +49,14 @@
         tagCuts = { T: null, L: null, R: null, B: null }
 
         constructor(shp, quals) {
-            const aO5 = this
+            const 
+                aO5 = this,
+                name = window.olga5.C.MakeObjName(shp)
 
             shp.aO5shp = aO5
 
             Object.assign(aO5, {
-                a_name: window.olga5.C.MakeObjName(shp),  // shp.id, // только чтобы легче видеть в отладчике 
+                a_name: name,  // shp.id, // только чтобы легче видеть в отладчике 
                 parent: shp.parentElement,
                 nom: AO5.nom++,
                 id: shp.id,
@@ -85,6 +88,7 @@
                 orig: { display: '', position: '', top: 0, left: 0, height: 0, width: 0, },
             })
 
+            this.name = name
             for (const nam of ['base', 'frms', 'margs', 'outln', 'posC', 'posO', 'posS', 'orig', 'cls'])
                 if (aO5[nam])
                     Object.seal(aO5[nam])

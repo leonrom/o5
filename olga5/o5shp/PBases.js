@@ -49,11 +49,12 @@
 
             for (const m of 'TLRB') {
                 this.aAll.sort((a1, a2) => {   // по возрастанию
+                    const p1 = a1.posO, p2 = a2.posO
                     switch (m) {
-                        case 'T': return a1.posO.top - a2.posO.top;
-                        case 'L': return a1.posO.left - a2.posO.left;
-                        case 'R': return (a2.posO.left + a2.posO.width) - (a1.posO.left + a1.posO.width);
-                        case 'B': return (a2.posO.left + a2.posO.width) - (a1.posO.left + a1.posO.width);
+                        case 'T': return p1.top - p2.top;
+                        case 'L': return p1.left - p2.left;
+                        case 'R': return (p2.left + p2.width) - (p1.left + p1.width);
+                        case 'B': return (p2.top + p2.height) - (p1.top + p1.height);
                     }
                 })
                 this.aO5s[m] = new Set(this.aAll)

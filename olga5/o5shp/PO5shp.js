@@ -100,7 +100,7 @@
         },
         ro = new ResizeObserver(saved.Resize),
         Observe = entries => {
-            const aO5s = new Set()
+            // const aO5s = new Set()
             for (const entry of entries) {
                 const pO5 = entry.target.pO5
                 pO5.scops.isVisible = entry.isIntersecting
