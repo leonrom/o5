@@ -14,36 +14,46 @@
         o5debug = C.consts.o5debug,
         mdiglit = /[a-zA-Z]+|[+-]*\d+/g,
         MakeFrames = (aO5, ss) => {
-            const
-                errs = [],
-                typs = 'cins',
-                pBase = aO5.base.pBase,
-                tagBase = pBase.pO5.tag,
-                TagCheck = (t, typ, cod) => {
-                    const
-                        IsInClass = (cs, cod) => {
-                            for (const c of cs)
-                                if (c.toUpperCase == cod)
-                                    return true
-                        }
-                    switch (typ) {
-                        case 'n': return t.nodeName === cod
-                        case 'i': return t.id.toUpperCase() === cod
-                        case 'c': return IsInClass(t.classList, cod)
-                    }
-                }
-
             // удаляю старое использование
             for (const [key, frame] of Frame.frames) {
-                const i = frame.aO5fs.indexOf(aO5)
+                const i = frame.aO5s.indexOf(aO5)
                 if (i >= 0) {
-                    frame.aO5fs.splice(i, 1)
-                    if (frame.aO5fs.length === 0)
+                    frame.aO5s.splice(i, 1)
+                    if (frame.aO5s.length === 0)
                         Frame.frames.delete(key)
                 }
             }
             aO5.frms.frames.clear()
             aO5.frms.tagCut = null
+
+            const
+                errs = [],
+                typs = 'cins',
+                pBase = aO5.base.pBase,
+                IsInClass = (cs, cod) => {
+                    for (const c of cs)
+                        if (c.toUpperCase == cod)
+                            return true
+                },
+                FindTag = (ts, typ, cod, n0) => {
+                    let tag = null, n = n0
+                    for (const t of ts)
+                        if (
+                            (typ === 'n' && t.nodeName === cod) ||
+                            (typ === 'i' && t.id.toUpperCase() === cod) ||
+                            (typ === 'c' && IsInClass(t.classList, cod))
+                        ) {
+                            tag = t
+                            if (--n <= 0)
+                                break
+                        }
+                    if (!tag)
+                        errs.push(`не найден тег для typ=${typ}  и cod=${cod}`)
+                    else
+                        if (n > 0)
+                            errs.push(`взял ${n}-й тег (вместо ${n0}) `)
+                    return tag || ts[0]
+                }
 
             // добавляю aO5  к frames
             for (const s of ss) {
@@ -56,68 +66,43 @@
                     par = (uu[1] || '').trim(),
                     cuts = par.match(/c/i)
 
-                let
-                    typ = cc[0].trim().toLowerCase(),
-                    num = par.replace(/[fc]/gi, '') || 0 // 'f' уже не используется и игнорируется                    
-
+                let typ = cc[0].trim().toLowerCase()
                 if (!typs.includes(typ)) {
                     errs.push(`тип ссылки '${typ}' не начинается одним из '${typs}' заменен на 'i'`)
                     typ = 'i'
-                } 
-                if (!Number.isInteger(num) || isNaN(num)) {
-                    errs.push(`непонятное значение для num='${uu[1]}' (после символа '/'). Взято 0`)
-                    nim = 0
                 }
 
                 if (cuts) {
                     let tag = aO5.frms.tagCut
                     if (!tag) {
-                        let own = aO5.shp, n = num
-                        do {
-                            own = own.parentNode
-                            if (TagCheck(own, typ, cod)) {
-                                tag = own
-                                if (--n <= 0)
-                                    break
-                            }
-                        }
-                        while (own !== tagBase)
-
-                        if (!tag) {
-                            errs.push(`не найден внутренний контейнер для "${s}" . Взял '${tagBase.pO5.name}'`)
-                            tag = tagBase
-                        }
-                        else if (n > 0)
-                            errs.push(`взял ${n}-й тег (вместо ${n0} для  "${s}") `)
-
-                        aO5.frms.tagCut = tag
+                        tag = aO5.frms.tagCut = FindTag(pBase.tagsIn, typ, cod, 0)
                         if (!tag.pO5)
                             new wshp.PO5shp.PO5(tag, window.getComputedStyle(tag))
+                        
+                        if (!tag) {
+                            errs.push(`Нет тега для key=${key} среди внутренних_тегов - игнорирую`)
+                            continue
+                        }
                     }
                     else
                         errs.push(`несколько cut-квалификаторов (т.е. содержащих '/c')`)
                 }
                 else {
+                    const num = par.replace(/[fc]/gi, '') || 0 // 'f' уже не используется и игнорируется                    
+                    if (!Number.isInteger(num) || isNaN(num)) {
+                        errs.push(`непонятное значение для num='${uu[1]}' (после символа '/')`)
+                        continue
+                    }
                     const key = pBase.idn + ':' + typ + ',' + cod + ',' + num
-                    let frame = Frame.frames.get(key)                    
+
+                    let frame = Frame.frames.get(key)
                     if (!frame) {
-                        let own = pBase.pO5.tag, n = num, tag;
-                        do {
-                            if (TagCheck(own, typ, cod)) {
-                                tag = own
-                                if (--n <= 0)
-                                    break
-                            }
-                            own = own.parentNode
-                        }
-                        while (own.nodeName !== 'HTML')
+                        let tag = FindTag(pBase.pO5.tagsOut, typ, cod, num)
 
                         if (!tag) {
-                            errs.push(`не найден внешний контейнер для typ=${typ} и cod=${cod}. Взял '${pO5.name}'`)
-                            tag = pO5.tag
+                            errs.push(`Нет тега для key=${key} среди внешних_ скролл_тегов - игнорирую`)
+                            continue
                         }
-                        else if (n > 0)
-                            errs.push(`взял ${n}-й тег (вместо ${n0} для typ=${typ} и cod=${cod}) `)
 
                         frame = new Frame(key, typ, cod, num, tag.pO5)
 
@@ -127,12 +112,12 @@
                             console.log(`Определил (и добавил в base.frames) фрейм "${key} на ${frame.pO5.name}" `)
                     }
 
-                    frame.aO5fs.push(aO5)
+                    frame.aO5s.push(aO5)
                     aO5.frms.frames.add(frame)
                 }
             }
             if (!aO5.frms.tagCut)
-                aO5.frms.tagCut = tagBase
+                aO5.frms.tagCut = aO5.base.pBase.pO5.tag
 
             if (errs.length)
                 C.ConsoleError(`Ошибки определения фреймов для ${aO5.a_name}:`, errs.length, errs)
@@ -146,7 +131,7 @@
                 cod: cod,
                 num: num,
                 pO5: pO5,
-                aO5fs: [], // кто его использует
+                aO5s: [], // кто его использует
             })
             Object.seal(this)
         }

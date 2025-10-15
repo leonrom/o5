@@ -100,6 +100,7 @@
         },
         ro = new ResizeObserver(saved.Resize),
         Observe = entries => {
+            // const aO5s = new Set()
             for (const entry of entries) {
                 const pO5 = entry.target.pO5
                 pO5.scops.isVisible = entry.isIntersecting
@@ -145,10 +146,11 @@
                 name: tag.id ? tag.id : C.MakeObjName(tag),
 
                 pOuts: new Set(),  // д.б. Set() иначе в Attach будут повторы  (скроллируемые pO5) все скроллируемых внешних контейнеров
-                // tagsOut: new Set(),  // теги от pOuts
+                tagsOut: new Set(),  // теги от pOuts
                 pBases: new Set(),  //   -"-    (скроллируемые pO5) все скроллируемых вложенных контейнеров 
                 pIncs: new Set(),  //   -"-    (скроллируемые pO5) все скроллируемых вложенных контейнеров 
-                
+                // aO5s: new Set(),  // подвисабельные теги во вссех внутренних pBases
+
                 borders: {
                     top: parseFloat(nst.borderTopWidth),
                     left: parseFloat(nst.borderLeftWidth),
@@ -176,7 +178,7 @@
 
             this.pOuts.add(this)
             this.pIncs.add(this)
-            // this.tagsOut.add(tag)
+            this.tagsOut.add(tag)
 
             for (const nam of ['scrll', 'scops'])
                 Object.seal(this[nam])

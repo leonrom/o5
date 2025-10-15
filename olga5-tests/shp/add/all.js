@@ -406,7 +406,6 @@ class OO5 {
 
         const shp = aO5.shp,
             act = aO5.act
-        // mpos = aO5.act.mpos
 
         document.removeEventListener('mousemove', this.DoMove)
 
@@ -416,20 +415,6 @@ class OO5 {
         mpos.divStrt.aO5 = null
         shp.classList.remove('o5_moved')
         if (!e.o5ignore) { // новое позиционирование
-            // const
-            //     position = getComputedStyle(shp).position
-
-            // switch (position) {
-            //     case 'absolute': shp.style.transform = `translate(${dx}px, ${dy}px)`; break
-            //     case 'static': Object.assign(shp.style, { marginLeft: dx + "px", marginTop: dy + "px" }); break
-            //     case 'relative':
-            //     case 'absolute':
-            //     case 'fixed': Object.assign(shp.style, {
-            //         top: (mpos.divStrt.oy + mpos.divStrt.y + mpos.mousDiff.dy) + 'px',
-            //         left: (mpos.divStrt.ox + mpos.divStrt.x + mpos.mousDiff.dx) + 'px'
-            //     })
-            // }
-
             const
                 y = mpos.divStrt.oy + mpos.divStrt.y + mpos.mousDiff.dy - mpos.margs.marginTop,
                 x = mpos.divStrt.ox + mpos.divStrt.x + mpos.mousDiff.dx - mpos.margs.marginLeft
@@ -472,6 +457,7 @@ class OO5 {
 
             }
 
+        aO5.base.pBase.ReorderAO5s()
         this.#wshp.DoChgs.MakeScroll(0.1, 0.1, aO5.base.pBase.pO5, true)
     }
     DoMove = e => {

@@ -42,9 +42,7 @@
         static nom = 0
 
         name = ''
-        pFixs = { T: null, L: null, R: null, B: null }  // зафиксированные на границе контейнера
-        pAtts = { T: null, L: null, R: null, B: null }  // на какаом этот зафиксорован (аналог pFixs)
-        attaches = { T: [], L: [], R: [], B: [] }       // список: которые зафиксированы на этом
+        pFixs = { T: null, L: null, R: null, B: null }
 
         canFixs = { T: null, L: null, R: null, B: null }
         extCuts = { T: null, L: null, R: null, B: null }
@@ -80,7 +78,7 @@
                 outln: { w: '', s: '', c: '', o: '', },
 
                 pFixsOn: [],
-            
+
                 frms: { tagCut: null, frames: new Set() },
 
                 posS: { top: 0, left: 0, },
@@ -91,18 +89,12 @@
             })
 
             this.name = name
-            this.aO5s = {}  // списки тех, кто может наткнуться НА этого aO5
-            for (const m of 'TLRB')
-                this.aO5s[m] =  new Set()
-
             for (const nam of ['base', 'frms', 'margs', 'outln', 'posC', 'posO', 'posS', 'orig', 'cls'])
                 if (aO5[nam])
                     Object.seal(aO5[nam])
                 else
                     console.log("%c%s", fmtErr, `в aO5 отсутствует '${nam}'`)
 
-            Object.freeze(this.attaches)
-            Object.freeze(this.aO5s)
             Object.freeze(this)
         }
         #SetMargOutls(style, margs, outln) {
@@ -239,15 +231,14 @@
                     aO5.#SetMargOutls(shp.style, aO5.margs, aO5.outln)
                     aO5.parent.insertBefore(shp, act.cart)
                 }
+                if (o5debug)
+                    s += `- физически`
 
                 shp[(act.isfix ? 'add' : 'remove') + 'EventListener']('dblclick', DblClick, true)
                 window.dispatchEvent(new CustomEvent('o5_fixed', { detail: { aO5: this, fix: act.isfix } }))
-
-                if (o5debug)
-                    s += `- физически`
             }
             if (o5debug)
-                console.log(`DoFix ${this.name}: ` + s)
+                console.log(`DoFix ${this.a_name}: ` + s)
 
         }
         ShowFix() {

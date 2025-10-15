@@ -24,18 +24,18 @@
         constructor(pO5) {
             this.pO5 = pO5
             this.idn = PBase.#idn++
-            // this.tagsIn = new Set()
+            this.aO5s = { T: null, L: null, R: null, B: null }      // все эти будут проверяться на "натыкание"
+            
+            this.tagsIn = new Set()
 
             this.bordss = { // въезжание вложенных контейнеров
                 T: [pO5], L: [pO5], R: [pO5], B: [pO5],
             }
             this.bChgs = { // въезжание вложенных контейнеров
-                // time: -1, 
-                start: true,
-                T: 0, L: 0, R: 0, B: 0,
+                time:-1, T: 0, L: 0, R: 0, B: 0,
             }
 
-            for (const nam of ['bChgs'])
+            for (const nam of ['aO5s', 'bChgs'])
                 Object.seal(this[nam])
 
             Object.freeze(this.bordss)
@@ -43,54 +43,50 @@
 
             PBase.#pbases.set(pO5, this)
         }
-        static #sorters = {   // по возрастанию
-            T: (a1, a2) => a1.posO.top - a2.posO.top,
-            L: (a1, a2) => a1.posO.left - a2.posO.left,
-            R: (a1, a2) => (a2.posO.left + a2.posO.width) - (a1.posO.left + a1.posO.width),
-            B: (a1, a2) => (a2.posO.top + a2.posO.height) - (a1.posO.top + a1.posO.height),
-        }
         ReorderAO5s() {
             for (const aO5 of this.aAll)
                 aO5.CalcCurPos()
 
             for (const m of 'TLRB') {
-                this.aAll.sort(PBase.#sorters[m])
-
-                for (const aO5 of this.aAll) {
-                    aO5.aO5s[m].clear()
-
-                    const aO = aO5.posO
-                    let i = this.aAll.indexOf(aO5)
-                    while (++i < this.aAll.length) {
-                        const iO5 = this.aAll[i],
-                            iO = iO5.posO
-                        if (
-                            ('TB'.includes(m) && (iO.right < aO.left || iO.left > aO.right)) ||
-                            ('LR'.includes(m) && (iO.bottom < aO.top || iO.top > aO.bottom))
-                        )
-                            continue
-
-                        aO5.aO5s[m].add(iO5)
+                this.aAll.sort((a1, a2) => {   // по возрастанию
+                    const p1 = a1.posO, p2 = a2.posO
+                    switch (m) {
+                        case 'T': return p1.top - p2.top;
+                        case 'L': return p1.left - p2.left;
+                        case 'R': return (p2.left + p2.width) - (p1.left + p1.width);
+                        case 'B': return (p2.top + p2.height) - (p1.top + p1.height);
                     }
-                }
+                })
+                this.aO5s[m] = new Set(this.aAll)
+
+                // if (o5debug > 1)
+                //     console.log(`${this.idn}=${this.pO5.name}[${m}]: ${Array.from(this.aO5s[m]).map(a => a.a_name).join(',')}`)
             }
         }
-        #Add(bO5, aO5) {
-            const pBase = this
+        Add(bO5, aO5) {
+            const
+                pBase = this,
+                fintag = pBase.pO5.tag
 
             Object.assign(aO5.base, { bO5, pBase })
             if (!pBase.aAll.includes(aO5))
                 pBase.aAll.push(aO5)
+
+            let tag = aO5.shp
+            do {
+                tag = tag.parentNode
+                pBase.tagsIn.add(tag)
+            } while (tag != fintag)
         }
         static Attach(aO5) {
             let bO5, pTop, newPs = 0;
             const SetbO5 = pO5 => {
                 if (!bO5) bO5 = pO5
 
-                for (const pOut of bO5.pOuts)
+                for (const pOut of bO5.pOuts) {
                     pOut.pOuts.add(pO5)
-                // pOut.tagsOut.add(pO5.tag)
-
+                    pOut.tagsOut.add(pO5.tag)
+                }
 
                 if (pTop)
                     for (const pInc of pTop.pIncs)
@@ -129,7 +125,7 @@
             for (const pOut of bO5.pOuts)
                 pOut.pBases.add(pBase)
 
-            pBase.#Add(bO5, aO5)
+            pBase.Add(bO5, aO5)
 
             return newPs
         }

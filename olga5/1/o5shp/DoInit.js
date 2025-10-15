@@ -27,12 +27,12 @@
             observer: null,
             elements: new Set,
         },
-        DebugShowRez = oO5s => {
+        DebugShowRez = aO5s => {
             const
-                head = ` после "${Array.from(oO5s).map(aO5 => aO5.a_name).join(', ')}"`,
+                head = ` после "${Array.from(aO5s).map(aO5 => aO5.a_name).join(', ')}"`,
                 rez = []
 
-            for (const aO5 of oO5s)
+            for (const aO5 of aO5s)
                 rez.push({
                     aO5: aO5.a_name,
                     tagCut: aO5.frms.tagCut.id,
@@ -48,7 +48,11 @@
                     base: pBase.pO5.name,
                     pOuts: ' ' + (Array.from(pBase.pO5.pOuts)).map(pO5 => pO5.name).join(', '),
                     pIncs: ' ' + (Array.from(pBase.pO5.pIncs)).map(pO5 => pO5.name).join(', '),
-                    aAll: ' ' + pBase.aAll.map(tag => tag.id).join(', ')
+                    tagsIn: ' ' + (Array.from(pBase.tagsIn)).map(tag => tag.id).join(', '),
+                    aO5s_T: ' ' + (Array.from(pBase.aO5s.T)).map(aO5 => aO5.a_name).join(', '),
+                    aO5s_L: ' ' + (Array.from(pBase.aO5s.L)).map(aO5 => aO5.a_name).join(', '),
+                    aO5s_R: ' ' + (Array.from(pBase.aO5s.R)).map(aO5 => aO5.a_name).join(', '),
+                    aO5s_B: ' ' + (Array.from(pBase.aO5s.B)).map(aO5 => aO5.a_name).join(', ')
                 })
             }
             C.ConsoleInfo(`Базы ${head}`, rez.length, rez)
@@ -59,7 +63,7 @@
                     key: key,
                     tcn: frame.typ + ':' + frame.cod + ':' + frame.num,
                     pO5: frame.pO5.name,
-                    aO5fs: frame.aO5fs.map(a => a.a_name).join(', '),
+                    aO5s: frame.aO5s.map(a => a.a_name).join(', '),
                 })
             }
             C.ConsoleInfo(`Фреймы ${head}`, rez.length, rez)
@@ -137,7 +141,8 @@
     const
         Observe = entries => {
             const
-                oO5s = new Set()
+                oO5s = new Set(),
+                bBases = new Set()
             for (const entry of entries) {
                 const shp = entry.target
                 let aO5 = shp.aO5shp
@@ -174,7 +179,6 @@
             }
 
             if (oO5s.size > 0) {
-                const bBases = new Set()
                 let isNew = false
                 for (const aO5 of oO5s) {
                     if (wshp.PBases.PBase.Attach(aO5))  // если добавилась новая база
