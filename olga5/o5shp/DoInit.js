@@ -22,7 +22,6 @@
         o5debug = C.consts.o5debug,
         fmtOK = "background: blue; color: white;",
         fmtErr = "background: yellow; color: black;",
-        mselec = /[A-Z]|[+-]?\d+/g,
         state = {
             observer: null,
             elements: new Set,
@@ -91,47 +90,68 @@
         },
 
         ReadCls = (aO5, ss) => {
-            const 
-            cls = aO5.cls,
-            puts=cls.puts
+            const
+                errs = [],
+                cls = aO5.cls,
+                puts = cls.puts,
+                mselec = /[A-Z]|a-z]|[+-]?\d+/g
 
             Object.assign(cls, {           // для повторной инициализации (напр. в тестах)
                 level: 0,
                 pitch: 'S',
-                none: false,
                 nofx: false,
                 alive: false,
             })
             puts.T = puts.L = puts.R = puts.B = false
 
-            const cs = ss.match(mselec)
+            const cs = ss.toUpperCase().match(mselec)
             for (const c of cs)
-                if (!isNaN(c))
-                    cls.level = Number(c)
-                else
-                    switch (c) {
-                        case 'A': cls.alive = true; break
-                        case 'C':                       // сжимает предыдущий
-                        case 'P':                       // сталкивает предыдущий
-                        case 'S':                       // сдвигает предыдущий
-                        case 'O': cls.pitch = c; break  // наезжает на предыдущий
-                        case 'T':
-                        case 'L':
-                        case 'R':
-                        case 'B': cls.puts[c] = true; break
-                        case 'N': cls.nofx = true; break    // не подвисает, но может сдвигать остальные
-                        default: errs.push(`не определён квалиф. '${ql[i]}' в строке "${qual}"`)
-                    }
-
-            if (!puts.T && !puts.L && !puts.R && !puts.B) cls.puts.T=true
+                switch (c) {
+                    case 'A': cls.alive = true
+                        break
+                    case 'C':                // сжимает предыдущий
+                    case 'P':                // сталкивает предыдущий
+                    case 'S':                // сдвигает предыдущий
+                    case 'O': cls.pitch = c  // наезжает на предыдущий
+                        break
+                    case 'T':
+                    case 'L':
+                    case 'R':
+                    case 'B': puts[c] = true
+                        break
+                    case 'N': cls.nofx = true; break    // не подвисает, но может сдвигать остальные
+                    default:
+                        if (!isNaN(c)) cls.level = Number(c)
+                        else
+                            errs.push(`c='${c}' в "${ss}"`)
+                }
+            if (!puts.T && !puts.L && !puts.R && !puts.B) puts.T = true
+            
+            if (errs.length)
+                console.log("%c%s", fmtErr, `Для ${aO5.name} не опр. квалиф.: ` + errs.join(', '))
         },
 
         ReadAttrs = aO5 => {
             const aquals = aO5.act.quals.split(/[:;]/)
+            let sclss = 'T', sdivs = '';
+            switch (aquals.length) {
+                case 0: break
+                case 1:
+                    if (aquals[0].indexOf('=') < 0) sclss = aquals[0]
+                    else sdivs = aquals[0]
+                    break
+                case 2:
+                    sclss = aquals[0]
+                    sdivs = aquals[1]
+                    break
+                default:
+                    sclss = aquals[0]
+                    sdivs = aquals.slice(1).join(',')
+            }
 
-            ReadCls(aO5, aquals[0] || '') // разделяющие запятые там просто игнорируются
+            ReadCls(aO5, sclss) // разделяющие запятые там просто игнорируются
 
-            wshp.Frames.MakeFrames(aO5, (aquals[1] || '').split(','))
+            wshp.Frames.MakeFrames(aO5, sdivs.split(','))
         }
 
     const
@@ -154,21 +174,11 @@
                         oO5s.add(aO5)
                     }
 
-// AO5shp:236   DoFix #shp0: зафиксирован div3 по [T]- физически
-// DoChgs:179   изменения для #shp0: *fix=null->div3,  fix=div3->div3,  fix=null->null,                     
-// DoInit:149 #shp0 fixis Intersecting=true,     intersectionRatio=0.9833333492279053 зафиксировано и clone чуть-чуть "ушла"
-// DoInit:149 #shp0 fixis Intersecting=false,    intersectionRatio=0                  зафиксировано и clone совсем скрылось "ушла"
-// DoInit:149 #shp0 fixis Intersecting=true,     intersectionRatio=0                  только подошло к видимости. м.б. 0 или чуть-чуть
-// AO5shp:236   DoFix #shp0: расфиксирован  по [T]- физически
-// DoChgs:179   изменения для #shp0: *fix=div3->null,  fix=div3->div3,  fix=null->null, 
-// DoInit:149 #shp0 нет   isIntersecting=false,  intersectionRatio=0                  расфиксировано - закрылся clone
-// DoInit:149 #shp0 нет   isIntersecting=true,   intersectionRatio=1                  расфиксировано - появилось shp
-
                     if (entry.intersectionRatio === 1)  //   && !aO5.act.isfix  (необязательно)
                         aO5.act.ready = true
                 }
                 else {
-                    if (aO5 && !aO5.IsFixed())
+                    if (aO5 && !aO5.act.isfix)
                         aO5.act.ready = false
                 }
             }
@@ -177,7 +187,7 @@
                 const bBases = new Set()
                 let isNew = false
                 for (const aO5 of oO5s) {
-                    if (wshp.PBases.PBase.Attach(aO5))  // если добавилась новая база
+                    if (wshp.PBases.PBase.AddToBase(aO5))  // если добавилась новая база
                         isNew = true
 
                     ReadAttrs(aO5)

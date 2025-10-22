@@ -144,7 +144,7 @@
                 classOrigs: classList,
                 name: tag.id ? tag.id : C.MakeObjName(tag),
 
-                pOuts: new Set(),  // д.б. Set() иначе в Attach будут повторы  (скроллируемые pO5) все скроллируемых внешних контейнеров
+                pOuts: new Set(),  // д.б. Set() иначе в AddToBase будут повторы  (скроллируемые pO5) все скроллируемых внешних контейнеров
                 // tagsOut: new Set(),  // теги от pOuts
                 pBases: new Set(),  //   -"-    (скроллируемые pO5) все скроллируемых вложенных контейнеров 
                 pIncs: new Set(),  //   -"-    (скроллируемые pO5) все скроллируемых вложенных контейнеров 

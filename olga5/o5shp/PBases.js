@@ -35,6 +35,12 @@
                 T: 0, L: 0, R: 0, B: 0,
             }
 
+            this.bO5s = {}  // списки тех, кто может наткнуться НА этого aO5
+            for (const m of 'TLRB') {
+                this.bO5s[m] = new Set()
+                Object.freeze(this.bO5s[m])
+            }
+
             for (const nam of ['bChgs'])
                 Object.seal(this[nam])
 
@@ -49,13 +55,21 @@
             R: (a1, a2) => (a2.posO.left + a2.posO.width) - (a1.posO.left + a1.posO.width),
             B: (a1, a2) => (a2.posO.top + a2.posO.height) - (a1.posO.top + a1.posO.height),
         }
+        CalcCurPozs() {
+            for (const aO5 of this.aAll) {
+                const p = aO5.act.shdw.getBoundingClientRect()
+                Object.assign(aO5.posO, { top: p.top, left: p.left, height: p.height, width: p.width, right: p.right, bottom: p.bottom })
+                Object.assign(aO5.posC, { top: p.top, left: p.left, height: p.height, width: p.width })
+                Object.assign(aO5.posS, { top: 0, left: 0 })
+            }
+        }
         ReorderAO5s() {
-            for (const aO5 of this.aAll)
-                aO5.CalcCurPos()
+            this.CalcCurPozs()
 
             for (const m of 'TLRB') {
                 this.aAll.sort(PBase.#sorters[m])
 
+                this.bO5s[m].clear()
                 for (const aO5 of this.aAll) {
                     aO5.aO5s[m].clear()
 
@@ -72,6 +86,7 @@
 
                         aO5.aO5s[m].add(iO5)
                     }
+                    this.bO5s[m].add(aO5)
                 }
             }
         }
@@ -82,7 +97,7 @@
             if (!pBase.aAll.includes(aO5))
                 pBase.aAll.push(aO5)
         }
-        static Attach(aO5) {
+        static AddToBase(aO5) {
             let bO5, pTop, newPs = 0;
             const SetbO5 = pO5 => {
                 if (!bO5) bO5 = pO5

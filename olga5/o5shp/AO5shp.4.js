@@ -23,6 +23,7 @@
             }
 
             const aO5 = e.currentTarget.aO5shp
+
             for (const x of 'TRLB')    // т.е. расфиксирую всё
                 aO5.DoFix(x)
 
@@ -46,7 +47,7 @@
         attaches = { T: [], L: [], R: [], B: [] }       // список: которые зафиксированы на этом
 
         canFixs = { T: null, L: null, R: null, B: null }
-        fixCuts = { T: null, L: null, R: null, B: null }
+        extCuts = { T: null, L: null, R: null, B: null }
         tagCuts = { T: null, L: null, R: null, B: null }
 
         scops = {    //   копия из pO5 - координаты рабочей зоны контейнера
@@ -65,17 +66,18 @@
                 nom: AO5.nom++,
                 id: shp.id,
                 shp: shp,
-                cls: { level: 0, pitch: 0, nofx: 0, alive: 0, puts: { T: false, L: false, R: false, B: false } }, // инициализация будет в ReadCls(this, ss) 
+                cls: { level: 0, pitch: 0, none: 0, nofx: 0, alive: 0, puts: { T: false, L: false, R: false, B: false } }, // инициализация будет в ReadCls(this, ss) 
                 base: { bO5: null, pBase: null },  // будут присвоены в PBases в AddToBase(aO5)
                 act: {
+                    // time: -1,    // для пересчетка текущей позиции
                     shdw: shp,          // будет: или  shp или clon
                     clon: null,
                     cart: null,
                     quals: quals,
                     isfix: false,
                     ready: false,
-                    hidden: false,
-                    observer: null,    
+                    observer: null,
+                    // iTested: false,     // для контроля в тестах       
                 },
                 margs: { t: '', l: '', r: '', b: '', },
                 outln: { w: '', s: '', c: '', o: '', },
@@ -96,11 +98,7 @@
                 Object.freeze(this.aO5s[m])
             }
 
-            for (const nam of [
-                'posC', 'posO', 'posS', 'orig',
-                'base', 'frms', 'margs', 'outln',  'cls', 'scops',
-                'pFixs', 'aFixs', 'attaches', 'canFixs', 'fixCuts', 'tagCuts'
-            ])
+            for (const nam of ['base', 'frms', 'margs', 'outln', 'posC', 'posO', 'posS', 'orig', 'cls', 'scops'])
                 if (this[nam])
                     Object.seal(this[nam])
                 else
@@ -116,34 +114,94 @@
                 { outlineWidth: outln.w, outlineStyle: outln.s, outlineColor: outln.c, outlineOffset: outln.o }
             )
         }
+        HasHidden() {
+            for (const x of 'TLRB')
+                if (this.hidden[x])
+                    return true
+        }
         CanFixsOn(pO5) {
             for (const frame of this.frms.frames)
                 if (frame.pO5 === pO5)
                     return frame
         }
+        SetPos(x) {
+            const
+                v = this.pFixs[x].scops[x],
+                aC = this.posC
+            let d;
+            if (this.extCuts[x]) {
+                switch (x) {
+                    case 'T': d = v - aC.top; break
+                    case 'L': d = v - aC.left; break
+                    case 'R': d = (aC.left + aC.width) - v; break
+                    case 'B': d = (aC.top + aC.height) - v; break
+                }
+            }
+
+            switch (x) {
+                case 'T': aC.top = v; break
+                case 'L': aC.left = v; break
+                case 'R': aC.left = v - this.posO.width; break
+                case 'B': aC.top = v - this.posO.height; break
+            }
+
+            if (d > 0)
+                switch (x) {
+                    case 'T': aC.height -= d; this.posS.top -= d; break
+                    case 'L': aC.width -= d; this.posS.left -= d; break
+                    case 'R': aC.width -= d; break
+                    case 'B': aC.height -= d; break
+                }
+        }
+        CutFix(o) {
+            const
+                v = this.tagCuts[o].scops[o],
+                aC = this.posC
+
+            let d;
+            switch (o) {
+                case 'T': d = v - aC.top; break
+                case 'L': d = v - aC.left; break
+                case 'R': d = aC.left + aC.width - v; break
+                case 'B': d = aC.top + aC.height - v; break
+            }
+
+            if (d > 0)
+                switch (o) {
+                    case 'T': aC.height -= d; aC.top += d; break
+                    case 'L': aC.width -= d; aC.left += d; break
+                    case 'R': aC.width -= d; this.posS.left -= d; break
+                    case 'B': aC.height -= d; this.posS.top -= d; break
+                }
+
+            return (aC.height > 0 && aC.width > 0)
+        }
         DoFix(x, xO5) {
             const
                 pF = this.pFixs,
-                aF = this.aFixs
+                aF = this.aFixs,
+                op = xO5 ? 'фиксация' : 'расфиксация'
+
+            if (x && (
+                !!aF[x] === !!xO5 ||
+                !!pF[x] === !!xO5 ||
+                (aF[x] && pF[x])
+            )) {
+                alert(`DoFix повтор '${op}' на ${this.name} для : ${xO5 ? xO5.name : ' -  '}[${x}]`)
+                return
+            }
+
+            let s;
+            if (o5debug) s = x ? `${op} на ${xO5 ? xO5.name : ''} по [${x}]` : `расфиксирован полностью`
 
             if (x) {
-                if (xO5) {
-                    const isP = xO5.constructor.name === 'PO5'
-                    this[isP ? 'pFixs' : 'aFixs'][x] = xO5
-                }
+                if (xO5) this[(xO5.constructor.name === 'PO5') ? 'pFixs' : 'aFixs'][x] = xO5
                 else aF[x] = pF[x] = null
             }
             else
-                pF.T = pF.L = pF.R = pF.B = aF.T = aF.L = aF.R = aF.B = null
+                for (const m of 'TLRB')
+                    aF[m] = pF[m] = null
 
-            let s;
-            if (o5debug) {
-                console.log(`DoFix ${this.name}: ` +
-                    x ? `${xO5 ? 'фиксация' : 'расфиксация'}` +
-                `${xO5 ? ('  на ' + xO5.name) : '     '} по [${x}]` : `полная расфиксация`)
-                if (x && aF[x] && pF[x])
-                    console.log("%c%s", fmtErr, `DoFix повтор aF[x] && pF[x] на ${this.name} для : ${xO5 ? xO5.name : ' -  '}[${x}]`)
-            }
             const
                 act = this.act,
                 shp = this.shp,
@@ -157,7 +215,7 @@
                 act.isfix = fix
                 act.shdw = fix ? clon : shp
                 cart.style.display = fix ? '' : 'none'
-                clon.style.display = fix ? this.orig.display : 'none'
+                clon.style.display = fix ? this.orig.displ : 'none'
 
                 act.observer.observe(fix ? clon : shp)
                 act.observer.unobserve(fix ? shp : clon)
@@ -175,7 +233,16 @@
 
                 shp[(fix ? 'add' : 'remove') + 'EventListener']('dblclick', DblClick, true)
                 window.dispatchEvent(new CustomEvent('o5_fixed', { detail: { aO5: this, fix: fix } }))
+
+            const
+                p1 = act.shdw.getBoundingClientRect(),
+                p2 = shp.getBoundingClientRect(),
+                p3 = clon.getBoundingClientRect(),
+                p4 = cart.getBoundingClientRect()
+                if (o5debug) s += `- физически`
             }
+            if (o5debug)
+                console.log(`DoFix ${this.name}: ` + s)
         }
         ShowFix() {
             const
@@ -255,6 +322,13 @@
             this.#SetMargOutls(cart.style, AO5.Margs, this.outln)
 
             return clon
+        }
+        CalcCurPos() {
+            const                p = this.act.shdw.getBoundingClientRect()
+                // aNaN = { T: NaN, L: NaN, R: NaN, B: NaN }
+            Object.assign(this.posO, { top: p.top, left: p.left, height: p.height, width: p.width, right: p.right, bottom: p.bottom })
+            Object.assign(this.posC, { top: p.top, left: p.left, height: p.height, width: p.width })
+            Object.assign(this.posS, { top: 0, left: 0 })
         }
     }
 
