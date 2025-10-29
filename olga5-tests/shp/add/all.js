@@ -53,7 +53,6 @@ class OO5 {
         for (const b of bs) {
             const
                 b5 = b.b5,
-                // val = b5.val,
                 txt = b.innerText.trim()
 
             // if (b.id === 'div4-b1')
@@ -194,7 +193,7 @@ class OO5 {
                     is0.addEventListener('mouseup', AskScroll)
 
                     // if (p.className === 'div4')
-                    //     console.log(1)                    
+                    //     console.log(2)                    
                     let v0 = '?', v1 = '?'
                     if (isbase) {
                         v0 = frame ? c0 : cc
@@ -215,7 +214,7 @@ class OO5 {
                     if (!found) {
                         const pO5 = document.getElementById(icls)
                         bs[1].classList.add(isdis)
-                        aO5.CanFixsOn(pO5)
+                        // aO5.CanFixsOn(pO5)
                         v1 = cc
                     }
 

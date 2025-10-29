@@ -202,7 +202,7 @@
 
                 if (isNew)
                     for (const x of 'TL')
-                        wshp.DoChgs.SetBorders(x, body.pO5)
+                        wshp.PBases.PBase.SetBorders(x, body.pO5)
 
                 if (o5debug > 1)
                     DebugShowRez(oO5s)

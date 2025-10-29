@@ -12,20 +12,21 @@
         olga5_modul = "o5shp",
         modulname = 'PBases',
         C = window.olga5.C,
-        o5debug = C.consts.o5debug
-
+        o5debug = C.consts.o5debug,
+		opp = { T: 'B', L: 'R', R: 'L', B: 'T' }
     /**
     * база - скроллируемый контейнер, содержащий общую информацию для подвисабельных объектов
     */
     class PBase {
         static #pbases = new Map()
         static #idn = 0
+        tagCuts = new Set()
         aAll = []
+
         constructor(pO5) {
             this.pO5 = pO5
             this.idn = PBase.#idn++
             // this.tagsIn = new Set()
-
             this.bordss = { // въезжание вложенных контейнеров
                 T: [pO5], L: [pO5], R: [pO5], B: [pO5],
             }
@@ -35,14 +36,14 @@
                 T: 0, L: 0, R: 0, B: 0,
             }
 
+            for (const nam of ['bChgs'])
+                Object.seal(this[nam])
+
             this.bO5s = {}  // списки тех, кто может наткнуться НА этого aO5
             for (const m of 'TLRB') {
                 this.bO5s[m] = new Set()
                 Object.freeze(this.bO5s[m])
             }
-
-            for (const nam of ['bChgs'])
-                Object.seal(this[nam])
 
             Object.freeze(this.bordss)
             Object.freeze(this)
@@ -148,6 +149,70 @@
 
             return newPs
         }
+		static SetBorders  (x, pcO5) {
+			for (const m of [x, opp[x]]) {
+				const isTL = 'TL'.includes(m)
+
+				for (const pBase of pcO5.pBases) {
+					const
+						pbO5 = pBase.pO5,
+						bords = pBase.bordss[m]
+					let chg = ''
+					if (pbO5.scops.isVisible) {
+						const vb = pbO5.scops[m]
+
+						for (const pOut of pbO5.pOuts) {
+							if (pOut === pbO5)
+								continue
+
+							const
+								v = pOut.scops[m],
+								iOut = bords.indexOf(pOut),
+								inside = isTL ? vb < v : vb >= v
+
+							// chg: либо было пересечение а теперь стало внутри; либо пересечения не было а вышло из внутри
+							if (iOut >= 0) {
+								if (!inside) {
+									chg = `"удалил  '${pOut.name}'"`
+									bords.splice(iOut, 1)
+								}
+							}
+							else
+								if (inside) {
+									let i = bords.length
+									while (i-- > 0)
+										if (isTL ? bords[i].scops[m] >= v : bords[i].scops[m] < v)
+											break
+
+									bords.splice(i, 0, pOut)
+                                    chg = `"добавил '${pOut.name}'"`
+								}
+						}
+						// не вылезла ли граница за пределы?
+						if (!chg) {
+							let v, i = 1, vi = bords[0].scops[m]
+							while (!chg && i < bords.length) {
+								v = vi
+								vi = bords[i++].scops[m]
+								if (isTL ? v < vi : v >= vi)
+                                    chg = `"изменил '${bords[i].name}'"`
+							}
+						}
+
+						if (chg)
+							bords.sort((b1, b2) =>	 // по возрастанию						
+								isTL ? (b2.scops[m] - b1.scops[m]) : (b1.scops[m] - b2.scops[m]))
+					}
+					pBase.bChgs[m] = chg
+
+					if (o5debug > 1 && chg) 
+							console.log(
+								`скролл. ${pcO5.name} по [${m}] для ${pBase.pO5.id} '${chg}'   ` +
+								`${pBase.bordss[m].map(b => b.name + ':' + ('' + b.scops[m]).padStart(4)).join(', ')}`
+							)
+				}
+			}
+		}
         // делаем класс итерируемым
         static *[Symbol.iterator]() {
             for (const [pO5, pBase] of this.#pbases.entries()) {

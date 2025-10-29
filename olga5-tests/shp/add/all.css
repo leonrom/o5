@@ -37,7 +37,7 @@
     vertical-align: baseline;
 }
 
-.cboxed .divs{
+.cboxed .divs {
     border: 1px solid aqua;
     padding-left: 3px;
     padding-bottom: 0px;
@@ -55,7 +55,7 @@
     cursor: auto;
 }
 
-.frame i.button{
+.frame i.button {
     border: 1px solid gray;
     padding: 0;
     display: inline-block;
@@ -64,12 +64,14 @@
     border-radius: 5px;
     padding-left: 2px;
 }
-.frame i.button:active {
-    transform: scale(0.96);    /* слегка уменьшается */
-    border-color: black;
-  }
 
-#div-etalon{
+.frame i.button:active {
+    transform: scale(0.96);
+    /* слегка уменьшается */
+    border-color: black;
+}
+
+#div-etalon {
     display: none;
 }
 
@@ -89,19 +91,20 @@
     margin-bottom: 4px;
     padding-bottom: 3px;
 }
-  }
-  
-.cboxed div.div-shp {
-  margin-top: 6px;
-  margin-left: 6px;
-  border-top: 1px solid gray;
 }
 
-.cboxed p i{
+.cboxed div.div-shp {
+    margin-top: 6px;
+    margin-left: 6px;
+    border-top: 1px solid gray;
+}
+
+.cboxed p i {
     min-width: 30px;
     display: inline-block;
 }
-.cboxed p b{
+
+.cboxed p b {
     min-width: 10px;
 }
 
@@ -129,11 +132,13 @@
 .cboxed span b:nth-child(2) {
     border-radius: 8px;
 }
+
 .cboxed span b.disable {
     cursor: auto;
     border-color: transparent;
 }
-.cboxed span{
+
+.cboxed span {
     cursor: auto;
 }
 
@@ -177,8 +182,9 @@ div.olga5_shp {
 div.olga5_cart {
     cursor: pointer;
 }
+
 div.olga5_cart.moved {
-    cursor: grab;  
+    cursor: grab;
 }
 
 .olga5_shp_copy>p,
@@ -254,7 +260,8 @@ div.olga5_cart.moved {
 .div {
     position: relative;
     overflow: scroll;
-    -webkit-user-drag: none;    /*   сделать #div1 не draggable вообще:  */
+    -webkit-user-drag: none;
+    /*   сделать #div1 не draggable вообще:  */
     user-select: none;
 }
 
@@ -290,7 +297,7 @@ div.olga5_cart.moved {
     min-width: 360px;
 }
 
-#div2a, 
+#div2a,
 #div2 {
     border: 3px blue dashed;
     height: 70vh;
@@ -317,7 +324,9 @@ div.olga5_cart.moved {
 
 #cbo2a,
 #cbo2 {
-    background-size: 20px 20px; width: 2400px; height: 1800px; 
+    background-size: 20px 20px;
+    width: 2400px;
+    height: 1800px;
 }
 
 #cbo4a,
@@ -326,24 +335,28 @@ div.olga5_cart.moved {
         linear-gradient(90deg, lightgray 1px, transparent 1px),
         linear-gradient(0deg, lightgray 1px, transparent 1px);
 }
-#ref1{
+
+#ref1 {
     cursor: pointer;
 }
-.absent{
-    color:gray;
+
+.absent {
+    color: gray;
 }
 
 .olga5_shp {
     cursor: pointer;
 }
-.olga5_shp:not(.o5_fixed){
+
+.olga5_shp:not(.o5_fixed) {
     cursor: grab;
 }
+
 .olga5_shp.o5_moved {
-    cursor : grabbing;
+    cursor: grabbing;
 }
 
-#btnScrollHead{
+#btnScrollHead {
     position: absolute;
     top: 2px;
     right: 2px;
@@ -355,7 +368,8 @@ div.olga5_cart.moved {
     border-radius: 5px;
     font-size: x-small;
 }
-.btnCallScroll{
+
+.btnCallScroll {
     position: absolute;
     top: 0px;
     right: 0px;
@@ -367,15 +381,27 @@ div.olga5_cart.moved {
     cursor: pointer;
     font-size: x-small;
 }
+
 .btnCallScroll:active {
     box-shadow: -1px -1px #666;
     transform: translateY(1px);
-  }
+}
 
 .body,
 .div1,
 .div2,
 .div3,
-.div4{
+.div4 {
     cursor: pointer;
+}
+
+#div4 {
+    left: 750px;
+    top: 500px;
+    height: 240px;
+    width: 300px;
+    overflow: hidden;
+    background-color: lightgray;
+    opacity: 0.6;
+    border: 1px white solid
 }

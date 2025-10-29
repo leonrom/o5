@@ -3,7 +3,7 @@
         "ecmaVersion": 10,
         "sourceType": "script",
         "ecmaFeatures": {}
-    },
+    }, 
     "rules": {
         "constructor-super": 2,
         "for-direction": 2,

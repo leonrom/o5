@@ -22,9 +22,8 @@
                 return
             }
 
-            const aO5 = e.currentTarget.aO5shp
-            for (const x of 'TRLB')    // т.е. расфиксирую всё
-                aO5.DoFix(x)
+            const aO5 = e.currentTarget.aO5shp  // т.е. расфиксирую всё
+            aO5.DoFix()
 
             e.stopImmediatePropagation()
 
@@ -74,9 +73,9 @@
                     quals: quals,
                     isfix: false,
                     ready: false,
-                    hidden: false,
-                    observer: null,    
+                    observer: null,
                 },
+                hidden: { T: 0, L: 0, R: 0, B: 0},
                 margs: { t: '', l: '', r: '', b: '', },
                 outln: { w: '', s: '', c: '', o: '', },
 
@@ -98,7 +97,7 @@
 
             for (const nam of [
                 'posC', 'posO', 'posS', 'orig',
-                'base', 'frms', 'margs', 'outln',  'cls', 'scops',
+                'base', 'frms', 'margs', 'outln', 'cls', 'scops', 'hidden',
                 'pFixs', 'aFixs', 'attaches', 'canFixs', 'fixCuts', 'tagCuts'
             ])
                 if (this[nam])
@@ -116,11 +115,11 @@
                 { outlineWidth: outln.w, outlineStyle: outln.s, outlineColor: outln.c, outlineOffset: outln.o }
             )
         }
-        CanFixsOn(pO5) {
-            for (const frame of this.frms.frames)
-                if (frame.pO5 === pO5)
-                    return frame
-        }
+        // CanFixsOn(pO5) {
+        //     for (const frame of this.frms.frames)
+        //         if (frame.pO5 === pO5)
+        //             return frame
+        // }
         DoFix(x, xO5) {
             const
                 pF = this.pFixs,
@@ -172,6 +171,8 @@
                     this.#SetMargOutls(shp.style, this.margs, this.outln)
                     this.parent.insertBefore(shp, cart)
                 }
+
+                Object.assign(this.hidden, { T: 0, L: 0, R: 0, B: 0 })
 
                 shp[(fix ? 'add' : 'remove') + 'EventListener']('dblclick', DblClick, true)
                 window.dispatchEvent(new CustomEvent('o5_fixed', { detail: { aO5: this, fix: fix } }))

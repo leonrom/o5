@@ -17,6 +17,7 @@
             const
                 errs = [],
                 typs = 'cins',
+                frms = aO5.frms,
                 pBase = aO5.base.pBase,
                 tagBase = pBase.pO5.tag,
                 TagCheck = (t, typ, cod) => {
@@ -42,8 +43,9 @@
                         Frame.frames.delete(key)
                 }
             }
-            aO5.frms.frames.clear()
-            aO5.frms.tagCut = null
+            // pBase.tagCuts.clear()  // а вот и НЕ надо очищать!
+            frms.frames.clear()
+            frms.tagCut = null
 
             // добавляю aO5  к frames
             for (const s of ss) {
@@ -54,7 +56,8 @@
                     uu = (cc[1] || '').split('/'),
                     cod = (uu[0] || '').trim().toUpperCase(),
                     par = (uu[1] || '').trim(),
-                    cuts = par.match(/c/i)
+                    iscut = par.match(/c/i),
+                    isfix = !iscut || par.match(/f/i)
 
                 let
                     typ = cc[0].trim().toLowerCase(),
@@ -69,8 +72,8 @@
                     nim = 0
                 }
 
-                if (cuts) {
-                    let tag = aO5.frms.tagCut
+                if (iscut) {
+                    let tag = frms.tagCut
                     if (!tag) {
                         let own = aO5.shp, n = num
                         do {
@@ -90,14 +93,15 @@
                         else if (n > 0)
                             errs.push(`взял ${n}-й тег (вместо ${n0} для  "${s}") `)
 
-                        aO5.frms.tagCut = tag
+                        frms.tagCut = tag
                         if (!tag.pO5)
                             new wshp.PO5shp.PO5(tag, window.getComputedStyle(tag))
                     }
                     else
                         errs.push(`несколько cut-квалификаторов (т.е. содержащих '/c')`)
                 }
-                else {
+
+                if (isfix) {
                     const key = pBase.idn + ':' + typ + ',' + cod + ',' + num
                     let frame = Frame.frames.get(key)                    
                     if (!frame) {
@@ -128,11 +132,13 @@
                     }
 
                     frame.aO5fs.push(aO5)
-                    aO5.frms.frames.add(frame)
+                    frms.frames.add(frame)
                 }
             }
-            if (!aO5.frms.tagCut)
-                aO5.frms.tagCut = tagBase
+            if (!frms.tagCut)
+                frms.tagCut = tagBase
+
+            pBase.tagCuts.add(frms.tagCut)
 
             if (errs.length)
                 C.ConsoleError(`Ошибки определения фреймов для ${aO5.a_name}:`, errs.length, errs)
