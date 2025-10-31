@@ -75,7 +75,7 @@
                     ready: false,
                     observer: null,
                 },
-                hidden: { T: 0, L: 0, R: 0, B: 0},
+                hidden: { T: 0, L: 0, R: 0, B: 0 },
                 margs: { t: '', l: '', r: '', b: '', },
                 outln: { w: '', s: '', c: '', o: '', },
 
@@ -135,18 +135,24 @@
             else
                 pF.T = pF.L = pF.R = pF.B = aF.T = aF.L = aF.R = aF.B = null
 
-            let s;
-            if (o5debug) {
-                console.log(`DoFix ${this.name}: ` +
-                    x ? `${xO5 ? 'фиксация' : 'расфиксация'}` +
-                `${xO5 ? ('  на ' + xO5.name) : '     '} по [${x}]` : `полная расфиксация`)
-                if (x && aF[x] && pF[x])
-                    console.log("%c%s", fmtErr, `DoFix повтор aF[x] && pF[x] на ${this.name} для : ${xO5 ? xO5.name : ' -  '}[${x}]`)
-            }
             const
                 act = this.act,
                 shp = this.shp,
                 fix = pF.T || pF.L || pF.R || pF.B || aF.T || aF.L || aF.R || aF.B
+
+            //  let s;
+            if (o5debug) {
+                const op = xO5 ? `фиксация на ${xO5.name}` : `расфиксация`
+                console.log(`DoFix ${this.name}: по [${x}] ` +
+                    (x ? `${op} от ${act.isfix ? act.isfix.name : 'старт'}` : `полная расфиксация`))
+
+                if (x && aF[x] && pF[x])
+                    console.log("%c%s", fmtErr,
+                        `DoFix ${this.name}: повтор aF/pF для  ${xO5 ? xO5.name : 'null'}[${x}]`)
+            }
+
+// if (this.id ==='shp1')            
+//     console.log(`==='shp1' `+aF.T)
 
             if (act.isfix !== fix) {
                 const
