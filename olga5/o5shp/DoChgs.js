@@ -51,13 +51,16 @@
 							cF = p
 							break
 						}
+
+				aO5.canFixs[m] = cF
+				aO5.canCuts[m] = bords[0]	//	(cF === bords[0]) ? null : bords[0]
+
 				if (aO5.pFixs[m])
 					aO5.pFixs[m] = cF
-				aO5.canFixs[m] = cF
-				aO5.fixCuts[m] = bords[0]	//	(cF === bords[0]) ? null : bords[0]
+
 				if (o5debug > 1) console.log(`${aO5.name} :  ` +
 					`canFixs[${m}] = ${cF ? cF.name : ' -  '},   ` +
-					`fixCuts[${m}] = ${aO5.fixCuts[m] ? aO5.fixCuts[m].name : ' -  '}`)
+					`canCuts[${m}] = ${aO5.canCuts[m] ? aO5.canCuts[m].name : ' -  '}`)
 			}
 		},
 		GetV = (m, aX) => {
@@ -76,50 +79,137 @@
 				case 'B': aX.top = v - aX.height; break
 			}
 		},
-		AttachTo = (x, aO5) => {
+		CheckHidden = (aO5) => {
+			if (aO5.posC.height <= 0)
+				aO5.hidden.T = aO5.hidden.B = 1
+			if (aO5.posC.width <= 0)
+				aO5.hidden.L = aO5.hidden.R = 1
+
+			if (!aO5.cls.alive)
+				for (const x of 'TLRB')
+					if (aO5.hidden[x] && aO5.pFixs[x]) {
+						aO5.DoFix(x, null)
+
+						const
+							o = opp[x],
+							isTL = 'TL'.includes(x),
+							attaches = aO5.attaches[o]
+						let j = attaches.length
+						while (j-- > 0) {
+							const iO5 = attaches[j]
+							attaches.splice(j, 1)
+							iO5.DoFix(x)
+							if (!vv.ToFix(x, iO5, isTL))
+								UnAtFrom(x, iO5)
+						}
+					}
+
+			// const s = (aO5.posC.height > 0 ? '' : 'TB') + (aO5.posC.width > 0 ? '' : 'LR')
+			// for (const x of s) {
+			// 	aO5.hidden[x] = 1
+			// 	if (!aO5.cls.alive && aO5.pFixs[x]) {
+			// 		aO5.DoFix(x, null)
+
+			// 		const
+			// 			o = opp[x],
+			// 			isTL = 'TL'.includes(x),
+			// 			attaches = aO5.attaches[o]
+			// 		let j = attaches.length
+			// 		while (j-- > 0) {
+			// 			const iO5 = attaches[j]
+			// 			attaches.splice(j, 1)
+			// 			iO5.DoFix(x)
+			// 			if (!vv.ToFix(x, iO5, isTL))
+			// 				UnAtFrom(x, iO5)
+			// 		}
+			// 	}
+			// }
+		},
+		ShiftBy = (x, aO5) => {
 			const
 				o = opp[x],
 				level = aO5.cls.level,
 				vC = GetV(o, aO5.posC),
 				isTL = 'TL'.includes(x)
 
-			for (const iO5 of aO5.aO5s[x]) {
-				if (iO5.cls.level >= level || iO5.pFixs[x])
-					continue
-
-				if (!iO5.aFixs[x]) {
+			let vX = vC, xO5;
+			for (const iO5 of aO5.aO5s[x])
+				if (iO5.cls.level > level && !iO5.pFixs[x] && !iO5.aFixs[x]) {
 					const vI = GetV(x, iO5.posC)
-
-					if (isTL ? vC > vI : vC < vI) {
-						iO5.DoFix(x, aO5)
-						aO5.attaches[x].push(iO5)
+					if (isTL ? vX > vI : vX < vI) {
+						xO5 = iO5
+						vX = vI
 					}
 				}
-				if (iO5.aFixs[x]) {
-					SetV(x, iO5.posC, vC)
-					InternalTagCuts(opp[x], iO5)
+			if (xO5) {
+				const
+					d = isTL ? (vC - vX) : (vX - vC),
+					aC = aO5.posC
+				// aO5.posC['TB'.includes(x) ? 'height' : 'width'] -=
+				// 	isTL ? (vC - vX) : (vX - vC)
 
-					if (iO5.attaches[x].length > 0)
-						AttachTo(x, iO5)
+				switch (x) {
+					case 'T': aC.height -= d; aO5.posS.top -= d; break
+					case 'L': aC.width -= d; aO5.posS.left -= d; break
+					case 'R': aC.width -= d; aC.left += d; break
+					case 'B': aC.height -= d; aC.top += d; break
 				}
+
+				CheckHidden(aO5)
+
+				if (aO5.attaches[opp[x]].length > 0) {
+					UnAtFrom(x, aO5)
+					AttachTo(x, aO5)
+				}
+				return true
 			}
+		},
+		AttachTo = (x, aO5) => {
+			const
+				o = opp[x],
+				level = aO5.cls.level,
+				vC = GetV(o, aO5.posC),
+				isTL = 'TL'.includes(x),
+				attaches = aO5.attaches[o]
+
+			for (const iO5 of aO5.aO5s[x])
+				if (iO5.cls.level < level
+					&& !iO5.pFixs[x]
+				) {
+					if (!iO5.aFixs[x]) {
+						const vI = GetV(x, iO5.posC)
+						if (isTL ? vC > vI : vC < vI) {
+							iO5.DoFix(x, aO5)
+							attaches.push(iO5)
+						}
+					}
+					if (iO5.aFixs[x]) {
+						SetV(x, iO5.posC, vC)
+						InternalTagCuts(opp[x], iO5)
+
+						// if (iO5.attaches[opp[x]].length > 0)
+						AttachTo(x, iO5)
+					}
+				}
 		},
 		UnAtFrom = (x, aO5) => {
 			const
 				o = opp[x],
-				vC = GetV(x, aO5.posC),
-				atts = aO5.attaches[o],
-				isTL = 'TL'.includes(o)
+				vC = GetV(o, aO5.posC),
+				isTL = 'TL'.includes(x),
+				attaches = aO5.attaches[o]
+			// isfix = aO5.pFixs[x]||aO5.aFixs[x]
 
-			let j = atts.length
+			let j = attaches.length
 			while (j-- > 0) {
 				const
-					iO5 = atts[j],
-					vI = GetV(o, iO5.posO)
+					iO5 = attaches[j],
+					vI = GetV(x, iO5.posO)
 
-				if (isTL ? vC < vI : vC > vI) {
-					iO5.DoFix(o)
-					atts.splice(j, 1)
+				// if (!isfix || (isTL ? vC <=vI : vC >= vI) ){
+				if (isTL ? vC <= vI : vC >= vI) {
+					iO5.DoFix(x)
+					attaches.splice(j, 1)
 
 					if (iO5.attaches[o].length > 0)
 						UnAtFrom(x, iO5)
@@ -136,7 +226,7 @@
 		},
 		ExternalFixCuts = (x, aO5) => {
 			const
-				v = aO5.fixCuts[x].scops[x],
+				v = aO5.canCuts[x].scops[x],
 				aC = aO5.posC
 			let d;
 			switch (x) {
@@ -177,16 +267,44 @@
 					case 'B': aC.height -= d; aO5.posS.top -= d; break
 				}
 		},
-		vv = {
-			vO: NaN, pF: null, vF: NaN,
-			Set: (m, aO5) => {
-				if (vv.pF = aO5.canFixs[m]) {
-					vv.vO = GetV(m, aO5.posO)
-					vv.vF = vv.pF.scops[m]
-					return true
+		vv = (() => {
+			let vO = NaN, vF = NaN, pF;
+			const
+				Set = (m, aO5) => {
+					pF = aO5.canFixs[m]
+					if (pF) {
+						vF = pF.scops[m]
+						vO = GetV(m, aO5.posO)
+						return true
+					}
 				}
+			return {
+				ToFix(x, aO5, isTL) {
+					if (aO5.cls.puts[x] && !aO5.aFixs[x])
+						if (Set(x, aO5)
+							&& aO5.pFixs[x] !== pF
+							&& (isTL ? (vO < vF) : (vO > vF))
+						)
+							aO5.DoFix(x, pF)
+
+					if (aO5.pFixs[x]) {
+						SetPos(x, aO5.pFixs[x].scops[x], aO5.posC, aO5.posO)
+						return true
+					}
+				},
+				UnFix(o, aO5, isTL) {
+					if (Set(o, aO5)
+						&& aO5.pFixs[o] === pF
+						&& (isTL ? (vO >= vF) : (vO <= vF))
+					) {	//	тут не надо расфиксировать приаттаченные - они "отъехали" раньше
+						aO5.DoFix(o, null)
+						return true
+					}
+					else
+						SetPos(o, aO5.pFixs[o].scops[o], aO5.posC, aO5.posO)
+				},
 			}
-		}
+		})()
 
 	function MakeScroll(scV, scH, pcO5, fromTest) {
 		time = performance.now()
@@ -227,78 +345,72 @@
 
 			if (!pBase.pO5.scops.isVisible) continue
 
-			// for (const aO5 of pBase.bO5s[x]) {
-			for (const aO5 of pBase.aAll) {
-				if (!aO5.act.ready)
-					continue
+			for (const x of xs) {
+				// прямой ход и фиксация	по 'x' 
+				let isTL = 'TL'.includes(x)
+				for (const aO5 of pBase.bO5s[x])
+					if (
+						aO5.act.ready &&
+						!vv.ToFix(x, aO5, isTL)
+					)
+						break
 
-				const aC = aO5.posC
-				for (const x of xs) {
-					// прямой ход и фиксация	по 'x' 
-					if (aO5.cls.puts[x] && !aO5.aFixs[x])
-						if (
-							vv.Set(x, aO5) &&
-							aO5.pFixs[x] !== vv.pF &&
-							('TL'.includes(x) ? (vv.vO < vv.vF) : (vv.vO > vv.vF))
-						)
-							aO5.DoFix(x, vv.pF)
+				// расфиксация по 'opp[x]
+				const o = opp[x]
+				isTL = 'TL'.includes(o)
+				for (const aO5 of pBase.bO5s[o])
+					if (aO5.act.ready
+						&& aO5.pFixs[o]
+						&& vv.UnFix(o, aO5, isTL)
+					)
+						break
+			}
 
-					if (aO5.aFixs[x])
-						SetPos(x, aO5.pFixs[x].scops[x], aC, aO5.posO)
-
-					// расфиксация по 'opp[x]
-					const o = opp[x]
-					if (aO5.pFixs[o])
-						if (
-							vv.Set(o, aO5) &&
-							aO5.pFixs[o] === vv.pF &&
-							('TL'.includes(o) ? (vv.vO >= vv.vF) : (vv.vO <= vv.vF))
-						)
-							aO5.DoFix(o, null)
-						else
-							SetPos(o, aO5.pFixs[o].scops[o], aC, aO5.posO)
-				}
-			
-				// обрезание контейнерами			
-				if (aO5.act.isfix) {
+			for (const aO5 of pBase.aAll)
+				if (aO5.act.ready && aO5.act.isfix) {
 					for (const x of 'TLRB') {
 						if (aO5.pFixs[x])
 							InternalTagCuts(opp[x], aO5)
-						if (aO5.fixCuts[x] && !aO5.aFixs[x])
+						if (aO5.canCuts[x] && !aO5.aFixs[x])
 							ExternalFixCuts(x, aO5)
 					}
-
-					const s = (aC.height > 0 ? '' : 'TB') + (aC.width > 0 ? '' : 'LR')
-					for (const x of s) {
-						aO5.hidden[x] = 1
-						if (!aO5.cls.alive && aO5.pFixs[x])
-							aO5.DoFix(x, null)
-					}
+					CheckHidden(aO5)
 				}
-			}
 
 			// динамическая фиксация остальных на зависших элементах
-			for (const x of 'TLRB')
-				for (const aO5 of pBase.bO5s[x]) {
-					// if (aO5.hidden[x]) {
+			let shifts, n;
+			for (const x of 'TLRB') {
+				n = 0
+				do {
+					// прилипания к зафиксированным
+					for (const aO5 of pBase.bO5s[x]) {
+						if (aO5.pFixs[x]) // НЕ надо еще и "|| aO5.aFixs[x]"
+							AttachTo(x, aO5)
 
-					// } 
-					// else {
-					if (aO5.pFixs[x]) // НЕ надо еще и "|| aO5.aFixs[x]"
-						AttachTo(x, aO5)
+						if (aO5.attaches[opp[x]].length)
+							UnAtFrom(x, aO5)
+					}
+					// сдвиги зафиксированных
+					if (n > 0)
+						console.log()
+					shifts = 0
+					for (const aO5 of pBase.bO5s[x])
+						if ((aO5.pFixs[x] || aO5.aFixs[x])
+							&& ShiftBy(x, aO5)
+						)
+							shifts++
 
-					if (aO5.attaches[opp[x]].length > 0)
-						UnAtFrom(x, aO5)
-					// }
-				}
+					n++
+				} while (shifts > 0 && n < 5)
+			}
+			if (shifts > 0)
+				console.log("%c%s", fmtErr, `динамическая фиксация`, ` не завершилась за ${n} шагов`)
 
 			// отображение зафиксированых
 			for (const aO5 of pBase.aAll)
 				if (aO5.act.isfix)
 					ScheduleShowFixed(aO5)
 		}
-
 	}
-
 	wshp = C.AddModuleSub(olga5_modul, modulname, [MakeScroll])
 })();

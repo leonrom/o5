@@ -45,7 +45,7 @@
         attaches = { T: [], L: [], R: [], B: [] }       // список: которые зафиксированы на этом
 
         canFixs = { T: null, L: null, R: null, B: null }
-        fixCuts = { T: null, L: null, R: null, B: null }
+        canCuts = { T: null, L: null, R: null, B: null }
         tagCuts = { T: null, L: null, R: null, B: null }
 
         scops = {    //   копия из pO5 - координаты рабочей зоны контейнера
@@ -98,7 +98,7 @@
             for (const nam of [
                 'posC', 'posO', 'posS', 'orig',
                 'base', 'frms', 'margs', 'outln', 'cls', 'scops', 'hidden',
-                'pFixs', 'aFixs', 'attaches', 'canFixs', 'fixCuts', 'tagCuts'
+                'pFixs', 'aFixs', 'attaches', 'canFixs', 'canCuts', 'tagCuts'
             ])
                 if (this[nam])
                     Object.seal(this[nam])

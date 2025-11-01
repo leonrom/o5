@@ -87,7 +87,7 @@
                         while (own !== tagBase)
 
                         if (!tag) {
-                            errs.push(`не найден внутренний контейнер для "${s}" . Взял '${tagBase.pO5.name}'`)
+                            errs.push(`${aO5.name}: не найден 'внутренний' контейнер для "${s}" . Взял '${tagBase.pO5.name}'`)
                             tag = tagBase
                         }
                         else if (n > 0)
@@ -117,7 +117,7 @@
                         while (own.nodeName !== 'HTML')
 
                         if (!tag) {
-                            errs.push(`не найден внешний контейнер для typ=${typ} и cod=${cod}. Взял '${pO5.name}'`)
+                            errs.push(`${aO5.name}: не найден 'внешний' контейнер для typ=${typ} и cod=${cod}. Взял base='${pO5.name}'`)
                             tag = pO5.tag
                         }
                         else if (n > 0)

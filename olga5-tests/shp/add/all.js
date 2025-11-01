@@ -197,24 +197,23 @@ class OO5 {
                     let v0 = '?', v1 = '?'
                     if (isbase) {
                         v0 = frame ? c0 : cc
-                        v1 = c1
                         found = true
                     }
                     else
                         if (found) {
                             bs[0].classList.add(isdis)
                             v0 = cc
-                            v1 = (aO5.frms.tagCut.id === icls) ? c1 : cc
                         }
                         else {
                             v0 = frame ? c0 : cc
                             bs[1].classList.add(isdis)
                         }
 
-                    if (!found) {
+                    if (found)
+                        v1 = (aO5.frms.tagCut.id === icls) ? c1 : cc
+                    else {
                         const pO5 = document.getElementById(icls)
                         bs[1].classList.add(isdis)
-                        // aO5.CanFixsOn(pO5)
                         v1 = cc
                     }
 
