@@ -64,7 +64,8 @@
                 nom: AO5.nom++,
                 id: shp.id,
                 shp: shp,
-                cls: { level: 0, pitch: 0, nofx: 0, alive: 0, puts: { T: false, L: false, R: false, B: false } }, // инициализация будет в ReadCls(this, ss) 
+                cls: { level: 0, pitch: 0, nofx: 0, alive: 0, zIndex : shp.style.zIndex,
+                    puts: { T: false, L: false, R: false, B: false } }, // инициализация puts будет в ReadCls(this, ss) 
                 base: { bO5: null, pBase: null },  // будут присвоены в PBases в AddToBase(aO5)
                 act: {
                     shdw: shp,          // будет: или  shp или clon
@@ -73,9 +74,11 @@
                     quals: quals,
                     isfix: false,
                     ready: false,
+                    zIndex:NaN,
                     observer: null,
                 },
                 hidden: { T: 0, L: 0, R: 0, B: 0 },
+                // forced: { T: 0, L: 0, R: 0, B: 0 },
                 margs: { t: '', l: '', r: '', b: '', },
                 outln: { w: '', s: '', c: '', o: '', },
 
@@ -89,7 +92,7 @@
             })
 
             this.name = name
-            this.aO5s = {}  // списки тех, кто может наткнуться НА этого aO5
+            this.aO5s = {}      // списки тех, кто может наткнуться НА этого aO5
             for (const m of 'TLRB') {
                 this.aO5s[m] = new Set()
                 Object.freeze(this.aO5s[m])
@@ -97,7 +100,7 @@
 
             for (const nam of [
                 'posC', 'posO', 'posS', 'orig',
-                'base', 'frms', 'margs', 'outln', 'cls', 'scops', 'hidden',
+                'base', 'frms', 'margs', 'outln', 'cls', 'scops', 'hidden', // 'forced',
                 'pFixs', 'aFixs', 'attaches', 'canFixs', 'canCuts', 'tagCuts'
             ])
                 if (this[nam])
@@ -151,8 +154,8 @@
                         `DoFix ${this.name}: повтор aF/pF для  ${xO5 ? xO5.name : 'null'}[${x}]`)
             }
 
-// if (this.id ==='shp1')            
-//     console.log(`==='shp1' `+aF.T)
+            // if (this.id ==='shp1')            
+            //     console.log(`==='shp1' `+aF.T)
 
             if (act.isfix !== fix) {
                 const
@@ -176,9 +179,12 @@
                     Object.assign(shp.style, this.orig)
                     this.#SetMargOutls(shp.style, this.margs, this.outln)
                     this.parent.insertBefore(shp, cart)
+
+				    this.shp.style.zIndex = this.cls.zIndex	// исправить у тех, кто сдигал
                 }
 
                 Object.assign(this.hidden, { T: 0, L: 0, R: 0, B: 0 })
+                // Object.assign(this.forced, { T: 0, L: 0, R: 0, B: 0 })
 
                 shp[(fix ? 'add' : 'remove') + 'EventListener']('dblclick', DblClick, true)
                 window.dispatchEvent(new CustomEvent('o5_fixed', { detail: { aO5: this, fix: fix } }))
@@ -235,17 +241,17 @@
             cart.classList.add('olga5_cart')                        // нужно ля тестов - CC()
             if (id) cart.id = id + '_cart'
             cart.aO5shp = this
+
+            const nst = window.getComputedStyle(shp)
             Object.assign(cart.style, {
                 display: 'none',
                 cursor: 'pointer',
                 position: 'fixed',
                 overflow: 'hidden',
                 background: 'none',
-                zIndex: shp.style.zIndex // ? Number(shp.style.zIndex) : 0,
             })
             shp.parentNode.insertBefore(cart, shp)
 
-            const nst = window.getComputedStyle(shp)
             Object.assign(this.margs, {
                 t: nst.getPropertyValue('margin-top'),
                 l: nst.getPropertyValue('margin-left'),

@@ -58,7 +58,7 @@
 				if (aO5.pFixs[m])
 					aO5.pFixs[m] = cF
 
-				if (o5debug > 1) console.log(`${aO5.name} :  ` +
+				if (o5debug > 2) console.log(`${aO5.name} :  ` +
 					`canFixs[${m}] = ${cF ? cF.name : ' -  '},   ` +
 					`canCuts[${m}] = ${aO5.canCuts[m] ? aO5.canCuts[m].name : ' -  '}`)
 			}
@@ -87,7 +87,10 @@
 
 			if (!aO5.cls.alive)
 				for (const x of 'TLRB')
-					if (aO5.hidden[x] && aO5.pFixs[x]) {
+					if (aO5.hidden[x]
+						&& aO5.pFixs[x]
+						// && !aO5.forced[x]
+					) {
 						aO5.DoFix(x, null)
 
 						const
@@ -103,66 +106,6 @@
 								UnAtFrom(x, iO5)
 						}
 					}
-
-			// const s = (aO5.posC.height > 0 ? '' : 'TB') + (aO5.posC.width > 0 ? '' : 'LR')
-			// for (const x of s) {
-			// 	aO5.hidden[x] = 1
-			// 	if (!aO5.cls.alive && aO5.pFixs[x]) {
-			// 		aO5.DoFix(x, null)
-
-			// 		const
-			// 			o = opp[x],
-			// 			isTL = 'TL'.includes(x),
-			// 			attaches = aO5.attaches[o]
-			// 		let j = attaches.length
-			// 		while (j-- > 0) {
-			// 			const iO5 = attaches[j]
-			// 			attaches.splice(j, 1)
-			// 			iO5.DoFix(x)
-			// 			if (!vv.ToFix(x, iO5, isTL))
-			// 				UnAtFrom(x, iO5)
-			// 		}
-			// 	}
-			// }
-		},
-		ShiftBy = (x, aO5) => {
-			const
-				o = opp[x],
-				level = aO5.cls.level,
-				vC = GetV(o, aO5.posC),
-				isTL = 'TL'.includes(x)
-
-			let vX = vC, xO5;
-			for (const iO5 of aO5.aO5s[x])
-				if (iO5.cls.level > level && !iO5.pFixs[x] && !iO5.aFixs[x]) {
-					const vI = GetV(x, iO5.posC)
-					if (isTL ? vX > vI : vX < vI) {
-						xO5 = iO5
-						vX = vI
-					}
-				}
-			if (xO5) {
-				const
-					d = isTL ? (vC - vX) : (vX - vC),
-					aC = aO5.posC
-				// aO5.posC['TB'.includes(x) ? 'height' : 'width'] -=
-				// 	isTL ? (vC - vX) : (vX - vC)
-
-				switch (x) {
-					case 'T': aC.height -= d; aO5.posS.top -= d; break
-					case 'L': aC.width -= d; aO5.posS.left -= d; break
-					case 'R': aC.width -= d; aC.left += d; break
-					case 'B': aC.height -= d; aC.top += d; break
-				}
-
-				CheckHidden(aO5)
-
-				if (aO5.attaches[opp[x]].length > 0) {
-					UnAtFrom(x, aO5)
-					AttachTo(x, aO5)
-				}
-				return true
-			}
 		},
 		AttachTo = (x, aO5) => {
 			const
@@ -171,7 +114,9 @@
 				vC = GetV(o, aO5.posC),
 				isTL = 'TL'.includes(x),
 				attaches = aO5.attaches[o]
-
+/**
+ * ищу тех, кто может прилипнуть к aO5
+ */
 			for (const iO5 of aO5.aO5s[x])
 				if (iO5.cls.level < level
 					&& !iO5.pFixs[x]
@@ -184,10 +129,18 @@
 						}
 					}
 					if (iO5.aFixs[x]) {
-						SetV(x, iO5.posC, vC)
-						InternalTagCuts(opp[x], iO5)
+						const
+							o = opp[x],
+							vI = GetV(o, iO5.aFixs[x].posC)
 
-						// if (iO5.attaches[opp[x]].length > 0)
+						SetV(x, iO5.posC, vI)
+
+						// InternalTagCuts(o, iO5)
+						for (const m of 'TLRB') {
+							InternalTagCuts(m, iO5)
+							// if (aO5.canCuts[m])		// && !aO5.aFixs[x])
+							// 	ExternalFixCuts(m, aO5)
+						}
 						AttachTo(x, iO5)
 					}
 				}
@@ -267,6 +220,126 @@
 					case 'B': aC.height -= d; aO5.posS.top -= d; break
 				}
 		},
+		AbsoluteZIndex = (elem) => {
+			let current = elem, zTotal = 0, multiplier = 1;
+
+			while (current && current !== document) {
+				const style = window.getComputedStyle(current),
+					z = style.zIndex,
+					pos = style.position,
+					hasContext =
+						(pos !== 'static' && z !== 'auto') ||
+						['transform', 'opacity', 'filter', 'perspective', 'willChange'].some(p => {
+							const v = style[p]
+							return v && v !== 'none' && v !== '1'
+						})
+
+				if (hasContext) {
+					const zNum = isNaN(parseInt(z)) ? 0 : parseInt(z);
+					zTotal += zNum * multiplier;
+					multiplier *= 1000 // каждый новый контекст — «новый порядок» уровней
+				}
+				current = current.parentElement
+			}
+
+			return zTotal
+		},
+		ShiftBy = (x, aO5) => {
+			const
+				o = opp[x],
+				level = aO5.cls.level,
+				vC = GetV(o, aO5.posC),
+				isTL = 'TL'.includes(x)
+/**
+ * 	ищу тех, которы согут сдвинуть/сжать aO5
+ *  среди тех, которые находятся со стороны 'o'
+ */	
+			let vX = vC, xO5;
+			for (const iO5 of aO5.aO5s[x])
+				if (iO5.cls.level > level) {		// && !iO5.pFixs[x] && !iO5.aFixs[x]) {
+					const vI = GetV(x, iO5.posC)
+					if (isTL ? vX > vI : vX < vI) {
+						xO5 = iO5
+						vX = vI
+					}
+				}
+			let rez = 0
+			if (xO5) {
+				const d = isTL ? (vC - vX) : (vX - vC), aC = aO5.posC, aS = aO5.posS
+				switch (xO5.cls.pitch) {
+					case 'C':
+						switch (x) {	// сжимает предыдущий	
+							case 'T': aC.height -= d; break
+							case 'L': aC.width -= d; break
+							case 'R': aC.width -= d; aC.left += d; aS.left -= d; break
+							case 'B': aC.height -= d; aC.top += d; aS.top -= d; break
+						}
+						rez = 1
+						break
+					case 'P':
+						switch (x) {	// сталкивает предыдущий
+							case 'T': aC.height = 0; break
+							case 'L': aC.width = 0; break
+							case 'R': aC.width = 0; aC.left += aC.width; break
+							case 'B': aC.height = 0; aC.top += aC.height; break
+						}
+						rez = -1
+						break
+					case 'S':
+						switch (x) {	// сдвигает предыдущий
+							case 'T': aC.height -= d; aS.top -= d; break
+							case 'L': aC.width -= d; aS.left -= d; break
+							case 'R': aC.width -= d; aC.left += d; break
+							case 'B': aC.height -= d; aC.top += d; break
+						}
+						rez = 1
+						break
+					default: {	//case 'O' - наезжает на предыдущий // ничего не даформируется
+						if (isNaN(aO5.act.zIndex)) // еще не определялся - делаем однократно
+							aO5.act.zIndex = AbsoluteZIndex(aO5.act.cart)
+						let xIndex = xO5.shp.style.zIndex
+						if (isNaN(xIndex)) xIndex = 0
+						if (xIndex <= aO5.act.zIndex)
+							xO5.shp.style.zIndex = aO5.act.zIndex + 1
+						rez = -1
+					}
+				}
+				CheckHidden(aO5)
+
+				if (aO5.attaches[opp[x]].length > 0) {
+					UnAtFrom(x, aO5)
+					AttachTo(x, aO5)
+				}
+				return rez
+			}
+		},
+		DynamicFixAtt = (x, pBase) => {
+			let shifts, n = 0
+			do {
+				// прилипания к зафиксированным
+				for (const aO5 of pBase.bO5s[x]) {
+					if (aO5.pFixs[x]) // НЕ надо еще и "|| aO5.aFixs[x]"
+						AttachTo(x, aO5)
+
+					if (aO5.attaches[opp[x]].length)
+						UnAtFrom(x, aO5)
+				}
+				// сдвиги зафиксированных
+				if (n > 0)
+					console.log()
+				shifts = 0
+				for (const aO5 of pBase.bO5s[x])
+					if ((aO5.pFixs[x] || aO5.aFixs[x])
+						&& (ShiftBy(x, aO5) > 0)
+					)
+						shifts++
+
+				n++
+			} while (shifts > 0 && n < 5)
+
+			if (shifts > 0)
+				console.log("%c%s", fmtErr, `динамическая фиксация по [${x}]`, ` не завершилась за ${n} шагов`)
+		},
 		vv = (() => {
 			let vO = NaN, vF = NaN, pF;
 			const
@@ -306,7 +379,9 @@
 			}
 		})()
 
+	let dbgstrt = false
 	function MakeScroll(scV, scH, pcO5, fromTest) {
+		const GAll = i => pcO5.pBases.values().next().value.aAll[i]
 		time = performance.now()
 		// направление движения объектов в контейнере - обратное ползунку скроллинга	
 		let xs = ''
@@ -323,15 +398,12 @@
 		for (const pBase of pcO5.pBases) {
 			pBase.CalcCurPozs()
 
-			for (const aO5 of pBase.aAll) {
+			for (const aO5 of pBase.aAll)
 				for (const x of 'TLRB') {
 					aO5.hidden[x] = 0
 					if (aO5.pFixs[x])
 						SetV(x, aO5.posC, aO5.pFixs[x].scops[x])
-					// if (aO5.aFixs[x]) 	   // тут д.б.б. рекурсия
-					// 	SetV(x, aO5.posC, aO5.aFixs[x].scops[opp[x]])
 				}
-			}
 
 			for (const tagCut of pBase.tagCuts)
 				if (tagCut.pO5.scops.time !== time)
@@ -378,38 +450,19 @@
 				}
 
 			// динамическая фиксация остальных на зависших элементах
-			let shifts, n;
-			for (const x of 'TLRB') {
-				n = 0
-				do {
-					// прилипания к зафиксированным
-					for (const aO5 of pBase.bO5s[x]) {
-						if (aO5.pFixs[x]) // НЕ надо еще и "|| aO5.aFixs[x]"
-							AttachTo(x, aO5)
-
-						if (aO5.attaches[opp[x]].length)
-							UnAtFrom(x, aO5)
-					}
-					// сдвиги зафиксированных
-					if (n > 0)
-						console.log()
-					shifts = 0
-					for (const aO5 of pBase.bO5s[x])
-						if ((aO5.pFixs[x] || aO5.aFixs[x])
-							&& ShiftBy(x, aO5)
-						)
-							shifts++
-
-					n++
-				} while (shifts > 0 && n < 5)
-			}
-			if (shifts > 0)
-				console.log("%c%s", fmtErr, `динамическая фиксация`, ` не завершилась за ${n} шагов`)
+			for (const x of 'TLRB')
+				DynamicFixAtt(x, pBase)
 
 			// отображение зафиксированых
 			for (const aO5 of pBase.aAll)
 				if (aO5.act.isfix)
 					ScheduleShowFixed(aO5)
+
+			//   -----------------------  ОСТАВЬ для примера -------------------------------
+			// if (dbgstrt && GAll(1).posC.height > 20)
+			// 	console.log('-15-')
+			// if (GAll(1).posC.height < 20)
+			// 	dbgstrt = true
 		}
 	}
 	wshp = C.AddModuleSub(olga5_modul, modulname, [MakeScroll])

@@ -1,6 +1,10 @@
 "use strict";
+const
+    fmtOK = "background: aqua; color: black;",
+    fmtErr = "background: yellow; color: black;",
+    markout = '   all.js-> '
+let o5debug;
 class OO5 {
-    #fmtErr = "background: yellow; color: black;"
     #nbsp = '&nbsp;'
     #frame = 'frame'
     #pitch = 'pitch'
@@ -38,7 +42,7 @@ class OO5 {
         if (ps && ps.length > 0)
             ps[0].innerHTML = s
         else
-            console.log("%c%s", this.#fmtErr, `alltst.js->shpX_BordNames(): объект ${aO5.id} `, ` не содержит тег <p>`)
+            console.log("%c%s", fmtErr, `${markout}shpX_BordNames(): объект ${aO5.id} `, ` не содержит тег <p>`)
     }
     #SetaO5 = b5 => {
         const
@@ -91,6 +95,8 @@ class OO5 {
                 aO5.DoFix(x)
         }
 
+        if (o5debug)
+            console.log("%c%s", fmtOK, `${markout}изменено ${aO5.id} `, aO5.act.quals)
         this.#BordNames(aO5)
         this.#wshp.DoChgs.MakeScroll(0.1, 0.1, aO5.base.pBase.pO5, true)
         this.#wshp.DoChgs.MakeScroll(-0.1, -0.1, aO5.base.pBase.pO5, true)
@@ -243,7 +249,6 @@ class OO5 {
     }
     constructor() {
         this.outlin = { e: '', eOffset: '' }
-        this.markout = '     --------------    '
         this.dshps = new Set()
     }
     CallScroll = m => {  // вызывается из HTML
@@ -401,6 +406,8 @@ class OO5 {
 
         if (!aO5)
             return
+        if (o5debug)
+            console.log("%c%s", fmtOK, `${markout}новое позиционирование ${aO5.id} `)
 
         const shp = aO5.shp,
             act = aO5.act
@@ -435,13 +442,13 @@ class OO5 {
 
         const
             p1 = aO5.shp.getBoundingClientRect(),
-            aAlls = document.body.pO5.aAlls
+            aAlls = aO5.base.pBase.aAll      //  document.body.pO5.aAlls
 
         for (const xO5 of aAlls)
             if (xO5 !== aO5) {
                 const
                     pF = xO5.pFixs,
-                    p2 = (pF.T || pF.L || pF.R || pF.B) ? xO5.posCf : xO5.shp.getBoundingClientRect()
+                    p2 = (pF.T || pF.L || pF.R || pF.B) ? xO5.posC : xO5.shp.getBoundingClientRect()
                 if (
                     (
                         (p1.left <= p2.right && p1.right >= p2.left) ||
@@ -450,9 +457,11 @@ class OO5 {
                         (p1.top <= p2.bottom && p1.bottom >= p2.top) ||
                         (p2.top <= p1.bottom && p2.bottom >= p1.top)
                     )
-                )
-                    alert(`Не следует накладывать ${aO5.id} на объект ${xO5.id}`)
-
+                ) {
+                    const s = `Не следует накладывать ${aO5.id} на объект ${xO5.id}`
+                    console.log("%c%s", fmtErr, `${markout}${s} `)
+                    // alert(s)
+                }
             }
 
         aO5.base.pBase.ReorderAO5s()
@@ -591,7 +600,7 @@ class OO5 {
                         try {
                             window.document.title = (window.document.title == show1) ? nam : show1
                         } catch (e) {
-                            console.log(this.markout + 'Прекращено `focusTimer`, причина: ' + e.message);
+                            console.log("%c%s", fmtErr, `${markout}Прекращено 'focusTimer': `, e.message)
                             window.clearInterval(focusTimer);
                         }
                     }, 888)
@@ -600,6 +609,7 @@ class OO5 {
 
         this.#wshp = window.olga5.o5shp
         this.#C = window.olga5.C
+        o5debug = this.#C.consts.o5debug
 
         SetWindow()
 
@@ -635,6 +645,9 @@ class OO5 {
             if (aO5)
                 this.Activate({ detail: { div, aO5 } })
         }
+
+        if (o5debug)
+            console.log("%c%s", fmtOK, `${markout}  --- инициирован скрипт тестового примера --- `)
 
         window.addEventListener('o5_containers', this.Activate)
         window.addEventListener('o5_fixed', this.ActFix)

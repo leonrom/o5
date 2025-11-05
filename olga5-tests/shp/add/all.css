@@ -181,6 +181,7 @@ div.olga5_shp {
 
 div.olga5_cart {
     cursor: pointer;
+    z-index: 2;
 }
 
 div.olga5_cart.moved {
@@ -313,15 +314,6 @@ div.olga5_cart.moved {
     background-color: lightpink;
 }
 
-#div4a,
-#div4 {
-    border: 3px lightgray dashed;
-    height: 22vh;
-    width: 46vw;
-    background-color: bisque;
-    min-height: 144px;
-}
-
 #cbo2a,
 #cbo2 {
     background-size: 20px 20px;
@@ -396,12 +388,19 @@ div.olga5_cart.moved {
 }
 
 #div4 {
-    left: 750px;
-    top: 500px;
-    height: 240px;
-    width: 300px;
+    top: 500px;  
+    left: 700px;
+    width: 400px;
+    height: 250px;
     overflow: hidden;
-    background-color: lightgray;
-    opacity: 0.8;
-    border: 1px white solid
+    border: 3px lightgray dashed;  
+    background-color: bisque;
+    min-height: 144px;
+    opacity: 0.8;s
+}
+#div4.for3 {    
+    left: 650px;
+    top: 470px;
+    height: 333px;
+    width: 500px;
 }

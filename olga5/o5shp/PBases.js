@@ -37,7 +37,7 @@
             for (const nam of ['bChgs'])
                 Object.seal(this[nam])
 
-            this.bO5s = {}  // списки тех, кто может наткнуться НА этого aO5
+            this.bO5s = {}  // списки aO5 в порядке удалённости от соттв. края  (т.е. от 'TLRB')
             for (const m of 'TLRB') {
                 this.bO5s[m] = new Set()
                 Object.freeze(this.bO5s[m])
@@ -60,6 +60,10 @@
                 Object.assign(aO5.posO, { top: p.top, left: p.left, height: p.height, width: p.width, right: p.right, bottom: p.bottom })
                 Object.assign(aO5.posC, { top: p.top, left: p.left, height: p.height, width: p.width })
                 Object.assign(aO5.posS, { top: 0, left: 0 })
+                // // if (aO5.hidden.T) 
+                //     aO5.posC.height = aO5.hidden.T ? 0 : p.height
+                // // if (aO5.hidden.L) 
+                //     aO5.posC.width = aO5.hidden.L ? 0 : p.width                
             }
         }
         ReorderAO5s() {
@@ -71,20 +75,64 @@
                 this.bO5s[m].clear()
                 for (const aO5 of this.aAll) {
                     aO5.aO5s[m].clear()
+                    // if (
+                    // (m==='L' && aO5.id==='shp1' )||
+                    // (m==='R' && aO5.id==='shp2' )||
+                    // (m==='B' && aO5.id==='shp4' )
+                    //    )                 
+                    //    console.log()
 
                     const aO = aO5.posO
-                    let i = this.aAll.indexOf(aO5)
+                    let
+                        i = this.aAll.indexOf(aO5),
+                        xO = aO
                     while (++i < this.aAll.length) {
-                        const iO5 = this.aAll[i],
+                        const
+                            iO5 = this.aAll[i],
                             iO = iO5.posO
-                        if (
-                            ('TB'.includes(m) && (iO.right < aO.left || iO.left > aO.right)) ||
-                            ('LR'.includes(m) && (iO.bottom < aO.top || iO.top > aO.bottom))
-                        )
+
+                        // if (m === 'L' && aO5.id === 'shp1' && iO5.id === 'shp3') 
+                        //     console.log(`${iO.left} < ${xO.right}`)                        
+                        // if (m === 'R' && aO5.id === 'shp2' && iO5.id === 'shp1') 
+                        //     console.log(`${iO.right} > ${xO.left}`)                        
+                        // if (m === 'B' && aO5.id === 'shp4' && iO5.id === 'shp1') 
+                        //     console.log(`${iO.bottom} > ${xO.top}`)                        
+
+                        // const nop = 'TB'.includes(m) ?
+                        //     (
+                        //         iO.right < aO.left || iO.left > aO.right ||                     // в стороне от aO5
+                        //         (m === 'T' ? (iO.top < xO.bottom) : (iO.bottom > xO.top))      // перекрываются с предыдущим)
+                        //     ) : (
+                        //         iO.bottom < aO.top || iO.top > aO.bottom ||                     // в стороне от aO5
+                        //         (m === 'L' ? (iO.left < xO.right) : (iO.right > xO.left))      // перекрываются с предыдущим
+                        //     )
+
+                        // if (!(                                          // -> aO5 -> iO5 -> ...   - НЕ включаем!
+                        //     ('TB'.includes(m) && (false
+                        //         || iO.right < aO.left                    // в стороне от aO5
+                        //         || iO.left > aO.right                    // -"-"
+                        //         || (m === 'T' ? (iO.top < xO.bottom) : (iO.bottom > xO.top))     // перекрываются с предыдущим
+                        //     )) ||
+                        //     ('LR'.includes(m) && (false
+                        //         || iO.bottom < aO.top                    // в стороне от aO5
+                        //         || iO.top > aO.bottom                    // -"-"
+                        //         || (m === 'L' ? (iO.left < xO.right) : (iO.right > xO.left))     // перекрываются с предыдущим
+                        //     ))
+                        // )) 
+                        if ('TB'.includes(m) ? (
+                            iO.right < aO.left || iO.left > aO.right ||                 // в стороне от aO5
+                            (m === 'T' ? (iO.top < xO.bottom) : (iO.bottom > xO.top))   // перекрываются с предыдущим)
+                        ) : (
+                            iO.bottom < aO.top || iO.top > aO.bottom ||                 // в стороне от aO5
+                            (m === 'L' ? (iO.left < xO.right) : (iO.right > xO.left))   // перекрываются с предыдущим
+                        ))
                             continue
 
                         aO5.aO5s[m].add(iO5)
+                        // xO = iO
                     }
+                    if (o5debug > 1)
+                        console.log(`${aO5.id}[${m}]: ` + Array.from(aO5.aO5s[m]).map(a => a.id).join(', '))
                     this.bO5s[m].add(aO5)
                 }
             }
