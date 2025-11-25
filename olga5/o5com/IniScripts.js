@@ -375,7 +375,7 @@
 				}
 			}
 
-			const starts = document.querySelectorAll("[class *= '" + this.olga5Start + "']")
+			let starts = document.querySelectorAll("[class *= '" + this.olga5Start + "']")
 			if (!starts || !starts.length) {
 				starts=[document.body]
 				document.body.classList.add(this.olga5Start)

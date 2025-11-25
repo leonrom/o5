@@ -161,7 +161,8 @@
                 console.groupEnd()
             },
             MakeObjName: obj => (obj ? (
-                (obj.id && obj.id.length > 0) ? ('#' + obj.id) : (
+                // (obj.id && obj.id.length > 0) ? ('#' + obj.id) : (
+                (obj.id && obj.id.length > 0) ? obj.id : (
                     ('[' + obj.tagName ? obj.tagName : (obj.nodeName ? obj.nodeName : '?') + ']') +
                     '.' + (obj.className ? obj.className : '?'))) : 'НЕОПР?'),
             GetTagsByQueryes: query => document.querySelectorAll(query), // второй аргумент - игнорится

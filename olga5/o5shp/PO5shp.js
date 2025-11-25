@@ -28,13 +28,18 @@
 
                 if (sl.pO5 && sl.pO5 !== pO5) { // заканчиваю предыдущую цепочку скроллингов
                     if (o5debug > 2)
-                        console.log("%c%s", fmtErr, `scroll ${sl.pO5.id}: `, ' закончил!')
+                        console.log("%c%s", fmtOK, `scroll ${sl.pO5.id}: `, ' закончил!')
 
                     Object.assign(scrll, {
                         time: sl.time,
                         top: sl.top, left: sl.left, height: 0, width: 0
                     })
-                    wshp.DoChgs.MakeScroll(sl.sV || sl.rV, sl.sH || sl.rH, sl.pO5)
+                    wshp.DoChgs.MakeScroll(
+                        sl.sV || sl.rV,
+                        sl.sH || sl.rH,
+                        sl.pO5,
+                        true
+                    )
                     sl.pO5 = null
                 }
 
@@ -58,7 +63,7 @@
                     strt
                 ) {
                     if (o5debug > 2)
-                        console.log("%c%s", fmtErr, `saved ${pO5.id}: ${typ === 'S' ? 'скроллинг' : 'размеры'} ` +
+                        console.log("%c%s", fmtOK, `saved ${pO5.id}: ${typ === 'S' ? 'скроллинг' : 'размеры'} ` +
                             `sV=${sV}, sH=${sH}, rV=${rV}, rH=${rH}, sT=${el.scrollTop}, aT=${scrll.top}, sL=${el.scrollLeft}, aL=${scrll.left}`)
 
                     Object.assign(scrll, {
@@ -69,7 +74,8 @@
                     wshp.DoChgs.MakeScroll(
                         strt ? 0.1 : (typS ? sV : (rV ? 0.1 : 0)),
                         strt ? 0.1 : (typS ? sH : (rH ? 0.1 : 0)),
-                        pO5
+                        pO5,
+                        true
                     )
                     sl.pO5 = null
                 }
@@ -89,7 +95,8 @@
                     const
                         pO5 = e.target.pO5,
                         z = pO5.pOuts.size
-                    if (n < z || !p) {
+// console.log(`${pO5.name}: ${Array.from(pO5.pOuts).map(p=>p.name).join(', ')}`)                        
+                    if (n >= z || !p) {
                         n = z
                         p = pO5
                     }
@@ -145,10 +152,9 @@
                 name: tag.id ? tag.id : C.MakeObjName(tag),
 
                 pOuts: new Set(),  // д.б. Set() иначе в AddToBase будут повторы  (скроллируемые pO5) все скроллируемых внешних контейнеров
-                // tagsOut: new Set(),  // теги от pOuts
-                pBases: new Set(),  //   -"-    (скроллируемые pO5) все скроллируемых вложенных контейнеров 
                 pIncs: new Set(),  //   -"-    (скроллируемые pO5) все скроллируемых вложенных контейнеров 
-                
+                pBases: new Set(),  //   -"-    (скроллируемые pO5) все скроллируемых вложенных контейнеров 
+
                 borders: {
                     top: parseFloat(nst.borderTopWidth),
                     left: parseFloat(nst.borderLeftWidth),
@@ -173,10 +179,10 @@
                     T: tag.pO5, L: tag.pO5, R: tag.pO5, B: tag.pO5,
                 }
             })
-
+ 
+            this.pOuts.done = false
             this.pOuts.add(this)
             this.pIncs.add(this)
-            // this.tagsOut.add(tag)
 
             for (const nam of ['scrll', 'scops'])
                 Object.seal(this[nam])

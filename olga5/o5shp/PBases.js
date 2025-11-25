@@ -13,7 +13,62 @@
         modulname = 'PBases',
         C = window.olga5.C,
         o5debug = C.consts.o5debug,
-        opp = { T: 'B', L: 'R', R: 'L', B: 'T' }
+        opp = { T: 'B', L: 'R', R: 'L', B: 'T' },
+        FindAndFill = (aO5, adds) => {
+            let bO5, nst, scrls, tag = aO5.parent
+            do {
+                let p, c = ' ';
+                if (tag.pO5) {               // уже был раньше создан
+                    scrls = tag.pO5.scrls
+                    if (scrls.V || scrls.H) {
+                        p = tag.pO5
+                        c = '+'
+                    }
+                }
+                else {
+                    nst = window.getComputedStyle(tag)
+                    scrls = wshp.PO5shp.PO5.Scrls(tag, nst)
+                    if (scrls.V || scrls.H) {
+                        p = new wshp.PO5shp.PO5(tag, nst)
+                        c = '~'
+                    }
+                }
+                if (p && !bO5) bO5 = p
+
+                if (o5debug)
+                    adds.add(c + C.MakeObjName(tag))
+
+                tag = tag.parentNode
+            } while (tag && tag.nodeName !== 'HTML')
+
+            return bO5
+        },
+        FillPOuts = bO5 => {
+            let tag = bO5.tag, pTop = bO5, pO5;
+            do {
+                tag = tag.parentNode
+                if (tag && (pO5 = tag.pO5)) {
+                    for (const pOut of bO5.pOuts)
+                        pOut.pOuts.add(pO5)
+
+                        for (const pInc of pTop.pIncs)
+                            pO5.pIncs.add(pInc)
+
+                    if (pO5.pOuts.done) {
+                        for (const pOut of pO5.pOuts)
+                            for (const pInc of pTop.pIncs) {
+                                pInc.pOuts.add(pOut)
+                                pOut.pIncs.add(pInc)
+                            }
+
+                        break
+                    }
+                    pO5.pOuts.done = true
+
+                    pTop = pO5
+                }
+            } while (tag && tag.nodeName !== 'HTML')
+        }
     /**
     * база - скроллируемый контейнер, содержащий общую информацию для подвисабельных объектов
     */
@@ -54,20 +109,11 @@
             R: (a1, a2) => (a2.posO.left + a2.posO.width) - (a1.posO.left + a1.posO.width),
             B: (a1, a2) => (a2.posO.top + a2.posO.height) - (a1.posO.top + a1.posO.height),
         }
-        CalcCurPozs() {
+        ReorderAO5s() {
             for (const aO5 of this.aAll) {
                 const p = aO5.act.shdw.getBoundingClientRect()
                 Object.assign(aO5.posO, { top: p.top, left: p.left, height: p.height, width: p.width, right: p.right, bottom: p.bottom })
-                Object.assign(aO5.posC, { top: p.top, left: p.left, height: p.height, width: p.width })
-                Object.assign(aO5.posS, { top: 0, left: 0 })
-                // // if (aO5.hidden.T) 
-                //     aO5.posC.height = aO5.hidden.T ? 0 : p.height
-                // // if (aO5.hidden.L) 
-                //     aO5.posC.width = aO5.hidden.L ? 0 : p.width                
             }
-        }
-        ReorderAO5s() {
-            this.CalcCurPozs()
 
             for (const m of 'TLRB') {
                 this.aAll.sort(PBase.#sorters[m])
@@ -75,122 +121,67 @@
                 this.bO5s[m].clear()
                 for (const aO5 of this.aAll) {
                     aO5.aO5s[m].clear()
-                    // if (
-                    // (m==='L' && aO5.id==='shp1' )||
-                    // (m==='R' && aO5.id==='shp2' )||
-                    // (m==='B' && aO5.id==='shp4' )
-                    //    )                 
-                    //    console.log()
 
                     const aO = aO5.posO
-                    let
-                        i = this.aAll.indexOf(aO5),
-                        xO = aO
-                    while (++i < this.aAll.length) {
-                        const
-                            iO5 = this.aAll[i],
+                    let i = this.aAll.indexOf(aO5)
+
+                    while (i-- > 0) {
+                        const iO5 = this.aAll[i],
                             iO = iO5.posO
 
-                        // if (m === 'L' && aO5.id === 'shp1' && iO5.id === 'shp3') 
-                        //     console.log(`${iO.left} < ${xO.right}`)                        
-                        // if (m === 'R' && aO5.id === 'shp2' && iO5.id === 'shp1') 
-                        //     console.log(`${iO.right} > ${xO.left}`)                        
-                        // if (m === 'B' && aO5.id === 'shp4' && iO5.id === 'shp1') 
-                        //     console.log(`${iO.bottom} > ${xO.top}`)                        
-
-                        // const nop = 'TB'.includes(m) ?
-                        //     (
-                        //         iO.right < aO.left || iO.left > aO.right ||                     // в стороне от aO5
-                        //         (m === 'T' ? (iO.top < xO.bottom) : (iO.bottom > xO.top))      // перекрываются с предыдущим)
-                        //     ) : (
-                        //         iO.bottom < aO.top || iO.top > aO.bottom ||                     // в стороне от aO5
-                        //         (m === 'L' ? (iO.left < xO.right) : (iO.right > xO.left))      // перекрываются с предыдущим
-                        //     )
-
-                        // if (!(                                          // -> aO5 -> iO5 -> ...   - НЕ включаем!
-                        //     ('TB'.includes(m) && (false
-                        //         || iO.right < aO.left                    // в стороне от aO5
-                        //         || iO.left > aO.right                    // -"-"
-                        //         || (m === 'T' ? (iO.top < xO.bottom) : (iO.bottom > xO.top))     // перекрываются с предыдущим
-                        //     )) ||
-                        //     ('LR'.includes(m) && (false
-                        //         || iO.bottom < aO.top                    // в стороне от aO5
-                        //         || iO.top > aO.bottom                    // -"-"
-                        //         || (m === 'L' ? (iO.left < xO.right) : (iO.right > xO.left))     // перекрываются с предыдущим
-                        //     ))
-                        // )) 
                         if ('TB'.includes(m) ? (
-                            iO.right < aO.left || iO.left > aO.right ||                 // в стороне от aO5
-                            (m === 'T' ? (iO.top < xO.bottom) : (iO.bottom > xO.top))   // перекрываются с предыдущим)
+                            !(iO.right < aO.left || iO.left > aO.right) &&              // в стороне от aO5
+                            (m === 'T' ? (aO.top > iO.bottom) : (aO.bottom < iO.top))   // перекрываются с aO5
                         ) : (
-                            iO.bottom < aO.top || iO.top > aO.bottom ||                 // в стороне от aO5
-                            (m === 'L' ? (iO.left < xO.right) : (iO.right > xO.left))   // перекрываются с предыдущим
+                            !(iO.bottom < aO.top || iO.top > aO.bottom) &&              // в стороне от aO5
+                            (m === 'L' ? (aO.left > iO.right) : (aO.right < iO.left))   // перекрываются с aO5
                         ))
-                            continue
-
-                        aO5.aO5s[m].add(iO5)
-                        // xO = iO
+                            aO5.aO5s[m].add(iO5)
                     }
-                    if (o5debug > 1)
+
+                    if (o5debug > 2)
                         console.log(`${aO5.id}[${m}]: ` + Array.from(aO5.aO5s[m]).map(a => a.id).join(', '))
                     this.bO5s[m].add(aO5)
                 }
             }
+
+            if (o5debug > 1) {
+                const ra = []
+                for (const aO5 of this.aAll) {
+                    const r = { aO5: aO5.id }
+                    for (const m of 'TLRB')
+                        r[m] = Array.from(aO5.aO5s[m]).map(a => a.id).join(', ')
+                    const i = aO5.id.substr(-1)
+                    ra[i] = r
+                }
+                C.ConsoleInfo(`Теги, расположенные с соотв. стороны от aO5  (по удалённости)`, ra.length, ra)
+                const rb = []
+                for (const m of 'TLRB')
+                    rb.push({ m: m, aO5s: Array.from(this.bO5s[m]).map(a => a.id).join(', ') })
+                C.ConsoleInfo(`Теги, с соотв. стороны в контейнеры (по удалённости)`, rb.length, rb)
+            }
         }
         static AddToBase(aO5) {
-            let bO5, pTop, newPs = 0;
-            const SetbO5 = pO5 => {
-                if (!bO5) bO5 = pO5
+            let pTop, newPs = 0;
+            const
+                adds = new Set(),
+                bO5 = FindAndFill(aO5, adds)
 
-                for (const pOut of bO5.pOuts)
-                    pOut.pOuts.add(pO5)
-                // pOut.tagsOut.add(pO5.tag)
-
-
-                if (pTop)
-                    for (const pInc of pTop.pIncs)
-                        pO5.pIncs.add(pInc)
-
-                pTop = pO5
+            if (!bO5) {
+                console.error("%c%s", fmtErr, ` Тегу ${aO5.name} не найден базовый контейнер — пропускаем`)
+                return
             }
 
-            let nst, scrls, tag = aO5.parent, found = false
-            do {
-                let p;
-                if (tag.pO5) {               // уже был раньше создан
-                    scrls = tag.pO5.scrls
-                    if (scrls.V || scrls.H) {
-                        p = tag.pO5
-                        //     {
-                        //     SetbO5(tag.pO5)
-                        //     newPs++
-                        // }
-                        found = true
-                    }
-                }
-                else {
-                    nst = window.getComputedStyle(tag)
-                    scrls = wshp.PO5shp.PO5.Scrls(tag, nst)
-                    if (scrls.V || scrls.H)
-                        p = new wshp.PO5shp.PO5(tag, nst)
-                    // SetbO5(pO5)
-                    //     newPs++
-                    // }
-                }
-                if (p) {
-                    SetbO5(p)
-                    newPs++
-                }
-
-                if (o5debug > 1)
-                    console.log(`${aO5.a_name}: tag=${tag.id}, V=${scrls.V}, H=${scrls.H}. ${found ? ' === конец' : ''}`)
-
-                tag = tag.parentNode
-            } while (!found && tag && tag.nodeName !== 'HTML')
+            if (o5debug > 1)
+                console.log(`AddToBase: ${aO5.a_name}: ${Array.from(adds).join(', ')} `)
 
             // подключаем (и создаём) pbase
-            const
-                pBase = PBase.#pbases.get(bO5) || new PBase(bO5)   // там же и set()
+            let pBase = PBase.#pbases.get(bO5)
+            if (!pBase) {
+                pBase = new PBase(bO5)   // там же и set()
+                FillPOuts(bO5)
+                newPs++
+            }
 
             for (const pOut of bO5.pOuts)
                 pOut.pBases.add(pBase)
@@ -245,9 +236,10 @@
                             let v, i = 1, vi = bords[0].scops[m]
                             while (!chg && i < bords.length) {
                                 v = vi
-                                vi = bords[i++].scops[m]
+                                vi = bords[i].scops[m]
                                 if (isTL ? v < vi : v >= vi)
                                     chg = `"изменил '${bords[i].name}'"`
+                                i++
                             }
                         }
 

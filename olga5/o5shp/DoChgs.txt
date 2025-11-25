@@ -1,0 +1,104 @@
+ 
+
+		CalcCuts = (m, isTL, pcO5, x) => {
+			const
+				pCut = pcO5.cuts[m],
+				vc = pCut.scops[m]
+			let cuts;
+			for (const pInc of pcO5.pIncs) {
+				if (pInc !== pcO5) { // && pInc.scops.isVisible) {
+					const
+						vi = (m !== x) ? pInc.scops[m] : pInc.cuts[m].scops[m],
+						d = isTL ? vc - vi : vi - vc
+
+					if (d > 0 && pInc.cuts[m] !== pCut) {
+						pInc.cuts[m] = pCut
+						cuts = true
+					}
+					if (d < 0 && pInc.cuts[m] === pCut) {
+						const o = { p: null, d: NaN }
+						for (const p of pInc.pOuts) {
+							const d = isTL ? p.scops[m] - vi : vi - p.scops[m]
+							if (!o.p || d > o.d)
+								Object.assign(o, { p: p, d: d })
+						}
+						pInc.cuts[m] = o.p
+						cuts = true
+					}
+				}
+			}
+			return cuts
+		},
+
+
+		PushThisO5 = (x, aO5) => {
+			const
+				aC = aO5.posC,
+				level = aO5.cls.level,
+				isTL = 'TL'.includes(x),
+				va = GetV(opp[x], aO5.posC)
+			let rez = 0
+			for (const iO5 of aO5.aO5s[x])
+				if (iO5.cls.level > level) {
+					const
+						vi = GetV(x, iO5.posO),
+						d = isTL ? va - vi : vi - va
+
+					if (d > 0) {   //  пододвигаем !
+						switch (x) {
+							case 'T': aC.height -= d; this.posS.top -= d; break
+							case 'L': aC.width -= d; this.posS.left -= d; break
+							case 'R': aC.width -= d; break
+							case 'B': aC.height -= d; break
+						}
+
+						if (aC.width <= 0 || aC.height <= 0) {
+							if (!aO5.cls.alive) // расфиксирую ВСЕ
+								aO5.DoFix()
+							rez = -1
+							break
+						}
+						rez = 1
+					}
+				}
+			return rez
+		},
+
+
+		// for (const pBase of pcO5.pBases)
+		// 	for (const aO5 of pBase.aAll)
+		// 		if (aO5.frms.tagCut.pO5.scops.time !== time)
+		// 			aO5.frms.tagCut.pO5.CalcScope(time)
+
+
+
+			// 	// for (const x of 'TLRB') {		// CorrectPos
+			// 	// 	const
+			// 	// 		isTB = 'TB'.includes(x),
+			// 	// 		isTL = 'TL'.includes(x),
+			// 	// 		pos = isTB ? 'top' : 'left',
+			// 	// 		siz = isTB ? 'height' : 'width'
+
+			// 	// 	for (const aO5 of pBase.bO5s[x]) { // именно в очередности удаления от края
+			// 	// 		const
+			// 	// 			xF = aO5.pFixs[x] || aO5.aFixs[x],
+			// 	// 			aC = aO5.posC
+			// 	// 		if (aO5.pFixs[x]) {
+			// 	// 			aC[pos] = xF.scops[x]
+			// 	// 			aO5.scops[x] = isTL ? aC[pos] : (aC[pos] + aC[siz])
+			// 	// 		}
+			// 	// 		else
+			// 	// 			if (aO5.aFixs[x]) {
+			// 	// 				aC[pos] = xF.scops[x]
+			// 	// 				aO5.scops[x] = isTL ? aC[pos] : (aC[pos] + aC[siz])
+			// 	// 			}
+			// 	// 			else
+			// 	// 				break
+			// 	// 	}
+			// 	// }
+			// 	// // aO5.CorrectPos(x, pos)}
+			// 	// // if (!aO5.CorrectPos(x))
+			// 	// // 	break
+			// }
+
+			// for (const pBase of pcO5.pBases) {

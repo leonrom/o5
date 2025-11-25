@@ -1,8 +1,8 @@
 "use strict";
 const
-    fmtOK = "background: aqua; color: black;",
-    fmtErr = "background: yellow; color: black;",
-    markout = '   all.js-> '
+    fmtOK = "background: darkseagreen; color: black;",
+    fmtErr = "background: greenyellow;; color: black;",
+    markout = '  пример  '
 let o5debug;
 class OO5 {
     #nbsp = '&nbsp;'
@@ -14,12 +14,6 @@ class OO5 {
     #wshp = null
     #C = null
     #pitches = { 'O': 'наезд', 'P': 'сталк', 'C': 'стиск', 'S': 'сдвиг' }
-    #Join = o => {
-        let s = ''
-        for (const nam in o)
-            if (o[nam]) s += nam
-        return s
-    }
     #BordNames = aO5 => {
         const ps = aO5.shp.getElementsByTagName('p'),
             cls = aO5.cls,
@@ -87,13 +81,14 @@ class OO5 {
 
         this.#wshp.DoInit.ReadAttrs(aO5)
 
-        for (const x of 'TLRB') {
-            const
-                p = aO5.pFixs[x],
-                name = p ? p.name.substring(1) : ''
-            if (name && !frames.find(frame => frame.nam === name && !frame.cut))
-                aO5.DoFix(x)
-        }
+        for (const x of 'TLRB')
+            if (aO5.fixs[x].isP) {
+                const
+                    p = aO5.fixs[x].xO5,
+                    name = p ? p.name.substring(1) : ''
+                if (name && !frames.find(frame => frame.nam === name && !frame.cut))
+                    aO5.DoFix(x)
+            }
 
         if (o5debug)
             console.log("%c%s", fmtOK, `${markout}изменено ${aO5.id} `, aO5.act.quals)
@@ -300,7 +295,7 @@ class OO5 {
                 */
                 const o = b5.val,
                     aO5 = b5.aO5
-                if (aO5.pFixs[o]) {
+                if (aO5.IsP(o, true)) {
                     aO5.DoFix(o)
 
                     if ('TB'.includes(o)) aO5.posC.top = aO5.posO.top
@@ -447,8 +442,8 @@ class OO5 {
         for (const xO5 of aAlls)
             if (xO5 !== aO5) {
                 const
-                    pF = xO5.pFixs,
-                    p2 = (pF.T || pF.L || pF.R || pF.B) ? xO5.posC : xO5.shp.getBoundingClientRect()
+                    pF = xO5.fixs,
+                    p2 = (pF.T.xO5 || pF.L.xO5 || pF.R.xO5 || pF.B.xO5) ? xO5.posC : xO5.shp.getBoundingClientRect()
                 if (
                     (
                         (p1.left <= p2.right && p1.right >= p2.left) ||
@@ -484,7 +479,9 @@ class OO5 {
             aO5 = shp.aO5shp,
             mpos = this.mpos
 
-        if (shp.classList.contains('o5_fixed'))
+        if (shp.classList.contains('o5_fixed') ||
+            !shp.classList.contains('is-moveable')
+        )
             return
 
         if (!mpos.div) {
@@ -627,8 +624,12 @@ class OO5 {
             const
                 shp = tag,
                 id = shp.id,
+                nst = window.getComputedStyle(shp),
                 divX = document.createElement('div'),
                 div = divE.parentNode.appendChild(divX)
+
+            // if (nst.position === "relative") 
+                tag.classList.add("is-moveable")
 
             div.classList.add('div-shp')
             div.innerHTML = divE.innerHTML

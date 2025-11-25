@@ -5,7 +5,7 @@
 
 (function () {              // ---------------------------------------------- o5shp/AO5shp ---
     "use strict"
-    let wshp = {}
+    let wshp = {}, ytop;
 
     const
         debugnames = ['moe4'],	//'shp1-2', 
@@ -18,7 +18,7 @@
         DblClick = e => {
             if (e.currentTarget !== e.target && e.target.ondblclick) {
                 if (o5debug > 0)
-                    console.log("%c%s", fmtErr, ` У тега ${C.MakeObjName(e.target)} уже есть свой dblclick-обработчик — пропускаем`)
+                    console.error("%c%s", fmtErr, ` У тега ${C.MakeObjName(e.target)} уже есть свой dblclick-обработчик — пропускаем`)
                 return
             }
 
@@ -40,22 +40,16 @@
         static nom = 0
 
         name = ''
-        pFixs = { T: null, L: null, R: null, B: null }  // зафиксированные на границе контейнера
-        aFixs = { T: null, L: null, R: null, B: null }  // на какаом этот зафиксорован (аналог pFixs)
-        attaches = { T: [], L: [], R: [], B: [] }       // список: которые зафиксированы на этом
+        attachss = { T: [], L: [], R: [], B: [] }       // список: которые зафиксированы на этом
 
         canFixs = { T: null, L: null, R: null, B: null }
         canCuts = { T: null, L: null, R: null, B: null }
         tagCuts = { T: null, L: null, R: null, B: null }
 
-        scops = {    //   копия из pO5 - координаты рабочей зоны контейнера
-            T: 0, L: 0, R: 0, B: 0
-        }
+        scops = { T: 0, L: 0, R: 0, B: 0 }  //   копия из pO5 - координаты рабочей зоны контейнера
 
         constructor(shp, quals) {
-            const
-                name = window.olga5.C.MakeObjName(shp)
-
+            const name = window.olga5.C.MakeObjName(shp)
             shp.aO5shp = this
 
             Object.assign(this, {
@@ -64,8 +58,10 @@
                 nom: AO5.nom++,
                 id: shp.id,
                 shp: shp,
-                cls: { level: 0, pitch: 0, nofx: 0, alive: 0, zIndex : shp.style.zIndex,
-                    puts: { T: false, L: false, R: false, B: false } }, // инициализация puts будет в ReadCls(this, ss) 
+                cls: {
+                    level: 0, pitch: 0, nofx: 0, alive: 0, zIndex: shp.style.zIndex,
+                    puts: { T: false, L: false, R: false, B: false }
+                }, // инициализация puts будет в ReadCls(this, ss) 
                 base: { bO5: null, pBase: null },  // будут присвоены в PBases в AddToBase(aO5)
                 act: {
                     shdw: shp,          // будет: или  shp или clon
@@ -74,7 +70,8 @@
                     quals: quals,
                     isfix: false,
                     ready: false,
-                    zIndex:NaN,
+                    zIndex: NaN,
+                    // cpitch: false,      //метка для текущего pitch
                     observer: null,
                 },
                 hidden: { T: 0, L: 0, R: 0, B: 0 },
@@ -92,24 +89,29 @@
             })
 
             this.name = name
-            this.aO5s = {}      // списки тех, кто может наткнуться НА этого aO5
+            this.aO5s = {}      // списки aO5 в порядке удалённости с соттв. стороны  (т.е. от 'TLRB')
+            this.fixs = {}      // состояние фиксированности по сторонам 'TLRB'
             for (const m of 'TLRB') {
                 this.aO5s[m] = new Set()
                 Object.freeze(this.aO5s[m])
+
+                this.fixs[m] = { xO5: null, isP: '' }
+                Object.seal(this.fixs[m])
             }
 
             for (const nam of [
                 'posC', 'posO', 'posS', 'orig',
                 'base', 'frms', 'margs', 'outln', 'cls', 'scops', 'hidden', // 'forced',
-                'pFixs', 'aFixs', 'attaches', 'canFixs', 'canCuts', 'tagCuts'
+                'attachss', 'canFixs', 'canCuts', 'tagCuts'
             ])
                 if (this[nam])
                     Object.seal(this[nam])
                 else
                     console.log("%c%s", fmtErr, `в aO5 отсутствует '${nam}'`)
 
-            Object.freeze(this.attaches)
+            Object.freeze(this.attachss)
             Object.freeze(this.aO5s)
+            Object.freeze(this.fixs)
             Object.freeze(this)
         }
         #SetMargOutls(style, margs, outln) {
@@ -118,50 +120,53 @@
                 { outlineWidth: outln.w, outlineStyle: outln.s, outlineColor: outln.c, outlineOffset: outln.o }
             )
         }
-        // CanFixsOn(pO5) {
-        //     for (const frame of this.frms.frames)
-        //         if (frame.pO5 === pO5)
-        //             return frame
-        // }
+        IsP(x, isP) {
+            const fix = this.fixs[x]
+            if (fix.xO5)
+                if (fix.isP === isP)
+                    return fix.xO5
+                else return false
+            else return null
+        }
         DoFix(x, xO5) {
-            const
-                pF = this.pFixs,
-                aF = this.aFixs
-
+            const fixs = this.fixs
+            let fold;
+if (!xO5 && this.name==='shp1'){
+console.log('0shp', this.shp.scrollTop, this.shp.scrollLeft); 
+console.log('clon', this.act.clon.scrollTop, this.act.clon.scrollLeft); 
+console.log('cart', this.act.cart.scrollTop, this.act.cart.scrollLeft); }
             if (x) {
-                if (xO5) {
-                    const isP = xO5.constructor.name === 'PO5'
-                    this[isP ? 'pFixs' : 'aFixs'][x] = xO5
-                }
-                else aF[x] = pF[x] = null
+                fold = fixs[x].xO5
+                if (xO5)
+                    Object.assign(fixs[x], { xO5: xO5, isP: xO5.constructor.name === 'PO5' })
+                else
+                    fixs[x].xO5 = null
+
+                if (fold === xO5)
+                    console.log("%c%s", fmtErr,
+                        `DoFix ${this.name}: повтор 'fix' для  ${xO5 ? xO5.name : 'null'}[${x}]`)
             }
             else
-                pF.T = pF.L = pF.R = pF.B = aF.T = aF.L = aF.R = aF.B = null
+                fixs.T.xO5 = fixs.L.xO5 = fixs.R.xO5 = fixs.B.xO5 = null
 
             const
                 act = this.act,
                 shp = this.shp,
-                fix = pF.T || pF.L || pF.R || pF.B || aF.T || aF.L || aF.R || aF.B
+                fix = fixs.T.xO5 || fixs.L.xO5 || fixs.R.xO5 || fixs.B.xO5,
+                scroll = {scrollTop:shp.scrollTop, scrollLeft:shp.scrollLeft}
 
-            //  let s;
+                // scroll = Object.assign({}, {scrollTop:shp.scrollTop, scrollLeft:shp.scrollLeft})
+
             if (o5debug) {
-                const op = xO5 ? `фиксация на ${xO5.name}` : `расфиксация`
+                const op = xO5 ? ((fold ? `пере` : '    ') + `фиксация на ${xO5.name}`) : `расфиксация`
                 console.log(`DoFix ${this.name}: по [${x}] ` +
                     (x ? `${op} от ${act.isfix ? act.isfix.name : 'старт'}` : `полная расфиксация`))
-
-                if (x && aF[x] && pF[x])
-                    console.log("%c%s", fmtErr,
-                        `DoFix ${this.name}: повтор aF/pF для  ${xO5 ? xO5.name : 'null'}[${x}]`)
             }
-
-            // if (this.id ==='shp1')            
-            //     console.log(`==='shp1' `+aF.T)
 
             if (act.isfix !== fix) {
                 const
                     clon = act.clon || this.#Clone(),
                     cart = act.cart
-
                 act.isfix = fix
                 act.shdw = fix ? clon : shp
                 cart.style.display = fix ? '' : 'none'
@@ -176,13 +181,21 @@
                     Object.assign(shp.style, { position: 'absolute', top: 0, left: 0 })
                 }
                 else {
+
+                    // if (this.id ==='shp1')
+                    //     console.log()
+
                     Object.assign(shp.style, this.orig)
                     this.#SetMargOutls(shp.style, this.margs, this.outln)
                     this.parent.insertBefore(shp, cart)
 
-				    this.shp.style.zIndex = this.cls.zIndex	// исправить у тех, кто сдигал
+                    shp.style.zIndex = this.cls.zIndex	// исправить у тех, кто сдвигал
                 }
 
+                Object.assign(shp,  scroll)
+// if (this.name==='shp1'){                
+// console.log(' shp', shp.scrollTop, shp.scrollLeft); 
+// }
                 Object.assign(this.hidden, { T: 0, L: 0, R: 0, B: 0 })
                 // Object.assign(this.forced, { T: 0, L: 0, R: 0, B: 0 })
 
@@ -210,6 +223,13 @@
                 top: posS.top + 'px',
                 left: posS.left + 'px',
             })
+
+            // if (this.name==='shp0' || this.name==='shp-demo'){
+            // console.log('ShowFix(): '
+            //      + ('' + posC.top).padStart(4)
+            //      + (ytop > posC.top ? (' -' + (ytop - posC.top)) : '')
+            // )
+            // ytop = posC.top}
         }
         #Clone() {
             if (o5debug)
@@ -234,7 +254,7 @@
             clon.aO5shp = this
             Object.assign(clon.style, {
                 display: 'none',
-                opacity: 0,
+                opacity: o5debug ? 0.22 : 0,
             })
             shp.parentNode.insertBefore(clon, shp)
 
@@ -242,7 +262,6 @@
             if (id) cart.id = id + '_cart'
             cart.aO5shp = this
 
-            const nst = window.getComputedStyle(shp)
             Object.assign(cart.style, {
                 display: 'none',
                 cursor: 'pointer',
@@ -252,6 +271,7 @@
             })
             shp.parentNode.insertBefore(cart, shp)
 
+            const nst = window.getComputedStyle(shp)
             Object.assign(this.margs, {
                 t: nst.getPropertyValue('margin-top'),
                 l: nst.getPropertyValue('margin-left'),

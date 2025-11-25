@@ -17,6 +17,19 @@
 			'S': "background: blue;   color: white;border: solid 1px bisque;",
 			'I': "background: beige;  color: black;border: solid 1px bisque;",
 		},
+		TableNoIndex = data => {
+			if (!Array.isArray(data)) {
+				console.table(data);
+				return;
+			}
+
+			  const keys = Object.keys(data[0] || {});
+  const header = keys.join('\t');
+  console.log(header);
+  for (const row of data) {
+    console.log(keys.map(k => row[k]).join('\t'));
+  }
+		},
 		ConsoleMsg = (styp, txts, add, tab) => {
 			const txt = (txts && txts[txts.length - 1] != '') ? txts + ' ' : txts,
 				type = styp.substr(0, 1).toUpperCase(),
@@ -26,8 +39,8 @@
 
 			if (add === null || typeof add === 'undefined' || add === '') console.groupCollapsed('%c%s', (padd + clr1), txt)
 			else
-				if (Number.isInteger(add)) console.groupCollapsed('%c%s%c%s', (padd + clr1), txt, (padd), add + ' ')
-				else console.groupCollapsed('%c%s%c%s', (padd + clr1), txt, (padd + clr2), add + ' ')
+				if (Number.isInteger(add)) console.groupCollapsed('%c%s%c%s', (padd + clr1), txt, (padd), '', add + ' ')
+				else console.groupCollapsed('%c%s%c%s', (padd + clr1), txt, (padd + clr2), '', add + ' ')
 
 			const tt = []
 			if (tab) {
@@ -94,8 +107,8 @@
 						}
 				}
 				if (tt.length > 0) {
-					// tt.push({})    // иначе Chromium проглатывает последний элемент массива
 					console.table(tt)
+			// TableNoIndex(tt)
 				}
 			}
 			console.table()

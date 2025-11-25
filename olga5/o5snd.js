@@ -71,15 +71,18 @@
 			75% {transform: rotateZ(-33deg);}
 		}
 	`,
+		wshp = C.ModulAdd(W)
+
 	// eslint-disable-next-line no-mixed-spaces-and-tabs
-	 SndInit=() =>{
+
+	function SndInit() {
 
 		wshp.css = css
 
 		C.ParamsFill(W, o5css)
 
 
-		const excls = document.getElementsByClassName('olga5_sndNone') 
+		const excls = document.getElementsByClassName('olga5_sndNone')
 		for (const excl of excls) {
 			const exs = excl.querySelectorAll('[class *=olga5_snd]')
 			for (const ex of exs)
@@ -90,7 +93,6 @@
 		wshp.Prep(mtags)
 
 		C.E.DispatchEvent('o5_scriptDone', W.modul)
-	},
-	wshp = C.ModulAdd(W)
+	}
 
 })();

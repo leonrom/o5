@@ -3,7 +3,7 @@
 
 <head>
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
-	<title>2shp</title>
+	<title>3shp</title>
 	<link rel="shortcut icon" href="../add/favicon.svg" type="image/x-icon">
 
 	<link href='./add/all.css' media='screen' rel='stylesheet' />
@@ -41,7 +41,7 @@
 	</pre>
 		<div class="thetext" style="height: 227px;">
 			<p>
-				Демонстрация вариантов взаимодействия объектов <b>shp1</b>, <b>shp2</b> и <b>shp3</b>, 
+				Демонстрация вариантов взаимодействия объектов <b>shp1</b>, <b>shp2</b> и <b>shp3</b>,
 				где исходный приоритет (по умолчанию) равен номеру объекта.
 				<br>
 				При этом изменять:
@@ -53,21 +53,19 @@
 				<li>автовозврат после сдвига</li>
 				<li>положение объектов в кадре</li>
 			</ul>
+			<p>
+				Сравнить поведение <b>shp1</b> при скроллинге <b>div2</b> влево
+				в зависимости от включенности опции <i>Alive</i> для <b>shp2</b>
+			</p>
+			<p>
+				Сравнить поведение <b>shp2</b> при скроллинге <b>div3</b> вправо
+				в зависимости от опций зависания (<b>T</b>, <b>L</b>, <b>R</b>, <b>B</b>)
+			</p>
 			<div>
 				<div o5include='тесты + /shp/add/all.html?.descript'></div>
 			</div>
-			<!-- <p>
-				Задайте несколько фреймов <i>подвисания</i> (или <i>обрезания</i>) и посмотрите изменение
-				значений <b>t</b> и <b>b</b>
-				при изменении взаимного положения контейнеров <b>div1</b>, <b>div2</b> и <b>div3</b>.
-				Оцените зависание <b>shp1</b> на <b>div1</b> при задании <b>Где</b>=<i>внизу</i>
-				в зависимости от наличия горизонтальной полосы скроллинга.
-			</p> -->
 		</div>
 
-		<span style="font-size: 12px;background: lightcyan; color:black;">читать пояснение </span>
-		<span id="ref1"
-			style="font-size: 16px; background: yellow; font-weight: bold; border: 1px blue solid; border-radius: 5px;"><b>&uarr;</b></span>
 		<div id="div1" class="div" style="top:11px;left: 22px;">
 			<span>div1</span>
 			<div id="cbo1" class="cbo" style="background-size: 25px 25px; width: 3300px; height: 2200px;">
@@ -87,16 +85,29 @@
 								</div>
 
 								<div id="div4" class="div for3">
+                                    <span>div4</span>
 									<div id="shp1" class="moved olga5_shp:TrLb-1A:i=div3/fc"
-										style="left:260px; top:120px; height: 100px; width: 160px;">
+										style="
+										margin-left: 22px;left:9px; top:7px; 
+										height: 100px; width: 110px;
+										    background-color: burlywood;
+										overflow: scroll;
+									">
 										<p>название объекта</p>
+<div style="
+height:120px; width:170px; background-color:azure; border:1px solid blueviolet; 
+border-radius:50%; margin-top:15%; margin-left:25%; 
+display:flex; justify-content:center; align-items:center; 
+">
+    RL
+</div>
 									</div>
 									<div id="shp2" class="moved olga5_shp:TL:i=div4/c,div3,div2/f"
-										style="left:120px; top:30px;">
+										style="left:180px; top:80px;">
 										<p>название объекта</p>
 									</div>
 									<div id="shp3" class="moved olga5_shp:TrLb1A:i=div3/fc"
-										style="left:20px; top:140px; height: 60px; width: 180px;">
+										style="left:150px; top:0px; height: 60px; width: 180px;">
 										<p>название объекта</p>
 									</div>
 								</div>

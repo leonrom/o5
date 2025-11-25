@@ -21,16 +21,13 @@
                 pBase = aO5.base.pBase,
                 tagBase = pBase.pO5.tag,
                 TagCheck = (t, typ, cod) => {
-                    const
-                        IsInClass = (cs, cod) => {
-                            for (const c of cs)
-                                if (c.toUpperCase == cod)
-                                    return true
-                        }
                     switch (typ) {
                         case 'n': return t.nodeName === cod
                         case 'i': return t.id.toUpperCase() === cod
-                        case 'c': return IsInClass(t.classList, cod)
+                        case 'c':
+                            for (const c of t.classList)
+                                if (c.toUpperCase == cod)
+                                    return true
                     }
                 }
 
@@ -54,19 +51,20 @@
                 const
                     cc = s.includes('=') ? s.split('=') : ['i', s],  // считаем, что это значение для id                
                     uu = (cc[1] || '').split('/'),
-                    cod = (uu[0] || '').trim().toUpperCase(),
                     par = (uu[1] || '').trim(),
+                    nam = (uu[0] || '').trim(),
+                    cod = nam.toUpperCase(),
                     iscut = par.match(/c/i),
                     isfix = !iscut || par.match(/f/i)
 
                 let
-                    typ = cc[0].trim().toLowerCase(),
+                    typ = cc[0].trim().toLowerCase()[0],
                     num = par.replace(/[fc]/gi, '') || 0 // 'f' уже не используется и игнорируется                    
 
                 if (!typs.includes(typ)) {
                     errs.push(`тип ссылки '${typ}' не начинается одним из '${typs}' заменен на 'i'`)
                     typ = 'i'
-                } 
+                }
                 if (!Number.isInteger(num) || isNaN(num)) {
                     errs.push(`непонятное значение для num='${uu[1]}' (после символа '/'). Взято 0`)
                     nim = 0
@@ -87,7 +85,20 @@
                         while (own !== tagBase)
 
                         if (!tag) {
-                            errs.push(`${aO5.name}: не найден 'внутренний' контейнер для "${s}" . Взял '${tagBase.pO5.name}'`)
+                            own = pBase.pO5.tag, n = num
+                            do {
+                                if (TagCheck(own, typ, cod)) {
+                                    tag = own
+                                    if (--n <= 0)
+                                        break
+                                }
+                                own = own.parentNode
+                            }
+                            while (own.nodeName !== 'HTML')
+                        }
+
+                        if (!tag) {
+                            errs.push(`${aO5.name}: не найден контейнер 'владелец' для "${s}" . Взял '${tagBase.pO5.name}'`)
                             tag = tagBase
                         }
                         else if (n > 0)
@@ -103,7 +114,7 @@
 
                 if (isfix) {
                     const key = pBase.idn + ':' + typ + ',' + cod + ',' + num
-                    let frame = Frame.frames.get(key)                    
+                    let frame = Frame.frames.get(key)
                     if (!frame) {
                         let own = pBase.pO5.tag, n = num, tag;
                         do {
@@ -117,11 +128,19 @@
                         while (own.nodeName !== 'HTML')
 
                         if (!tag) {
-                            errs.push(`${aO5.name}: не найден 'внешний' контейнер для typ=${typ} и cod=${cod}. Взял base='${pO5.name}'`)
-                            tag = pO5.tag
+                            let found;
+                            switch (typ) {
+                                case 'n': found = !!document.getElementsByTagName(nam); break
+                                case 'i': found = !!document.getElementById(nam); break
+                                case 'c': found = !!document.getElementsByClassName(nam)
+                            }
+                            const txt = found ? `найден НЕ скроллируемый` : `не найден скроллируемый`
+                            errs.push(`${aO5.name}: ${txt}` + //  (или хотя  бы overflow: auto; / scroll;)    
+                                ` контейнер 'оператор' для typ=${typ} и cod='${nam}'. Взял '${pBase.pO5.name}'`)
+                            tag = pBase.pO5.tag
                         }
                         else if (n > 0)
-                            errs.push(`взял ${n}-й тег (вместо ${n0} для typ=${typ} и cod=${cod}) `)
+                            errs.push(`взял ${n}-й тег (вместо ${n0} для typ=${typ} и cod=${nam}) `)
 
                         frame = new Frame(key, typ, cod, num, tag.pO5)
 

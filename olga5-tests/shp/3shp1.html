@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>3shp1</title>
+    <link rel="shortcut icon" href="../add/favicon.svg" type="image/x-icon">
+
+    <link href='./add/all.css' media='screen' rel='stylesheet' />
+    <script src='./add/all.js'></script>
+
+    <script src='../../olga5/o5com.js' o5debug=0 data-o5urlrfs="
+      тесты='+ ../olga5-tests';
+    "></script>
+
+    <script data-src='+o5dbg.js' o5load="up"></script>></script>
+
+    <script data-src='+o5shp.js'></script>
+    <script data-src='+o5inc.js'></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            window.scrollTo(0, 260)
+            let div;
+            for (const m of ['', 'a']) {
+                div = document.getElementById('div3' + m); if (div) div.scrollTo(550, 450)
+                div = document.getElementById('div2' + m); if (div) div.scrollTo(750, 650)
+                div = document.getElementById('div1' + m); if (div) div.scrollTo(950, 750)
+            }
+        })
+    </script>
+</head>
+
+<body id="body" style="height: 1500px;">
+    <div class='example olga5_Start'>
+        <div class='cboxed'>
+            <div o5include='тесты + /shp/add/0shp.html?.cboxedinc'></div>
+        </div>
+
+        <pre id="ref0" class="pre-head"><b>Варианты подвисания <i>olga5_shp</i></b>
+	</pre>
+        <div class="thetext" style="height: 227px;">
+            <p>
+                Демонстрация вариантов взаимодействия объектов <b>shp1</b>, <b>shp2</b> и <b>shp3</b>,
+                где исходный приоритет (по умолчанию) равен номеру объекта.
+                <br>
+                Пример аналогичен <b>3shp.html</b>
+            </p>
+            <p>
+                Здесь <b>shp2</b> и <b>shp3</b> оба находятся "внутри" <b>out1</b>,
+                но у <b>shp2</b> задано <i>position: relative;</i>, а у <b>shp3</b> - <i>position: absolute;;</i>
+            </p>
+            <p>
+                Соответственно у них различные базовые контейнеры
+            </p>
+            <div>
+                <div o5include='тесты + /shp/add/all.html?.descript'></div>
+            </div>
+        </div>
+
+        <div id="div1" class="div" style="top:11px;left: 22px;">
+            <span>div1</span>
+            <div id="cbo1" class="cbo" style="background-size: 25px 25px; width: 3300px; height: 2200px;">
+
+                <div id="div2" class="div" style="left:1000px; top:800px;">
+                    <span>div2</span>
+                    <div id="cbo2" class="cbo">
+
+                        <div id="div3" class="div" style="left:800px; top:700px;">
+                            <span>div3</span>
+                            <div id="cbo3" class="cbo"
+                                style="background-size: 15px 15px; width: 1900px; height: 1300px; ">
+
+                                <div id="shpX" class="moved olga5_shp:n o5shp_none"
+                                    style="left:550px; top:520px; height: 50px; width: 55px;">
+                                    <p><br>контроль</p>
+                                </div>
+
+                                <div id="div4" class="div for3">
+                                    <span>div4</span>
+                                    <div id="out1" style="
+										left:290px; top:70px; height: 130px; width: calc(99% - 23px);
+										background-color: aqua;overflow: scroll; margin-top: 25px; margin-left: 5px;
+									">
+                                        <span>out1</span>
+                                        <!-- <div id="shp1" class="moved olga5_shp:TrLb-1A:i=div3/fc" style="
+margin-left: 22px; height: 100px; left:9px; top:7px; width: calc(99% - 63px); background-color: burlywood; overflow: scroll;
+">
+                                            <p>название объекта</p>
+                                            <div style="
+height:120px; width:170px; background-color:azure; border:1px solid blueviolet; 
+border-radius:50%; margin-top:15%; margin-left:25%; 
+display:flex; justify-content:center; align-items:center; 
+">
+                                                RL
+                                            </div>
+                                        </div> -->
+                                        <div id="shp2" class="moved olga5_shp:TL:i=div4/c,div3,div2/f"
+                                            style="left:180px; top:80px; position: relative;">
+                                            <p>название объекта</p>
+                                        </div>
+                                        <div id="shp3" class="moved olga5_shp:TrLb1A:i=div3/fc"
+                                            style="left:20px; top:180px; position: absolute;;">
+                                            <p>название объекта</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="div2a" class="div" style="left:1030px; top:1460px;">
+                <span>div2a</span>
+                <div id="cbo2a" class="cbo">
+                    <div id="div3a" class="div" style="left:800px; top:700px;">
+                        <span>div3a</span>
+                        <div id="cbo3a" class="cbo" style="background-size: 15px 15px; width: 1900px; height: 1300px; ">
+
+                            <div id="shp9" class="moved olga5_shp:TrLb:i=div3a/fc,div2a/f"
+                                style="left:750px; top:500px;">
+                                <p>название объекта</p>
+                            </div>
+
+                            <!-- <div id="shp2" class="moved olga5_shp:TrLb:1:i=div3/fc" style="left:900px; top:660px;">
+								<p>название объекта</p>
+							</div>
+							<div id="shp3" class="moved olga5_shp:TrLb2A:i=div3/fc" style="left:700px; top:700px; height: 60px;">
+								<p>название объекта</p>
+							</div>
+							<div id="shp4" class="moved olga5_shp:TrLb:3:i=div3/fc" style="left:950px; top:860px;">
+								<p>название объекта</p>
+							</div> -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -164,7 +164,7 @@
 					for (const nam in nams)
 						if (!nams[nam]) lefts.push(nam)
 
-					if (C.consts.o5debug > 0)
+					if (C.consts.o5debug > 1)
 						console.log(`загружено включение '${name}' осталось [${lefts.join(', ')}]`)
 					if (lefts.length == 0) {
 						if (load.timeout > 0) {
@@ -208,9 +208,10 @@
 					script.dataset.o5add = modul
 					script.setAttribute('async', '')
 
-					if (C.consts.o5debug > 0) {
+					if (C.consts.o5debug > 1) {
 						const MakeObjName = obj => obj ? (
-							(obj.id && obj.id.length > 0) ? ('#' + obj.id) : (
+							// (obj.id && obj.id.length > 0) ? ('#' + obj.id) : (
+							(obj.id && obj.id.length > 0) ? obj.id : (
 								('[' + obj.tagName ? obj.tagName : (obj.nodeName ? obj.nodeName : '?') + ']') +
 								'.' + (obj.className ? obj.className : '?'))) : 'НЕОПР.'
 						console.log(`вставка ${(name + '.js').padEnd(15)}  перед  ${modul + '.js'} (в parentNode=${MakeObjName(actscript.parentNode)})`)

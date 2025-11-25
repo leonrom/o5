@@ -38,19 +38,29 @@
                     base: aO5.base.pBase.pO5.name,
                     frms: Array.from(aO5.frms.frames).map(f => f.pO5.id).join(', ')
                 })
-
             C.ConsoleInfo(`Обработка ${head}`, rez.length, rez)
 
             rez.length = 0
-            for (const { bO5, pBase } of wshp.PBases.PBase) {
+            for (const { bO5, pBase } of wshp.PBases.PBase)
                 rez.push({
                     base: pBase.pO5.name,
-                    pOuts: ' ' + (Array.from(pBase.pO5.pOuts)).map(pO5 => pO5.name).join(', '),
-                    pIncs: ' ' + (Array.from(pBase.pO5.pIncs)).map(pO5 => pO5.name).join(', '),
+                    pOuts: ' ' + (Array.from(pBase.pO5.pOuts)).map(p => p.name).join(', '),
+                    pIncs: ' ' + (Array.from(pBase.pO5.pIncs)).map(p => p.name).join(', '),
                     aAll: ' ' + pBase.aAll.map(tag => tag.id).join(', ')
                 })
-            }
             C.ConsoleInfo(`Базы ${head}`, rez.length, rez)
+
+            rez.length = 0
+            for (const { bO5, pBase } of wshp.PBases.PBase)
+                for (const pOut of pBase.pO5.pOuts)
+                    rez.push({
+                        base: pBase.pO5.name,
+                        pOut: pOut.name,
+                        pOuts: ' ' + (Array.from(pOut.pOuts)).map(p => p.name).join(', '),
+                        pIncs: ' ' + (Array.from(pOut.pIncs)).map(p => p.name).join(', ')
+                    })
+            C.ConsoleInfo(`pOuts/pIncs ${head}`, rez.length, rez)
+
 
             rez.length = 0
             for (const { key, frame } of wshp.Frames.Frame) {
@@ -86,7 +96,8 @@
             }
 
             if (!found)
-                console.log("%c%s", fmtErr, `В тегах с классом 'olga5_Start' нет объектов '${wshp.W.class}' без class='o5shp_none' и квалификатора ':N'`)
+                console.log("%c%s", fmtErr, `Контейнера с классом 'olga5_Start' не содержат '${wshp.W.class}'`,
+                    `(либо вообще, либо без 'o5shp_none' и ':N')`)
         },
 
         ReadCls = (aO5, ss) => {
@@ -126,9 +137,9 @@
                             errs.push(`c='${c}' в "${ss}"`)
                 }
             if (!puts.T && !puts.L && !puts.R && !puts.B) puts.T = true
-            
+
             if (errs.length)
-                console.log("%c%s", fmtErr, `Для ${aO5.name} не опр. квалиф.: ` + errs.join(', '))
+                console.error("%c%s", fmtErr, `Для ${aO5.name} не опр. квалиф.: ` + errs.join(', '))
         },
 
         ReadAttrs = aO5 => {

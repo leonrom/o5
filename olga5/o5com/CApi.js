@@ -21,14 +21,14 @@
 					if (Fun)
 						for (const nam of nams) {
 							const matches = Fun.call(owner.start, nam)
-							let tags = []								
-								
+							let tags = []
+
 							// проверяю сам тег 'olga5_start'
-							if (nam && owner.start.matches(nam)) 
+							if (nam && owner.start.matches(nam))
 								tags.push(owner.start)
-								
+
 							if (matches) {
-								const amatches =Array.from(matches)
+								const amatches = Array.from(matches)
 								tags = tags.concat(amatches)
 							}
 
@@ -48,13 +48,14 @@
 		Object.assign(C, {
 			owners: [],
 			scrpts: [],
-			Match: Match,			
+			Match: Match,
 			// MyRound: s => { return Math.round(parseFloat(s)) },
 			MakeObjName: function (obj, len) { // моё формирование имени объекта
 				if (obj) {
 					const nam = Object.is(obj, window) ? '#window' : (
 						Object.is(obj, document) ? '#document' : (
-							(obj.id && obj.id.length > 0) ? ('#' + obj.id) : (
+							// (obj.id && obj.id.length > 0) ? ('#' + obj.id) : (
+							(obj.id && obj.id.length > 0) ? obj.id : (
 								('[' + obj.tagName ? obj.tagName : (obj.nodeName ? obj.nodeName : '?') + ']') +
 								'.' + (obj.className ? obj.className : '?')
 							)
@@ -77,7 +78,7 @@
 					rez = []
 				for (const tag of tags)
 					// if (!tag.classList.contains(C.olga5ignore))
-						rez.push(tag)
+					rez.push(tag)
 				return rez
 			},
 			GetTagsByTagNames: (tagnams, modul) => {
@@ -87,22 +88,22 @@
 				const tags = GetTagsBy(modul, 'querySelectorAll', '[class *=' + classnam + ']'),
 					match = Match(classnam),
 					rez = []
-				for (const tag of tags){
+				for (const tag of tags) {
 					// if (!tag.classList.contains(C.olga5ignore)) {
-						const ms = tag.className.match(match)
-						if (ms) {
-							const quals = [],
-								m = ms[0].trim(),
-								ss = m.split(mquals)
+					const ms = tag.className.match(match)
+					if (ms) {
+						const quals = [],
+							m = ms[0].trim(),
+							ss = m.split(mquals)
 
-							if (!do_not_replace_class)  // кромк IniScript-теста ВСЕГДА убираю квалификаторы
-								tag.className = tag.className.replace(m, classnam + ' ')
+						if (!do_not_replace_class)  // кромк IniScript-теста ВСЕГДА убираю квалификаторы
+							tag.className = tag.className.replace(m, classnam + ' ')
 
-							for (let j = 1; j < ss.length; j++)
-								quals.push(ss[j].trim())
-							rez.push({ tag: tag, quals: quals, origcls: ms.input })
-						}
+						for (let j = 1; j < ss.length; j++)
+							quals.push(ss[j].trim())
+						rez.push({ tag: tag, quals: quals, origcls: ms.input })
 					}
+				}
 				return rez
 			},
 			QuerySelectorInit: (starts, scls) => {
@@ -123,11 +124,18 @@
 
 							tag.className = tag.className.replace(m, scls)// ВСЕГДА убираю квалификаторы (остальные в ms - не трогать!)
 
-							for (let j = 1; j < ss.length; j++) {
-								const modul = ss[j]
+							// for (let j = 1; j < ss.length; j++) {
+							// 	const modul = ss[j]
 
-								if (C.scrpts.find(scrpt => scrpt.modul == modul)) quals.push(modul)
-								else errs.push(modul)
+							// 	if (C.scrpts.find(scrpt => scrpt.modul == modul)) quals.push(modul)
+							// 	else errs.push(modul)
+							// }
+
+							if (ss[1]) {
+								const us = ss[1].split(/\s*[,]\s*/)
+								for (const modul of us)
+									if (C.scrpts.find(scrpt => scrpt.modul == modul)) quals.push(modul)
+									else errs.push(modul)
 							}
 							C.owners.push({ start: tag, modules: quals, origcls: m }) // специально чуть по-иному
 							if (C.consts.o5debug > 1)

@@ -122,7 +122,7 @@
 
 			if (err) C.ConsoleError('>>  создание CSS  ' + err, 'InitCSS')
 			else {
-				if (C.consts.o5debug > 0)
+				if (C.consts.o5debug > 1)
 					console.log(`>>  СОЗДАНИЕ CSS   ${W.class} (для модуля ${W.modul}) с id='${id}'`)
 				csslist[W.class] = W.modul
 
