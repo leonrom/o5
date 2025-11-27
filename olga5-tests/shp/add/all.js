@@ -399,8 +399,7 @@ class OO5 {
             mpos = this.mpos,
             aO5 = mpos.divStrt ? mpos.divStrt.aO5 : null
 
-        if (!aO5)
-            return
+        if (!aO5) return
         if (o5debug)
             console.log("%c%s", fmtOK, `${markout}новое позиционирование ${aO5.id} `)
 
@@ -415,16 +414,30 @@ class OO5 {
         mpos.divStrt.aO5 = null
         shp.classList.remove('o5_moved')
         if (!e.o5ignore) { // новое позиционирование
-            const
-                y = mpos.divStrt.oy + mpos.divStrt.y + mpos.mousDiff.dy - mpos.margs.marginTop,
-                x = mpos.divStrt.ox + mpos.divStrt.x + mpos.mousDiff.dx - mpos.margs.marginLeft
+            // const
+            //     y = mpos.divStrt.oy + mpos.divStrt.y + mpos.mousDiff.dy - mpos.margs.marginTop,
+            //     x = mpos.divStrt.ox + mpos.divStrt.x + mpos.mousDiff.dx - mpos.margs.marginLeft
 
-            shp.style.setProperty('top', y + 'px')
-            shp.style.setProperty('left', x + 'px',)
-            Object.assign(shp.style, {
-                top: y + 'px',
-                left: x + 'px'
-            })
+            // // shp.style.setProperty('top', y + 'px')
+            // // shp.style.setProperty('left', x + 'px',)
+            // Object.assign(shp.style, {                top: y + 'px',                left: x + 'px'            })
+
+            const
+                t = aO5.transform,
+                add = t.add,
+                tac = t.tac
+
+if (shp.classList.contains('rs-moveable')) {
+            add.x += mpos.mousDiff.dx
+            add.y += mpos.mousDiff.dy
+                tac.x = t.x + add.x
+                tac.y = t.y + add.y
+                shp.style.transform = `translate(${tac.x}px, ${tac.y}px)`
+}
+            // console.log(`add=[${add.x.toFixed(1).padStart(5)}, ${('' + add.x.toFixed(1)).padStart(5)}], ` +
+            //     `mouseDiff=[${('' + mouseDiff.dx.toFixed(1)).padStart(5)}, ${('' + mouseDiff.dx.toFixed(1)).padStart(5)}]`
+            // )
+
             if (act.clon) {
                 act.clon.parentNode.removeChild(act.clon);
                 // delete act.clon; 
@@ -480,7 +493,7 @@ class OO5 {
             mpos = this.mpos
 
         if (shp.classList.contains('o5_fixed') ||
-            !shp.classList.contains('is-moveable')
+            !shp.classList.contains('rs-moveable')
         )
             return
 
@@ -488,8 +501,8 @@ class OO5 {
             Object.assign(mpos, {
                 div: shp.cloneNode(false),
                 divStrt: { y: 0, x: 0, aO5: null, oy: 0, ox: 0 },
-                mousStrt: { y: 0, x: 0, },
                 mousDiff: { dy: 0, dx: 0, },
+                mousStrt: { y: 0, x: 0, },
                 margs: { y: 0, x: 0, },
             })
             Object.freeze(mpos)
@@ -624,12 +637,13 @@ class OO5 {
             const
                 shp = tag,
                 id = shp.id,
+                // aO5 = shp.aO5shp,
                 nst = window.getComputedStyle(shp),
                 divX = document.createElement('div'),
                 div = divE.parentNode.appendChild(divX)
 
-            // if (nst.position === "relative") 
-                tag.classList.add("is-moveable")
+            if (nst.position === 'relative' || nst.position === 'static')
+                tag.classList.add('rs-moveable')
 
             div.classList.add('div-shp')
             div.innerHTML = divE.innerHTML
@@ -642,9 +656,8 @@ class OO5 {
 
             this.dshps.add({ shp, div })
 
-            const aO5 = shp.aO5shp
-            if (aO5)
-                this.Activate({ detail: { div, aO5 } })
+            // if (aO5)
+            //     this.Activate({ detail: { div, aO5 } })
         }
 
         if (o5debug)
